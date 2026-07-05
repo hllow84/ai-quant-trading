@@ -1,0 +1,13 @@
+# Factor registry: name → source, endpoint, type_hint
+# type_hint drives preprocess.py classification (continuous_stationary |
+# continuous_nonstationary | signed | skewed_lognormal)
+
+coinbase_premium_gap:
+  source: ccxt
+  endpoint: ohlcv_spread
+  venues: [coinbase, binance]
+  type_hint: signed
+  asset: BTC/USDT
+  timeframe: "1h"
+  direction: both
+  note: "Spread between Coinbase and Binance BTC price. US spot demand proxy."

@@ -1,0 +1,26 @@
+costs:
+  default_fee_bps: 7        # taker fee ~3.5 bps per leg
+  maker_fee_bps: 2
+  default_slippage_bps: 5
+
+venues:
+  reference: binance
+  execution: TBD            # open decision — constrained by regulatory considerations
+
+date_range:
+  start: "2020-01-01"
+  end: "2025-12-31"
+
+walkforward:
+  train_months: 6
+  test_months: 3
+  step_months: 3            # non-overlapping test windows
+  embargo_bars: 48          # 2 days on 1h bars — sized to longest feature lookback
+
+timeframes:
+  default: "1h"
+
+thresholds:
+  keep_sharpe: 1.0
+  keep_positive_folds_pct: 60
+  overfit_is_oos_degradation: 0.40
