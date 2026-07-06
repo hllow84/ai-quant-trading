@@ -60,6 +60,7 @@ class FactorReportData:
     point_in_time_clean:     bool = True
     bars_per_year:           int  = 8_760
     n_configs:               int  = 1
+    regime_analysis_text:    str  = ""
 
 
 # ── Verdict logic ─────────────────────────────────────────────────────────────
@@ -373,6 +374,16 @@ def _build_markdown(data: FactorReportData, artifacts_dir: Path) -> str:
         f"![Per-fold Sharpe]({dir_name}/walkforward_folds.png)",
         "",
     ]
+
+    if data.regime_analysis_text:
+        lines += [
+            "## Regime Analysis — The Real Test",
+            "",
+            "```",
+            data.regime_analysis_text,
+            "```",
+            "",
+        ]
 
     if opt_block:
         lines.append(opt_block)

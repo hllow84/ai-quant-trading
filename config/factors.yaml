@@ -87,3 +87,39 @@ perpetual_funding_rate:
   optimize:
     z_entry: [1.5, 2.0, 2.5]
     window: [72, 168, 336]
+
+funding_rate_regime_cond:
+  alpha_story: |
+    Same base mechanism as perpetual_funding_rate: extreme perpetual funding
+    spikes signal overcrowded positions that mean-revert as carry costs force
+    de-levering. Hypothesis extension: the edge is conditional on a high realized-
+    volatility regime. When volatility is elevated — realized vol in the top 50%
+    of its rolling 336-bar history — crowded longs face larger mark-to-market
+    losses and are forced to de-lever faster. The reversion is stronger and faster.
+    In low-volatility regimes the carry cost is tolerable relative to the trend;
+    longs are not forced out; the mean-reversion signal dissolves.
+    Observable regime trigger: rolling 336-bar realized volatility of BTC/USDT
+    1-hour returns, ranked against its own 336-bar rolling percentile history.
+    Gate opens when that rank >= 0.50 (current vol above the median of recent history).
+    All regime inputs are past-only and lagged >=1 bar. No calendar date or fold
+    index is used anywhere in the regime construction.
+    The real test: if the regime gate correlates strongly with which calendar
+    periods fall inside the walk-forward folds, it is a calendar proxy, not a
+    genuine conditional strategy, and must be killed regardless of Sharpe.
+  source: ccxt_funding
+  symbol: BTC/USDT:USDT
+  venue: binance
+  asset: BTC/USDT
+  timeframe: "1h"
+  direction: both
+  point_in_time_clean: true
+  signal_model: regime_conditional
+  signal_params:
+    z_entry: 1.5
+    z_exit: 0.5
+    window: 336
+    rv_window: 336
+    rv_quantile: 0.5
+  optimize:
+    z_entry: [1.5, 2.0, 2.5]
+    window: [72, 168, 336]

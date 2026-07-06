@@ -179,8 +179,13 @@ def _load_factor_data(
 def _build_make_signal(
     spec: dict,
     param_overrides: dict | None = None,
+    regime_mask: "pd.Series | None" = None,
 ) -> Callable[[pd.Series], pd.Series]:
-    """Build make_signal(normalised_factor) → signal from spec."""
+    """Build make_signal(normalised_factor) → signal from spec.
+
+    regime_mask: precomputed boolean Series (same index as full factor/returns),
+    already lagged ≥1 bar. Only used when signal_model == 'regime_conditional'.
+    """
     from research.signals import spike_capture, mean_drift
 
     model  = spec.get("signal_model", "spike_capture")
@@ -188,19 +193,219 @@ def _build_make_signal(
     if param_overrides:
         params.update(param_overrides)
 
-    if model == "spike_capture":
-        return lambda norm: spike_capture(norm, **params)
+    _SC_KEYS  = ("z_entry", "z_exit", "window")
+    sc_params = {k: params[k] for k in _SC_KEYS if k in params}
+
+    if model in ("spike_capture", "regime_conditional"):
+        base_fn = lambda norm: spike_capture(norm, **sc_params)
+        if model == "spike_capture" or regime_mask is None:
+            return base_fn
+        _mask = regime_mask  # closure — full-series boolean, pre-lagged ≥1 bar
+        def _gated(norm: pd.Series) -> pd.Series:
+            gate = _mask.reindex(norm.index).fillna(False).astype(int)
+            return (base_fn(norm) * gate).astype(int)
+        return _gated
+
     if model == "mean_drift":
         return lambda norm: mean_drift(norm, **params)
     raise ValueError(
-        f"Unknown signal_model '{model}'. Supported: spike_capture, mean_drift."
+        f"Unknown signal_model '{model}'. "
+        "Supported: spike_capture, regime_conditional, mean_drift."
     )
 
 
 def _signal_model_str(spec: dict) -> str:
     model  = spec.get("signal_model", "spike_capture")
     params = spec.get("signal_params", {})
+    if model == "regime_conditional":
+        _SC_KEYS  = ("z_entry", "z_exit", "window")
+        sc_params = {k: params[k] for k in _SC_KEYS if k in params}
+        rv_window   = params.get("rv_window",   336)
+        rv_quantile = params.get("rv_quantile", 0.5)
+        base_str = f"spike_capture({', '.join(f'{k}={v}' for k, v in sc_params.items())})"
+        return (f"regime_conditional(base={base_str}, "
+                f"gate=rv{rv_window}>=p{rv_quantile:.0%})")
     return f"{model}({', '.join(f'{k}={v}' for k, v in params.items())})"
+
+
+# ── Regime helpers ────────────────────────────────────────────────────────────
+
+def _rolling_pctrank_series(s: pd.Series, window: int) -> pd.Series:
+    """Rolling percentile rank of current bar vs past window bars. Output in [0,1]."""
+    min_p = max(window // 4, 5)
+    return s.rolling(window, min_periods=min_p).apply(
+        lambda x: float((x[:-1] < x[-1]).mean()) if len(x) > 1 else 0.5,
+        raw=True,
+    )
+
+
+def _build_regime_mask(
+    asset_returns: pd.Series,
+    rv_window: int = 336,
+    rv_quantile: float = 0.5,
+    bars_per_year: int = 8_760,
+) -> pd.Series:
+    """
+    Boolean regime mask derived from realized volatility (past-only, lagged 1 bar).
+
+    Computation at each bar t:
+      1. rv[t]  = std(returns[t-rv_window+1 .. t]) * sqrt(bars_per_year)
+      2. pct[t] = percentile rank of rv[t] vs rv[t-rv_window+1 .. t-1]
+      3. mask[t] = (pct[t] >= rv_quantile)
+    Then mask is shifted 1 bar so signal at bar t sees the regime as of bar t-1.
+    """
+    min_p = max(rv_window // 4, 5)
+    rv    = (
+        asset_returns
+        .rolling(rv_window, min_periods=min_p)
+        .std()
+        .mul(np.sqrt(bars_per_year))
+    )
+    pct  = _rolling_pctrank_series(rv, window=rv_window)
+    # .shift(1) on bool Series yields object dtype in pandas (NaN can't be bool);
+    # .fillna(False).astype(bool) restores proper bool dtype for safe ~ inversion.
+    mask = (pct >= rv_quantile).shift(1).fillna(False).astype(bool)
+    return mask
+
+
+def _run_regime_analysis(
+    factor:        pd.Series,
+    asset_returns: pd.Series,
+    spec:          dict,
+    regime_mask:   pd.Series,
+    funding_rates: "pd.Series | None",
+    bars_per_year: int,
+    gated_wf:      object,
+    best_params:   "dict | None",
+    wf_kw:         dict,
+) -> str:
+    """
+    Run ungated spike_capture baseline through the same WF folds.
+    Split stitched OOS returns by the precomputed regime mask.
+
+    Returns formatted analysis text.
+
+    The key test: if ungated signal has positive Sharpe in-regime and negative
+    out-of-regime, the regime genuinely discriminates. If per-fold regime coverage
+    correlates strongly (|r|>0.5) with fold performance, the gate is a calendar
+    proxy — report as OVERFIT/KILL regardless of gated Sharpe.
+    """
+    from research import walkforward
+    from research.metrics import sharpe as _sharpe
+
+    base_make = _build_make_signal(spec, best_params, regime_mask=None)
+    print("\n  Running ungated baseline walk-forward for in/out-regime comparison...")
+    base_wf = walkforward.run(
+        factor, asset_returns, base_make,
+        funding_rates=funding_rates,
+        bars_per_year=bars_per_year,
+        **wf_kw,
+    )
+
+    # Align stitched OOS returns with regime mask (same datetime index)
+    gated_oos     = gated_wf.oos_returns
+    base_oos      = base_wf.oos_returns.reindex(gated_oos.index)
+    oos_in_regime = regime_mask.reindex(gated_oos.index).fillna(False).astype(bool)
+
+    n_total = len(oos_in_regime)
+    n_in    = int(oos_in_regime.sum())
+    n_out   = n_total - n_in
+    pct_in  = n_in / n_total if n_total > 0 else 0.0
+
+    # Ungated in/out Sharpe — the informative split
+    base_in_ret  = base_oos[oos_in_regime]
+    base_out_ret = base_oos[~oos_in_regime]
+    sr_base_in   = _sharpe(base_in_ret,  bars_per_year) if len(base_in_ret)  > 10 else float("nan")
+    sr_base_out  = _sharpe(base_out_ret, bars_per_year) if len(base_out_ret) > 10 else float("nan")
+
+    # Gated in-regime Sharpe (gate is transparent in-regime, so ≈ base_in)
+    gated_in_ret = gated_oos[oos_in_regime]
+    sr_gated_in  = _sharpe(gated_in_ret, bars_per_year) if len(gated_in_ret) > 10 else float("nan")
+
+    # Per-fold: regime coverage % and SR comparison
+    folds     = gated_wf.folds
+    fold_rows = []
+    for i, fold in enumerate(folds):
+        fold_regime = regime_mask.iloc[fold.test_start:fold.test_end]
+        fold_pct    = float(fold_regime.mean())
+        sr_g        = gated_wf.fold_sharpes_oos[i]
+        sr_b        = base_wf.fold_sharpes_oos[i]
+        fold_rows.append((fold.fold_idx, fold_pct, sr_b, sr_g))
+
+    # Calendar proxy test: corr(regime coverage per fold, ungated fold SR)
+    pcts       = [r[1] for r in fold_rows]
+    srs_base   = [r[2] for r in fold_rows]
+    valid      = [(p, s) for p, s in zip(pcts, srs_base) if np.isfinite(p) and np.isfinite(s)]
+    if len(valid) >= 3:
+        pv, sv = zip(*valid)
+        corr = float(np.corrcoef(pv, sv)[0, 1])
+    else:
+        corr = float("nan")
+
+    calendar_proxy = np.isfinite(corr) and abs(corr) > 0.5
+    genuine_edge   = (
+        np.isfinite(sr_base_in)  and sr_base_in  > 0.3 and
+        np.isfinite(sr_base_out) and sr_base_out < 0.0
+    )
+    partial_edge   = (
+        not genuine_edge and
+        np.isfinite(sr_base_in) and np.isfinite(sr_base_out) and
+        sr_base_in > sr_base_out + 0.3
+    )
+
+    if calendar_proxy:
+        interp = (
+            "CALENDAR PROXY: regime coverage correlates strongly with fold performance\n"
+            "(|r|>0.5). The gate selects historically good calendar periods, not a\n"
+            "live-observable market state. Hindsight masquerading as a signal. KILL."
+        )
+    elif genuine_edge:
+        interp = (
+            "GENUINE CONDITIONAL EDGE: ungated signal is positive in-regime and\n"
+            "negative out-of-regime. The realized-vol gate discriminates on a live-\n"
+            "observable indicator and is not a calendar proxy. Edge is legitimately\n"
+            "conditional on regime."
+        )
+    elif partial_edge:
+        interp = (
+            "PARTIAL CONDITIONAL EDGE: in-regime SR > out-regime SR by >0.3, but\n"
+            "out-regime SR is not clearly negative. Gate reduces low-quality trades\n"
+            "without specifically blocking losing periods. Proceed with caution."
+        )
+    else:
+        interp = (
+            "NO GENUINE CONDITIONAL EDGE: regime does not meaningfully discriminate.\n"
+            "In-regime and out-regime ungated SRs are similar or both non-positive.\n"
+            "The regime gate does not add value."
+        )
+
+    sf = lambda x: f"{x:>+.3f}" if np.isfinite(x) else "   NaN"
+    lines = [
+        f"  OOS bars : {n_total:,} total  |  "
+        f"{n_in:,} in-regime ({pct_in:.1%})  |  "
+        f"{n_out:,} out-of-regime ({1-pct_in:.1%})",
+        "",
+        f"  {'Signal':<32}  {'In-regime SR':>12}  {'Out-regime SR':>13}",
+        f"  {'-'*32}  {'-'*12}  {'-'*13}",
+        f"  {'Ungated spike_capture':<32}  {sf(sr_base_in):>12}  {sf(sr_base_out):>13}",
+        f"  {'Regime-gated (active bars only)':<32}  {sf(sr_gated_in):>12}  {'(gate=0)':>13}",
+        "",
+        f"  Regime-coverage / fold-SR corr : {corr:>+.3f}"
+        + ("  [FAIL |r|>0.5 — calendar proxy]" if calendar_proxy else "  [OK |r|<=0.5]"),
+        "",
+        "  Per-fold breakdown:",
+        f"  {'Fold':>5}  {'%In-regime':>10}  {'Ungated OOS SR':>14}  {'Gated OOS SR':>12}",
+        f"  {'-'*5}  {'-'*10}  {'-'*14}  {'-'*12}",
+    ]
+    for fold_idx, pct, sr_b, sr_g in fold_rows:
+        lines.append(
+            f"  {fold_idx:>5}  {pct:>10.1%}  {sf(sr_b):>14}  {sf(sr_g):>12}"
+        )
+    lines += ["", "  Interpretation:"]
+    for il in interp.split("\n"):
+        lines.append(f"  {il}")
+
+    return "\n".join(lines)
 
 
 # ── Pipeline result ───────────────────────────────────────────────────────────
@@ -273,8 +478,22 @@ def run_pipeline(
 
     # ── §9.3 Model selection ─────────────────────────────────────────────────
     _hdr("§9.3 Signal Model")
-    model_str   = _signal_model_str(spec)
-    make_signal = _build_make_signal(spec)
+    model_str = _signal_model_str(spec)
+
+    # Regime mask — computed once on full series (past-only, lagged ≥1 bar).
+    # None for spike_capture / mean_drift; populated only for regime_conditional.
+    regime_mask = None
+    if spec.get("signal_model") == "regime_conditional":
+        rv_window   = int(spec.get("signal_params", {}).get("rv_window",   336))
+        rv_quantile = float(spec.get("signal_params", {}).get("rv_quantile", 0.5))
+        regime_mask = _build_regime_mask(asset_returns, rv_window, rv_quantile, bars_per_year)
+        n_in_full   = int(regime_mask.sum())
+        print(f"Regime gate   : realized-vol (past {rv_window} bars) >= "
+              f"{rv_quantile:.0%} rolling pct-rank, lagged 1 bar")
+        print(f"In-regime bars: {n_in_full:,} / {len(regime_mask):,} "
+              f"({float(regime_mask.mean()):.1%} of full series)")
+
+    make_signal = _build_make_signal(spec, regime_mask=regime_mask)
     print(f"Model : {model_str}")
 
     # ── §9.5 Full-period backtest ─────────────────────────────────────────────
@@ -312,14 +531,14 @@ def run_pipeline(
     if len(param_grid) == 2:
         opt_result = opt_mod.run(
             factor, asset_returns,
-            make_signal   = lambda norm, **p: _build_make_signal(spec, p)(norm),
+            make_signal   = lambda norm, **p: _build_make_signal(spec, p, regime_mask=regime_mask)(norm),
             param_grid    = param_grid,
             funding_rates = funding_rates,
             bars_per_year = bars_per_year,
             wf_kwargs     = _wf_kw if _wf_kw else None,
         )
         print(opt_result.report())
-        best_make_signal = _build_make_signal(spec, opt_result.best_params)
+        best_make_signal = _build_make_signal(spec, opt_result.best_params, regime_mask=regime_mask)
     elif param_grid:
         print(f"Skipping optimize: param_grid has {len(param_grid)} key(s), need exactly 2.")
     else:
@@ -340,6 +559,25 @@ def run_pipeline(
     n_configs  = opt_result.n_configs if opt_result is not None else 1
     fac_stats  = {"raw_sample": factor.values[:500].tolist(), **stats}
 
+    # Regime analysis runs before report_data creation so the text is embedded
+    # in the saved report.  Prints immediately; verdict section follows.
+    regime_analysis_text = ""
+    if regime_mask is not None:
+        _hdr("Regime Analysis — The Real Test")
+        regime_analysis_text = _run_regime_analysis(
+            factor        = factor,
+            asset_returns = asset_returns,
+            spec          = spec,
+            regime_mask   = regime_mask,
+            funding_rates = funding_rates,
+            bars_per_year = bars_per_year,
+            gated_wf      = wf_result,
+            best_params   = opt_result.best_params if opt_result is not None else None,
+            wf_kw         = _wf_kw,
+        )
+        print(regime_analysis_text)
+        _hdr("§9.8 Verdict (continued)")
+
     report_data = FactorReportData(
         factor_name             = factor_name,
         asset                   = spec.get("asset", "BTC/USDT"),
@@ -354,6 +592,7 @@ def run_pipeline(
         point_in_time_clean     = bool(spec.get("point_in_time_clean", True)),
         bars_per_year           = bars_per_year,
         n_configs               = n_configs,
+        regime_analysis_text    = regime_analysis_text,
     )
     verdict, reasons = _verdict(report_data)
 
