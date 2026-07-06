@@ -124,6 +124,54 @@ funding_rate_regime_cond:
     z_entry: [1.5, 2.0, 2.5]
     window: [72, 168, 336]
 
+price_momentum_daily:
+  alpha_story: |
+    Same mechanism as price_momentum (1h): trend continuation from slow
+    information diffusion and momentum-chasing behavior on BTC/USDT.
+
+    This is a diagnostic run, not a new hypothesis. The five 1h kills
+    (coinbase_premium_gap, perpetual_funding_rate, funding_rate_regime_cond,
+    futures_basis, price_momentum) could reflect either (a) the factor
+    mechanisms themselves lack edge, or (b) 1h resolution is the confound —
+    noise dominates signal at hourly granularity, and 12bp fixed costs eat any
+    marginal edge in a short holding window. This test isolates which.
+
+    At daily (1d) resolution the signal-to-noise ratio is higher: each bar
+    integrates 24h of price discovery. The holding period for a full MA-cross
+    cycle is 5-30 bars = 1-4 weeks. The 12bp round-trip cost is amortized over
+    a longer hold, reducing cost-per-day from 12bp (1h turnover) toward 0.5bp.
+
+    Counter-argument: daily crypto momentum is well-documented in academic
+    literature (Liu, Tsyvinski & Wu 2019; Borri 2019; Cong et al 2021). Every
+    institutional crypto fund runs daily trend signals. The edge at daily
+    resolution has had years to be arbed by participants with near-zero costs.
+
+    The diagnostic question: if daily kills, the five 1h kills generalize across
+    timeframe — the factor mechanisms themselves lack edge, and on-chain data is
+    the justified next spend. If daily shows structure, resolution was the
+    confound and we have free daily factors to work before spending on Glassnode.
+
+    Model: mean_drift (fast/slow MA cross). MA windows scaled to daily
+    equivalents: fast [5, 10, 20] days, slow [30, 60, 120] days.
+  source: ccxt_ohlcv
+  asset: BTC/USDT
+  venue: binance
+  timeframe: "1d"
+  direction: both
+  point_in_time_clean: true
+  signal_model: mean_drift
+  signal_params:
+    fast: 10
+    slow: 60
+  bars_per_year: 365
+  train_bars: 500
+  test_bars: 90
+  step_bars: 90
+  embargo_bars: 10
+  optimize:
+    fast: [5, 10, 20]
+    slow: [30, 60, 120]
+
 price_momentum:
   alpha_story: |
     Price momentum on hourly BTC: trend continuation from slow information

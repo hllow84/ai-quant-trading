@@ -444,6 +444,7 @@ def run_pipeline(
     funding_rates: pd.Series | None = None,
     train_bars:    int | None = None,
     test_bars:     int | None = None,
+    step_bars:     int | None = None,
     embargo_bars:  int | None = None,
     fee_bps:       float | None = None,
     slippage_bps:  float | None = None,
@@ -531,6 +532,7 @@ def run_pipeline(
     _wf_kw: dict = {}
     if train_bars   is not None: _wf_kw["train_bars"]   = train_bars
     if test_bars    is not None: _wf_kw["test_bars"]     = test_bars
+    if step_bars    is not None: _wf_kw["step_bars"]     = step_bars
     if embargo_bars is not None: _wf_kw["embargo_bars"]  = embargo_bars
     if fee_bps      is not None: _wf_kw["fee_bps"]       = fee_bps
     if slippage_bps is not None: _wf_kw["slippage_bps"]  = slippage_bps
@@ -737,6 +739,13 @@ def main(argv: list[str] | None = None) -> int:
     out_dir    = Path(args.out) if args.out else _DEFAULT_OUT
     notes_root = out_dir.parent
 
+    # Spec-level WF params (CLI args take priority over spec, spec over defaults).
+    bars_per_year = int(spec.get("bars_per_year", 8_760))
+    train_bars    = args.train_bars   if args.train_bars   is not None else spec.get("train_bars")
+    test_bars     = args.test_bars    if args.test_bars    is not None else spec.get("test_bars")
+    step_bars     = spec.get("step_bars")   # CLI has no --step-bars; spec-only override
+    embargo_bars  = args.embargo_bars if args.embargo_bars is not None else spec.get("embargo_bars")
+
     try:
         run_pipeline(
             factor_name   = args.factor,
@@ -744,9 +753,11 @@ def main(argv: list[str] | None = None) -> int:
             asset_returns = asset_returns,
             spec          = spec,
             funding_rates = funding_rates,
-            train_bars    = args.train_bars,
-            test_bars     = args.test_bars,
-            embargo_bars  = args.embargo_bars,
+            bars_per_year = bars_per_year,
+            train_bars    = train_bars,
+            test_bars     = test_bars,
+            step_bars     = step_bars,
+            embargo_bars  = embargo_bars,
             fee_bps       = args.fee_bps,
             slippage_bps  = args.slippage_bps,
             direction     = args.direction,
