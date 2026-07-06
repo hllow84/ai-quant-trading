@@ -15,7 +15,7 @@ walkforward:
   train_months: 6
   test_months: 3
   step_months: 3            # non-overlapping test windows
-  embargo_bars: 48          # 2 days on 1h bars — sized to longest feature lookback
+  embargo_bars: 168         # 1 week on 1h bars — must be >= transform_window (168)
 
 timeframes:
   default: "1h"

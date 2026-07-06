@@ -53,6 +53,7 @@ def run(
     fee_bps: float = 7.0,
     slippage_bps: float = 5.0,
     direction: str = "both",
+    guard: bool = True,
 ) -> dict:
     """
     Run a single backtest pass.
@@ -75,6 +76,10 @@ def run(
         'long'  — zero out short signals.
         'short' — zero out long signals.
         'both'  — unrestricted long/short.
+    guard : bool
+        If True (default), call guard_look_ahead before computing any P&L.
+        Set to False only in tests that intentionally probe what happens without
+        the guard — never disable it in production research pipelines.
 
     Returns
     -------
@@ -83,6 +88,9 @@ def run(
     """
     if direction not in ("long", "short", "both"):
         raise ValueError(f"direction must be 'long', 'short', or 'both' — got {direction!r}")
+
+    if guard:
+        guard_look_ahead(signal, asset_returns)
 
     idx = asset_returns.index
     sig = signal.reindex(idx).fillna(0)

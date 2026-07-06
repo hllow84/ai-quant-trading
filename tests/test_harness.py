@@ -59,6 +59,48 @@ class TestLookAheadTrap:
         with pytest.raises(LookAheadError):
             guard_look_ahead(look_ahead_factor, rets, threshold=0.5)
 
+    def test_bt_run_raises_on_look_ahead_factor(self):
+        """
+        End-to-end wiring: bt_run must raise LookAheadError when handed a look-ahead
+        factor (= next-bar return), because guard_look_ahead is invoked inside bt_run
+        before any P&L is computed.
+
+        If this test fails with a finite Sharpe instead of LookAheadError, the guard is
+        not wired into bt_run — callers could forget to call it and get silently wrong results.
+        """
+        _rng = np.random.default_rng(101)
+        idx  = pd.date_range("2023-01-01", periods=N, freq="1h", tz="UTC")
+        rets = pd.Series(_rng.normal(0.0001, 0.01, size=N), index=idx)
+        look_ahead_factor = rets.shift(-1).fillna(0)
+
+        with pytest.raises(LookAheadError):
+            bt_run(look_ahead_factor, rets)
+
+    def test_look_ahead_factor_inflates_sharpe_without_guard(self):
+        """
+        Canary: guard disabled (guard=False) → look-ahead factor must yield Sharpe > 20.
+
+        Documents that the guard is load-bearing: if it were removed, a caller could
+        silently backtest a next-bar-return factor and see an explosive Sharpe with no
+        warning. The threshold of 20 is conservative — typical observed value is > 50.
+
+        Arithmetic:
+            factor[t]    = return[t+1]
+            position[t]  = factor.shift(1)[t] = return[t]   ← still same-bar!
+            gross_ret[t] = return[t]² > 0 always             ← Sharpe >> 0
+        """
+        _rng = np.random.default_rng(99)
+        idx  = pd.date_range("2023-01-01", periods=N, freq="1h", tz="UTC")
+        rets = pd.Series(_rng.normal(0.0001, 0.01, size=N), index=idx)
+        look_ahead_factor = rets.shift(-1).fillna(0)
+
+        res = bt_run(look_ahead_factor, rets, fee_bps=0, slippage_bps=0, guard=False)
+        sr  = sharpe(res["net_ret"])
+        assert sr > 20, (
+            f"Expected Sharpe > 20 with guard=False and look-ahead factor; got {sr:.2f}. "
+            f"If the guard is ever removed, this canary will catch the missing explosion."
+        )
+
     def test_extra_forward_shift_does_not_improve_sharpe(self):
         """
         If the engine already lags correctly, shifting the signal one additional bar
