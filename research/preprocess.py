@@ -239,8 +239,8 @@ def transform(
         roll_mad  = _rolling_mad(factor, window, min_p)
         normalised = (factor - roll_med) / (roll_mad * 1.4826).clip(lower=1e-12)
         justification = (
-            "Series is stationary (ADF rejects unit root, p ≤ 0.10). Applied robust "
-            "rolling z-score (median / MAD × 1.4826) with past-only window. Median/MAD "
+            "Series is stationary (ADF rejects unit root, p <= 0.10). Applied robust "
+            "rolling z-score (median / MAD x 1.4826) with past-only window. Median/MAD "
             "chosen over mean/std to limit sensitivity to transient outlier spikes that "
             "are common in derivatives market data."
         )

@@ -1,13 +1,57 @@
-# Factor registry: name → source, endpoint, type_hint
-# type_hint drives preprocess.py classification (continuous_stationary |
-# continuous_nonstationary | signed | skewed_lognormal)
+# Factor registry: name -> source, signal model, optimization grid
+# alpha_story is REQUIRED for every factor before any backtest.
+# No credible mechanism stated here = no backtest run. This is the gate (spec §9.1).
 
-coinbase_premium_gap:
-  source: ccxt
-  endpoint: ohlcv_spread
-  venues: [coinbase, binance]
-  type_hint: signed
+synthetic_test:
+  alpha_story: |
+    Synthetic factor for pipeline smoke-test only. This is a random AR(1) series
+    with no real alpha mechanism. Its sole purpose is to verify end-to-end CLI
+    wiring and report generation without network calls.
+    Do not treat any result from this factor as economically meaningful.
+  source: synthetic
   asset: BTC/USDT
   timeframe: "1h"
   direction: both
-  note: "Spread between Coinbase and Binance BTC price. US spot demand proxy."
+  point_in_time_clean: true
+  signal_model: spike_capture
+  signal_params:
+    z_entry: 2.0
+    z_exit: 0.5
+    window: 50
+  optimize:
+    z_entry: [1.5, 2.0, 2.5]
+    window: [30, 50, 80]
+
+coinbase_premium_gap:
+  alpha_story: |
+    The Coinbase premium gap is the spread between BTC/USD on Coinbase (US retail and
+    institutional spot) and BTC/USDT on Binance (global perpetual reference price).
+    Mechanism: when US-side buying pressure exceeds cross-venue arbitrage capacity,
+    Coinbase price rises above Binance. Arbitrageurs close the spread by transferring
+    BTC from Binance to Coinbase, which tends to coincide with, and slightly precede,
+    a short-term up-move in the global reference price.
+    Who is on the other side: statistical arbitrageurs and market-makers exploiting the
+    spread; retail traders on Coinbase paying a premium for immediacy.
+    Why the edge persists: on-chain BTC transfers take 10-60 minutes; stablecoin
+    liquidity on Coinbase is shallower than Binance, limiting instantaneous arb.
+    Expected value: mean-reversion of extreme spikes (|premium| > 2 sigma) within
+    2-6 hours on 1h bars.
+    Expected decay horizon: 6-18 months of active trading before arb infrastructure
+    compresses the edge materially.
+  source: ccxt_spread
+  symbol_a: BTC/USDT
+  venue_a: binance
+  symbol_b: BTC/USD
+  venue_b: coinbase
+  asset: BTC/USDT
+  timeframe: "1h"
+  direction: both
+  point_in_time_clean: true
+  signal_model: spike_capture
+  signal_params:
+    z_entry: 2.0
+    z_exit: 0.5
+    window: 168
+  optimize:
+    z_entry: [1.5, 2.0, 2.5]
+    window: [72, 168, 336]

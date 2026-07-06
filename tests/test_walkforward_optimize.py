@@ -150,6 +150,57 @@ class TestBoundaryLeakage:
             f"A value near 0 would indicate full-series stats were used."
         )
 
+    def test_subtle_drift_affects_scaling_not_classification(self):
+        """
+        WF1b: A ≈2σ shift in the test period keeps the classification label
+        identical (both fits see the same category) but still produces measurably
+        different normalisation statistics (median).
+
+        This is the realistic leakage: real factor distributions drift subtly over
+        time — not a 30σ structural break, just a slow mean shift. The 30σ WF1 case
+        proves leakage via classification divergence; WF1b proves it can occur even
+        when the classification label is unchanged.
+        """
+        rng     = np.random.default_rng(91)
+        n_train = 800
+        n_test  = 200
+        shift   = 2.0   # ≈2σ: enough to shift stats, small enough to keep classification
+
+        vals     = np.concatenate([
+            rng.normal(0,     1, n_train),
+            rng.normal(shift, 1, n_test),
+        ])
+        idx       = _make_idx(n_train + n_test)
+        full      = pd.Series(vals, index=idx)
+        train_sl  = full.iloc[:n_train]
+
+        norm_train = FrozenNormalizer().fit(train_sl)
+        norm_full  = FrozenNormalizer().fit(full)
+
+        # Classification must be the same for both — the subtle case.
+        assert norm_train.classification == norm_full.classification, (
+            f"WF1b: expected identical classification for a 2σ shift; "
+            f"got train={norm_train.classification!r} vs full={norm_full.classification!r}. "
+            "Increase shift to trigger WF1 (30σ) instead."
+        )
+
+        # Both should be 'signed' or 'continuous_stationary' (white noise).
+        assert norm_train.classification in ("signed", "continuous_stationary"), (
+            f"Unexpected classification {norm_train.classification!r} for white noise input."
+        )
+
+        # Even though classification matches, the scaling statistics must differ.
+        # full-series median is pulled up ~0.3 by the 20%-weight N(2,1) component.
+        train_median = norm_train._stats.get("median", norm_train._stats.get("diff_median", 0.0))
+        full_median  = norm_full._stats.get("median",  norm_full._stats.get("diff_median",  0.0))
+        diff_median  = abs(train_median - full_median)
+
+        assert diff_median > 0.15, (
+            f"Median diff = {diff_median:.4f} but expected > 0.15 for a 2σ shift. "
+            "Using full-series stats here would subtly mis-centre the test-window "
+            "normalisation — the contamination that WF1b specifically targets."
+        )
+
     def test_oos_sharpe_not_inflated_by_normalization_leakage(self):
         """
         Walk-forward on a null factor (no edge vs. random returns) must give
