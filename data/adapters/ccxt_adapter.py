@@ -51,7 +51,7 @@ def _to_ms(dt: str | datetime) -> int:
 
 
 def _cache_path(source: str, asset: str, metric: str, resolution: str, asof: str) -> Path:
-    asset_safe = asset.replace("/", "-")
+    asset_safe = asset.replace("/", "-").replace(":", "_")  # colon is illegal in Windows filenames
     return CACHE_DIR / f"{source}__{asset_safe}__{metric}__{resolution}__{asof}.parquet"
 
 

@@ -123,3 +123,59 @@ funding_rate_regime_cond:
   optimize:
     z_entry: [1.5, 2.0, 2.5]
     window: [72, 168, 336]
+
+futures_basis:
+  alpha_story: |
+    The futures basis (perpetual close - spot close) captures real-time leveraged
+    demand imbalance. When perp trades above spot, longs are paying a premium to hold
+    leveraged exposure; when below, shorts are crowded and paying a discount.
+
+    Mechanism: an elevated positive basis (longs crowded) closes via three simultaneous
+    pressures. First, arbitrageurs buy spot and sell perp, purchasing against the trend.
+    Second, the 8h funding settlement forces longs to pay a cash carry cost proportional
+    to the basis itself, eroding their position economics. Third, over-leveraged longs
+    face liquidation cascades when the basis widens beyond their margin threshold.
+    All three forces apply simultaneously and self-reinforce — the wider the basis, the
+    stronger the reversion pressure. Mirror logic applies for negative basis.
+
+    Who is on the other side: momentum-driven leveraged traders chasing directional
+    moves on the perp; retail speculators who prefer the perp for instant leverage
+    access and accept any premium to open; and arb bots (who are self-correcting —
+    their activity closes the edge, but they exhaust their capital at large spikes).
+
+    Why the edge persists at extremes: arb capacity is bounded by balance-sheet
+    constraints, counterparty limits, and settlement latency between spot and perp.
+    At large basis spikes (e.g. 1%+ premium), the risk-adjusted return to the arb
+    deteriorates quickly: the arb requires holding two legs simultaneously with
+    margin on each, and any directional move that widens the basis before it closes
+    causes mark-to-market losses. Retail demand sustains the premium past efficient
+    arb levels for hours to days.
+
+    Distinction from perpetual_funding_rate: basis is priced continuously at every
+    1h bar — it measures current crowding pressure directly. Funding rate is sampled
+    at 8h settlement intervals and is the exchange mechanism to anchor perp to spot.
+    The basis is the raw imbalance signal; the funding rate is the lagged correction.
+    Both reflect the same underlying market structure but basis has 8x more observations
+    per trading day.
+
+    Expected decay: 12-24 months as cross-venue arb infrastructure scales. Data
+    quality is unimpeachable (5-year OHLCV cache, no revision risk, no look-ahead).
+    This is a clean re-approach to the carry mechanism visible in perpetual_funding_rate,
+    on data deep enough to validate properly.
+  source: ccxt_spread
+  symbol_a: BTC/USDT
+  venue_a: binance
+  symbol_b: BTC/USDT:USDT
+  venue_b: binance
+  asset: BTC/USDT
+  timeframe: "1h"
+  direction: both
+  point_in_time_clean: true
+  signal_model: spike_capture
+  signal_params:
+    z_entry: 2.0
+    z_exit: 0.5
+    window: 168
+  optimize:
+    z_entry: [1.5, 2.0, 2.5]
+    window: [72, 168, 336]
