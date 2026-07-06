@@ -106,41 +106,71 @@ def _load_factor_data(
         n = 8_760 * 3  # 3 years of 1h bars
         return _make_synthetic(n)
 
-    if source in ("ccxt", "ccxt_spread"):
+    if source in ("ccxt", "ccxt_spread", "ccxt_funding"):
         sys.path.insert(0, str(_ROOT))
-        from data.adapters.ccxt_adapter import fetch_ohlcv
-
         timeframe = spec.get("timeframe", "1h")
-        ohlcv     = fetch_ohlcv(asset, timeframe, since=start, until=end, exchange=venue)
-        returns   = ohlcv["close"].pct_change().rename("asset_return")
 
         if source == "ccxt_spread":
+            from data.adapters.ccxt_adapter import fetch_ohlcv_spread, SpreadAlignmentError
             sym_a   = spec.get("symbol_a", asset)
             sym_b   = spec.get("symbol_b", asset)
             venue_a = spec.get("venue_a", venue)
             venue_b = spec.get("venue_b", "coinbase")
-            df_a    = fetch_ohlcv(sym_a, timeframe, start, end, venue_a)
-            df_b    = fetch_ohlcv(sym_b, timeframe, start, end, venue_b)
-            factor  = (df_b["close"] - df_a["close"]).rename("spread")
-        else:
-            raise NotImplementedError(
-                f"Direct ccxt metric for source='{source}' not yet implemented. "
-                "Use ccxt_spread or synthetic."
+            factor, returns = fetch_ohlcv_spread(
+                sym_a, sym_b, timeframe, start, end, venue_a, venue_b
             )
+            # Binance USDT-margined perp funding for held position cost
+            fund = None
+            try:
+                from data.adapters.ccxt_adapter import fetch_funding_rate_history
+                perp_symbol = asset.split("/")[0] + "/USDT:USDT"
+                fdf = fetch_funding_rate_history(perp_symbol, since=start, until=end, venue=venue)
+                if fdf.empty:
+                    print(
+                        f"\nWARNING: Funding rate fetch returned empty for {perp_symbol} "
+                        f"on {venue}. Proceeding with zero funding cost.",
+                        file=sys.stderr,
+                    )
+                else:
+                    n_intervals = len(fdf)
+                    # Divide by 8: 8h rate distributed across 8 × 1h bars
+                    fund = (fdf["funding_rate"].reindex(factor.index).ffill() / 8)
+                    print(f"\nFunding loaded : {n_intervals} 8h intervals ({perp_symbol} / {venue})")
+            except Exception as _fund_exc:
+                print(
+                    f"\nWARNING: Funding rate fetch failed ({_fund_exc}). "
+                    "Proceeding with zero funding cost.",
+                    file=sys.stderr,
+                )
+            return factor, returns, fund
 
-        fund = None
-        try:
-            from data.adapters.ccxt_adapter import fetch_funding_rate_history
-            fdf  = fetch_funding_rate_history(asset, since=start, until=end, exchange=venue)
-            fund = fdf.get("fundingRate")
-        except Exception:
-            pass
+        elif source == "ccxt_funding":
+            from data.adapters.ccxt_adapter import fetch_funding_rate_history, fetch_ohlcv
+            symbol_perp = spec.get("symbol", asset.split("/")[0] + "/USDT:USDT")
+            # Asset returns from 1h OHLCV
+            ohlcv   = fetch_ohlcv(asset, timeframe, since=start, until=end, venue=venue)
+            returns = ohlcv["close"].pct_change().rename("asset_return")
+            # Funding rate (8h native) ffilled to 1h — point-in-time correct
+            fdf = fetch_funding_rate_history(symbol_perp, since=start, until=end, venue=venue)
+            if fdf.empty:
+                raise ValueError(f"No funding rate data for {symbol_perp} on {venue}.")
+            factor = fdf["funding_rate"].reindex(returns.index).ffill().rename("funding_rate")
+            # Cost model: per-1h share of the 8h settlement
+            fund_cost = (factor / 8).rename("funding_rate_per_bar")
+            return factor, returns, fund_cost
 
-        return factor, returns, fund
+        elif source == "ccxt":
+            from data.adapters.ccxt_adapter import fetch_ohlcv
+            ohlcv   = fetch_ohlcv(asset, timeframe, since=start, until=end, venue=venue)
+            returns = ohlcv["close"].pct_change().rename("asset_return")
+            raise NotImplementedError(
+                f"Direct ccxt metric factor not yet implemented. "
+                "Use ccxt_spread, ccxt_funding, or synthetic."
+            )
 
     raise ValueError(
         f"Unknown source '{source}' for factor. "
-        "Supported: ccxt, ccxt_spread, synthetic."
+        "Supported: ccxt_spread, ccxt_funding, synthetic."
     )
 
 
@@ -259,6 +289,12 @@ def run_pipeline(
     )
     print(f"Full-period Sharpe : {sharpe(bt_result['net_ret'], bars_per_year):.3f}")
     print(f"Max Drawdown       : {max_drawdown(bt_result['equity']):.1%}")
+    total_fund_cost = float(bt_result['fund_cost'].sum())
+    if total_fund_cost == 0.0:
+        print("Funding cost       : 0.00000 (no funding data — costs understated)")
+    else:
+        funded_bars = int((bt_result['fund_cost'] != 0).sum())
+        print(f"Funding cost       : {total_fund_cost:.5f} total  ({funded_bars} bars with non-zero funding)")
 
     # ── §9.6 Optimise ─────────────────────────────────────────────────────────
     _hdr("§9.6 Optimise")
@@ -320,9 +356,41 @@ def run_pipeline(
         n_configs               = n_configs,
     )
     verdict, reasons = _verdict(report_data)
-    print(f"\nVerdict: {verdict}")
+
+    # Headline numbers — order is fixed: DSR, positive folds, IS->OOS degradation
+    from research.metrics import deflated_sharpe_ratio
+    oos_ret = wf_result.oos_returns.dropna()
+    try:
+        dsr_prob, e_max_sr = deflated_sharpe_ratio(
+            sr_best             = wf_result.cv_sharpe,
+            sr_trials           = (
+                opt_result.sharpe_grid.flatten().tolist()
+                if opt_result is not None else [wf_result.cv_sharpe]
+            ),
+            n_obs               = max(len(oos_ret), 2),
+            skewness            = float(oos_ret.skew()) if len(oos_ret) > 3 else 0.0,
+            excess_kurtosis     = float(oos_ret.kurtosis()) if len(oos_ret) > 3 else 0.0,
+        )
+        dsr_line = f"{dsr_prob:.4f}  (E[max SR]={e_max_sr:.3f})"
+    except Exception:
+        dsr_line = "n/a"
+
+    n_folds   = len(wf_result.folds)
+    pos_pct   = wf_result.n_positive_folds / n_folds if n_folds > 0 else 0.0
+    degrad    = wf_result.is_oos_degradation
+
+    # ── Headline numbers (user-requested order) ───────────────────────────────
+    print()
+    print("=" * 52)
+    print(f"  RESULT: {factor_name}")
+    print("=" * 52)
+    print(f"  1. Deflated Sharpe prob  : {dsr_line}")
+    print(f"  2. Positive folds        : {wf_result.n_positive_folds}/{n_folds} ({pos_pct:.0%})")
+    print(f"  3. IS -> OOS degradation : {degrad:+.3f}")
+    print(f"  Verdict                  : {verdict}")
     for r in reasons:
-        print(f"  - {r}")
+        print(f"     - {r}")
+    print("=" * 52)
 
     # ── §9.9 Persist ──────────────────────────────────────────────────────────
     _hdr("§9.9 Persist")
@@ -396,6 +464,9 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     """CLI entry point. Returns 0 on success, 1 on error."""
+    # Windows terminal defaults to cp1252; research module uses Unicode box chars.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     args = _parse_args(argv)
 
     # §9.1 — alpha story gate

@@ -55,3 +55,35 @@ coinbase_premium_gap:
   optimize:
     z_entry: [1.5, 2.0, 2.5]
     window: [72, 168, 336]
+
+perpetual_funding_rate:
+  alpha_story: |
+    Perpetual swap funding rates reflect the cost of holding leveraged directional
+    exposure. When the market is net-long and bullish, longs pay shorts (positive
+    funding); when net-short, shorts pay longs (negative funding). Extreme positive
+    funding signals overcrowded longs: carry cost erodes long P&L, eventually forcing
+    de-leveraging and mean-reversion. Extreme negative funding signals the reverse.
+    Who is on the other side: leveraged trend-followers and momentum traders paying
+    the funding bill; hedgers on the short side receiving it.
+    Why the edge should persist: funding reflects a real cash transfer every 8 hours,
+    so the signal is grounded in economics, not just price. Crowded positioning unwinds
+    mechanically when carry cost exceeds expected gain.
+    Expected value: contrarian mean-reversion after extreme funding spikes (|z| > 2),
+    with a holding horizon of 8-48 hours (1-6 funding intervals).
+    Expected decay horizon: 12-24 months; arb funds explicitly farm funding extremes,
+    compressing the edge as AUM grows.
+  source: ccxt_funding
+  symbol: BTC/USDT:USDT
+  venue: binance
+  asset: BTC/USDT
+  timeframe: "1h"
+  direction: both
+  point_in_time_clean: true
+  signal_model: spike_capture
+  signal_params:
+    z_entry: 2.0
+    z_exit: 0.5
+    window: 168
+  optimize:
+    z_entry: [1.5, 2.0, 2.5]
+    window: [72, 168, 336]

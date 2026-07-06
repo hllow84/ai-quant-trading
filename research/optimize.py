@@ -141,11 +141,11 @@ class OptimizeResult:
             sr_trials = self.sharpe_grid.flatten().tolist(),
             n_obs     = 1,     # placeholder; caller should pass actual OOS n_obs
         )
-        flag = "  ⚠ ONE-CELL PLATEAU — treat as overfit" if self.plateau_size == 1 else ""
+        flag = "  [!] ONE-CELL PLATEAU -- treat as overfit" if self.plateau_size == 1 else ""
         lines = [
             "Optimisation report",
             "=" * 52,
-            f"Grid shape:     {self.sharpe_grid.shape[0]} × {self.sharpe_grid.shape[1]}  "
+            f"Grid shape:     {self.sharpe_grid.shape[0]} x {self.sharpe_grid.shape[1]}  "
             f"({self.n_configs} configs)",
             f"Threshold:      {self.threshold:.3f}",
             f"Plateau size:   {self.plateau_size} cells{flag}",

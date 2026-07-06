@@ -110,7 +110,7 @@ def fetch_ohlcv(
         if last_ts <= cursor:
             break
         cursor = last_ts + 1
-        if len(batch) < 1000:
+        if last_ts >= until_ms:
             break
 
     if not rows:
@@ -122,6 +122,74 @@ def fetch_ohlcv(
     df = df[~df.index.duplicated(keep="first")]
     _save_cache(df, cpath)
     return _ts_filter(df, since, until)
+
+
+# ── Two-venue spread ───────────────────────────────────────────────────────────
+
+class SpreadAlignmentError(ValueError):
+    """Raised when the two OHLCV series have more than max_drop_pct non-overlapping bars."""
+
+
+def fetch_ohlcv_spread(
+    symbol_a: str,
+    symbol_b: str,
+    timeframe: str,
+    since: str,
+    until: str,
+    venue_a: str = "binance",
+    venue_b: str = "coinbase",
+    max_drop_pct: float = 0.02,
+) -> tuple[pd.Series, pd.Series]:
+    """
+    Fetch OHLCV close from two venues, inner-join on UTC timestamps.
+
+    Raises SpreadAlignmentError if more than max_drop_pct of bars are dropped
+    by the inner join.
+
+    Returns
+    -------
+    (spread, asset_returns)
+        spread        : close_b - close_a, name="spread"
+        asset_returns : pct_change of close_a (reference venue for trading)
+    """
+    df_a = fetch_ohlcv(symbol_a, timeframe, since, until, venue_a)
+    df_b = fetch_ohlcv(symbol_b, timeframe, since, until, venue_b)
+
+    n_a = len(df_a)
+    n_b = len(df_b)
+
+    joined = df_a[["close"]].join(df_b[["close"]], how="inner", lsuffix="_a", rsuffix="_b")
+
+    n_joined   = len(joined)
+    n_universe = max(n_a, n_b)
+    n_dropped  = n_universe - n_joined
+    drop_pct   = n_dropped / n_universe if n_universe > 0 else 0.0
+
+    print(
+        f"\nAlignment: {venue_a}/{symbol_a}={n_a} bars, "
+        f"{venue_b}/{symbol_b}={n_b} bars\n"
+        f"  Inner join: {n_joined} bars aligned, {n_dropped} dropped ({drop_pct:.2%})"
+    )
+
+    if drop_pct > max_drop_pct:
+        ts_a    = set(df_a.index)
+        ts_b    = set(df_b.index)
+        only_a  = sorted(ts_a - ts_b)
+        only_b  = sorted(ts_b - ts_a)
+        sample_a = [str(t)[:19] for t in only_a[:5]]
+        sample_b = [str(t)[:19] for t in only_b[:5]]
+        raise SpreadAlignmentError(
+            f"Alignment failed: {n_dropped}/{n_universe} = {drop_pct:.2%} bars dropped "
+            f"(threshold {max_drop_pct:.0%}).\n"
+            f"  Only in {venue_a}/{symbol_a}: {len(only_a)} bars (sample: {sample_a})\n"
+            f"  Only in {venue_b}/{symbol_b}: {len(only_b)} bars (sample: {sample_b})\n"
+            f"Common causes: exchange maintenance gaps, different listing dates, "
+            f"API coverage limits, or timezone offset."
+        )
+
+    spread  = (joined["close_b"] - joined["close_a"]).rename("spread")
+    returns = joined["close_a"].pct_change().rename("asset_return")
+    return spread, returns
 
 
 def fetch_funding_rate_history(
@@ -155,7 +223,7 @@ def fetch_funding_rate_history(
         if last_ts <= cursor:
             break
         cursor = last_ts + 1
-        if len(batch) < 1000:
+        if last_ts >= until_ms:
             break
 
     if not rows:
