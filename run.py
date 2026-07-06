@@ -106,7 +106,7 @@ def _load_factor_data(
         n = 8_760 * 3  # 3 years of 1h bars
         return _make_synthetic(n)
 
-    if source in ("ccxt", "ccxt_spread", "ccxt_funding"):
+    if source in ("ccxt", "ccxt_spread", "ccxt_funding", "ccxt_ohlcv"):
         sys.path.insert(0, str(_ROOT))
         timeframe = spec.get("timeframe", "1h")
 
@@ -159,18 +159,25 @@ def _load_factor_data(
             fund_cost = (factor / 8).rename("funding_rate_per_bar")
             return factor, returns, fund_cost
 
-        elif source == "ccxt":
+        elif source == "ccxt_ohlcv":
             from data.adapters.ccxt_adapter import fetch_ohlcv
             ohlcv   = fetch_ohlcv(asset, timeframe, since=start, until=end, venue=venue)
             returns = ohlcv["close"].pct_change().rename("asset_return")
+            # Factor = 1h return (known at bar close; backtest engine applies the
+            # 1-bar execution lag). mean_drift MA cross on this detects trend persistence.
+            factor  = ohlcv["close"].pct_change().rename("price_momentum")
+            return factor, returns, None  # pure spot, no funding cost
+
+        elif source == "ccxt":
             raise NotImplementedError(
-                f"Direct ccxt metric factor not yet implemented. "
-                "Use ccxt_spread, ccxt_funding, or synthetic."
+                "Source 'ccxt' is reserved. Use ccxt_ohlcv for single-asset price "
+                "factors, ccxt_spread for two-venue spreads, or ccxt_funding for "
+                "perpetual funding rate factors."
             )
 
     raise ValueError(
         f"Unknown source '{source}' for factor. "
-        "Supported: ccxt_spread, ccxt_funding, synthetic."
+        "Supported: ccxt_ohlcv, ccxt_spread, ccxt_funding, synthetic."
     )
 
 
