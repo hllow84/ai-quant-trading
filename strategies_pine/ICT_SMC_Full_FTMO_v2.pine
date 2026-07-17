@@ -1,0 +1,343 @@
+//@version=5
+// [v2] barstate.isconfirmed gates entries — signals evaluate on confirmed bar close only.
+//      calc_on_bar_close is not a valid strategy() argument in Pine v5 (valid for indicator() only).
+//      barstate.isconfirmed is the correct v5 equivalent: true only on the bar's final tick.
+strategy("ICT SMC Full Model FTMO", shorttitle="ICT-FTMO", overlay=true, pyramiding=0, default_qty_type=strategy.percent_of_equity, default_qty_value=1, commission_type=strategy.commission.percent, commission_value=0.007, slippage=2)
+
+// ══════════════════════════════════════════════════════════════════
+// WHAT THIS BUILDS — THE FULL ICT MODEL
+// ══════════════════════════════════════════════════════════════════
+// 1. HTF BIAS        — Daily 50 EMA defines the macro trend
+// 2. MARKET STRUCTURE— Swing highs/lows, BOS, CHoCH
+// 3. LIQUIDITY SWEEP — Price wicks through a swing level then closes back
+// 4. DISPLACEMENT    — Institutional candle confirming the move
+// 5. ORDER BLOCKS    — Last opposite candle before the displacement
+// 6. FAIR VALUE GAPS — 3-candle imbalance zones price returns to fill
+// 7. KILL ZONES      — London 07:00-10:00 UTC + NY 13:30-16:00 UTC
+//
+// ENTRY SEQUENCE (long example):
+//   Daily close > 50 EMA (bullish bias)
+//   + Bullish market structure (BOS or CHoCH up)
+//   + Price sweeps a swing LOW (sell-side liquidity raid)
+//   + Bullish displacement candle follows (within 5 bars)
+//   + Price retraces into the bullish ORDER BLOCK or FVG   ← both paths now require sweep
+//   + Kill zone active
+//   = LONG entry
+
+// ══════════════════════════════════════════════════════════════════
+// INPUTS
+// ══════════════════════════════════════════════════════════════════
+var string G1 = "Market Structure"
+pivot_len    = input.int(5,  "Pivot Length (bars each side)", group=G1, minval=2, maxval=10)
+
+var string G2 = "ICT Model"
+use_ob       = input.bool(true,  "Use Order Block entries",        group=G2)
+use_fvg      = input.bool(true,  "Use Fair Value Gap entries",     group=G2)
+use_kz       = input.bool(true,  "Kill Zone filter (London + NY)", group=G2)
+disp_mult    = input.float(1.5,  "Displacement multiplier",        group=G2, minval=1.0, step=0.1, tooltip="Minimum candle size vs 20-bar average to qualify as institutional displacement")
+ob_max_bars  = input.int(50,     "Max OB age (bars)",              group=G2, minval=10,  tooltip="Invalidate order block after this many bars if not tested")
+sweep_window = input.int(5,      "Sweep-to-displacement window",   group=G2, minval=1,   tooltip="Bars after a sweep within which displacement must occur")
+
+var string G3 = "Risk"
+rr_ratio     = input.float(2.0, "Reward : Risk", group=G3, minval=0.5, step=0.5)
+
+// [v2] pc_sym default changed from "EURUSD" to "XAUUSD".
+//      pc_id and pc_risk are placeholders — set them before enabling live alerts.
+var string G4 = "PineConnector"
+pc_id   = input.string("YOUR_LICENSE_ID", "License ID",     group=G4)
+pc_risk = input.float(0.5,                "Risk % / Trade", group=G4, minval=0.1, step=0.1)
+pc_sym  = input.string("XAUUSD",          "Symbol",         group=G4)
+
+// ══════════════════════════════════════════════════════════════════
+// 1. HTF BIAS — Daily 50 EMA
+// ══════════════════════════════════════════════════════════════════
+d_ema50      = request.security(syminfo.tickerid, "D", ta.ema(close, 50), lookahead=barmerge.lookahead_off)
+bullish_bias = close > d_ema50
+bearish_bias = close < d_ema50
+
+// ══════════════════════════════════════════════════════════════════
+// 2. MARKET STRUCTURE — Pivot-based swing levels, BOS, CHoCH
+// ══════════════════════════════════════════════════════════════════
+ph = ta.pivothigh(high, pivot_len, pivot_len)
+pl = ta.pivotlow(low,  pivot_len, pivot_len)
+
+var float last_sh = na
+var float last_sl = na
+
+if not na(ph)
+    last_sh := ph
+if not na(pl)
+    last_sl := pl
+
+bull_bos = not na(last_sh) and close > last_sh and close[1] <= last_sh
+bear_bos = not na(last_sl) and close < last_sl and close[1] >= last_sl
+
+var int mkt_str = 0  // 1=bullish, -1=bearish
+
+bull_choch = mkt_str == -1 and bull_bos
+bear_choch = mkt_str ==  1 and bear_bos
+
+if bull_bos
+    mkt_str := 1
+if bear_bos
+    mkt_str := -1
+
+// ══════════════════════════════════════════════════════════════════
+// 3. LIQUIDITY SWEEP — Stop hunt detection
+// Bullish: wick below swing low, close back above (SSL raid)
+// Bearish: wick above swing high, close back below (BSL raid)
+// ══════════════════════════════════════════════════════════════════
+bull_sweep = not na(last_sl) and low  < last_sl and close > last_sl
+bear_sweep = not na(last_sh) and high > last_sh and close < last_sh
+
+var bool awaiting_bull = false
+var bool awaiting_bear = false
+var int  bull_sw_bar   = na
+var int  bear_sw_bar   = na
+
+if bull_sweep
+    awaiting_bull := true
+    bull_sw_bar   := bar_index
+
+if bear_sweep
+    awaiting_bear := true
+    bear_sw_bar   := bar_index
+
+if awaiting_bull and not na(bull_sw_bar) and (bar_index - bull_sw_bar) > sweep_window
+    awaiting_bull := false
+if awaiting_bear and not na(bear_sw_bar) and (bar_index - bear_sw_bar) > sweep_window
+    awaiting_bear := false
+
+// ══════════════════════════════════════════════════════════════════
+// 4. DISPLACEMENT — Large institutional candle after the sweep
+// Body must exceed the 20-bar average body by the multiplier
+// ══════════════════════════════════════════════════════════════════
+avg_body  = ta.sma(math.abs(close - open), 20)
+body_size = math.abs(close - open)
+bull_disp = close > open and body_size > avg_body * disp_mult
+bear_disp = close < open and body_size > avg_body * disp_mult
+
+// ══════════════════════════════════════════════════════════════════
+// 5. ORDER BLOCKS — Last opposite candle before the displacement
+// Bullish OB = last bearish candle (body) before bull displacement
+// Bearish OB = last bullish candle (body) before bear displacement
+// Invalidated when: price closes through the OB OR OB ages out
+//
+// [v2] bull_fvg_armed / bear_fvg_armed: set in the same sweep→displacement
+//      event that creates the OB, and aged/invalidated in parallel.
+//      FVG entries are only permitted when the matching arm flag is true,
+//      ensuring both entry paths require a prior liquidity sweep.
+// ══════════════════════════════════════════════════════════════════
+var float bull_ob_hi  = na
+var float bull_ob_lo  = na
+var bool  bull_ob_on  = false
+var int   bull_ob_age = 0
+var float bear_ob_hi  = na
+var float bear_ob_lo  = na
+var bool  bear_ob_on  = false
+var int   bear_ob_age = 0
+
+// [v2] FVG arm flags — gated on the same sweep→displacement event as the OB
+var bool bull_fvg_armed = false
+var int  bull_fvg_arm_age = 0
+var bool bear_fvg_armed = false
+var int  bear_fvg_arm_age = 0
+
+if awaiting_bull and bull_disp
+    awaiting_bull := false
+    for i = 1 to 30
+        if close[i] < open[i]
+            bull_ob_hi      := open[i]
+            bull_ob_lo      := close[i]
+            bull_ob_on      := true
+            bull_ob_age     := 0
+            break
+    // [v2] arm FVG entries on the same sweep→displacement trigger
+    bull_fvg_armed    := true
+    bull_fvg_arm_age  := 0
+
+if awaiting_bear and bear_disp
+    awaiting_bear := false
+    for i = 1 to 30
+        if close[i] > open[i]
+            bear_ob_hi      := close[i]
+            bear_ob_lo      := open[i]
+            bear_ob_on      := true
+            bear_ob_age     := 0
+            break
+    // [v2] arm FVG entries on the same sweep→displacement trigger
+    bear_fvg_armed    := true
+    bear_fvg_arm_age  := 0
+
+if bull_ob_on
+    bull_ob_age += 1
+    if close < bull_ob_lo or bull_ob_age > ob_max_bars
+        bull_ob_on := false
+
+if bear_ob_on
+    bear_ob_age += 1
+    if close > bear_ob_hi or bear_ob_age > ob_max_bars
+        bear_ob_on := false
+
+// [v2] age and expire FVG arm flags in parallel with OB age limit
+if bull_fvg_armed
+    bull_fvg_arm_age += 1
+    if bull_fvg_arm_age > ob_max_bars
+        bull_fvg_armed := false
+
+if bear_fvg_armed
+    bear_fvg_arm_age += 1
+    if bear_fvg_arm_age > ob_max_bars
+        bear_fvg_armed := false
+
+// ══════════════════════════════════════════════════════════════════
+// 6. FAIR VALUE GAPS — 3-candle imbalance zones
+// Bullish FVG: high[2] < low[0]  — gap above candle-2, below candle-0
+// Bearish FVG: low[2]  > high[0] — gap below candle-2, above candle-0
+// Store last 3 of each type; price entering zone = entry signal
+// ══════════════════════════════════════════════════════════════════
+bull_fvg_new = high[2] < low[0]
+bear_fvg_new = low[2]  > high[0]
+
+var float[] bfvg_hi = array.new_float(0)
+var float[] bfvg_lo = array.new_float(0)
+var float[] sfvg_hi = array.new_float(0)
+var float[] sfvg_lo = array.new_float(0)
+
+if bull_fvg_new
+    array.unshift(bfvg_hi, low[0])
+    array.unshift(bfvg_lo, high[2])
+    if array.size(bfvg_hi) > 3
+        array.pop(bfvg_hi)
+        array.pop(bfvg_lo)
+
+if bear_fvg_new
+    array.unshift(sfvg_hi, low[2])
+    array.unshift(sfvg_lo, high[0])
+    if array.size(sfvg_hi) > 3
+        array.pop(sfvg_hi)
+        array.pop(sfvg_lo)
+
+f_in_bull_fvg() =>
+    result = false
+    if array.size(bfvg_hi) > 0
+        for i = 0 to array.size(bfvg_hi) - 1
+            if close <= array.get(bfvg_hi, i) and close >= array.get(bfvg_lo, i)
+                result := true
+    result
+
+f_in_bear_fvg() =>
+    result = false
+    if array.size(sfvg_hi) > 0
+        for i = 0 to array.size(sfvg_hi) - 1
+            if close <= array.get(sfvg_hi, i) and close >= array.get(sfvg_lo, i)
+                result := true
+    result
+
+in_bull_fvg = f_in_bull_fvg()
+in_bear_fvg = f_in_bear_fvg()
+
+// ══════════════════════════════════════════════════════════════════
+// 7. KILL ZONES — UTC time windows (highest institutional activity)
+// London Open: 07:00-10:00 UTC
+// New York Open: 13:30-16:00 UTC
+// ══════════════════════════════════════════════════════════════════
+london_kz = not na(time(timeframe.period, "0700-1000", "UTC+0"))
+ny_kz     = not na(time(timeframe.period, "1330-1600", "UTC+0"))
+in_kz     = not use_kz or london_kz or ny_kz
+
+// ══════════════════════════════════════════════════════════════════
+// ENTRY CONDITIONS — All components must align
+//
+// [v2] FVG path now requires bull_fvg_armed / bear_fvg_armed.
+//      Both OB and FVG entries are gated on a prior sweep→displacement.
+//      No entry of either type can fire without a preceding liquidity sweep.
+//
+// BEFORE (v1):
+//   long_entry  = bullish_bias and mkt_str == 1 and (use_ob and in_bull_ob or use_fvg and in_bull_fvg) and in_kz and no_pos
+//   short_entry = bearish_bias and mkt_str == -1 and (use_ob and in_bear_ob or use_fvg and in_bear_fvg) and in_kz and no_pos
+//
+// AFTER (v2):
+//   long_entry  = barstate.isconfirmed and bullish_bias and mkt_str == 1 and (use_ob and in_bull_ob or use_fvg and bull_fvg_armed and in_bull_fvg) and in_kz and no_pos
+//   short_entry = barstate.isconfirmed and bearish_bias and mkt_str == -1 and (use_ob and in_bear_ob or use_fvg and bear_fvg_armed and in_bear_fvg) and in_kz and no_pos
+//   (barstate.isconfirmed replaces v4 calc_on_bar_close: fires only on the bar's final tick)
+// ══════════════════════════════════════════════════════════════════
+no_pos = strategy.position_size == 0
+
+in_bull_ob = bull_ob_on and close >= bull_ob_lo and close <= bull_ob_hi
+in_bear_ob = bear_ob_on and close <= bear_ob_hi and close >= bear_ob_lo
+
+long_entry  = barstate.isconfirmed and bullish_bias and mkt_str == 1 and (use_ob and in_bull_ob or use_fvg and bull_fvg_armed and in_bull_fvg) and in_kz and no_pos
+short_entry = barstate.isconfirmed and bearish_bias and mkt_str == -1 and (use_ob and in_bear_ob or use_fvg and bear_fvg_armed and in_bear_fvg) and in_kz and no_pos
+
+// ══════════════════════════════════════════════════════════════════
+// STOP LOSS & TAKE PROFIT
+// SL: below order block low (long) / above order block high (short)
+// TP: SL distance x R ratio
+// ══════════════════════════════════════════════════════════════════
+buf      = syminfo.mintick * 5
+sl_long  = (bull_ob_on ? bull_ob_lo : ta.lowest(low,  10)) - buf
+tp_long  = close + (close - sl_long)  * rr_ratio
+sl_short = (bear_ob_on ? bear_ob_hi : ta.highest(high, 10)) + buf
+tp_short = close - (sl_short - close) * rr_ratio
+
+// ══════════════════════════════════════════════════════════════════
+// ORDERS
+// ══════════════════════════════════════════════════════════════════
+if long_entry
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", from_entry="Long", stop=sl_long, limit=tp_long)
+
+if short_entry
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", from_entry="Short", stop=sl_short, limit=tp_short)
+
+// ══════════════════════════════════════════════════════════════════
+// PINECONNECTOR ALERTS
+// ══════════════════════════════════════════════════════════════════
+if long_entry
+    alert(pc_id + ",buy,"  + pc_sym + ",risk=" + str.tostring(pc_risk) + ",sl=" + str.tostring(sl_long,  "#.#####") + ",tp=" + str.tostring(tp_long,  "#.#####"), alert.freq_once_per_bar_close)
+if short_entry
+    alert(pc_id + ",sell," + pc_sym + ",risk=" + str.tostring(pc_risk) + ",sl=" + str.tostring(sl_short, "#.#####") + ",tp=" + str.tostring(tp_short, "#.#####"), alert.freq_once_per_bar_close)
+
+// ══════════════════════════════════════════════════════════════════
+// VISUALS
+// ══════════════════════════════════════════════════════════════════
+// HTF bias line
+plot(d_ema50, "Daily 50 EMA", color=color.new(color.white, 0), linewidth=2)
+bgcolor(bullish_bias ? color.new(color.green, 95) : color.new(color.red, 95), title="HTF Bias")
+
+// Swing structure levels
+plot(last_sh, "Last Swing High", color=color.new(color.red,   50), linewidth=1, style=plot.style_linebr)
+plot(last_sl, "Last Swing Low",  color=color.new(color.teal,  50), linewidth=1, style=plot.style_linebr)
+
+// BOS and CHoCH labels
+plotshape(bull_bos and not bull_choch, "BOS Up",    shape.labelup,   location.belowbar, color.new(color.green,  30), text="BOS",   textcolor=color.white, size=size.tiny)
+plotshape(bear_bos and not bear_choch, "BOS Down",  shape.labeldown, location.abovebar, color.new(color.red,    30), text="BOS",   textcolor=color.white, size=size.tiny)
+plotshape(bull_choch,                  "CHoCH Up",  shape.labelup,   location.belowbar, color.new(color.lime,    0), text="CHoCH", textcolor=color.black, size=size.small)
+plotshape(bear_choch,                  "CHoCH Down",shape.labeldown, location.abovebar, color.new(color.orange,  0), text="CHoCH", textcolor=color.black, size=size.small)
+
+// Liquidity sweep dots
+plotshape(bull_sweep, "SSL Swept", shape.circle, location.belowbar, color.new(color.aqua,    0), size=size.tiny)
+plotshape(bear_sweep, "BSL Swept", shape.circle, location.abovebar, color.new(color.fuchsia,  0), size=size.tiny)
+
+// Order block zones (horizontal lines at OB boundaries)
+plot(bull_ob_on ? bull_ob_hi : na, "Bull OB Hi", color=color.new(color.green, 20), linewidth=2, style=plot.style_linebr)
+plot(bull_ob_on ? bull_ob_lo : na, "Bull OB Lo", color=color.new(color.green, 20), linewidth=2, style=plot.style_linebr)
+plot(bear_ob_on ? bear_ob_hi : na, "Bear OB Hi", color=color.new(color.red,   20), linewidth=2, style=plot.style_linebr)
+plot(bear_ob_on ? bear_ob_lo : na, "Bear OB Lo", color=color.new(color.red,   20), linewidth=2, style=plot.style_linebr)
+
+// Most recent FVG boundaries
+bfvg_top_plot = array.size(bfvg_hi) > 0 ? array.get(bfvg_hi, 0) : na
+bfvg_bot_plot = array.size(bfvg_lo) > 0 ? array.get(bfvg_lo, 0) : na
+sfvg_top_plot = array.size(sfvg_hi) > 0 ? array.get(sfvg_hi, 0) : na
+sfvg_bot_plot = array.size(sfvg_lo) > 0 ? array.get(sfvg_lo, 0) : na
+
+plot(bfvg_top_plot, "Bull FVG Hi", color=color.new(color.green, 60), linewidth=1, style=plot.style_linebr)
+plot(bfvg_bot_plot, "Bull FVG Lo", color=color.new(color.green, 60), linewidth=1, style=plot.style_linebr)
+plot(sfvg_top_plot, "Bear FVG Hi", color=color.new(color.red,   60), linewidth=1, style=plot.style_linebr)
+plot(sfvg_bot_plot, "Bear FVG Lo", color=color.new(color.red,   60), linewidth=1, style=plot.style_linebr)
+
+// Entry signals
+plotshape(long_entry,  "Long",  shape.triangleup,   location.belowbar, color.new(color.green, 0), size=size.normal)
+plotshape(short_entry, "Short", shape.triangledown,  location.abovebar, color.new(color.red,   0), size=size.normal)

@@ -1,0 +1,104 @@
+//@version=5
+strategy("London Breakout FTMO", shorttitle="LB-FTMO", overlay=true, pyramiding=0, default_qty_type=strategy.percent_of_equity, default_qty_value=1, commission_type=strategy.commission.percent, commission_value=0.007, slippage=2, calc_on_bar_close=true)
+
+// ── INPUTS ───────────────────────────────────────────────────────────────────
+var string GS = "Session Settings (UTC time)"
+min_pips = input.int(15, "Min Asian Range (pips)", group=GS, minval=1, tooltip="Skip the day if Asian range is too narrow — choppy market")
+max_pips = input.int(80, "Max Asian Range (pips)", group=GS, minval=1, tooltip="Skip the day if Asian range is too wide — already volatile")
+
+var string GR = "Risk Management"
+rr_ratio = input.float(2.0, "Reward : Risk (R)", group=GR, minval=0.5, step=0.5, tooltip="TP = SL distance x R. Start with 2.0.")
+
+var string GP = "PineConnector Bridge"
+pc_id   = input.string("YOUR_LICENSE_ID", "License ID",     group=GP)
+pc_risk = input.float(0.5,                "Risk % / Trade", group=GP, minval=0.1, step=0.1)
+pc_sym  = input.string("EURUSD",          "Symbol",         group=GP, tooltip="Match exactly to your broker symbol")
+
+// ── SESSION DETECTION (UTC) ──────────────────────────────────────────────────
+// Asian range: midnight to London open
+// London window: 07:00-12:00 UTC (first 5 hours = highest probability)
+is_asian  = not na(time(timeframe.period, "0000-0700", "UTC+0"))
+is_london = not na(time(timeframe.period, "0700-1200", "UTC+0"))
+new_day   = ta.change(time("D")) != 0
+
+// ── ASIAN RANGE TRACKING ─────────────────────────────────────────────────────
+var float range_hi = na
+var float range_lo = na
+var bool  traded   = false
+
+if new_day
+    range_hi := na
+    range_lo := na
+    traded   := false
+
+if is_asian
+    range_hi := na(range_hi) ? high : math.max(range_hi, high)
+    range_lo := na(range_lo) ? low  : math.min(range_lo, low)
+
+// ── RANGE SIZE FILTER ────────────────────────────────────────────────────────
+pip_size   = syminfo.mintick * 10
+range_pips = (na(range_hi) or na(range_lo)) ? 0.0 : (range_hi - range_lo) / pip_size
+valid_day  = range_pips >= min_pips and range_pips <= max_pips
+
+// ── SIGNALS ──────────────────────────────────────────────────────────────────
+// Long:  London open bar closes ABOVE Asian high
+// Short: London open bar closes BELOW Asian low
+// Only one trade per day (traded flag prevents re-entry)
+long_signal  = is_london and not traded and valid_day and not na(range_hi) and close > range_hi
+short_signal = is_london and not traded and valid_day and not na(range_lo) and close < range_lo
+
+// ── STOP LOSS & TAKE PROFIT ──────────────────────────────────────────────────
+// SL sits at the opposite side of the Asian range
+// TP = SL distance x R ratio
+sl_long  = range_lo
+tp_long  = close + (close - sl_long)  * rr_ratio
+sl_short = range_hi
+tp_short = close - (sl_short - close) * rr_ratio
+
+// ── STRATEGY ORDERS ──────────────────────────────────────────────────────────
+if long_signal
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", from_entry="Long", stop=sl_long, limit=tp_long)
+    traded := true
+
+if short_signal
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", from_entry="Short", stop=sl_short, limit=tp_short)
+    traded := true
+
+// Time-based exit: close at end of London window if trade still open
+session_ended = not is_london and is_london[1]
+if session_ended and strategy.position_size != 0
+    strategy.close_all(comment="London close")
+
+// ── PINECONNECTOR ALERTS ─────────────────────────────────────────────────────
+if long_signal
+    alert(pc_id + ",buy," + pc_sym + ",risk=" + str.tostring(pc_risk) + ",sl=" + str.tostring(sl_long, "#.#####") + ",tp=" + str.tostring(tp_long, "#.#####"), alert.freq_once_per_bar_close)
+
+if short_signal
+    alert(pc_id + ",sell," + pc_sym + ",risk=" + str.tostring(pc_risk) + ",sl=" + str.tostring(sl_short, "#.#####") + ",tp=" + str.tostring(tp_short, "#.#####"), alert.freq_once_per_bar_close)
+
+if session_ended and strategy.position_size != 0
+    alert(pc_id + ",closeall," + pc_sym, alert.freq_once_per_bar_close)
+
+// ── VISUALS ──────────────────────────────────────────────────────────────────
+// Asian range lines (orange — the key levels to watch)
+plot(na(range_hi) ? na : range_hi, "Asian High", color=color.new(color.orange, 0), linewidth=2, style=plot.style_linebr)
+plot(na(range_lo) ? na : range_lo, "Asian Low",  color=color.new(color.orange, 0), linewidth=2, style=plot.style_linebr)
+
+// Session backgrounds
+bgcolor(is_asian  ? color.new(color.yellow, 88) : na, title="Asian session")
+bgcolor(is_london ? color.new(color.blue,   90) : na, title="London session")
+
+// Entry signals
+plotshape(long_signal,  "Long",  shape.triangleup,   location.belowbar, color.new(color.green, 0), size=size.normal)
+plotshape(short_signal, "Short", shape.triangledown,  location.abovebar, color.new(color.red,   0), size=size.normal)
+
+// ── WHAT TO CHECK IN STRATEGY TESTER ────────────────────────────────────────
+// Use H1 timeframe on EURUSD, date range 2022-2024
+// Targets before paying FTMO fee:
+//   Net profit    > 5%
+//   Max drawdown  < 4%
+//   Win rate      > 45%
+//   Total trades  > 40
+//   Avg RR        > 1.5

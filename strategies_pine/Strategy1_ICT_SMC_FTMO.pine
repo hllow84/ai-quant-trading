@@ -1,0 +1,76 @@
+//@version=5
+strategy("ICT SMC FTMO - Strategy 1", shorttitle="SMC-FTMO", overlay=true, pyramiding=0, default_qty_type=strategy.percent_of_equity, default_qty_value=1, commission_type=strategy.commission.percent, commission_value=0.007, slippage=2, calc_on_bar_close=true)
+
+// ── HOW THIS STRATEGY WORKS ───────────────────────────────────────────────────
+// ICT core concept: institutions grab liquidity sitting above swing highs
+// or below swing lows (retail stop losses), then reverse price.
+// We trade AFTER the sweep when price closes back through the level.
+//
+// LONG:  Uptrend (above 200 EMA) + price sweeps BELOW a prior swing low + closes back above → buy
+// SHORT: Downtrend (below 200 EMA) + price sweeps ABOVE a prior swing high + closes back below → sell
+// STOP:  Beyond the sweep wick (the furthest point of the liquidity grab)
+// TARGET: 2R from stop
+
+// ── INPUTS ───────────────────────────────────────────────────────────────────
+var string GS = "Strategy Settings"
+pivot_len  = input.int(5,   "Swing Pivot Length",  group=GS, minval=2, tooltip="Bars each side to confirm a swing high/low")
+rr_ratio   = input.float(2.0, "Reward:Risk (R)",   group=GS, minval=0.5, step=0.5)
+
+var string GP = "PineConnector Bridge"
+pc_id   = input.string("YOUR_LICENSE_ID", "License ID",     group=GP)
+pc_risk = input.float(0.5,                "Risk % / Trade", group=GP, minval=0.1, step=0.1)
+pc_sym  = input.string("EURUSD",          "Symbol",         group=GP)
+
+// ── INDICATORS ────────────────────────────────────────────────────────────────
+ema200 = ta.ema(close, 200)
+
+// Confirmed swing highs and lows (pivot_len bars each side to confirm)
+raw_sh = ta.pivothigh(high, pivot_len, pivot_len)
+raw_sl = ta.pivotlow(low,  pivot_len, pivot_len)
+
+// Store most recent confirmed swing levels
+var float last_sh = na
+var float last_sl = na
+
+if not na(raw_sh)
+    last_sh := raw_sh
+if not na(raw_sl)
+    last_sl := raw_sl
+
+// ── SIGNALS ──────────────────────────────────────────────────────────────────
+// Bullish liquidity sweep: uptrend + wick below swing low + close back above
+bull_sweep = close > ema200 and not na(last_sl) and low < last_sl and close > last_sl and strategy.position_size == 0
+
+// Bearish liquidity sweep: downtrend + wick above swing high + close back below
+bear_sweep = close < ema200 and not na(last_sh) and high > last_sh and close < last_sh and strategy.position_size == 0
+
+// ── PRICE LEVELS ─────────────────────────────────────────────────────────────
+sl_long  = low
+tp_long  = close + (close - sl_long) * rr_ratio
+
+sl_short = high
+tp_short = close - (sl_short - close) * rr_ratio
+
+// ── ORDERS ───────────────────────────────────────────────────────────────────
+if bull_sweep
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", from_entry="Long", stop=sl_long, limit=tp_long)
+
+if bear_sweep
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", from_entry="Short", stop=sl_short, limit=tp_short)
+
+// ── PINECONNECTOR ALERTS ─────────────────────────────────────────────────────
+if bull_sweep
+    alert(pc_id + ",buy," + pc_sym + ",risk=" + str.tostring(pc_risk) + ",sl=" + str.tostring(sl_long, "#.#####") + ",tp=" + str.tostring(tp_long, "#.#####"), alert.freq_once_per_bar_close)
+
+if bear_sweep
+    alert(pc_id + ",sell," + pc_sym + ",risk=" + str.tostring(pc_risk) + ",sl=" + str.tostring(sl_short, "#.#####") + ",tp=" + str.tostring(tp_short, "#.#####"), alert.freq_once_per_bar_close)
+
+// ── VISUALS ──────────────────────────────────────────────────────────────────
+plot(ema200, "200 EMA", color=color.new(color.white, 0), linewidth=2)
+bgcolor(close > ema200 ? color.new(color.green, 95) : color.new(color.red, 95), title="Trend zone")
+plot(last_sh, "Last Swing High", color=color.new(color.red, 40),   linewidth=1, style=plot.style_linebr)
+plot(last_sl, "Last Swing Low",  color=color.new(color.green, 40), linewidth=1, style=plot.style_linebr)
+plotshape(bull_sweep, "Long sweep",  shape.triangleup,   location.belowbar, color.new(color.green, 0), size=size.normal)
+plotshape(bear_sweep, "Short sweep", shape.triangledown,  location.abovebar, color.new(color.red,   0), size=size.normal)

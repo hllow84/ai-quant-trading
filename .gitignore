@@ -4,3 +4,12 @@ __pycache__/
 data/cache/
 .pytest_cache/
 *.parquet
+
+# Large intermediate raw data pulls (per-year Dukascopy bid/ask).
+data/raw/
+download/
+
+# Merged clean spot CSV is 250 MB — exceeds GitHub's 100 MB limit, kept LOCAL only.
+# Reproduce it with scripts/download_xauusd.sh + scripts/merge_xauusd.py.
+data/XAUUSD_M1_*_spot_dukascopy.csv
+*.csv

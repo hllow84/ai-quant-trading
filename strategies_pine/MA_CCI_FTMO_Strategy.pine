@@ -1,0 +1,167 @@
+// ══════════════════════════════════════════════════════════════════════
+//  MA-CCI FTMO Strategy v1.0
+//  Designed for: EURUSD (adaptable to XAUUSD, GBPUSD, BTCUSD)
+//  Timeframe: H1 or H4 recommended
+//  Platform: TradingView → MT5 via PineConnector bridge
+// ══════════════════════════════════════════════════════════════════════
+//@version=5
+strategy(
+    title             = "MA-CCI FTMO Strategy v1",
+    shorttitle        = "MA-CCI FTMO",
+    overlay           = true,
+    pyramiding        = 0,
+    default_qty_type  = strategy.percent_of_equity,
+    default_qty_value = 1,
+    commission_type   = strategy.commission.percent,
+    commission_value  = 0.007,
+    slippage          = 2,
+    calc_on_bar_close = true
+)
+
+// ══════════════════════════════════════════════════════════════════════
+//  INPUTS
+// ══════════════════════════════════════════════════════════════════════
+var string GS = "── Strategy Parameters ──"
+sma_len      = input.int  (50,    "SMA Period",         group=GS, minval=1)
+cci_len      = input.int  (20,    "CCI Period",         group=GS, minval=1)
+slope_bars   = input.int  (3,     "CCI Slope Lookback", group=GS, minval=1,
+                            tooltip="CCI must be trending in the signal direction vs N bars ago — filters weak crossovers")
+enable_short = input.bool (false, "Enable Short Trades",group=GS,
+                            tooltip="OFF by default — test longs first before enabling shorts")
+
+var string GR = "── Risk Management ──"
+sl_pct   = input.float(1.5, "Stop Loss %",       group=GR, minval=0.1, step=0.1,
+                        tooltip="% distance from entry to stop. Default 1.5% = 15 pips on EURUSD at 1.0800")
+rr_ratio = input.float(2.0, "Reward:Risk (R)",   group=GR, minval=0.5, step=0.5,
+                        tooltip="TP = SL distance × R. Default 2.0 = 2R target. Try 1.5 or 3.0 in backtest.")
+
+var string GP = "── PineConnector Bridge ──"
+pc_id    = input.string("YOUR_LICENSE_ID", "License ID",    group=GP,
+                         tooltip="Replace with your PineConnector license key")
+pc_risk  = input.float (0.5,               "Risk % / Trade",group=GP, minval=0.1, step=0.1,
+                         tooltip="0.5% = safe for FTMO. Max 1% for the challenge.")
+pc_sym   = input.string("EURUSD",          "Symbol",        group=GP,
+                         tooltip="Must match your broker symbol exactly (e.g. EURUSDm, EURUSD.r)")
+
+// ══════════════════════════════════════════════════════════════════════
+//  INDICATORS
+// ══════════════════════════════════════════════════════════════════════
+sma = ta.sma(close, sma_len)   // Trend filter: price must be on the right side
+cci = ta.cci(close, cci_len)   // Momentum: crossover of zero line = signal
+
+// Slope confirmation: CCI must be moving in the trade direction
+// over the last N bars — kills weak, flat crossovers
+cci_rising  = cci > cci[slope_bars]
+cci_falling = cci < cci[slope_bars]
+
+// ══════════════════════════════════════════════════════════════════════
+//  SIGNAL CONDITIONS
+//  All signals fire on bar CLOSE only → no repainting → safe for FTMO
+// ══════════════════════════════════════════════════════════════════════
+long_entry = (
+     close > sma              // Price above 50 SMA (uptrend)
+     and ta.crossover(cci, 0) // CCI crosses above zero
+     and cci_rising           // CCI slope confirms momentum
+     and strategy.position_size == 0  // No existing position
+ )
+
+short_entry = (
+     enable_short
+     and close < sma               // Price below 50 SMA (downtrend)
+     and ta.crossunder(cci, 0)     // CCI crosses below zero
+     and cci_falling               // CCI slope confirms momentum
+     and strategy.position_size == 0
+ )
+
+// Exit: either SMA side-switch OR CCI crosses back through zero
+long_exit  = (close < sma or ta.crossunder(cci, 0)) and strategy.position_size  > 0
+short_exit = (close > sma or ta.crossover(cci, 0))  and strategy.position_size  < 0
+
+// ══════════════════════════════════════════════════════════════════════
+//  PRICE LEVELS  (calculated at bar close = confirmed entry price)
+// ══════════════════════════════════════════════════════════════════════
+sl_long  = close * (1 - sl_pct / 100)
+tp_long  = close + (close - sl_long) * rr_ratio
+
+sl_short = close * (1 + sl_pct / 100)
+tp_short = close - (sl_short - close) * rr_ratio
+
+// ══════════════════════════════════════════════════════════════════════
+//  STRATEGY ORDERS  (backtesting engine)
+// ══════════════════════════════════════════════════════════════════════
+if long_entry
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long TP/SL", from_entry="Long", stop=sl_long, limit=tp_long)
+
+if short_entry
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short TP/SL", from_entry="Short", stop=sl_short, limit=tp_short)
+
+if long_exit
+    strategy.close("Long",  comment="CCI/SMA exit")
+
+if short_exit
+    strategy.close("Short", comment="CCI/SMA exit")
+
+// ══════════════════════════════════════════════════════════════════════
+//  PINECONNECTOR ALERTS
+//  Fires on bar close only → no premature triggers
+//  Format: LICENSE,command,SYMBOL,risk=X,sl=PRICE,tp=PRICE
+// ══════════════════════════════════════════════════════════════════════
+if long_entry
+    alert(
+         pc_id + ",buy," + pc_sym
+         + ",risk=" + str.tostring(pc_risk)
+         + ",sl="   + str.tostring(sl_long,  "#.#####")
+         + ",tp="   + str.tostring(tp_long,  "#.#####"),
+         alert.freq_once_per_bar_close
+     )
+
+if short_entry
+    alert(
+         pc_id + ",sell," + pc_sym
+         + ",risk=" + str.tostring(pc_risk)
+         + ",sl="   + str.tostring(sl_short, "#.#####")
+         + ",tp="   + str.tostring(tp_short, "#.#####"),
+         alert.freq_once_per_bar_close
+     )
+
+if long_exit
+    alert(pc_id + ",closelong,"  + pc_sym, alert.freq_once_per_bar_close)
+
+if short_exit
+    alert(pc_id + ",closeshort," + pc_sym, alert.freq_once_per_bar_close)
+
+// ══════════════════════════════════════════════════════════════════════
+//  VISUALS
+// ══════════════════════════════════════════════════════════════════════
+// 50 SMA — the trend backbone
+plot(sma, "50 SMA", color=color.new(color.blue, 0), linewidth=2)
+
+// Green background = bullish zone (above SMA), red = bearish zone
+bgcolor(
+     close > sma ? color.new(color.green, 93) : color.new(color.red, 93),
+     title="Trend zone"
+ )
+
+// Entry arrows
+plotshape(long_entry,  "Long entry",  shape.triangleup,   location.belowbar,
+           color.new(color.green, 0), size=size.small)
+plotshape(short_entry, "Short entry", shape.triangledown,  location.abovebar,
+           color.new(color.red, 0),   size=size.small)
+
+// Exit markers
+plotshape(long_exit  and not long_entry,  "Long exit",  shape.xcross,
+           location.abovebar, color.new(color.orange, 0), size=size.tiny)
+plotshape(short_exit and not short_entry, "Short exit", shape.xcross,
+           location.belowbar, color.new(color.orange, 0), size=size.tiny)
+
+// ══════════════════════════════════════════════════════════════════════
+//  WHAT TO CHECK IN THE STRATEGY TESTER (bottom panel in TradingView)
+//  Target before taking the FTMO challenge:
+//    Net profit:       > 5% over 60+ bars
+//    Max drawdown:     < 4%
+//    Win rate:         > 40%
+//    Avg R:R achieved: > 1.5
+//    Total trades:     > 30 (enough sample size)
+// ══════════════════════════════════════════════════════════════════════
