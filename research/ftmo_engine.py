@@ -46,9 +46,23 @@ def _slip_per_side(ts: pd.Timestamp) -> float:
     return SLIP_NORMAL_PER_SIDE
 
 
-def simulate_trades(m1_mid: pd.DataFrame, trades: list[dict]) -> pd.DataFrame:
+def simulate_trades(
+    m1_mid: pd.DataFrame,
+    trades: list[dict],
+    strictly_after: bool = False,
+) -> pd.DataFrame:
     """
-    Resolve each candidate trade on M1 mid data.
+    Resolve each candidate trade on a mid-OHLC resolution frame.
+
+    `m1_mid` is any OHLC frame (M1 for intraday fidelity, or H4 for swing speed)
+    with columns mid_high, mid_low, mid_close, spread.
+
+    strictly_after : if True, resolution starts at the first bar STRICTLY AFTER
+        entry_time. Use this when the resolution frame is the SAME frame the signal
+        was generated on (e.g. H4 signals resolved on H4 bars), so the entry bar's
+        own range is not re-used (which would be look-ahead). For M1 resolution of
+        coarser signals, leave False (the M1 bar at entry_time already sits after
+        the signal bar's close).
 
     Each trade dict must have:
         entry_time  : pd.Timestamp (decision/execution time; resolution scans M1 bars >= this)
@@ -85,7 +99,7 @@ def simulate_trades(m1_mid: pd.DataFrame, trades: list[dict]) -> pd.DataFrame:
 
         entry_ns = pd.Timestamp(entry_time).tz_convert(None).value
         end_ns   = pd.Timestamp(sess_end).tz_convert(None).value
-        start = int(np.searchsorted(ts_ns, entry_ns, side="left"))
+        start = int(np.searchsorted(ts_ns, entry_ns, side="right" if strictly_after else "left"))
         end   = int(np.searchsorted(ts_ns, end_ns,   side="right"))
         if start >= n or start >= end:
             continue  # no forward data
