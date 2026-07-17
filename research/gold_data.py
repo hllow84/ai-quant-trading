@@ -93,6 +93,48 @@ def load_daily_spot(path: Path | str = DEFAULT_M1_PATH) -> pd.DataFrame:
     return aggregate_daily(load_m1_spot(path))
 
 
+def load_m1_mid(path: Path | str = DEFAULT_M1_PATH) -> pd.DataFrame:
+    """
+    Load M1 spot and derive mid OHLC (+ keep spread, volume).
+
+    Returns columns: mid_open, mid_high, mid_low, mid_close, spread, volume.
+    Signals, stops, and targets are all expressed in MID prices; the bid/ask
+    spread is charged explicitly as a cost (see research/ftmo_engine.py), which
+    avoids double-counting versus filling at bid/ask.
+    """
+    m1 = load_m1_spot(path)
+    out = pd.DataFrame(index=m1.index)
+    out["mid_open"]  = (m1["bid_open"]  + m1["ask_open"])  / 2
+    out["mid_high"]  = (m1["bid_high"]  + m1["ask_high"])  / 2
+    out["mid_low"]   = (m1["bid_low"]   + m1["ask_low"])   / 2
+    out["mid_close"] = (m1["bid_close"] + m1["ask_close"]) / 2
+    out["spread"]    = m1["spread"]
+    out["volume"]    = m1["volume"]
+    return out
+
+
+def resample_mid(m1_mid: pd.DataFrame, freq: str) -> pd.DataFrame:
+    """
+    Resample M1 mid OHLC to a coarser bar. Uses label='right', closed='left':
+    a bar timestamped T aggregates M1 data from [T-freq, T), so it is fully known
+    AT time T. Downstream code decides on bar T and executes at/after T — no
+    look-ahead by construction.
+
+    Returns: mid_open, mid_high, mid_low, mid_close, spread (mean over bar), volume.
+    Empty buckets (weekends/holidays) are dropped.
+    """
+    r = m1_mid.resample(freq, label="right", closed="left")
+    out = pd.DataFrame({
+        "mid_open":  r["mid_open"].first(),
+        "mid_high":  r["mid_high"].max(),
+        "mid_low":   r["mid_low"].min(),
+        "mid_close": r["mid_close"].last(),
+        "spread":    r["spread"].mean(),
+        "volume":    r["volume"].sum(),
+    })
+    return out.dropna(subset=["mid_close"])
+
+
 if __name__ == "__main__":
     import sys
     if hasattr(sys.stdout, "reconfigure"):
