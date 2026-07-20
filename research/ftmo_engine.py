@@ -38,18 +38,23 @@ NEWS_HOURS_UTC = [
 RISK_PER_TRADE = 0.01          # 1% of current equity per trade
 
 
-def _slip_per_side(ts: pd.Timestamp) -> float:
+def _in_news(ts: pd.Timestamp) -> bool:
     minute_of_day = ts.hour * 60 + ts.minute
     for h1, m1, h2, m2 in NEWS_HOURS_UTC:
         if h1 * 60 + m1 <= minute_of_day < h2 * 60 + m2:
-            return SLIP_NEWS_PER_SIDE
-    return SLIP_NORMAL_PER_SIDE
+            return True
+    return False
+
+
+def _slip_per_side(ts: pd.Timestamp) -> float:
+    return SLIP_NEWS_PER_SIDE if _in_news(ts) else SLIP_NORMAL_PER_SIDE
 
 
 def simulate_trades(
     m1_mid: pd.DataFrame,
     trades: list[dict],
     strictly_after: bool = False,
+    cost_bps: dict | None = None,
 ) -> pd.DataFrame:
     """
     Resolve each candidate trade on a mid-OHLC resolution frame.
@@ -104,37 +109,44 @@ def simulate_trades(
         if start >= n or start >= end:
             continue  # no forward data
 
-        exit_mid = None
-        reason   = None
-        exit_i   = None
-        for i in range(start, min(end, n)):
-            if side == "long":
-                if lows[i] <= stop:
-                    exit_mid, reason, exit_i = stop, "stop", i
-                    break
-                if highs[i] >= target:
-                    exit_mid, reason, exit_i = target, "target", i
-                    break
-            else:  # short
-                if highs[i] >= stop:
-                    exit_mid, reason, exit_i = stop, "stop", i
-                    break
-                if lows[i] <= target:
-                    exit_mid, reason, exit_i = target, "target", i
-                    break
-        if exit_mid is None:
-            # time exit at the last in-session bar
-            exit_i   = min(end, n) - 1
+        # Vectorized resolution over the [start, end) window (stop-first on ties).
+        w_lo = lows[start:end]
+        w_hi = highs[start:end]
+        if side == "long":
+            stop_mask = w_lo <= stop
+            tgt_mask  = w_hi >= target
+        else:
+            stop_mask = w_hi >= stop
+            tgt_mask  = w_lo <= target
+        i_stop = int(np.argmax(stop_mask)) if stop_mask.any() else -1
+        i_tgt  = int(np.argmax(tgt_mask))  if tgt_mask.any()  else -1
+
+        if i_stop == -1 and i_tgt == -1:
+            exit_i   = end - 1
             exit_mid = float(closes[exit_i])
             reason   = "time"
+        elif i_tgt == -1 or (i_stop != -1 and i_stop <= i_tgt):
+            exit_i   = start + i_stop
+            exit_mid = stop
+            reason   = "stop"
+        else:
+            exit_i   = start + i_tgt
+            exit_mid = target
+            reason   = "target"
 
         gross_R = ((exit_mid - entry_mid) if side == "long"
                    else (entry_mid - exit_mid)) / risk
 
-        # Cost in price units: real spread (round-turn) + 2x per-side slip + commission
+        # Cost in price units. Real spread (round-turn) always from data.
         spread_at_entry = float(spreads[start])
-        slip_rt = 2.0 * _slip_per_side(entry_time)
-        cost_price = spread_at_entry + slip_rt + COMMISSION_PER_OZ
+        if cost_bps is None:
+            # legacy gold $/oz model (backward-compatible with intraday/swing scripts)
+            cost_price = spread_at_entry + 2.0 * _slip_per_side(entry_time) + COMMISSION_PER_OZ
+        else:
+            # instrument-agnostic bps-of-price model for the multi-asset sweep
+            slip_side = cost_bps["slip_news"] if _in_news(entry_time) else cost_bps["slip_normal"]
+            total_bps = (spread_at_entry / entry_mid) * 1e4 + cost_bps["commission"] + 2.0 * slip_side
+            cost_price = total_bps / 1e4 * entry_mid
         cost_R = cost_price / risk
         net_R  = gross_R - cost_R
 
@@ -191,13 +203,19 @@ def de_overlap(trades_df: pd.DataFrame) -> pd.DataFrame:
     if trades_df.empty:
         return trades_df
     df = trades_df.sort_values("entry_time").reset_index(drop=True)
-    keep = []
-    free_at = pd.Timestamp.min.tz_localize("UTC")
-    for _, r in df.iterrows():
-        if r["entry_time"] >= free_at:
-            keep.append(r)
-            free_at = r["exit_time"]
-    return pd.DataFrame(keep).sort_values("exit_time").reset_index(drop=True)
+    # Normalize to tz-naive datetime64[ns] for comparison. Under pandas 2.x,
+    # .to_numpy() on a tz-aware column returns an OBJECT array of Timestamps,
+    # which cannot be compared against a naive datetime64 sentinel — so convert
+    # explicitly (the returned rows below keep their original tz-aware values).
+    entry = pd.DatetimeIndex(df["entry_time"]).tz_convert("UTC").tz_localize(None).values
+    exit_ = pd.DatetimeIndex(df["exit_time"]).tz_convert("UTC").tz_localize(None).values
+    keep_idx = []
+    free_at = np.datetime64("1900-01-01")
+    for i in range(len(df)):
+        if entry[i] >= free_at:
+            keep_idx.append(i)
+            free_at = exit_[i]
+    return df.iloc[keep_idx].sort_values("exit_time").reset_index(drop=True)
 
 
 def build_position_series(trades_df: pd.DataFrame, exec_index: pd.DatetimeIndex) -> pd.Series:
@@ -210,7 +228,17 @@ def build_position_series(trades_df: pd.DataFrame, exec_index: pd.DatetimeIndex)
     pos = pd.Series(0.0, index=exec_index)
     if trades_df.empty:
         return pos
-    for _, r in trades_df.iterrows():
-        mask = (exec_index > r["entry_time"]) & (exec_index <= r["exit_time"])
-        pos.loc[mask] = 1.0 if r["side"] == "long" else -1.0
+    # O(trades + N) via searchsorted + a difference array (trades are non-overlapping
+    # after de_overlap, so signed segments never collide).
+    idx_ns = exec_index.tz_localize(None).values.astype("datetime64[ns]").view("int64")
+    n = len(exec_index)
+    delta = np.zeros(n + 1)
+    for et, xt, side in zip(trades_df["entry_time"], trades_df["exit_time"], trades_df["side"]):
+        s = int(np.searchsorted(idx_ns, pd.Timestamp(et).tz_convert(None).value, side="right"))
+        e = int(np.searchsorted(idx_ns, pd.Timestamp(xt).tz_convert(None).value, side="right"))
+        val = 1.0 if side == "long" else -1.0
+        if s < e:
+            delta[s] += val
+            delta[e] -= val
+    pos.iloc[:] = np.cumsum(delta[:n])
     return pos

@@ -1,0 +1,136 @@
+Grid: XAUUSD x 5 TF x 5 families x variants = 75 configs. Already done: 0.
+Loading M1 mid (real spot) ...
+  M1 bars: 1,827,147  span 2018-01-01 -> 2025-12-31
+[M5] resampling (5min) ...
+[M5] 365,698 bars.
+  [1/75]  M5 trend     v0 n=13560 netPF= 0.56 SR=-10.67 guard=PASS
+  [2/75]  M5 trend     v1 n=11011 netPF= 0.60 SR= -9.15 guard=PASS
+  [3/75]  M5 trend     v2 n=10741 netPF= 0.68 SR= -6.27 guard=PASS
+  [4/75]  M5 breakout  v0 n=18107 netPF= 0.51 SR=-14.59 guard=PASS
+  [5/75]  M5 breakout  v1 n=10427 netPF= 0.56 SR=-10.33 guard=PASS
+  [6/75]  M5 breakout  v2 n=16991 netPF= 0.55 SR=-13.09 guard=PASS
+  [7/75]  M5 meanrev   v0 n= 6893 netPF= 0.48 SR= -9.10 guard=PASS
+  [8/75]  M5 meanrev   v1 n= 3245 netPF= 0.38 SR= -7.72 guard=PASS
+  [9/75]  M5 meanrev   v2 n=14042 netPF= 0.56 SR=-10.34 guard=PASS
+  [10/75]  M5 momentum  v0 n=11091 netPF= 0.60 SR= -9.10 guard=PASS
+  [11/75]  M5 momentum  v1 n= 7684 netPF= 0.65 SR= -6.56 guard=PASS
+  [12/75]  M5 momentum  v2 n=20749 netPF= 0.51 SR=-14.43 guard=PASS
+  [13/75]  M5 macross   v0 n= 5886 netPF= 0.63 SR= -6.34 guard=PASS
+  [14/75]  M5 macross   v1 n= 3819 netPF= 0.66 SR= -4.61 guard=PASS
+  [15/75]  M5 macross   v2 n= 7365 netPF= 0.61 SR= -7.06 guard=PASS
+[M15] resampling (15min) ...
+[M15] 121,910 bars.
+  [16/75] M15 trend     v0 n= 4455 netPF= 0.71 SR= -3.97 guard=PASS
+  [17/75] M15 trend     v1 n= 3769 netPF= 0.73 SR= -3.56 guard=PASS
+  [18/75] M15 trend     v2 n= 3768 netPF= 0.80 SR= -2.32 guard=PASS
+  [19/75] M15 breakout  v0 n= 6030 netPF= 0.69 SR= -5.10 guard=PASS
+  [20/75] M15 breakout  v1 n= 3544 netPF= 0.73 SR= -3.55 guard=PASS
+  [21/75] M15 breakout  v2 n= 5678 netPF= 0.73 SR= -4.11 guard=PASS
+  [22/75] M15 meanrev   v0 n= 2511 netPF= 0.68 SR= -3.28 guard=PASS
+  [23/75] M15 meanrev   v1 n= 1358 netPF= 0.59 SR= -3.10 guard=PASS
+  [24/75] M15 meanrev   v2 n= 4889 netPF= 0.72 SR= -3.81 guard=PASS
+  [25/75] M15 momentum  v0 n= 3731 netPF= 0.82 SR= -2.18 guard=PASS
+  [26/75] M15 momentum  v1 n= 2607 netPF= 0.83 SR= -1.78 guard=PASS
+  [27/75] M15 momentum  v2 n= 7101 netPF= 0.70 SR= -5.28 guard=PASS
+  [28/75] M15 macross   v0 n= 1897 netPF= 0.77 SR= -2.12 guard=PASS
+  [29/75] M15 macross   v1 n= 1251 netPF= 0.79 SR= -1.50 guard=PASS
+  [30/75] M15 macross   v2 n= 2340 netPF= 0.73 SR= -2.61 guard=PASS
+[M30] resampling (30min) ...
+[M30] 60,963 bars.
+  [31/75] M30 trend     v0 n= 2258 netPF= 0.79 SR= -2.07 guard=PASS
+  [32/75] M30 trend     v1 n= 1866 netPF= 0.82 SR= -1.72 guard=PASS
+  [33/75] M30 trend     v2 n= 2006 netPF= 0.81 SR= -1.91 guard=PASS
+  [34/75] M30 breakout  v0 n= 3101 netPF= 0.80 SR= -2.33 guard=PASS
+  [35/75] M30 breakout  v1 n= 1631 netPF= 0.89 SR= -1.01 guard=PASS
+  [36/75] M30 breakout  v2 n= 2951 netPF= 0.80 SR= -2.13 guard=PASS
+  [37/75] M30 meanrev   v0 n= 1446 netPF= 0.70 SR= -2.25 guard=PASS
+  [38/75] M30 meanrev   v1 n=  819 netPF= 0.65 SR= -2.01 guard=PASS
+  [39/75] M30 meanrev   v2 n= 2596 netPF= 0.76 SR= -2.46 guard=PASS
+  [40/75] M30 momentum  v0 n= 1933 netPF= 0.86 SR= -1.18 guard=PASS
+  [41/75] M30 momentum  v1 n= 1281 netPF= 0.85 SR= -1.08 guard=PASS
+  [42/75] M30 momentum  v2 n= 3515 netPF= 0.82 SR= -2.08 guard=PASS
+  [43/75] M30 macross   v0 n=  960 netPF= 0.86 SR= -0.83 guard=PASS
+  [44/75] M30 macross   v1 n=  679 netPF= 0.85 SR= -0.76 guard=PASS
+  [45/75] M30 macross   v2 n= 1149 netPF= 0.85 SR= -0.97 guard=PASS
+[H1] resampling (1h) ...
+[H1] 30,492 bars.
+  [46/75]  H1 trend     v0 n= 1140 netPF= 0.81 SR= -1.32 guard=PASS
+  [47/75]  H1 trend     v1 n=  980 netPF= 0.81 SR= -1.24 guard=PASS
+  [48/75]  H1 trend     v2 n= 1038 netPF= 0.81 SR= -1.39 guard=PASS
+  [49/75]  H1 breakout  v0 n= 1436 netPF= 0.87 SR= -1.03 guard=PASS
+  [50/75]  H1 breakout  v1 n=  830 netPF= 0.91 SR= -0.59 guard=PASS
+  [51/75]  H1 breakout  v2 n= 1383 netPF= 0.87 SR= -1.00 guard=PASS
+  [52/75]  H1 meanrev   v0 n=  826 netPF= 0.76 SR= -1.35 guard=PASS
+  [53/75]  H1 meanrev   v1 n=  494 netPF= 0.69 SR= -1.43 guard=PASS
+  [54/75]  H1 meanrev   v2 n= 1353 netPF= 0.83 SR= -1.28 guard=PASS
+  [55/75]  H1 momentum  v0 n=  981 netPF= 0.90 SR= -0.64 guard=PASS
+  [56/75]  H1 momentum  v1 n=  659 netPF= 1.01 SR= -0.06 guard=PASS
+  [57/75]  H1 momentum  v2 n= 1756 netPF= 0.93 SR= -0.58 guard=PASS
+  [58/75]  H1 macross   v0 n=  497 netPF= 0.89 SR= -0.51 guard=PASS
+  [59/75]  H1 macross   v1 n=  325 netPF= 0.90 SR= -0.36 guard=PASS
+  [60/75]  H1 macross   v2 n=  621 netPF= 0.82 SR= -0.96 guard=PASS
+[H4] resampling (4h) ...
+[H4] 8,252 bars.
+  [61/75]  H4 trend     v0 n=  339 netPF= 1.01 SR= -0.45 guard=PASS
+  [62/75]  H4 trend     v1 n=  259 netPF= 1.02 SR= +0.00 guard=PASS
+  [63/75]  H4 trend     v2 n=  275 netPF= 1.18 SR= +0.02 guard=PASS
+  [64/75]  H4 breakout  v0 n=  411 netPF= 0.91 SR= -0.66 guard=PASS
+  [65/75]  H4 breakout  v1 n=  228 netPF= 1.08 SR= +0.09 guard=PASS
+  [66/75]  H4 breakout  v2 n=  396 netPF= 0.94 SR= -0.45 guard=PASS
+  [67/75]  H4 meanrev   v0 n=  307 netPF= 0.92 SR= -0.28 guard=PASS
+  [68/75]  H4 meanrev   v1 n=  170 netPF= 0.82 SR= -0.29 guard=PASS
+  [69/75]  H4 meanrev   v2 n=  426 netPF= 0.87 SR= -0.68 guard=PASS
+  [70/75]  H4 momentum  v0 n=  294 netPF= 0.71 SR= -1.23 guard=PASS
+  [71/75]  H4 momentum  v1 n=  193 netPF= 0.99 SR= -0.12 guard=PASS
+  [72/75]  H4 momentum  v2 n=  511 netPF= 0.95 SR= -0.41 guard=PASS
+  [73/75]  H4 macross   v0 n=  145 netPF= 1.05 SR= -0.01 guard=PASS
+  [74/75]  H4 macross   v1 n=   95 netPF= 1.01 SR= +0.02 guard=PASS
+  [75/75]  H4 macross   v2 n=  168 netPF= 1.20 SR= +0.23 guard=PASS
+
+Grid complete: 75/75 configs in C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\sweep_progress.csv
+
+======================================================================================================================
+  SYSTEMATIC SWEEP — anti-overfitting enforcement
+  Instrument: XAUUSD spot (only qualifying real-spread asset) | 2018-2025 UTC
+  Cost: REAL per-bar spread (round-turn) + $0.07/oz commission + news slippage | 1% risk/trade | NO tuning
+  TRUE TRIAL COUNT (DSR haircut N): 75   |   configs that traded: 75
+  Survival bars: DSR > 0.95  AND  OOS holds (IS&OOS net PF>1, OOS SR>0, OOS trades>=20)  AND  FTMO pass >= 30%
+======================================================================================================================
+   #  TF family    v netPF  grPF  Sharpe   DSR  maxDD trades  FTMO% OOS?
+  ------------------------------------------------------------------------------------------------------------------
+   1  H4 macross   2  1.20  1.28   +0.23  0.00  19.9%    168   0.0%  YES
+   2  H4 breakout  1  1.08  1.15   +0.09  0.00  23.5%    228   1.1%   no
+   3  H4 macross   1  1.01  1.06   +0.02  0.00   9.1%     95   0.0%   no
+   4  H4 trend     2  1.18  1.24   +0.02  0.00  15.8%    275   0.0%  YES
+   5  H4 trend     1  1.02  1.09   +0.00  0.00  13.7%    259   0.0%   no
+   6  H4 macross   0  1.05  1.11   -0.01  0.00  17.4%    145   0.0%   no
+   7  H1 momentum  1  1.01  1.12   -0.06  0.00  25.7%    659   2.1%   no
+   8  H4 momentum  1  0.99  1.04   -0.12  0.00  21.5%    193   0.0%   no
+   9  H4 meanrev   0  0.92  1.02   -0.28  0.00  28.4%    307   0.0%   no
+  10  H4 meanrev   1  0.82  0.92   -0.29  0.00  19.2%    170   0.0%   no
+  11  H1 macross   1  0.90  1.01   -0.36  0.00  25.6%    325   0.0%   no
+  12  H4 momentum  2  0.95  1.04   -0.41  0.00  35.3%    511   0.0%   no
+  13  H4 breakout  2  0.94  1.00   -0.45  0.00  29.5%    396   0.0%   no
+  14  H4 trend     0  1.01  1.09   -0.45  0.00  25.6%    339   0.0%  YES
+  15  H1 macross   0  0.89  1.01   -0.51  0.00  37.1%    497   1.1%   no
+======================================================================================================================
+
+  VERDICT
+  ------------------------------------------------------------
+  NO config survived. Not a single one cleared all three gates.
+  Best raw Sharpe: macross H4 v2 SR=+0.23, but:
+    - DSR = 0.000 (need > 0.95) -> FAIL: within the noise of 75 trials
+    - OOS holds = YES (IS PF 1.07 / OOS PF 1.75, OOS SR +3.68)
+    - FTMO pass = 0.0% (need >= 30%)
+  This is a valid, honest NEGATIVE result: the price-only family sweep
+  on XAUUSD produces no edge that survives the multiple-testing haircut,
+  holds out-of-sample, AND clears the FTMO ruleset.
+
+  Sweep summary:
+    configs with a positive net Sharpe : 5 / 75
+    configs with net PF > 1            : 8 / 75
+    configs passing look-ahead guard   : 75 / 75
+    configs where OOS holds            : 3 / 75
+    configs clearing DSR haircut       : 0 / 75
+
+  Leaderboard written -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\leaderboard.csv
