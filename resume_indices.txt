@@ -1,0 +1,49 @@
+RESUME THE INDEX PIPELINE
+=========================
+If the run dies (terminal closed, reboot, crash), restart it with ONE command.
+Everything is resumable: the download skips completed .done files, the merge is
+rebuilt from scratch each time, and the sweep skips configs already in
+results/sweep_indices.csv. Re-running is always safe.
+
+--- ONE-LINE RESTART (PowerShell, detached — survives closing the terminal) ---
+
+Start-Process -FilePath "C:\Program Files\Git\bin\bash.exe" -ArgumentList '-lc','"C:/Claude Code/AI Quant Trading/crypto-factor-lab/scripts/run_all_indices.sh"' -WorkingDirectory "C:\Claude Code\AI Quant Trading\crypto-factor-lab" -WindowStyle Hidden
+
+
+--- SAME THING, ATTACHED (dies with the terminal; use only to watch it live) ---
+
+bash "C:/Claude Code/AI Quant Trading/crypto-factor-lab/scripts/run_all_indices.sh"
+
+
+--- CHECK PROGRESS ---
+
+  tail -40 "C:/Claude Code/AI Quant Trading/crypto-factor-lab/results/pipeline_indices.log"
+  ls "C:/Claude Code/AI Quant Trading/crypto-factor-lab/data/raw/idx_tmp/download/"*.done | wc -l    # want 32
+  wc -l < "C:/Claude Code/AI Quant Trading/crypto-factor-lab/results/sweep_indices.csv"              # want 151 (150 + header)
+
+  Is it alive?   Get-CimInstance Win32_Process | Where-Object { $_.Name -match 'node|python|bash' } | Select ProcessId,Name
+
+
+--- WHAT THE PIPELINE DOES ---
+
+  Step 1  scripts/download_indices.sh   resume M1 bid+ask, 2 instruments x 8 years x 2 prices = 32 files
+  Step 2  scripts/merge_indices.py      DELETES both merged files, rebuilds from all year files
+  Step 3  scripts/verify_indices.py     HARD GATE: must span 2018-01 -> 2025-12, all 8 years present,
+                                        spread column real, price band sane. Sweep is SKIPPED on failure.
+  Step 4  run_sweep_indices.py          150 configs (2 inst x 5 TF x 5 families x 3 variants),
+                                        cumulative trial count 237, DSR deflated against all 237.
+
+--- RUN A SINGLE STEP BY HAND ---
+
+  cd "C:/Claude Code/AI Quant Trading/crypto-factor-lab"
+  bash scripts/download_indices.sh        # resume download only
+  python scripts/merge_indices.py         # merge only (delete data/*_M1_2018_2025_*.csv first)
+  python scripts/verify_indices.py        # verify only; exit 0 = good, 1 = do not sweep
+  python run_sweep_indices.py             # sweep + analysis
+  python run_sweep_indices.py --analyze   # re-print the leaderboard from existing results, no re-run
+
+--- WHY THE OLD CHAIN DIED ---
+
+scripts/chain_indices.sh ran as a SECOND process polling the downloader's log.
+Closing the terminal killed both, mid-file, at 27/32 with no resume. run_all_indices.sh
+runs all four steps sequentially in ONE detached process instead.

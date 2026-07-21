@@ -1,0 +1,459 @@
+[2026-07-21 21:03:15] ================= PIPELINE START (pid 1228) =================
+[2026-07-21 21:03:15] STEP 1/4  resuming index M1 download (skips completed .done files)
+[2026-07-21 21:16:30] STEP 1 exit=0
+[2026-07-21 21:16:30] download markers: 32/32 complete, 0
+0 hard failures
+[2026-07-21 21:16:30] STEP 2/4  rebuilding merged files from scratch
+[2026-07-21 21:16:30]   deleting stale NAS100_M1_2018_2025_cfd_dukascopy.csv (386266 lines)
+
+==================================================================
+usatechidxusd -> NAS100
+==================================================================
+Loading BID files:
+  loaded  usatechidxusd-m1-bid-2018.csv: 258,594 rows
+  loaded  usatechidxusd-m1-bid-2019.csv: 310,214 rows
+  loaded  usatechidxusd-m1-bid-2020.csv: 324,020 rows
+  loaded  usatechidxusd-m1-bid-2021.csv: 310,660 rows
+  loaded  usatechidxusd-m1-bid-2022.csv: 342,776 rows
+  loaded  usatechidxusd-m1-bid-2023.csv: 306,404 rows
+  loaded  usatechidxusd-m1-bid-2024.csv: 308,842 rows
+  loaded  usatechidxusd-m1-bid-2025.csv: 340,556 rows
+Loading ASK files:
+  loaded  usatechidxusd-m1-ask-2018.csv: 219,172 rows
+  loaded  usatechidxusd-m1-ask-2019.csv: 242,060 rows
+  loaded  usatechidxusd-m1-ask-2020.csv: 266,127 rows
+  loaded  usatechidxusd-m1-ask-2021.csv: 343,906 rows
+  loaded  usatechidxusd-m1-ask-2022.csv: 341,441 rows
+  loaded  usatechidxusd-m1-ask-2023.csv: 314,354 rows
+  loaded  usatechidxusd-m1-ask-2024.csv: 318,580 rows
+  loaded  usatechidxusd-m1-ask-2025.csv: 336,565 rows
+
+=== SANITY CHECK ===
+rows               : 2,211,511
+date range (UTC)   : 2018-01-03 07:05:00+00:00  ->  2025-12-31 21:13:00+00:00
+bid_close range    : 5,995.27  ->  26,254.85
+spread min/med/max : 0.0010 / 3.2240 / 18.9390  (index points)
+median spread      : 2.315 bps of price
+negative spreads   : 0 (0.000%)
+WARNING: price range outside expected NAS100 band (5,500-25,000).
+
+Wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\NAS100_M1_2018_2025_cfd_dukascopy.csv
+File size: 312.3 MB
+
+==================================================================
+usa30idxusd -> US30
+==================================================================
+Loading BID files:
+  loaded  usa30idxusd-m1-bid-2018.csv: 227,059 rows
+  loaded  usa30idxusd-m1-bid-2019.csv: 266,131 rows
+  loaded  usa30idxusd-m1-bid-2020.csv: 268,670 rows
+  loaded  usa30idxusd-m1-bid-2021.csv: 281,408 rows
+  loaded  usa30idxusd-m1-bid-2022.csv: 212,679 rows
+  loaded  usa30idxusd-m1-bid-2023.csv: 308,677 rows
+  loaded  usa30idxusd-m1-bid-2024.csv: 342,672 rows
+  loaded  usa30idxusd-m1-bid-2025.csv: 340,959 rows
+Loading ASK files:
+  loaded  usa30idxusd-m1-ask-2018.csv: 304,963 rows
+  loaded  usa30idxusd-m1-ask-2019.csv: 340,790 rows
+  loaded  usa30idxusd-m1-ask-2020.csv: 258,511 rows
+  loaded  usa30idxusd-m1-ask-2021.csv: 239,015 rows
+  loaded  usa30idxusd-m1-ask-2022.csv: 336,197 rows
+  loaded  usa30idxusd-m1-ask-2023.csv: 340,514 rows
+  loaded  usa30idxusd-m1-ask-2024.csv: 342,672 rows
+  loaded  usa30idxusd-m1-ask-2025.csv: 340,959 rows
+
+=== SANITY CHECK ===
+rows               : 2,090,818
+date range (UTC)   : 2018-01-02 07:05:00+00:00  ->  2025-12-31 21:13:00+00:00
+bid_close range    : 18,186.00  ->  48,880.99
+spread min/med/max : 0.0010 / 3.9720 / 38.9700  (index points)
+median spread      : 1.176 bps of price
+negative spreads   : 0 (0.000%)
+OK: price range consistent with US30.
+
+Wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\US30_M1_2018_2025_cfd_dukascopy.csv
+File size: 299.3 MB
+[2026-07-21 21:17:15] STEP 2 merge exit=0
+[2026-07-21 21:17:15] STEP 3/4  verifying merged file coverage (HARD GATE)
+
+======================================================================
+VERIFY NAS100  (NAS100_M1_2018_2025_cfd_dukascopy.csv)
+======================================================================
+  rows            : 2,211,511
+  first bar (UTC) : 2018-01-03 07:05:00+00:00
+  last  bar (UTC) : 2025-12-31 21:13:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 5,995.27 -> 26,254.85   (median 13,928.86)
+  spread med      : 3.2240 pts = 2.315 bps of price
+  negative spreads: 0 (0.000%)
+  --> FAIL
+      - price 5,995-26,255 outside NAS100 band 5,500-25,000
+
+======================================================================
+VERIFY US30  (US30_M1_2018_2025_cfd_dukascopy.csv)
+======================================================================
+  rows            : 2,090,818
+  first bar (UTC) : 2018-01-02 07:05:00+00:00
+  last  bar (UTC) : 2025-12-31 21:13:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 18,186.00 -> 48,880.99   (median 33,782.52)
+  spread med      : 3.9720 pts = 1.176 bps of price
+  negative spreads: 0 (0.000%)
+  --> PASS: full 2018-2025 coverage, spread present, price band sane.
+
+======================================================================
+   NAS100: FAIL
+     US30: PASS
+  VERIFICATION FAILED — sweep will NOT run. Fix the data first.
+======================================================================
+[2026-07-21 21:17:26] STEP 3 verify exit=1
+[2026-07-21 21:17:26] VERIFICATION FAILED — refusing to run the sweep on incomplete data.
+[2026-07-21 21:17:26] Re-run scripts/run_all_indices.sh once the missing files are downloaded.
+[2026-07-21 21:17:26] ================= PIPELINE HALTED =================
+[2026-07-21 21:30:55] ================= PIPELINE START (pid 1438) =================
+[2026-07-21 21:30:55] STEP 1/4  resuming index M1 download (skips completed .done files)
+[2026-07-21 21:30:56] STEP 1 exit=0
+[2026-07-21 21:30:56] download markers: 32/32 complete, 0
+0 hard failures
+[2026-07-21 21:30:56] STEP 2/4  rebuilding merged files from scratch
+[2026-07-21 21:30:57]   deleting stale NAS100_M1_2018_2025_cfd_dukascopy.csv (2211512 lines)
+[2026-07-21 21:30:57]   deleting stale US30_M1_2018_2025_cfd_dukascopy.csv (2090819 lines)
+
+==================================================================
+usatechidxusd -> NAS100
+==================================================================
+Loading BID files:
+  loaded  usatechidxusd-m1-bid-2018.csv: 258,594 rows
+  loaded  usatechidxusd-m1-bid-2019.csv: 310,214 rows
+  loaded  usatechidxusd-m1-bid-2020.csv: 324,020 rows
+  loaded  usatechidxusd-m1-bid-2021.csv: 310,660 rows
+  loaded  usatechidxusd-m1-bid-2022.csv: 342,776 rows
+  loaded  usatechidxusd-m1-bid-2023.csv: 306,404 rows
+  loaded  usatechidxusd-m1-bid-2024.csv: 308,842 rows
+  loaded  usatechidxusd-m1-bid-2025.csv: 340,556 rows
+Loading ASK files:
+  loaded  usatechidxusd-m1-ask-2018.csv: 219,172 rows
+  loaded  usatechidxusd-m1-ask-2019.csv: 242,060 rows
+  loaded  usatechidxusd-m1-ask-2020.csv: 266,127 rows
+  loaded  usatechidxusd-m1-ask-2021.csv: 343,906 rows
+  loaded  usatechidxusd-m1-ask-2022.csv: 341,441 rows
+  loaded  usatechidxusd-m1-ask-2023.csv: 314,354 rows
+  loaded  usatechidxusd-m1-ask-2024.csv: 318,580 rows
+  loaded  usatechidxusd-m1-ask-2025.csv: 336,565 rows
+
+=== SANITY CHECK ===
+rows               : 2,211,511
+date range (UTC)   : 2018-01-03 07:05:00+00:00  ->  2025-12-31 21:13:00+00:00
+bid_close range    : 5,995.27  ->  26,254.85
+spread min/med/max : 0.0010 / 3.2240 / 18.9390  (index points)
+median spread      : 2.315 bps of price
+negative spreads   : 0 (0.000%)
+WARNING: price range outside expected NAS100 band (5,500-25,000).
+
+Wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\NAS100_M1_2018_2025_cfd_dukascopy.csv
+File size: 312.3 MB
+
+==================================================================
+usa30idxusd -> US30
+==================================================================
+Loading BID files:
+  loaded  usa30idxusd-m1-bid-2018.csv: 227,059 rows
+  loaded  usa30idxusd-m1-bid-2019.csv: 266,131 rows
+  loaded  usa30idxusd-m1-bid-2020.csv: 268,670 rows
+  loaded  usa30idxusd-m1-bid-2021.csv: 281,408 rows
+  loaded  usa30idxusd-m1-bid-2022.csv: 212,679 rows
+  loaded  usa30idxusd-m1-bid-2023.csv: 308,677 rows
+  loaded  usa30idxusd-m1-bid-2024.csv: 342,672 rows
+  loaded  usa30idxusd-m1-bid-2025.csv: 340,959 rows
+Loading ASK files:
+  loaded  usa30idxusd-m1-ask-2018.csv: 304,963 rows
+  loaded  usa30idxusd-m1-ask-2019.csv: 340,790 rows
+  loaded  usa30idxusd-m1-ask-2020.csv: 258,511 rows
+  loaded  usa30idxusd-m1-ask-2021.csv: 239,015 rows
+  loaded  usa30idxusd-m1-ask-2022.csv: 336,197 rows
+  loaded  usa30idxusd-m1-ask-2023.csv: 340,514 rows
+  loaded  usa30idxusd-m1-ask-2024.csv: 342,672 rows
+  loaded  usa30idxusd-m1-ask-2025.csv: 340,959 rows
+
+=== SANITY CHECK ===
+rows               : 2,090,818
+date range (UTC)   : 2018-01-02 07:05:00+00:00  ->  2025-12-31 21:13:00+00:00
+bid_close range    : 18,186.00  ->  48,880.99
+spread min/med/max : 0.0010 / 3.9720 / 38.9700  (index points)
+median spread      : 1.176 bps of price
+negative spreads   : 0 (0.000%)
+OK: price range consistent with US30.
+
+Wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\US30_M1_2018_2025_cfd_dukascopy.csv
+File size: 299.3 MB
+[2026-07-21 21:31:40] STEP 2 merge exit=0
+[2026-07-21 21:31:40] STEP 3/4  verifying merged file coverage (HARD GATE)
+
+======================================================================
+VERIFY NAS100  (NAS100_M1_2018_2025_cfd_dukascopy.csv)
+======================================================================
+  rows            : 2,211,511
+  first bar (UTC) : 2018-01-03 07:05:00+00:00
+  last  bar (UTC) : 2025-12-31 21:13:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 5,995.27 -> 26,254.85   (median 13,928.86)
+  spread med      : 3.2240 pts = 2.315 bps of price
+  negative spreads: 0 (0.000%)
+  --> PASS: full 2018-2025 coverage, spread present, price band sane.
+
+======================================================================
+VERIFY US30  (US30_M1_2018_2025_cfd_dukascopy.csv)
+======================================================================
+  rows            : 2,090,818
+  first bar (UTC) : 2018-01-02 07:05:00+00:00
+  last  bar (UTC) : 2025-12-31 21:13:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 18,186.00 -> 48,880.99   (median 33,782.52)
+  spread med      : 3.9720 pts = 1.176 bps of price
+  negative spreads: 0 (0.000%)
+  --> PASS: full 2018-2025 coverage, spread present, price band sane.
+
+======================================================================
+   NAS100: PASS
+     US30: PASS
+  ALL FILES VERIFIED — sweep may proceed.
+======================================================================
+[2026-07-21 21:31:50] STEP 3 verify exit=0
+[2026-07-21 21:31:50] STEP 4/4  running the 150-config index sweep
+Grid: 2 instruments x 5 TF x 5 families x 3 variants = 150 configs. Already done: 0.
+
+[NAS100] loading M1 mid ...
+[NAS100] M1 bars 2,211,511 | 2018-01-03 -> 2025-12-31 | median px 13,930.3 | median spread 3.224 pts (2.31 bps)
+[NAS100/M5] 442,555 bars.
+  [1/150] NAS100  M5 trend     v0 n=16324 netPF=0.62 SR=-9.13 costR=26.5% guard=PASS
+  [2/150] NAS100  M5 trend     v1 n=13624 netPF=0.65 SR=-8.21 costR=23.6% guard=PASS
+  [3/150] NAS100  M5 trend     v2 n=13367 netPF=0.74 SR=-5.27 costR=20.6% guard=PASS
+  [4/150] NAS100  M5 breakout  v0 n=22597 netPF=0.60 SR=-11.35 costR=34.4% guard=PASS
+  [5/150] NAS100  M5 breakout  v1 n=13521 netPF=0.64 SR=-8.22 costR=31.0% guard=PASS
+  [6/150] NAS100  M5 breakout  v2 n=21274 netPF=0.63 SR=-9.96 costR=25.1% guard=PASS
+  [7/150] NAS100  M5 meanrev   v0 n= 9594 netPF=0.49 SR=-9.32 costR=36.7% guard=PASS
+  [8/150] NAS100  M5 meanrev   v1 n= 4543 netPF=0.41 SR=-7.42 costR=36.6% guard=PASS
+  [9/150] NAS100  M5 meanrev   v2 n=18487 netPF=0.58 SR=-9.73 costR=25.9% guard=PASS
+  [10/150] NAS100  M5 momentum  v0 n=13265 netPF=0.70 SR=-6.25 costR=24.7% guard=PASS
+  [11/150] NAS100  M5 momentum  v1 n= 9244 netPF=0.73 SR=-4.91 costR=24.0% guard=PASS
+  [12/150] NAS100  M5 momentum  v2 n=25003 netPF=0.57 SR=-11.63 costR=32.3% guard=PASS
+  [13/150] NAS100  M5 macross   v0 n= 7027 netPF=0.73 SR=-4.29 costR=23.7% guard=PASS
+  [14/150] NAS100  M5 macross   v1 n= 4702 netPF=0.77 SR=-2.92 costR=20.8% guard=PASS
+  [15/150] NAS100  M5 macross   v2 n= 8741 netPF=0.74 SR=-4.37 costR=30.8% guard=PASS
+[NAS100/M15] 147,614 bars.
+  [16/150] NAS100 M15 trend     v0 n= 5397 netPF=0.80 SR=-2.64 costR=13.9% guard=PASS
+  [17/150] NAS100 M15 trend     v1 n= 4711 netPF=0.79 SR=-2.68 costR=12.3% guard=PASS
+  [18/150] NAS100 M15 trend     v2 n= 4873 netPF=0.88 SR=-1.40 costR=10.8% guard=PASS
+  [19/150] NAS100 M15 breakout  v0 n= 7762 netPF=0.77 SR=-3.87 costR=18.3% guard=PASS
+  [20/150] NAS100 M15 breakout  v1 n= 4734 netPF=0.83 SR=-2.21 costR=14.5% guard=PASS
+  [21/150] NAS100 M15 breakout  v2 n= 7364 netPF=0.80 SR=-3.22 costR=13.4% guard=PASS
+  [22/150] NAS100 M15 meanrev   v0 n= 3649 netPF=0.66 SR=-3.89 costR=20.5% guard=PASS
+  [23/150] NAS100 M15 meanrev   v1 n= 1937 netPF=0.53 SR=-3.94 costR=21.2% guard=PASS
+  [24/150] NAS100 M15 meanrev   v2 n= 6554 netPF=0.72 SR=-3.98 costR=14.5% guard=PASS
+  [25/150] NAS100 M15 momentum  v0 n= 4752 netPF=0.80 SR=-2.47 costR=12.5% guard=PASS
+  [26/150] NAS100 M15 momentum  v1 n= 3267 netPF=0.77 SR=-2.44 costR=12.1% guard=PASS
+  [27/150] NAS100 M15 momentum  v2 n= 8745 netPF=0.76 SR=-4.21 costR=17.0% guard=PASS
+  [28/150] NAS100 M15 macross   v0 n= 2337 netPF=0.80 SR=-1.76 costR=11.3% guard=PASS
+  [29/150] NAS100 M15 macross   v1 n= 1415 netPF=0.91 SR=-0.63 costR=9.7% guard=PASS
+  [30/150] NAS100 M15 macross   v2 n= 2852 netPF=0.83 SR=-1.58 costR=14.6% guard=PASS
+[NAS100/M30] 74,616 bars.
+  [31/150] NAS100 M30 trend     v0 n= 2881 netPF=0.88 SR=-1.14 costR=9.1% guard=PASS
+  [32/150] NAS100 M30 trend     v1 n= 2303 netPF=0.89 SR=-1.00 costR=7.5% guard=PASS
+  [33/150] NAS100 M30 trend     v2 n= 2370 netPF=0.99 SR=-0.25 costR=6.5% guard=PASS
+  [34/150] NAS100 M30 breakout  v0 n= 4238 netPF=0.85 SR=-1.70 costR=11.2% guard=PASS
+  [35/150] NAS100 M30 breakout  v1 n= 2141 netPF=0.94 SR=-0.49 costR=8.6% guard=PASS
+  [36/150] NAS100 M30 breakout  v2 n= 4049 netPF=0.85 SR=-1.64 costR=8.1% guard=PASS
+  [37/150] NAS100 M30 meanrev   v0 n= 2084 netPF=0.76 SR=-1.96 costR=13.3% guard=PASS
+  [38/150] NAS100 M30 meanrev   v1 n= 1211 netPF=0.65 SR=-2.36 costR=14.5% guard=PASS
+  [39/150] NAS100 M30 meanrev   v2 n= 3544 netPF=0.77 SR=-2.43 costR=9.2% guard=PASS
+  [40/150] NAS100 M30 momentum  v0 n= 2499 netPF=0.86 SR=-1.25 costR=8.2% guard=PASS
+  [41/150] NAS100 M30 momentum  v1 n= 1460 netPF=0.91 SR=-0.60 costR=5.9% guard=PASS
+  [42/150] NAS100 M30 momentum  v2 n= 4416 netPF=0.81 SR=-2.27 costR=10.3% guard=PASS
+  [43/150] NAS100 M30 macross   v0 n= 1099 netPF=0.87 SR=-0.78 costR=7.1% guard=PASS
+  [44/150] NAS100 M30 macross   v1 n=  734 netPF=0.92 SR=-0.41 costR=5.7% guard=PASS
+  [45/150] NAS100 M30 macross   v2 n= 1357 netPF=0.87 SR=-0.88 costR=9.1% guard=PASS
+[NAS100/H1] 38,119 bars.
+  [46/150] NAS100  H1 trend     v0 n= 1429 netPF=0.92 SR=-0.66 costR=4.8% guard=PASS
+  [47/150] NAS100  H1 trend     v1 n= 1225 netPF=0.91 SR=-0.62 costR=4.3% guard=PASS
+  [48/150] NAS100  H1 trend     v2 n= 1336 netPF=0.94 SR=-0.50 costR=4.5% guard=PASS
+  [49/150] NAS100  H1 breakout  v0 n= 1978 netPF=0.98 SR=-0.21 costR=6.1% guard=PASS
+  [50/150] NAS100  H1 breakout  v1 n= 1248 netPF=1.00 SR=-0.05 costR=6.2% guard=PASS
+  [51/150] NAS100  H1 breakout  v2 n= 1871 netPF=0.94 SR=-0.46 costR=4.5% guard=PASS
+  [52/150] NAS100  H1 meanrev   v0 n= 1247 netPF=0.77 SR=-1.55 costR=8.4% guard=PASS
+  [53/150] NAS100  H1 meanrev   v1 n=  692 netPF=0.71 SR=-1.36 costR=8.9% guard=PASS
+  [54/150] NAS100  H1 meanrev   v2 n= 1894 netPF=0.80 SR=-1.52 costR=5.6% guard=PASS
+  [55/150] NAS100  H1 momentum  v0 n= 1222 netPF=0.94 SR=-0.43 costR=4.2% guard=PASS
+  [56/150] NAS100  H1 momentum  v1 n=  782 netPF=1.06 SR=+0.21 costR=4.0% guard=PASS
+  [57/150] NAS100  H1 momentum  v2 n= 2391 netPF=0.87 SR=-1.14 costR=6.5% guard=PASS
+  [58/150] NAS100  H1 macross   v0 n=  582 netPF=1.11 SR=+0.34 costR=4.1% guard=PASS
+  [59/150] NAS100  H1 macross   v1 n=  406 netPF=1.17 SR=+0.44 costR=3.9% guard=PASS
+  [60/150] NAS100  H1 macross   v2 n=  702 netPF=1.13 SR=+0.45 costR=5.4% guard=PASS
+[NAS100/H4] 10,361 bars.
+  [61/150] NAS100  H4 trend     v0 n=  398 netPF=1.09 SR=-0.26 costR=2.0% guard=PASS
+  [62/150] NAS100  H4 trend     v1 n=  311 netPF=1.13 SR=+0.26 costR=1.7% guard=PASS
+  [63/150] NAS100  H4 trend     v2 n=  355 netPF=1.13 SR=-0.09 costR=1.7% guard=PASS
+  [64/150] NAS100  H4 breakout  v0 n=  580 netPF=1.00 SR=-0.48 costR=2.9% guard=PASS
+  [65/150] NAS100  H4 breakout  v1 n=  347 netPF=1.10 SR=+0.10 costR=3.0% guard=PASS
+  [66/150] NAS100  H4 breakout  v2 n=  547 netPF=1.07 SR=-0.20 costR=2.1% guard=PASS
+  [67/150] NAS100  H4 meanrev   v0 n=  408 netPF=0.73 SR=-1.09 costR=5.5% guard=PASS
+  [68/150] NAS100  H4 meanrev   v1 n=  217 netPF=0.73 SR=-0.70 costR=5.9% guard=PASS
+  [69/150] NAS100  H4 meanrev   v2 n=  627 netPF=0.87 SR=-0.51 costR=3.2% guard=PASS
+  [70/150] NAS100  H4 momentum  v0 n=  338 netPF=1.06 SR=-0.05 costR=2.0% guard=PASS
+  [71/150] NAS100  H4 momentum  v1 n=  218 netPF=0.90 SR=-0.29 costR=1.9% guard=PASS
+  [72/150] NAS100  H4 momentum  v2 n=  617 netPF=1.03 SR=+0.04 costR=2.6% guard=PASS
+  [73/150] NAS100  H4 macross   v0 n=  177 netPF=1.47 SR=+0.67 costR=1.9% guard=PASS
+  [74/150] NAS100  H4 macross   v1 n=  106 netPF=1.36 SR=+0.44 costR=1.9% guard=PASS
+  [75/150] NAS100  H4 macross   v2 n=  209 netPF=1.37 SR=+0.48 costR=2.6% guard=PASS
+
+[US30] loading M1 mid ...
+[US30] M1 bars 2,090,818 | 2018-01-02 -> 2025-12-31 | median px 33,784.6 | median spread 3.972 pts (1.18 bps)
+[US30/M5] 419,016 bars.
+  [76/150]   US30  M5 trend     v0 n=15553 netPF=0.63 SR=-8.75 costR=24.5% guard=PASS
+  [77/150]   US30  M5 trend     v1 n=12917 netPF=0.67 SR=-7.44 costR=21.7% guard=PASS
+  [78/150]   US30  M5 trend     v2 n=12674 netPF=0.74 SR=-5.00 costR=19.2% guard=PASS
+  [79/150]   US30  M5 breakout  v0 n=21457 netPF=0.59 SR=-11.50 costR=33.1% guard=PASS
+  [80/150]   US30  M5 breakout  v1 n=12673 netPF=0.65 SR=-8.13 costR=30.0% guard=PASS
+  [81/150]   US30  M5 breakout  v2 n=20108 netPF=0.63 SR=-9.92 costR=24.0% guard=PASS
+  [82/150]   US30  M5 meanrev   v0 n= 8643 netPF=0.54 SR=-8.27 costR=34.2% guard=PASS
+  [83/150]   US30  M5 meanrev   v1 n= 4051 netPF=0.47 SR=-6.76 costR=32.7% guard=PASS
+  [84/150]   US30  M5 meanrev   v2 n=17096 netPF=0.62 SR=-9.08 costR=24.3% guard=PASS
+  [85/150]   US30  M5 momentum  v0 n=12808 netPF=0.68 SR=-7.01 costR=23.2% guard=PASS
+  [86/150]   US30  M5 momentum  v1 n= 8895 netPF=0.72 SR=-4.97 costR=22.1% guard=PASS
+  [87/150]   US30  M5 momentum  v2 n=23949 netPF=0.57 SR=-12.09 costR=30.2% guard=PASS
+  [88/150]   US30  M5 macross   v0 n= 6868 netPF=0.71 SR=-4.66 costR=22.3% guard=PASS
+  [89/150]   US30  M5 macross   v1 n= 4522 netPF=0.77 SR=-2.91 costR=19.6% guard=PASS
+  [90/150]   US30  M5 macross   v2 n= 8539 netPF=0.69 SR=-5.20 costR=29.5% guard=PASS
+[US30/M15] 139,726 bars.
+  [91/150]   US30 M15 trend     v0 n= 5234 netPF=0.81 SR=-2.41 costR=13.1% guard=PASS
+  [92/150]   US30 M15 trend     v1 n= 4498 netPF=0.81 SR=-2.33 costR=11.4% guard=PASS
+  [93/150]   US30 M15 trend     v2 n= 4589 netPF=0.86 SR=-1.67 costR=10.0% guard=PASS
+  [94/150]   US30 M15 breakout  v0 n= 7362 netPF=0.75 SR=-4.13 costR=17.6% guard=PASS
+  [95/150]   US30 M15 breakout  v1 n= 4334 netPF=0.79 SR=-2.73 costR=13.3% guard=PASS
+  [96/150]   US30 M15 breakout  v2 n= 6974 netPF=0.78 SR=-3.42 costR=12.7% guard=PASS
+  [97/150]   US30 M15 meanrev   v0 n= 3186 netPF=0.71 SR=-3.23 costR=18.3% guard=PASS
+  [98/150]   US30 M15 meanrev   v1 n= 1663 netPF=0.63 SR=-2.91 costR=18.9% guard=PASS
+  [99/150]   US30 M15 meanrev   v2 n= 6095 netPF=0.80 SR=-2.75 costR=13.3% guard=PASS
+  [100/150]   US30 M15 momentum  v0 n= 4519 netPF=0.84 SR=-1.89 costR=11.5% guard=PASS
+  [101/150]   US30 M15 momentum  v1 n= 3158 netPF=0.80 SR=-2.05 costR=11.8% guard=PASS
+  [102/150]   US30 M15 momentum  v2 n= 8373 netPF=0.77 SR=-3.80 costR=15.6% guard=PASS
+  [103/150]   US30 M15 macross   v0 n= 2281 netPF=0.83 SR=-1.48 costR=10.6% guard=PASS
+  [104/150]   US30 M15 macross   v1 n= 1424 netPF=0.84 SR=-1.16 costR=9.3% guard=PASS
+  [105/150]   US30 M15 macross   v2 n= 2801 netPF=0.84 SR=-1.47 costR=13.6% guard=PASS
+[US30/M30] 70,631 bars.
+  [106/150]   US30 M30 trend     v0 n= 2795 netPF=0.87 SR=-1.17 costR=8.3% guard=PASS
+  [107/150]   US30 M30 trend     v1 n= 2167 netPF=0.86 SR=-1.13 costR=6.7% guard=PASS
+  [108/150]   US30 M30 trend     v2 n= 2232 netPF=0.95 SR=-0.46 costR=6.0% guard=PASS
+  [109/150]   US30 M30 breakout  v0 n= 3907 netPF=0.84 SR=-1.86 costR=10.4% guard=PASS
+  [110/150]   US30 M30 breakout  v1 n= 1951 netPF=0.90 SR=-0.86 costR=8.2% guard=PASS
+  [111/150]   US30 M30 breakout  v2 n= 3740 netPF=0.86 SR=-1.64 costR=7.6% guard=PASS
+  [112/150]   US30 M30 meanrev   v0 n= 1805 netPF=0.83 SR=-1.39 costR=11.7% guard=PASS
+  [113/150]   US30 M30 meanrev   v1 n= 1009 netPF=0.75 SR=-1.56 costR=12.3% guard=PASS
+  [114/150]   US30 M30 meanrev   v2 n= 3256 netPF=0.78 SR=-2.26 costR=8.3% guard=PASS
+  [115/150]   US30 M30 momentum  v0 n= 2364 netPF=0.86 SR=-1.21 costR=7.9% guard=PASS
+  [116/150]   US30 M30 momentum  v1 n= 1402 netPF=0.89 SR=-0.73 costR=5.6% guard=PASS
+  [117/150]   US30 M30 momentum  v2 n= 4219 netPF=0.81 SR=-2.16 costR=9.5% guard=PASS
+  [118/150]   US30 M30 macross   v0 n= 1069 netPF=0.87 SR=-0.78 costR=6.4% guard=PASS
+  [119/150]   US30 M30 macross   v1 n=  705 netPF=1.00 SR=-0.03 costR=5.9% guard=PASS
+  [120/150]   US30 M30 macross   v2 n= 1311 netPF=0.89 SR=-0.69 costR=8.6% guard=PASS
+[US30/H1] 36,081 bars.
+  [121/150]   US30  H1 trend     v0 n= 1341 netPF=0.93 SR=-0.44 costR=4.7% guard=PASS
+  [122/150]   US30  H1 trend     v1 n= 1150 netPF=0.94 SR=-0.40 costR=4.2% guard=PASS
+  [123/150]   US30  H1 trend     v2 n= 1246 netPF=1.01 SR=-0.11 costR=3.9% guard=PASS
+  [124/150]   US30  H1 breakout  v0 n= 1827 netPF=0.97 SR=-0.33 costR=6.0% guard=PASS
+  [125/150]   US30  H1 breakout  v1 n= 1091 netPF=0.95 SR=-0.36 costR=5.9% guard=PASS
+  [126/150]   US30  H1 breakout  v2 n= 1754 netPF=0.96 SR=-0.36 costR=4.4% guard=PASS
+  [127/150]   US30  H1 meanrev   v0 n= 1024 netPF=0.86 SR=-0.80 costR=7.1% guard=PASS
+  [128/150]   US30  H1 meanrev   v1 n=  593 netPF=0.83 SR=-0.77 costR=7.2% guard=PASS
+  [129/150]   US30  H1 meanrev   v2 n= 1670 netPF=0.84 SR=-1.23 costR=4.8% guard=PASS
+  [130/150]   US30  H1 momentum  v0 n= 1174 netPF=0.92 SR=-0.53 costR=4.2% guard=PASS
+  [131/150]   US30  H1 momentum  v1 n=  798 netPF=1.06 SR=+0.17 costR=4.0% guard=PASS
+  [132/150]   US30  H1 momentum  v2 n= 2255 netPF=0.90 SR=-0.85 costR=6.3% guard=PASS
+  [133/150]   US30  H1 macross   v0 n=  567 netPF=1.00 SR=-0.03 costR=4.3% guard=PASS
+  [134/150]   US30  H1 macross   v1 n=  373 netPF=1.20 SR=+0.51 costR=3.8% guard=PASS
+  [135/150]   US30  H1 macross   v2 n=  710 netPF=1.00 SR=-0.14 costR=5.6% guard=PASS
+[US30/H4] 9,845 bars.
+  [136/150]   US30  H4 trend     v0 n=  389 netPF=1.17 SR=-0.04 costR=2.0% guard=PASS
+  [137/150]   US30  H4 trend     v1 n=  298 netPF=1.16 SR=+0.29 costR=1.8% guard=PASS
+  [138/150]   US30  H4 trend     v2 n=  323 netPF=1.11 SR=-0.30 costR=1.6% guard=PASS
+  [139/150]   US30  H4 breakout  v0 n=  510 netPF=1.12 SR=+0.21 costR=2.6% guard=PASS
+  [140/150]   US30  H4 breakout  v1 n=  320 netPF=0.95 SR=-0.25 costR=2.6% guard=PASS
+  [141/150]   US30  H4 breakout  v2 n=  484 netPF=1.18 SR=+0.40 costR=1.9% guard=PASS
+  [142/150]   US30  H4 meanrev   v0 n=  344 netPF=0.85 SR=-0.53 costR=4.7% guard=PASS
+  [143/150]   US30  H4 meanrev   v1 n=  182 netPF=0.93 SR=-0.08 costR=4.7% guard=PASS
+  [144/150]   US30  H4 meanrev   v2 n=  557 netPF=0.77 SR=-1.01 costR=2.8% guard=PASS
+  [145/150]   US30  H4 momentum  v0 n=  311 netPF=1.15 SR=+0.18 costR=1.9% guard=PASS
+  [146/150]   US30  H4 momentum  v1 n=  220 netPF=1.12 SR=+0.22 costR=1.7% guard=PASS
+  [147/150]   US30  H4 momentum  v2 n=  631 netPF=1.04 SR=+0.13 costR=2.6% guard=PASS
+  [148/150]   US30  H4 macross   v0 n=  151 netPF=1.28 SR=+0.33 costR=1.9% guard=PASS
+  [149/150]   US30  H4 macross   v1 n=  112 netPF=1.31 SR=+0.39 costR=1.9% guard=PASS
+  [150/150]   US30  H4 macross   v2 n=  190 netPF=1.46 SR=+0.56 costR=2.5% guard=PASS
+
+Grid complete: 150/150 in C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\sweep_indices.csv
+
+================================================================================================================================
+  US INDEX CFD SWEEP (NAS100 + US30) — real Dukascopy spread, 2018-2025 UTC
+  Cost: REAL per-bar spread + 0.35 bps commission (round-turn) + 0.15/0.5 bps per-side slippage | 1% risk/trade | NO tuning
+  Configs THIS BATCH: 150  |  CUMULATIVE TRIAL COUNT (DSR N): 87 prior + 150 = 237
+  DSR trial universe: prior [sweep_progress.csv:75, htf_breakout.csv:12] + 150 traded here = 237 Sharpes
+  Gates: DSR > 0.95 AND OOS holds (IS&OOS netPF>1, OOS SR>0, OOS trades>=20) AND FTMO P1 >= 30%
+================================================================================================================================
+  TOP 15 BY NET SHARPE
+   #   inst  TF family    v  grPF netPF  Sharpe   DSR  maxDD trades  costR%  FTMO% OOS? guard
+  ----------------------------------------------------------------------------------------------------------------------------
+   1 NAS100  H4 macross   0  1.52  1.47   +0.67  0.00  13.7%    177    1.9%   0.0%  YES  PASS
+   2   US30  H4 macross   2  1.51  1.46   +0.56  0.00  12.5%    190    2.5%   0.0%  YES  PASS
+   3   US30  H1 macross   1  1.27  1.20   +0.51  0.00  18.4%    373    3.8%   0.0%  YES  PASS
+   4 NAS100  H4 macross   2  1.42  1.37   +0.48  0.00  10.8%    209    2.6%   0.0%  YES  PASS
+   5 NAS100  H1 macross   2  1.23  1.13   +0.45  0.00  20.6%    702    5.4%   7.4%  YES  PASS
+   6 NAS100  H4 macross   1  1.40  1.36   +0.44  0.00   6.4%    106    1.9%   0.0%  YES  PASS
+   7 NAS100  H1 macross   1  1.24  1.17   +0.44  0.00  14.5%    406    3.9%   0.0%  YES  PASS
+   8   US30  H4 breakout  2  1.23  1.18   +0.40  0.00  24.1%    484    1.9%   0.0%  YES  PASS
+   9   US30  H4 macross   1  1.35  1.31   +0.39  0.00  11.1%    112    1.9%   0.0%  YES  PASS
+  10 NAS100  H1 macross   0  1.19  1.11   +0.34  0.00  19.6%    582    4.1%   2.1%   no  PASS
+  11   US30  H4 macross   0  1.33  1.28   +0.33  0.00  13.9%    151    1.9%   0.0%  YES  PASS
+  12   US30  H4 trend     1  1.20  1.16   +0.29  0.00  16.0%    298    1.8%   0.0%  YES  PASS
+  13 NAS100  H4 trend     1  1.17  1.13   +0.26  0.00   9.7%    311    1.7%   0.0%  YES  PASS
+  14   US30  H4 momentum  1  1.15  1.12   +0.22  0.00  19.6%    220    1.7%   0.0%   no  PASS
+  15 NAS100  H1 momentum  1  1.13  1.06   +0.21  0.00  23.7%    782    4.0%   3.2%  YES  PASS
+================================================================================================================================
+
+  COST-TO-RISK BY TIMEFRAME (the thesis test) — cost_R as % of 1R
+    inst  TF  medR (pts)   costR%  grossR/trd   netR/trd  grPF  netPF
+  ----------------------------------------------------------------------
+  NAS100  M5        20.6    27.8%     +0.0094    -0.2685  1.01   0.64
+  NAS100 M15        38.8    14.4%     -0.0008    -0.1452  1.00   0.78
+  NAS100 M30        57.3     8.9%     +0.0016    -0.0879  1.00   0.86
+  NAS100  H1        89.5     5.4%     +0.0275    -0.0267  1.05   0.95
+  NAS100  H4       175.8     2.7%     +0.0638    +0.0366  1.12   1.07
+    US30  M5        35.1    26.0%     -0.0009    -0.2613  1.00   0.65
+    US30 M15        65.5    13.4%     -0.0005    -0.1345  1.00   0.79
+    US30 M30        95.1     8.2%     +0.0017    -0.0807  1.00   0.87
+    US30  H1       148.2     5.1%     +0.0282    -0.0228  1.05   0.96
+    US30  H4       313.3     2.5%     +0.0824    +0.0576  1.16   1.11
+
+  GOLD COMPARISON (prior sweeps, same families & cost method):
+    XAUUSD M5  cost_R ~60%   |  M15 ~32%  |  M30 ~21%  |  H4 ~4-6%
+
+  VERDICT
+  --------------------------------------------------------------------------
+  NO config survived. Zero cleared DSR + OOS + FTMO.
+  Best raw net Sharpe: NAS100 H4 macross v0 -> SR +0.67, netPF 1.47
+    - DSR 0.000 (need > 0.95) -> FAIL: inside the noise of 237 cumulative trials
+    - OOS holds: YES (IS PF 1.37 / OOS PF 1.63, OOS SR +3.60, OOS trades 73)
+    - FTMO P1 pass 0.0% (need >= 30%)
+
+  vs BUY-AND-HOLD THE INDEX (same period, spread crossed once):
+    NAS100: B&H Sharpe +0.84, MDD 35.7%, CAGR 18.3%  |  best strategy SR +0.67 -> LOSES TO B&H (gap -0.17)
+    US30: B&H Sharpe +0.55, MDD 37.0%, CAGR 8.6%  |  best strategy SR +0.56 -> BEATS B&H (gap +0.01)
+
+  Batch summary:
+    positive net Sharpe : 21 / 150
+    net PF > 1          : 30 / 150
+    gross PF > 1        : 90 / 150
+    look-ahead guard    : 150 / 150 PASS
+    OOS holds           : 21 / 150
+    clears DSR haircut  : 0 / 150
+
+  Leaderboard -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\leaderboard_indices.csv
+[2026-07-21 21:35:19] STEP 4 sweep exit=0
+[2026-07-21 21:35:19] ================= PIPELINE COMPLETE =================
