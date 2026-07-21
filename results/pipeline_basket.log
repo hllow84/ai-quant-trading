@@ -1,0 +1,416 @@
+[2026-07-21 23:53:41] ================= BASKET PIPELINE START (pid 1725) =================
+[2026-07-21 23:53:41] STEP 1/4  downloading H1 bid+ask for GER40 / UK100 / JP225 / SPX500
+[2026-07-22 00:10:57] STEP 1 exit=0
+[2026-07-22 00:10:58] download markers: 64/64 complete, 0
+0 hard failures
+[2026-07-22 00:10:58] STEP 2/4  merging 6 H1 base files (4 downloaded + NAS100/US30 derived from M1)
+
+======================================================================
+deuidxeur -> GER40  (downloaded H1)
+======================================================================
+  rows            : 46,434
+  range (UTC)     : 2018-01-02 07:00:00+00:00 -> 2025-12-31 20:00:00+00:00
+  bid_close range : 8,006.66 -> 24,747.26
+  spread median   : 2.6320 pts = 1.805 bps of price
+  negative spreads: 0 (0.000%)
+  OK: price range consistent with GER40.
+  wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\GER40_H1_2018_2025_cfd_dukascopy.csv  (6.3 MB)
+
+======================================================================
+gbridxgbp -> UK100  (downloaded H1)
+======================================================================
+  rows            : 45,884
+  range (UTC)     : 2018-01-02 07:00:00+00:00 -> 2025-12-31 18:00:00+00:00
+  bid_close range : 4,855.55 -> 9,957.21
+  spread median   : 1.9900 pts = 2.669 bps of price
+  negative spreads: 0 (0.000%)
+  OK: price range consistent with UK100.
+  wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\UK100_H1_2018_2025_cfd_dukascopy.csv  (5.9 MB)
+
+======================================================================
+jpnidxjpy -> JP225  (downloaded H1)
+======================================================================
+  rows            : 46,375
+  range (UTC)     : 2018-01-02 01:00:00+00:00 -> 2025-12-31 21:00:00+00:00
+  bid_close range : 16,289.52 -> 52,535.00
+  spread median   : 7.1100 pts = 2.557 bps of price
+  negative spreads: 0 (0.000%)
+  OK: price range consistent with JP225.
+  wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\JP225_H1_2018_2025_cfd_dukascopy.csv  (6.4 MB)
+
+======================================================================
+usa500idxusd -> SPX500  (downloaded H1)
+======================================================================
+  rows            : 46,548
+  range (UTC)     : 2018-01-02 07:00:00+00:00 -> 2025-12-31 21:00:00+00:00
+  bid_close range : 2,186.04 -> 6,938.25
+  spread median   : 0.5280 pts = 1.288 bps of price
+  negative spreads: 0 (0.000%)
+  OK: price range consistent with SPX500.
+  wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\SPX500_H1_2018_2025_cfd_dukascopy.csv  (6.0 MB)
+
+======================================================================
+NAS100_M1_2018_2025_cfd_dukascopy.csv -> NAS100  (derived M1 -> H1)
+======================================================================
+  aggregated 2,211,511 M1 bars -> 38,119 H1 bars
+  rows            : 38,119
+  range (UTC)     : 2018-01-03 07:00:00+00:00 -> 2025-12-31 21:00:00+00:00
+  bid_close range : 6,042.86 -> 26,236.22
+  spread median   : 3.1140 pts = 2.234 bps of price
+  negative spreads: 0 (0.000%)
+  OK: price range consistent with NAS100.
+  wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\NAS100_H1_2018_2025_cfd_dukascopy.csv  (5.4 MB)
+
+======================================================================
+US30_M1_2018_2025_cfd_dukascopy.csv -> US30  (derived M1 -> H1)
+======================================================================
+  aggregated 2,090,818 M1 bars -> 36,081 H1 bars
+  rows            : 36,081
+  range (UTC)     : 2018-01-02 07:00:00+00:00 -> 2025-12-31 21:00:00+00:00
+  bid_close range : 18,203.21 -> 48,858.92
+  spread median   : 3.9420 pts = 1.167 bps of price
+  negative spreads: 0 (0.000%)
+  OK: price range consistent with US30.
+  wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\US30_H1_2018_2025_cfd_dukascopy.csv  (5.2 MB)
+
+======================================================================
+  6/6 instruments written.
+======================================================================
+[2026-07-22 00:11:16] STEP 2 merge exit=0  (non-zero just means some instrument was incomplete; verify decides)
+[2026-07-22 00:11:16] STEP 3/4  verifying all 6 H1 files (HARD GATE)
+
+========================================================================
+VERIFY NAS100  (NAS100_H1_2018_2025_cfd_dukascopy.csv)
+========================================================================
+  bars            : 38,119
+  first / last    : 2018-01-03 07:00:00+00:00  ->  2025-12-31 21:00:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 6,042.86 -> 26,236.22  (median 13,937.50)
+  spread median   : 3.1140 pts = 2.234 bps
+  negative spreads: 0 (0.000%)
+  --> PASS
+
+========================================================================
+VERIFY US30  (US30_H1_2018_2025_cfd_dukascopy.csv)
+========================================================================
+  bars            : 36,081
+  first / last    : 2018-01-02 07:00:00+00:00  ->  2025-12-31 21:00:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 18,203.21 -> 48,858.92  (median 33,781.70)
+  spread median   : 3.9420 pts = 1.167 bps
+  negative spreads: 0 (0.000%)
+  --> PASS
+
+========================================================================
+VERIFY GER40  (GER40_H1_2018_2025_cfd_dukascopy.csv)
+========================================================================
+  bars            : 46,434
+  first / last    : 2018-01-02 07:00:00+00:00  ->  2025-12-31 20:00:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 8,006.66 -> 24,747.26  (median 14,585.53)
+  spread median   : 2.6320 pts = 1.805 bps
+  negative spreads: 0 (0.000%)
+  --> PASS
+
+========================================================================
+VERIFY UK100  (UK100_H1_2018_2025_cfd_dukascopy.csv)
+========================================================================
+  bars            : 45,884
+  first / last    : 2018-01-02 07:00:00+00:00  ->  2025-12-31 18:00:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 4,855.55 -> 9,957.21  (median 7,456.64)
+  spread median   : 1.9900 pts = 2.669 bps
+  negative spreads: 0 (0.000%)
+  --> PASS
+
+========================================================================
+VERIFY JP225  (JP225_H1_2018_2025_cfd_dukascopy.csv)
+========================================================================
+  bars            : 46,375
+  first / last    : 2018-01-02 01:00:00+00:00  ->  2025-12-31 21:00:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 16,289.52 -> 52,535.00  (median 27,809.27)
+  spread median   : 7.1100 pts = 2.557 bps
+  negative spreads: 0 (0.000%)
+  --> PASS
+
+========================================================================
+VERIFY SPX500  (SPX500_H1_2018_2025_cfd_dukascopy.csv)
+========================================================================
+  bars            : 46,548
+  first / last    : 2018-01-02 07:00:00+00:00  ->  2025-12-31 21:00:00+00:00
+  years present   : [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  bid_close range : 2,186.04 -> 6,938.25  (median 4,100.16)
+  spread median   : 0.5280 pts = 1.288 bps
+  negative spreads: 0 (0.000%)
+  --> PASS
+
+========================================================================
+   NAS100: PASS
+     US30: PASS
+    GER40: PASS
+    UK100: PASS
+    JP225: PASS
+   SPX500: PASS
+  ALL 6 VERIFIED — basket sweep may proceed.
+========================================================================
+[2026-07-22 00:11:18] STEP 3 verify exit=0
+[2026-07-22 00:11:18] STEP 4/4  running the 108-config sweep + 18 baskets
+
+[NAS100] loading H1 base ...
+[NAS100] 38,119 H1 bars | 2018-01-03 -> 2025-12-31 | median px 13,938.2 | spread 3.114 pts (2.23 bps)
+  [1/108] NAS100 H4 trend    v0 n= 404 netPF=1.08 SR=+0.23 costR=2.0% guard=PASS
+  [2/108] NAS100 H4 trend    v1 n= 312 netPF=1.14 SR=+0.38 costR=1.7% guard=PASS
+  [3/108] NAS100 H4 trend    v2 n= 359 netPF=1.12 SR=+0.33 costR=1.7% guard=PASS
+  [4/108] NAS100 H4 macross  v0 n= 177 netPF=1.48 SR=+0.85 costR=1.8% guard=PASS
+  [5/108] NAS100 H4 macross  v1 n= 106 netPF=1.36 SR=+0.52 costR=1.8% guard=PASS
+  [6/108] NAS100 H4 macross  v2 n= 210 netPF=1.40 SR=+0.75 costR=2.4% guard=PASS
+  [7/108] NAS100 H8 trend    v0 n= 209 netPF=1.09 SR=+0.21 costR=1.4% guard=PASS
+  [8/108] NAS100 H8 trend    v1 n= 164 netPF=1.27 SR=+0.51 costR=1.2% guard=PASS
+  [9/108] NAS100 H8 trend    v2 n= 187 netPF=1.09 SR=+0.19 costR=1.1% guard=PASS
+  [10/108] NAS100 H8 macross  v0 n=  82 netPF=1.73 SR=+0.76 costR=1.2% guard=PASS
+  [11/108] NAS100 H8 macross  v1 n=  52 netPF=1.30 SR=+0.31 costR=1.3% guard=PASS
+  [12/108] NAS100 H8 macross  v2 n=  97 netPF=1.53 SR=+0.61 costR=1.6% guard=PASS
+  [13/108] NAS100 D1 trend    v0 n=  80 netPF=2.25 SR=+1.07 costR=0.9% guard=PASS
+  [14/108] NAS100 D1 trend    v1 n=  67 netPF=1.78 SR=+0.78 costR=0.8% guard=PASS
+  [15/108] NAS100 D1 trend    v2 n=  63 netPF=1.74 SR=+0.63 costR=0.8% guard=PASS
+  [16/108] NAS100 D1 macross  v0 n=  26 netPF=1.26 SR=+0.19 costR=0.9% guard=PASS
+  [17/108] NAS100 D1 macross  v1 n=  16 netPF=3.10 SR=+0.74 costR=0.9% guard=PASS
+  [18/108] NAS100 D1 macross  v2 n=  33 netPF=1.22 SR=+0.17 costR=1.1% guard=PASS
+
+[US30] loading H1 base ...
+[US30] 36,081 H1 bars | 2018-01-02 -> 2025-12-31 | median px 33,784.5 | spread 3.942 pts (1.17 bps)
+  [19/108]   US30 H4 trend    v0 n= 393 netPF=1.17 SR=+0.48 costR=1.9% guard=PASS
+  [20/108]   US30 H4 trend    v1 n= 302 netPF=1.13 SR=+0.36 costR=1.7% guard=PASS
+  [21/108]   US30 H4 trend    v2 n= 324 netPF=1.11 SR=+0.30 costR=1.5% guard=PASS
+  [22/108]   US30 H4 macross  v0 n= 151 netPF=1.30 SR=+0.54 costR=1.9% guard=PASS
+  [23/108]   US30 H4 macross  v1 n= 113 netPF=1.34 SR=+0.52 costR=1.8% guard=PASS
+  [24/108]   US30 H4 macross  v2 n= 191 netPF=1.46 SR=+0.81 costR=2.4% guard=PASS
+  [25/108]   US30 H8 trend    v0 n= 191 netPF=1.24 SR=+0.48 costR=1.3% guard=PASS
+  [26/108]   US30 H8 trend    v1 n= 156 netPF=1.05 SR=+0.11 costR=1.1% guard=PASS
+  [27/108]   US30 H8 trend    v2 n= 170 netPF=1.12 SR=+0.23 costR=1.1% guard=PASS
+  [28/108]   US30 H8 macross  v0 n=  86 netPF=1.21 SR=+0.30 costR=1.1% guard=PASS
+  [29/108]   US30 H8 macross  v1 n=  60 netPF=1.87 SR=+0.81 costR=1.2% guard=PASS
+  [30/108]   US30 H8 macross  v2 n= 112 netPF=1.44 SR=+0.61 costR=1.5% guard=PASS
+  [31/108]   US30 D1 trend    v0 n=  72 netPF=1.12 SR=+0.16 costR=0.9% guard=PASS
+  [32/108]   US30 D1 trend    v1 n=  61 netPF=1.10 SR=+0.13 costR=0.9% guard=PASS
+  [33/108]   US30 D1 trend    v2 n=  62 netPF=0.84 SR=-0.22 costR=0.7% guard=PASS
+  [34/108]   US30 D1 macross  v0 n=  22 netPF=1.56 SR=+0.35 costR=0.8% guard=PASS
+  [35/108]   US30 D1 macross  v1 n=  18 netPF=1.37 SR=+0.24 costR=1.0% guard=PASS
+  [36/108]   US30 D1 macross  v2 n=  28 netPF=1.05 SR=+0.04 costR=1.1% guard=PASS
+
+[SPX500] loading H1 base ...
+[SPX500] 46,548 H1 bars | 2018-01-02 -> 2025-12-31 | median px 4,100.5 | spread 0.528 pts (1.29 bps)
+  [37/108] SPX500 H4 trend    v0 n= 516 netPF=1.12 SR=+0.35 costR=2.5% guard=PASS
+  [38/108] SPX500 H4 trend    v1 n= 395 netPF=1.07 SR=+0.19 costR=2.1% guard=PASS
+  [39/108] SPX500 H4 trend    v2 n= 397 netPF=1.18 SR=+0.46 costR=1.9% guard=PASS
+  [40/108] SPX500 H4 macross  v0 n= 191 netPF=1.58 SR=+0.93 costR=2.2% guard=PASS
+  [41/108] SPX500 H4 macross  v1 n= 127 netPF=1.61 SR=+0.80 costR=2.0% guard=PASS
+  [42/108] SPX500 H4 macross  v2 n= 238 netPF=1.52 SR=+0.89 costR=2.9% guard=PASS
+  [43/108] SPX500 H8 trend    v0 n= 255 netPF=1.09 SR=+0.20 costR=1.7% guard=PASS
+  [44/108] SPX500 H8 trend    v1 n= 203 netPF=1.17 SR=+0.33 costR=1.5% guard=PASS
+  [45/108] SPX500 H8 trend    v2 n= 216 netPF=1.06 SR=+0.12 costR=1.2% guard=PASS
+  [46/108] SPX500 H8 macross  v0 n=  94 netPF=1.66 SR=+0.71 costR=1.3% guard=PASS
+  [47/108] SPX500 H8 macross  v1 n=  54 netPF=1.69 SR=+0.57 costR=1.4% guard=PASS
+  [48/108] SPX500 H8 macross  v2 n= 111 netPF=1.99 SR=+0.98 costR=1.8% guard=PASS
+  [49/108] SPX500 D1 trend    v0 n=  97 netPF=1.08 SR=+0.11 costR=0.9% guard=PASS
+  [50/108] SPX500 D1 trend    v1 n=  81 netPF=0.94 SR=-0.09 costR=0.8% guard=PASS
+  [51/108] SPX500 D1 trend    v2 n=  77 netPF=1.26 SR=+0.28 costR=0.8% guard=PASS
+  [52/108] SPX500 D1 macross  v0 n=  32 netPF=1.51 SR=+0.35 costR=0.9% guard=PASS
+  [53/108] SPX500 D1 macross  v1 n=  27 netPF=1.58 SR=+0.37 costR=0.8% guard=PASS
+  [54/108] SPX500 D1 macross  v2 n=  38 netPF=1.65 SR=+0.42 costR=1.2% guard=PASS
+
+[GER40] loading H1 base ...
+[GER40] 46,434 H1 bars | 2018-01-02 -> 2025-12-31 | median px 14,586.8 | spread 2.632 pts (1.80 bps)
+  [55/108]  GER40 H4 trend    v0 n= 524 netPF=0.88 SR=-0.43 costR=2.8% guard=PASS
+  [56/108]  GER40 H4 trend    v1 n= 388 netPF=0.89 SR=-0.34 costR=2.6% guard=PASS
+  [57/108]  GER40 H4 trend    v2 n= 412 netPF=0.97 SR=-0.09 costR=2.3% guard=PASS
+  [58/108]  GER40 H4 macross  v0 n= 220 netPF=0.84 SR=-0.39 costR=2.8% guard=PASS
+  [59/108]  GER40 H4 macross  v1 n= 146 netPF=0.90 SR=-0.20 costR=3.1% guard=PASS
+  [60/108]  GER40 H4 macross  v2 n= 274 netPF=0.84 SR=-0.40 costR=3.7% guard=PASS
+  [61/108]  GER40 H8 trend    v0 n= 274 netPF=0.83 SR=-0.42 costR=1.7% guard=PASS
+  [62/108]  GER40 H8 trend    v1 n= 211 netPF=0.81 SR=-0.48 costR=1.6% guard=PASS
+  [63/108]  GER40 H8 trend    v2 n= 207 netPF=0.84 SR=-0.33 costR=1.4% guard=PASS
+  [64/108]  GER40 H8 macross  v0 n= 102 netPF=1.34 SR=+0.43 costR=1.7% guard=PASS
+  [65/108]  GER40 H8 macross  v1 n=  86 netPF=1.43 SR=+0.50 costR=1.6% guard=PASS
+  [66/108]  GER40 H8 macross  v2 n= 133 netPF=1.14 SR=+0.21 costR=2.5% guard=PASS
+  [67/108]  GER40 D1 trend    v0 n= 101 netPF=0.88 SR=-0.18 costR=1.4% guard=PASS
+  [68/108]  GER40 D1 trend    v1 n=  79 netPF=1.01 SR=+0.01 costR=1.3% guard=PASS
+  [69/108]  GER40 D1 trend    v2 n=  77 netPF=1.06 SR=+0.07 costR=1.2% guard=PASS
+  [70/108]  GER40 D1 macross  v0 n=  36 netPF=1.82 SR=+0.52 costR=1.5% guard=PASS
+  [71/108]  GER40 D1 macross  v1 n=  26 netPF=0.83 SR=-0.15 costR=1.5% guard=PASS
+  [72/108]  GER40 D1 macross  v2 n=  45 netPF=1.25 SR=+0.21 costR=2.0% guard=PASS
+
+[UK100] loading H1 base ...
+[UK100] 45,884 H1 bars | 2018-01-02 -> 2025-12-31 | median px 7,458.0 | spread 1.990 pts (2.67 bps)
+  [73/108]  UK100 H4 trend    v0 n= 537 netPF=0.80 SR=-0.72 costR=4.9% guard=PASS
+  [74/108]  UK100 H4 trend    v1 n= 419 netPF=0.74 SR=-0.90 costR=4.1% guard=PASS
+  [75/108]  UK100 H4 trend    v2 n= 405 netPF=0.79 SR=-0.65 costR=3.6% guard=PASS
+  [76/108]  UK100 H4 macross  v0 n= 209 netPF=0.75 SR=-0.62 costR=4.8% guard=PASS
+  [77/108]  UK100 H4 macross  v1 n= 159 netPF=0.64 SR=-0.86 costR=4.6% guard=PASS
+  [78/108]  UK100 H4 macross  v2 n= 275 netPF=0.80 SR=-0.53 costR=6.6% guard=PASS
+  [79/108]  UK100 H8 trend    v0 n= 281 netPF=0.84 SR=-0.41 costR=3.3% guard=PASS
+  [80/108]  UK100 H8 trend    v1 n= 211 netPF=0.80 SR=-0.49 costR=3.1% guard=PASS
+  [81/108]  UK100 H8 trend    v2 n= 217 netPF=0.74 SR=-0.61 costR=2.5% guard=PASS
+  [82/108]  UK100 H8 macross  v0 n= 119 netPF=0.74 SR=-0.49 costR=3.1% guard=PASS
+  [83/108]  UK100 H8 macross  v1 n=  81 netPF=0.86 SR=-0.21 costR=3.2% guard=PASS
+  [84/108]  UK100 H8 macross  v2 n= 152 netPF=0.91 SR=-0.17 costR=4.2% guard=PASS
+  [85/108]  UK100 D1 trend    v0 n=  97 netPF=0.78 SR=-0.35 costR=3.3% guard=PASS
+  [86/108]  UK100 D1 trend    v1 n=  82 netPF=0.66 SR=-0.56 costR=3.0% guard=PASS
+  [87/108]  UK100 D1 trend    v2 n=  78 netPF=0.71 SR=-0.42 costR=2.5% guard=PASS
+  [88/108]  UK100 D1 macross  v0 n=  44 netPF=0.95 SR=-0.05 costR=3.0% guard=PASS
+  [89/108]  UK100 D1 macross  v1 n=  36 netPF=0.53 SR=-0.59 costR=2.7% guard=PASS
+  [90/108]  UK100 D1 macross  v2 n=  54 netPF=0.87 SR=-0.14 costR=4.0% guard=PASS
+
+[JP225] loading H1 base ...
+[JP225] 46,375 H1 bars | 2018-01-02 -> 2025-12-31 | median px 27,812.7 | spread 7.110 pts (2.56 bps)
+  [91/108]  JP225 H4 trend    v0 n= 533 netPF=0.84 SR=-0.56 costR=2.9% guard=PASS
+  [92/108]  JP225 H4 trend    v1 n= 397 netPF=0.88 SR=-0.39 costR=2.4% guard=PASS
+  [93/108]  JP225 H4 trend    v2 n= 424 netPF=0.86 SR=-0.40 costR=2.3% guard=PASS
+  [94/108]  JP225 H4 macross  v0 n= 206 netPF=1.23 SR=+0.44 costR=2.7% guard=PASS
+  [95/108]  JP225 H4 macross  v1 n= 133 netPF=1.26 SR=+0.40 costR=2.7% guard=PASS
+  [96/108]  JP225 H4 macross  v2 n= 252 netPF=1.53 SR=+0.94 costR=3.6% guard=PASS
+  [97/108]  JP225 H8 trend    v0 n= 267 netPF=0.86 SR=-0.36 costR=2.0% guard=PASS
+  [98/108]  JP225 H8 trend    v1 n= 215 netPF=0.93 SR=-0.17 costR=1.8% guard=PASS
+  [99/108]  JP225 H8 trend    v2 n= 213 netPF=0.98 SR=-0.04 costR=1.5% guard=PASS
+  [100/108]  JP225 H8 macross  v0 n= 107 netPF=0.88 SR=-0.19 costR=1.9% guard=PASS
+  [101/108]  JP225 H8 macross  v1 n=  90 netPF=0.68 SR=-0.56 costR=2.0% guard=PASS
+  [102/108]  JP225 H8 macross  v2 n= 137 netPF=1.07 SR=+0.11 costR=2.5% guard=PASS
+  [103/108]  JP225 D1 trend    v0 n= 102 netPF=1.03 SR=+0.04 costR=1.2% guard=PASS
+  [104/108]  JP225 D1 trend    v1 n=  80 netPF=0.96 SR=-0.05 costR=1.1% guard=PASS
+  [105/108]  JP225 D1 trend    v2 n=  75 netPF=0.86 SR=-0.18 costR=1.0% guard=PASS
+  [106/108]  JP225 D1 macross  v0 n=  46 netPF=0.89 SR=-0.12 costR=1.2% guard=PASS
+  [107/108]  JP225 D1 macross  v1 n=  34 netPF=0.26 SR=-1.13 costR=1.2% guard=PASS
+  [108/108]  JP225 D1 macross  v2 n=  61 netPF=1.41 SR=+0.36 costR=1.7% guard=PASS
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:239: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  allret = pd.concat({n: s for n, s in members}, axis=1).fillna(0.0)
+C:\Claude Code\AI Quant Trading\crypto-factor-lab\run_basket_trend.py:279: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+  bh_all = pd.concat({n: s for n, s in bh_ret_map.items()}, axis=1).fillna(0.0)
+
+Wrote C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\basket_configs.csv  (108 configs)
+
+==========================================================================================================================
+  JOB 2 — DIVERSIFIED INDEX TREND-FOLLOWING (6 instruments, H4/H8/D1)
+  Cost: REAL per-bar spread + 0.35 bps comm + 0.15/0.5 bps/side slip | 1% risk | NO tuning
+  Configs THIS BATCH: 108 single-name + 18 baskets  |  CUMULATIVE TRIALS: 237 prior + 108 = 345
+  Sharpe: daily-aggregated returns annualised at 252 for ALL timeframes
+  Guard PASS: 108/108
+  DSR single-name pool: N=144 (prior swing-trend 36 + batch 108), E[max SR]=+1.323
+  DSR basket pool     : N=18 baskets, E[max SR]=+0.840
+==========================================================================================================================
+
+  PER-INSTRUMENT LEADERBOARD — TOP 15 BY NET SHARPE
+   #   inst TF family   v  grPF netPF  Sharpe    DSR  maxDD trades  costR%  FTMO% OOS?
+  ----------------------------------------------------------------------------------------------------------------------
+   1 NAS100 D1 trend    0  2.29  2.25   +1.07  0.208   4.1%     80   0.89%   0.0%  YES
+   2 SPX500 H8 macross  2  2.05  1.99   +0.98  0.103   5.7%    111   1.83%   0.0%  YES
+   3  JP225 H4 macross  2  1.61  1.53   +0.94  0.094  14.4%    252   3.55%   0.0%  YES
+   4 SPX500 H4 macross  0  1.64  1.58   +0.93  0.096   8.2%    191   2.15%   0.0%  YES
+   5 SPX500 H4 macross  2  1.58  1.52   +0.89  0.070  11.9%    238   2.88%   0.0%  YES
+   6 NAS100 H4 macross  0  1.52  1.48   +0.85  0.076  12.8%    177   1.79%   0.0%  YES
+   7   US30 H8 macross  1  1.90  1.87   +0.81  0.058   5.9%     60   1.21%   0.0%  YES
+   8   US30 H4 macross  2  1.51  1.46   +0.81  0.063  10.2%    191   2.43%   0.0%  YES
+   9 SPX500 H4 macross  1  1.66  1.61   +0.80  0.039   6.3%    127   2.00%   0.0%  YES
+  10 NAS100 D1 trend    1  1.81  1.78   +0.78  0.051   4.9%     67   0.80%   0.0%  YES
+  11 NAS100 H8 macross  0  1.77  1.73   +0.76  0.039   6.2%     82   1.20%   0.0%  YES
+  12 NAS100 H4 macross  2  1.45  1.40   +0.75  0.040   9.7%    210   2.38%   0.0%  YES
+  13 NAS100 D1 macross  1  3.14  3.10   +0.74  0.024   2.1%     16   0.88%   0.0%   no
+  14 SPX500 H8 macross  0  1.70  1.66   +0.71  0.020   5.8%     94   1.33%   0.0%  YES
+  15 NAS100 D1 trend    2  1.76  1.74   +0.63  0.013   4.5%     63   0.80%   0.0%  YES
+
+==========================================================================================================================
+  BASKET RESULTS — equal-risk across 6 indices, ONE config applied to all
+  TF family   v mem  grPF netPF  Sharpe    DSR  maxDD   CAGR    vol  corr trades  IS_SR  OOS_SR OOS?
+  ----------------------------------------------------------------------------------------------------------------------
+  H4 macross  2   6  1.26  1.20   +0.80  0.446   7.8%   4.0%   4.1%  0.08   1440  +0.70   +0.95  YES
+  H8 macross  2   6  1.30  1.26   +0.73  0.355   3.6%   2.6%   2.9%  0.08    742  +0.34   +1.34  YES
+  H4 macross  0   6  1.19  1.14   +0.56  0.180  10.5%   1.9%   2.9%  0.08   1154  +0.29   +0.98  YES
+  H8 macross  1   6  1.21  1.18   +0.46  0.108   3.3%   1.0%   1.7%  0.04    423  +0.41   +0.54  YES
+  H8 macross  0   6  1.20  1.16   +0.45  0.105   3.4%   1.1%   2.0%  0.08    590  +0.16   +0.95  YES
+  D1 macross  0   6  1.27  1.23   +0.42  0.088   2.2%   0.6%   1.1%  0.02    206  +0.70   -0.04   no
+  D1 macross  2   6  1.26  1.22   +0.41  0.074   2.5%   0.8%   1.6%  0.05    259  +0.50   +0.26  YES
+  H4 macross  1   6  1.15  1.10   +0.36  0.064   5.5%   1.0%   2.4%  0.06    784  +0.20   +0.63  YES
+  D1 trend    0   6  1.13  1.10   +0.27  0.035   5.6%   0.5%   1.6%  0.06    549  -0.41   +1.27   no
+  D1 trend    2   6  1.05  1.03   +0.08  0.008   6.6%   0.1%   1.7%  0.05    432  -0.66   +1.08   no
+  D1 trend    1   6  1.04  1.02   +0.05  0.007   6.2%   0.1%   1.5%  0.06    450  -0.47   +0.83   no
+  H4 trend    2   6  1.03  0.99   -0.04  0.003  10.2%  -0.3%   4.2%  0.11   2321  -0.22   +0.23   no
+  H8 trend    1   6  1.01  0.98   -0.10  0.002   9.4%  -0.3%   2.5%  0.10   1160  -0.31   +0.23   no
+  H8 trend    2   6  0.98  0.96   -0.16  0.001  13.8%  -0.7%   3.0%  0.11   1210  -0.28   +0.02   no
+  H8 trend    0   6  1.00  0.96   -0.17  0.001  10.9%  -0.6%   2.8%  0.10   1477  -0.49   +0.32   no
+  D1 macross  1   6  0.89  0.87   -0.25  0.000   5.6%  -0.3%   1.0%  0.02    157  -0.44   +0.05   no
+  H4 trend    0   6  1.01  0.95   -0.27  0.000  15.9%  -1.5%   4.1%  0.14   2907  -0.30   -0.22   no
+  H4 trend    1   6  1.00  0.95   -0.30  0.000  15.1%  -1.3%   3.5%  0.11   2213  -0.32   -0.26   no
+
+==========================================================================================================================
+  BENCHMARKS — buy-and-hold, same period, spread crossed once
+  instrument    B&H Sharpe  B&H maxDD  B&H CAGR
+  ----------------------------------------------
+  NAS100             +0.84      35.7%     18.3%
+  US30               +0.55      37.0%      8.6%
+  SPX500             +0.63      35.0%     12.4%
+  GER40              +0.46      39.9%      8.4%
+  UK100              +0.26      38.0%      3.3%
+  JP225              +0.53      32.2%     10.4%
+  EW B&H BASKET       +0.63      32.3%     10.8%
+
+==========================================================================================================================
+  DOES DIVERSIFIED TREND-FOLLOWING BEAT BUY-AND-HOLD?
+  ----------------------------------------------------------------------------------------------------------------------
+  Best basket        : H4 macross v2  Sharpe +0.80, netPF 1.20, maxDD 7.8%, CAGR 4.0%, vol 4.1%
+  EW B&H basket      : Sharpe +0.63, maxDD 32.3%, CAGR 10.8%, vol 14.9%
+  Vol-matching the basket to EW B&H needs 3.7x leverage -> ~14.6% CAGR at ~28.9% maxDD
+    (financing cost and gap risk at 3.7x are NOT modelled here)
+    -> vs EW B&H basket : BEATS (gap +0.17)
+    -> vs best single B&H (+0.84) : LOSES TO (gap -0.04)
+    -> drawdown vs EW B&H: 7.8% vs 32.3%  (LOWER - better)
+  Basket vs its own best member (SR +1.07): diversification does NOT help
+
+  VERDICT
+  ----------------------------------------------------------------------------------------------------------------------
+  single-name clearing DSR>0.95 AND OOS-holds : 0 / 108
+  baskets     clearing DSR>0.95 AND OOS-holds : 0 / 18
+  ... of those, also beating EW B&H basket      : 0
+  NO config or basket passes all three. This is a KILL.
+  Best basket DSR 0.446 (need >0.95); OOS holds YES; vs EW B&H +0.17
+
+  FTMO viability (context only — this lead is an own-capital edge):
+    best single-name FTMO P1 pass rate in batch: 1.1% (bar 30%)
+==========================================================================================================================
+
+  Written -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\basket_configs_scored.csv, C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\basket_results.csv
+[2026-07-22 00:11:38] STEP 4 sweep exit=0
+[2026-07-22 00:11:38] ================= BASKET PIPELINE COMPLETE =================
