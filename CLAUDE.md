@@ -5,6 +5,13 @@ apply without reminders. The parent folder `C:\Claude Code\AI Quant Trading\CLAU
 holds the longer crypto-factor-research context; this file is the enforced rulebook for
 ALL work in `crypto-factor-lab` (crypto factors AND forex/gold FTMO strategies).
 
+## START HERE
+**Read `STATE_OF_PLAY.md` (repo root) before doing anything else.** It is the
+standalone briefing: what has been settled (the FTMO hunt is concluded — no viable
+edge across 345 trials, with the structural reason), the one live lead (diversified
+index trend-following on the macross family), the DSR gate repair, the open next
+steps, and a full data/code inventory. `research_log.md` has the per-test detail.
+
 ## Standing Rules (enforced every session, no reminders needed)
 
 1. **File location — never Downloads.** All generated files stay inside this repo
@@ -46,6 +53,15 @@ ALL work in `crypto-factor-lab` (crypto factors AND forex/gold FTMO strategies).
 
 8. **Research log.** Log every strategy/variant tested plus its result in
    `research_log.md` at the repo root. One row per test.
+
+9. **DSR — use `research/dsr.py`, never `metrics.py`'s version.** The one in
+   `metrics.py` is broken two ways (annualised numerator over a per-period standard
+   error, ~10.8x too small; plus a deflation pool contaminated by structurally
+   doomed configs) and returns only 0.0000 or 1.0000. It is kept intact solely so
+   historical verdicts are not silently restated. Always STATE the deflation pool.
+   Prefer `structural_pool()` (a priori TF x family); `floor_pool()` selects on
+   outcome and makes passing easier, so it is a sensitivity check only. Any DSR
+   figure in `research_log.md` dated before 2026-07-22 is unreliable.
 
 ## Data source notes
 - **Gold/forex spot with spread:** Dukascopy via `dukascopy-node` (bid and ask pulled

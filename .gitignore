@@ -13,3 +13,9 @@ download/
 # Reproduce it with scripts/download_xauusd.sh + scripts/merge_xauusd.py.
 data/XAUUSD_M1_*_spot_dukascopy.csv
 *.csv
+
+# ...but DO track the results CSVs. They are the numeric evidence behind every
+# claim in research_log.md and STATE_OF_PLAY.md (all 345 trials), and the whole
+# set is ~330 KB. Without these a fresh clone has the conclusions but not the
+# data they rest on.
+!results/*.csv
