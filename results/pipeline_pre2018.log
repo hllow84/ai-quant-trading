@@ -1,0 +1,397 @@
+[15:08:14] STEP 1/3 — verify pre-2018 H1 files (hard gate)
+
+==============================================================================
+VERIFY NAS100  (NAS100_H1_2013_2017_cfd_dukascopy.csv)
+==============================================================================
+  bars            : 16,401
+  first / last    : 2013-09-30 13:00:00+00:00  ->  2017-12-29 20:00:00+00:00
+  bars per year   : {2013: 1190, 2014: 4420, 2015: 4477, 2016: 2905, 2017: 3409}
+  bid_close range : 3,123.48 -> 6,522.77  (median 4,383.97)
+  spread median   : 1.1130 pts = 2.539 bps
+  negative spreads: 0 (0.000%)
+  largest gap     : 33 days 17:00:00  (7 gaps > 10d)
+  WARN: 7 coverage gap(s) > 10d, largest 33 days 17:00:00
+  --> PASS
+
+==============================================================================
+VERIFY US30  (US30_H1_2013_2017_cfd_dukascopy.csv)
+==============================================================================
+  bars            : 17,143
+  first / last    : 2013-09-30 13:00:00+00:00  ->  2017-12-29 20:00:00+00:00
+  bars per year   : {2013: 1192, 2014: 4860, 2015: 4468, 2016: 3514, 2017: 3109}
+  bid_close range : 14,757.00 -> 24,884.07  (median 17,717.74)
+  spread median   : 2.2430 pts = 1.266 bps
+  negative spreads: 0 (0.000%)
+  largest gap     : 31 days 10:00:00  (5 gaps > 10d)
+  WARN: 5 coverage gap(s) > 10d, largest 31 days 10:00:00
+  --> PASS
+
+==============================================================================
+VERIFY SPX500  (SPX500_H1_2013_2017_cfd_dukascopy.csv)
+==============================================================================
+  bars            : 15,141
+  first / last    : 2013-09-30 13:00:00+00:00  ->  2017-12-29 20:00:00+00:00
+  bars per year   : {2013: 702, 2014: 4535, 2015: 3686, 2016: 2811, 2017: 3407}
+  bid_close range : 1,650.29 -> 2,694.60  (median 2,070.20)
+  spread median   : 0.4570 pts = 2.208 bps
+  negative spreads: 0 (0.000%)
+  largest gap     : 93 days 06:00:00  (8 gaps > 10d)
+  WARN: 8 coverage gap(s) > 10d, largest 93 days 06:00:00
+  --> PASS
+
+==============================================================================
+VERIFY UK100  (UK100_H1_2013_2017_cfd_dukascopy.csv)
+==============================================================================
+  bars            : 16,257
+  first / last    : 2013-09-30 11:00:00+00:00  ->  2017-12-29 20:00:00+00:00
+  bars per year   : {2013: 1310, 2014: 4399, 2015: 3424, 2016: 3774, 2017: 3350}
+  bid_close range : 5,528.00 -> 7,682.67  (median 6,758.00)
+  spread median   : 1.0060 pts = 1.489 bps
+  negative spreads: 0 (0.000%)
+  largest gap     : 33 days 11:00:00  (6 gaps > 10d)
+  WARN: 6 coverage gap(s) > 10d, largest 33 days 11:00:00
+  --> PASS
+
+==============================================================================
+VERIFY JP225  (JP225_H1_2013_2017_cfd_dukascopy.csv)
+==============================================================================
+  bars            : 17,838
+  first / last    : 2013-10-02 00:00:00+00:00  ->  2017-11-30 20:00:00+00:00
+  bars per year   : {2013: 1132, 2014: 5397, 2015: 3609, 2016: 4310, 2017: 3390}
+  bid_close range : 13,767.50 -> 23,411.97  (median 17,236.47)
+  spread median   : 8.0060 pts = 4.645 bps
+  negative spreads: 0 (0.000%)
+  largest gap     : 65 days 05:00:00  (7 gaps > 10d)
+  WARN: tail stops 2017-11-30 — member is short of the 2017-12-29 window end
+  WARN: 7 coverage gap(s) > 10d, largest 65 days 05:00:00
+  --> PASS
+
+==============================================================================
+   NAS100: PASS
+     US30: PASS
+   SPX500: PASS
+    UK100: PASS
+    JP225: PASS
+  ALL 5 VERIFIED — pre-2018 out-of-regime test may proceed.
+  NOTE: GER40 is absent by design (no Dukascopy ask/spread before 2015).
+==============================================================================
+[15:08:15] verify PASS
+[15:08:15] STEP 2/3 — pre-2018 out-of-regime run (2013_2017, split 2016-01-01)
+
+[NAS100] loading H1 base ...
+[NAS100] 16,401 H1 bars | 2013-09-30 -> 2017-12-29 | median px 4,384.5 | spread 1.113 pts (2.54 bps)
+  [1/90] NAS100 H4 trend    v0 n= 199 netPF=0.91 SR=-0.28 costR=4.5% guard=PASS
+  [2/90] NAS100 H4 trend    v1 n= 146 netPF=0.94 SR=-0.17 costR=3.8% guard=PASS
+  [3/90] NAS100 H4 trend    v2 n= 168 netPF=1.01 SR=+0.02 costR=3.7% guard=PASS
+  [4/90] NAS100 H4 macross  v0 n=  93 netPF=0.96 SR=-0.10 costR=3.7% guard=PASS
+  [5/90] NAS100 H4 macross  v1 n=  57 netPF=1.23 SR=+0.37 costR=4.0% guard=PASS
+  [6/90] NAS100 H4 macross  v2 n= 108 netPF=1.08 SR=+0.17 costR=4.8% guard=PASS
+  [7/90] NAS100 H8 trend    v0 n= 109 netPF=0.83 SR=-0.45 costR=3.0% guard=PASS
+  [8/90] NAS100 H8 trend    v1 n=  85 netPF=0.77 SR=-0.58 costR=2.6% guard=PASS
+  [9/90] NAS100 H8 trend    v2 n=  85 netPF=1.11 SR=+0.21 costR=2.4% guard=PASS
+  [10/90] NAS100 H8 macross  v0 n=  49 netPF=1.73 SR=+0.89 costR=2.5% guard=PASS
+  [11/90] NAS100 H8 macross  v1 n=  36 netPF=1.02 SR=+0.03 costR=2.3% guard=PASS
+  [12/90] NAS100 H8 macross  v2 n=  60 netPF=1.54 SR=+0.74 costR=3.2% guard=PASS
+  [13/90] NAS100 D1 trend    v0 n=  42 netPF=1.08 SR=+0.11 costR=1.6% guard=PASS
+  [14/90] NAS100 D1 trend    v1 n=  35 netPF=1.83 SR=+0.84 costR=1.4% guard=PASS
+  [15/90] NAS100 D1 trend    v2 n=  32 netPF=1.61 SR=+0.55 costR=1.4% guard=PASS
+  [16/90] NAS100 D1 macross  v0 n=  14 netPF=1.94 SR=+0.74 costR=1.2% guard=PASS
+  [17/90] NAS100 D1 macross  v1 n=  11 netPF=0.91 SR=-0.10 costR=1.1% guard=PASS
+  [18/90] NAS100 D1 macross  v2 n=  18 netPF=1.99 SR=+0.81 costR=1.5% guard=PASS
+
+[US30] loading H1 base ...
+[US30] 17,143 H1 bars | 2013-09-30 -> 2017-12-29 | median px 17,718.9 | spread 2.243 pts (1.27 bps)
+  [19/90]   US30 H4 trend    v0 n= 213 netPF=0.76 SR=-0.85 costR=3.9% guard=PASS
+  [20/90]   US30 H4 trend    v1 n= 170 netPF=0.88 SR=-0.38 costR=3.4% guard=PASS
+  [21/90]   US30 H4 trend    v2 n= 178 netPF=0.93 SR=-0.21 costR=2.7% guard=PASS
+  [22/90]   US30 H4 macross  v0 n=  95 netPF=0.62 SR=-1.09 costR=3.2% guard=PASS
+  [23/90]   US30 H4 macross  v1 n=  59 netPF=0.49 SR=-1.28 costR=3.0% guard=PASS
+  [24/90]   US30 H4 macross  v2 n= 117 netPF=0.74 SR=-0.74 costR=4.2% guard=PASS
+  [25/90]   US30 H8 trend    v0 n= 103 netPF=0.96 SR=-0.08 costR=2.3% guard=PASS
+  [26/90]   US30 H8 trend    v1 n=  87 netPF=1.21 SR=+0.40 costR=2.1% guard=PASS
+  [27/90]   US30 H8 trend    v2 n= 103 netPF=1.14 SR=+0.28 costR=2.0% guard=PASS
+  [28/90]   US30 H8 macross  v0 n=  52 netPF=0.73 SR=-0.51 costR=2.0% guard=PASS
+  [29/90]   US30 H8 macross  v1 n=  35 netPF=0.82 SR=-0.29 costR=2.0% guard=PASS
+  [30/90]   US30 H8 macross  v2 n=  61 netPF=0.58 SR=-0.92 costR=2.7% guard=PASS
+  [31/90]   US30 D1 trend    v0 n=  40 netPF=0.82 SR=-0.28 costR=1.4% guard=PASS
+  [32/90]   US30 D1 trend    v1 n=  27 netPF=0.95 SR=-0.06 costR=1.1% guard=PASS
+  [33/90]   US30 D1 trend    v2 n=  35 netPF=1.13 SR=+0.16 costR=1.2% guard=PASS
+  [34/90]   US30 D1 macross  v0 n=  14 netPF=1.12 SR=+0.12 costR=1.2% guard=PASS
+  [35/90]   US30 D1 macross  v1 n=   9 netPF=3.16 SR=+0.85 costR=0.9% guard=PASS
+  [36/90]   US30 D1 macross  v2 n=  21 netPF=0.59 SR=-0.63 costR=1.6% guard=PASS
+
+[SPX500] loading H1 base ...
+[SPX500] 15,141 H1 bars | 2013-09-30 -> 2017-12-29 | median px 2,070.4 | spread 0.457 pts (2.21 bps)
+  [37/90] SPX500 H4 trend    v0 n= 188 netPF=0.89 SR=-0.38 costR=4.6% guard=PASS
+  [38/90] SPX500 H4 trend    v1 n= 145 netPF=0.77 SR=-0.79 costR=3.9% guard=PASS
+  [39/90] SPX500 H4 trend    v2 n= 167 netPF=0.78 SR=-0.73 costR=3.3% guard=PASS
+  [40/90] SPX500 H4 macross  v0 n=  91 netPF=0.95 SR=-0.12 costR=3.6% guard=PASS
+  [41/90] SPX500 H4 macross  v1 n=  62 netPF=1.08 SR=+0.16 costR=3.5% guard=PASS
+  [42/90] SPX500 H4 macross  v2 n= 112 netPF=1.07 SR=+0.18 costR=5.0% guard=PASS
+  [43/90] SPX500 H8 trend    v0 n= 113 netPF=0.80 SR=-0.55 costR=3.0% guard=PASS
+  [44/90] SPX500 H8 trend    v1 n=  82 netPF=0.94 SR=-0.15 costR=2.9% guard=PASS
+  [45/90] SPX500 H8 trend    v2 n=  90 netPF=0.90 SR=-0.23 costR=2.5% guard=PASS
+  [46/90] SPX500 H8 macross  v0 n=  43 netPF=1.02 SR=+0.03 costR=2.4% guard=PASS
+  [47/90] SPX500 H8 macross  v1 n=  33 netPF=0.74 SR=-0.45 costR=2.3% guard=PASS
+  [48/90] SPX500 H8 macross  v2 n=  64 netPF=0.87 SR=-0.27 costR=3.5% guard=PASS
+  [49/90] SPX500 D1 trend    v0 n=  35 netPF=0.82 SR=-0.29 costR=1.5% guard=PASS
+  [50/90] SPX500 D1 trend    v1 n=  27 netPF=0.91 SR=-0.12 costR=1.2% guard=PASS
+  [51/90] SPX500 D1 trend    v2 n=  32 netPF=1.00 SR=+0.00 costR=1.5% guard=PASS
+  [52/90] SPX500 D1 macross  v0 n=  15 netPF=1.23 SR=+0.23 costR=1.2% guard=PASS
+  [53/90] SPX500 D1 macross  v1 n=   6 netPF=0.48 SR=-0.88 costR=0.9% guard=PASS
+  [54/90] SPX500 D1 macross  v2 n=  20 netPF=0.84 SR=-0.22 costR=1.6% guard=PASS
+
+[UK100] loading H1 base ...
+[UK100] 16,257 H1 bars | 2013-09-30 -> 2017-12-29 | median px 6,759.0 | spread 1.006 pts (1.49 bps)
+  [55/90]  UK100 H4 trend    v0 n= 201 netPF=0.69 SR=-1.15 costR=4.2% guard=PASS
+  [56/90]  UK100 H4 trend    v1 n= 154 netPF=0.65 SR=-1.24 costR=3.5% guard=PASS
+  [57/90]  UK100 H4 trend    v2 n= 177 netPF=0.56 SR=-1.69 costR=2.8% guard=PASS
+  [58/90]  UK100 H4 macross  v0 n=  92 netPF=0.77 SR=-0.60 costR=3.7% guard=PASS
+  [59/90]  UK100 H4 macross  v1 n=  69 netPF=0.92 SR=-0.16 costR=3.5% guard=PASS
+  [60/90]  UK100 H4 macross  v2 n= 111 netPF=0.85 SR=-0.38 costR=4.9% guard=PASS
+  [61/90]  UK100 H8 trend    v0 n= 113 netPF=0.58 SR=-1.32 costR=2.8% guard=PASS
+  [62/90]  UK100 H8 trend    v1 n=  93 netPF=0.65 SR=-1.01 costR=2.4% guard=PASS
+  [63/90]  UK100 H8 trend    v2 n=  98 netPF=0.54 SR=-1.30 costR=2.4% guard=PASS
+  [64/90]  UK100 H8 macross  v0 n=  61 netPF=0.85 SR=-0.31 costR=2.4% guard=PASS
+  [65/90]  UK100 H8 macross  v1 n=  54 netPF=0.93 SR=-0.13 costR=2.0% guard=PASS
+  [66/90]  UK100 H8 macross  v2 n=  75 netPF=1.09 SR=+0.17 costR=3.0% guard=PASS
+  [67/90]  UK100 D1 trend    v0 n=  44 netPF=0.53 SR=-0.99 costR=1.7% guard=PASS
+  [68/90]  UK100 D1 trend    v1 n=  35 netPF=0.52 SR=-0.90 costR=1.8% guard=PASS
+  [69/90]  UK100 D1 trend    v2 n=  35 netPF=0.23 SR=-1.82 costR=1.7% guard=PASS
+  [70/90]  UK100 D1 macross  v0 n=  31 netPF=0.68 SR=-0.52 costR=2.1% guard=PASS
+  [71/90]  UK100 D1 macross  v1 n=  17 netPF=0.71 SR=-0.34 costR=2.3% guard=PASS
+  [72/90]  UK100 D1 macross  v2 n=  35 netPF=0.68 SR=-0.52 costR=2.9% guard=PASS
+
+[JP225] loading H1 base ...
+[JP225] 17,838 H1 bars | 2013-10-02 -> 2017-11-30 | median px 17,240.3 | spread 8.006 pts (4.64 bps)
+  [73/90]  JP225 H4 trend    v0 n= 196 netPF=0.93 SR=-0.24 costR=5.0% guard=PASS
+  [74/90]  JP225 H4 trend    v1 n= 147 netPF=0.87 SR=-0.41 costR=4.6% guard=PASS
+  [75/90]  JP225 H4 trend    v2 n= 161 netPF=0.92 SR=-0.24 costR=4.0% guard=PASS
+  [76/90]  JP225 H4 macross  v0 n=  91 netPF=0.80 SR=-0.51 costR=4.6% guard=PASS
+  [77/90]  JP225 H4 macross  v1 n=  65 netPF=0.92 SR=-0.17 costR=4.9% guard=PASS
+  [78/90]  JP225 H4 macross  v2 n= 109 netPF=0.97 SR=-0.07 costR=6.3% guard=PASS
+  [79/90]  JP225 H8 trend    v0 n= 113 netPF=1.06 SR=+0.14 costR=3.6% guard=PASS
+  [80/90]  JP225 H8 trend    v1 n=  83 netPF=1.07 SR=+0.15 costR=3.2% guard=PASS
+  [81/90]  JP225 H8 trend    v2 n=  88 netPF=0.74 SR=-0.63 costR=2.6% guard=PASS
+  [82/90]  JP225 H8 macross  v0 n=  53 netPF=0.84 SR=-0.29 costR=3.6% guard=PASS
+  [83/90]  JP225 H8 macross  v1 n=  27 netPF=1.00 SR=-0.01 costR=2.9% guard=PASS
+  [84/90]  JP225 H8 macross  v2 n=  62 netPF=0.62 SR=-0.84 costR=4.8% guard=PASS
+  [85/90]  JP225 D1 trend    v0 n=  37 netPF=0.90 SR=-0.15 costR=1.6% guard=PASS
+  [86/90]  JP225 D1 trend    v1 n=  29 netPF=1.07 SR=+0.09 costR=1.5% guard=PASS
+  [87/90]  JP225 D1 trend    v2 n=  35 netPF=0.83 SR=-0.26 costR=1.4% guard=PASS
+  [88/90]  JP225 D1 macross  v0 n=  19 netPF=1.14 SR=+0.13 costR=1.8% guard=PASS
+  [89/90]  JP225 D1 macross  v1 n=   7 netPF=1.27 SR=+0.18 costR=2.1% guard=PASS
+  [90/90]  JP225 D1 macross  v2 n=  25 netPF=1.01 SR=+0.01 costR=2.2% guard=PASS
+
+==========================================================================================================================
+  PRE-2018 OUT-OF-REGIME TEST  [pre2018]  window: 2013-09-30 -> 2017-12-29 (OUT OF REGIME)
+  Instruments (5): NAS100, US30, SPX500, UK100, JP225   (GER40 excluded: no pre-2015 ask/spread)
+  Cost: REAL per-bar spread + 0.35 bps comm + 0.15/0.5 bps/side slip | 1% risk | NO tuning
+  Sharpe: daily-aggregated returns annualised at 252 for ALL timeframes
+  Guard PASS: 90/90
+  DSR single-name pool: N=90 (batch structural), E[max SR]=+1.104
+  DSR basket pool     : N=18 baskets, E[max SR]=+0.228
+==========================================================================================================================
+
+  BASKET RESULTS — equal-risk across 5 indices, ONE config applied to all
+  TF family   v mem  grPF netPF  Sharpe    DSR  maxDD   CAGR    vol  corr trades  IS_SR  OOS_SR OOS?
+  ----------------------------------------------------------------------------------------------------------------------
+  D1 macross  0   5  1.08  1.05   +0.10  0.392   3.0%   0.1%   1.2%  0.03     93  -0.65   +1.01   no
+  D1 macross  1   5  1.08  1.05   +0.08  0.378   2.0%   0.1%   1.0%  0.06     50  +0.04   +0.12  YES
+  D1 trend    1   5  1.02  0.99   -0.01  0.304   5.5%  -0.0%   1.3%  0.03    153  -1.15   +1.15   no
+  H8 macross  0   5  1.03  0.98   -0.05  0.279   6.0%  -0.1%   2.2%  0.08    258  -0.37   +0.30   no
+  D1 macross  2   5  0.94  0.91   -0.18  0.202   5.9%  -0.4%   1.8%  0.07    119  -0.93   +0.78   no
+  H4 macross  2   5  1.01  0.93   -0.28  0.143  10.8%  -1.3%   4.1%  0.09    557  -0.22   -0.37   no
+  H8 macross  1   5  0.93  0.90   -0.29  0.136   6.9%  -0.6%   1.9%  0.05    185  -0.96   +0.48   no
+  H8 macross  2   5  0.96  0.91   -0.30  0.137  10.1%  -1.0%   3.0%  0.08    322  -0.51   -0.05   no
+  D1 trend    2   5  0.91  0.88   -0.31  0.134   8.1%  -0.5%   1.6%  0.02    169  -1.11   +0.38   no
+  H4 macross  1   5  0.96  0.90   -0.35  0.111   9.2%  -1.0%   2.5%  0.07    312  -0.26   -0.48   no
+  H8 trend    1   5  0.95  0.90   -0.41  0.089   9.0%  -1.1%   2.5%  0.10    430  -0.98   +0.20   no
+  H8 trend    2   5  0.90  0.87   -0.53  0.060  14.4%  -1.8%   3.0%  0.09    464  -1.60   +0.58   no
+  D1 trend    0   5  0.83  0.80   -0.57  0.044   7.5%  -1.0%   1.5%  0.07    198  -1.06   -0.04   no
+  H8 trend    0   5  0.88  0.83   -0.75  0.020  11.5%  -2.4%   2.9%  0.11    551  -1.14   -0.32   no
+  H4 macross  0   5  0.86  0.81   -0.81  0.014  14.4%  -2.7%   3.1%  0.11    462  -0.94   -0.63   no
+  H4 trend    2   5  0.88  0.83   -0.86  0.013  21.1%  -4.1%   4.4%  0.16    851  -1.26   -0.34   no
+  H4 trend    0   5  0.91  0.83   -0.95  0.007  18.8%  -4.1%   4.0%  0.14    997  -1.52   -0.22   no
+  H4 trend    1   5  0.88  0.82   -1.00  0.005  17.6%  -3.7%   3.4%  0.12    762  -1.77   -0.08   no
+
+  BENCHMARKS — buy-and-hold, same window, spread crossed once
+  instrument    B&H Sharpe  B&H maxDD  B&H CAGR
+  ----------------------------------------------
+  NAS100             +1.26      16.5%     17.5%
+  US30               +1.05      14.5%     12.3%
+  SPX500             +1.03      14.3%     11.5%
+  UK100              +0.37      21.6%      4.1%
+  JP225              +0.71      27.4%     12.1%
+  EW B&H BASKET       +0.96      17.1%     11.8%
+
+==========================================================================================================================
+  HEADLINE — H4 macross v2 basket (the 2018-2025 lead cell)
+  ----------------------------------------------------------------------------------------------------------------------
+  Sharpe -0.283 | netPF 0.935 | maxDD 10.8% | CAGR -1.3% | vol 4.1% | corr 0.09
+  IS_SR -0.223 -> OOS_SR -0.371 | DSR 0.143 | trades 557 | OOS-holds NO
+  vs EW B&H basket (+0.96): LOSES TO (gap -1.247) | drawdown 10.8% vs 17.1% (LOWER-better)
+
+  Written -> results/basket_configs_scored_pre2018.csv, results/basket_results_pre2018.csv
+==========================================================================================================================
+[15:08:28] pre2018 exit=0
+[15:08:28] STEP 3/3 — matched in-regime baseline (2018_2025, same 5 indices, split 2022-01-01)
+
+[NAS100] loading H1 base ...
+[NAS100] 38,119 H1 bars | 2018-01-03 -> 2025-12-31 | median px 13,938.2 | spread 3.114 pts (2.23 bps)
+  [1/90] NAS100 H4 trend    v0 n= 404 netPF=1.08 SR=+0.23 costR=2.0% guard=PASS
+  [2/90] NAS100 H4 trend    v1 n= 312 netPF=1.14 SR=+0.38 costR=1.7% guard=PASS
+  [3/90] NAS100 H4 trend    v2 n= 359 netPF=1.12 SR=+0.33 costR=1.7% guard=PASS
+  [4/90] NAS100 H4 macross  v0 n= 177 netPF=1.48 SR=+0.85 costR=1.8% guard=PASS
+  [5/90] NAS100 H4 macross  v1 n= 106 netPF=1.36 SR=+0.52 costR=1.8% guard=PASS
+  [6/90] NAS100 H4 macross  v2 n= 210 netPF=1.40 SR=+0.75 costR=2.4% guard=PASS
+  [7/90] NAS100 H8 trend    v0 n= 209 netPF=1.09 SR=+0.21 costR=1.4% guard=PASS
+  [8/90] NAS100 H8 trend    v1 n= 164 netPF=1.27 SR=+0.51 costR=1.2% guard=PASS
+  [9/90] NAS100 H8 trend    v2 n= 187 netPF=1.09 SR=+0.19 costR=1.1% guard=PASS
+  [10/90] NAS100 H8 macross  v0 n=  82 netPF=1.73 SR=+0.76 costR=1.2% guard=PASS
+  [11/90] NAS100 H8 macross  v1 n=  52 netPF=1.30 SR=+0.31 costR=1.3% guard=PASS
+  [12/90] NAS100 H8 macross  v2 n=  97 netPF=1.53 SR=+0.61 costR=1.6% guard=PASS
+  [13/90] NAS100 D1 trend    v0 n=  80 netPF=2.25 SR=+1.07 costR=0.9% guard=PASS
+  [14/90] NAS100 D1 trend    v1 n=  67 netPF=1.78 SR=+0.78 costR=0.8% guard=PASS
+  [15/90] NAS100 D1 trend    v2 n=  63 netPF=1.74 SR=+0.63 costR=0.8% guard=PASS
+  [16/90] NAS100 D1 macross  v0 n=  26 netPF=1.26 SR=+0.19 costR=0.9% guard=PASS
+  [17/90] NAS100 D1 macross  v1 n=  16 netPF=3.10 SR=+0.74 costR=0.9% guard=PASS
+  [18/90] NAS100 D1 macross  v2 n=  33 netPF=1.22 SR=+0.17 costR=1.1% guard=PASS
+
+[US30] loading H1 base ...
+[US30] 36,081 H1 bars | 2018-01-02 -> 2025-12-31 | median px 33,784.5 | spread 3.942 pts (1.17 bps)
+  [19/90]   US30 H4 trend    v0 n= 393 netPF=1.17 SR=+0.48 costR=1.9% guard=PASS
+  [20/90]   US30 H4 trend    v1 n= 302 netPF=1.13 SR=+0.36 costR=1.7% guard=PASS
+  [21/90]   US30 H4 trend    v2 n= 324 netPF=1.11 SR=+0.30 costR=1.5% guard=PASS
+  [22/90]   US30 H4 macross  v0 n= 151 netPF=1.30 SR=+0.54 costR=1.9% guard=PASS
+  [23/90]   US30 H4 macross  v1 n= 113 netPF=1.34 SR=+0.52 costR=1.8% guard=PASS
+  [24/90]   US30 H4 macross  v2 n= 191 netPF=1.46 SR=+0.81 costR=2.4% guard=PASS
+  [25/90]   US30 H8 trend    v0 n= 191 netPF=1.24 SR=+0.48 costR=1.3% guard=PASS
+  [26/90]   US30 H8 trend    v1 n= 156 netPF=1.05 SR=+0.11 costR=1.1% guard=PASS
+  [27/90]   US30 H8 trend    v2 n= 170 netPF=1.12 SR=+0.23 costR=1.1% guard=PASS
+  [28/90]   US30 H8 macross  v0 n=  86 netPF=1.21 SR=+0.30 costR=1.1% guard=PASS
+  [29/90]   US30 H8 macross  v1 n=  60 netPF=1.87 SR=+0.81 costR=1.2% guard=PASS
+  [30/90]   US30 H8 macross  v2 n= 112 netPF=1.44 SR=+0.61 costR=1.5% guard=PASS
+  [31/90]   US30 D1 trend    v0 n=  72 netPF=1.12 SR=+0.16 costR=0.9% guard=PASS
+  [32/90]   US30 D1 trend    v1 n=  61 netPF=1.10 SR=+0.13 costR=0.9% guard=PASS
+  [33/90]   US30 D1 trend    v2 n=  62 netPF=0.84 SR=-0.22 costR=0.7% guard=PASS
+  [34/90]   US30 D1 macross  v0 n=  22 netPF=1.56 SR=+0.35 costR=0.8% guard=PASS
+  [35/90]   US30 D1 macross  v1 n=  18 netPF=1.37 SR=+0.24 costR=1.0% guard=PASS
+  [36/90]   US30 D1 macross  v2 n=  28 netPF=1.05 SR=+0.04 costR=1.1% guard=PASS
+
+[SPX500] loading H1 base ...
+[SPX500] 46,548 H1 bars | 2018-01-02 -> 2025-12-31 | median px 4,100.5 | spread 0.528 pts (1.29 bps)
+  [37/90] SPX500 H4 trend    v0 n= 516 netPF=1.12 SR=+0.35 costR=2.5% guard=PASS
+  [38/90] SPX500 H4 trend    v1 n= 395 netPF=1.07 SR=+0.19 costR=2.1% guard=PASS
+  [39/90] SPX500 H4 trend    v2 n= 397 netPF=1.18 SR=+0.46 costR=1.9% guard=PASS
+  [40/90] SPX500 H4 macross  v0 n= 191 netPF=1.58 SR=+0.93 costR=2.2% guard=PASS
+  [41/90] SPX500 H4 macross  v1 n= 127 netPF=1.61 SR=+0.80 costR=2.0% guard=PASS
+  [42/90] SPX500 H4 macross  v2 n= 238 netPF=1.52 SR=+0.89 costR=2.9% guard=PASS
+  [43/90] SPX500 H8 trend    v0 n= 255 netPF=1.09 SR=+0.20 costR=1.7% guard=PASS
+  [44/90] SPX500 H8 trend    v1 n= 203 netPF=1.17 SR=+0.33 costR=1.5% guard=PASS
+  [45/90] SPX500 H8 trend    v2 n= 216 netPF=1.06 SR=+0.12 costR=1.2% guard=PASS
+  [46/90] SPX500 H8 macross  v0 n=  94 netPF=1.66 SR=+0.71 costR=1.3% guard=PASS
+  [47/90] SPX500 H8 macross  v1 n=  54 netPF=1.69 SR=+0.57 costR=1.4% guard=PASS
+  [48/90] SPX500 H8 macross  v2 n= 111 netPF=1.99 SR=+0.98 costR=1.8% guard=PASS
+  [49/90] SPX500 D1 trend    v0 n=  97 netPF=1.08 SR=+0.11 costR=0.9% guard=PASS
+  [50/90] SPX500 D1 trend    v1 n=  81 netPF=0.94 SR=-0.09 costR=0.8% guard=PASS
+  [51/90] SPX500 D1 trend    v2 n=  77 netPF=1.26 SR=+0.28 costR=0.8% guard=PASS
+  [52/90] SPX500 D1 macross  v0 n=  32 netPF=1.51 SR=+0.35 costR=0.9% guard=PASS
+  [53/90] SPX500 D1 macross  v1 n=  27 netPF=1.58 SR=+0.37 costR=0.8% guard=PASS
+  [54/90] SPX500 D1 macross  v2 n=  38 netPF=1.65 SR=+0.42 costR=1.2% guard=PASS
+
+[UK100] loading H1 base ...
+[UK100] 45,884 H1 bars | 2018-01-02 -> 2025-12-31 | median px 7,458.0 | spread 1.990 pts (2.67 bps)
+  [55/90]  UK100 H4 trend    v0 n= 537 netPF=0.80 SR=-0.72 costR=4.9% guard=PASS
+  [56/90]  UK100 H4 trend    v1 n= 419 netPF=0.74 SR=-0.90 costR=4.1% guard=PASS
+  [57/90]  UK100 H4 trend    v2 n= 405 netPF=0.79 SR=-0.65 costR=3.6% guard=PASS
+  [58/90]  UK100 H4 macross  v0 n= 209 netPF=0.75 SR=-0.62 costR=4.8% guard=PASS
+  [59/90]  UK100 H4 macross  v1 n= 159 netPF=0.64 SR=-0.86 costR=4.6% guard=PASS
+  [60/90]  UK100 H4 macross  v2 n= 275 netPF=0.80 SR=-0.53 costR=6.6% guard=PASS
+  [61/90]  UK100 H8 trend    v0 n= 281 netPF=0.84 SR=-0.41 costR=3.3% guard=PASS
+  [62/90]  UK100 H8 trend    v1 n= 211 netPF=0.80 SR=-0.49 costR=3.1% guard=PASS
+  [63/90]  UK100 H8 trend    v2 n= 217 netPF=0.74 SR=-0.61 costR=2.5% guard=PASS
+  [64/90]  UK100 H8 macross  v0 n= 119 netPF=0.74 SR=-0.49 costR=3.1% guard=PASS
+  [65/90]  UK100 H8 macross  v1 n=  81 netPF=0.86 SR=-0.21 costR=3.2% guard=PASS
+  [66/90]  UK100 H8 macross  v2 n= 152 netPF=0.91 SR=-0.17 costR=4.2% guard=PASS
+  [67/90]  UK100 D1 trend    v0 n=  97 netPF=0.78 SR=-0.35 costR=3.3% guard=PASS
+  [68/90]  UK100 D1 trend    v1 n=  82 netPF=0.66 SR=-0.56 costR=3.0% guard=PASS
+  [69/90]  UK100 D1 trend    v2 n=  78 netPF=0.71 SR=-0.42 costR=2.5% guard=PASS
+  [70/90]  UK100 D1 macross  v0 n=  44 netPF=0.95 SR=-0.05 costR=3.0% guard=PASS
+  [71/90]  UK100 D1 macross  v1 n=  36 netPF=0.53 SR=-0.59 costR=2.7% guard=PASS
+  [72/90]  UK100 D1 macross  v2 n=  54 netPF=0.87 SR=-0.14 costR=4.0% guard=PASS
+
+[JP225] loading H1 base ...
+[JP225] 46,375 H1 bars | 2018-01-02 -> 2025-12-31 | median px 27,812.7 | spread 7.110 pts (2.56 bps)
+  [73/90]  JP225 H4 trend    v0 n= 533 netPF=0.84 SR=-0.56 costR=2.9% guard=PASS
+  [74/90]  JP225 H4 trend    v1 n= 397 netPF=0.88 SR=-0.39 costR=2.4% guard=PASS
+  [75/90]  JP225 H4 trend    v2 n= 424 netPF=0.86 SR=-0.40 costR=2.3% guard=PASS
+  [76/90]  JP225 H4 macross  v0 n= 206 netPF=1.23 SR=+0.44 costR=2.7% guard=PASS
+  [77/90]  JP225 H4 macross  v1 n= 133 netPF=1.26 SR=+0.40 costR=2.7% guard=PASS
+  [78/90]  JP225 H4 macross  v2 n= 252 netPF=1.53 SR=+0.94 costR=3.6% guard=PASS
+  [79/90]  JP225 H8 trend    v0 n= 267 netPF=0.86 SR=-0.36 costR=2.0% guard=PASS
+  [80/90]  JP225 H8 trend    v1 n= 215 netPF=0.93 SR=-0.17 costR=1.8% guard=PASS
+  [81/90]  JP225 H8 trend    v2 n= 213 netPF=0.98 SR=-0.04 costR=1.5% guard=PASS
+  [82/90]  JP225 H8 macross  v0 n= 107 netPF=0.88 SR=-0.19 costR=1.9% guard=PASS
+  [83/90]  JP225 H8 macross  v1 n=  90 netPF=0.68 SR=-0.56 costR=2.0% guard=PASS
+  [84/90]  JP225 H8 macross  v2 n= 137 netPF=1.07 SR=+0.11 costR=2.5% guard=PASS
+  [85/90]  JP225 D1 trend    v0 n= 102 netPF=1.03 SR=+0.04 costR=1.2% guard=PASS
+  [86/90]  JP225 D1 trend    v1 n=  80 netPF=0.96 SR=-0.05 costR=1.1% guard=PASS
+  [87/90]  JP225 D1 trend    v2 n=  75 netPF=0.86 SR=-0.18 costR=1.0% guard=PASS
+  [88/90]  JP225 D1 macross  v0 n=  46 netPF=0.89 SR=-0.12 costR=1.2% guard=PASS
+  [89/90]  JP225 D1 macross  v1 n=  34 netPF=0.26 SR=-1.13 costR=1.2% guard=PASS
+  [90/90]  JP225 D1 macross  v2 n=  61 netPF=1.41 SR=+0.36 costR=1.7% guard=PASS
+
+==========================================================================================================================
+  PRE-2018 OUT-OF-REGIME TEST  [new5]  window: 2018-01-02 -> 2025-12-31 (IN REGIME, matched 5 indices)
+  Instruments (5): NAS100, US30, SPX500, UK100, JP225   (GER40 excluded: no pre-2015 ask/spread)
+  Cost: REAL per-bar spread + 0.35 bps comm + 0.15/0.5 bps/side slip | 1% risk | NO tuning
+  Sharpe: daily-aggregated returns annualised at 252 for ALL timeframes
+  Guard PASS: 90/90
+  DSR single-name pool: N=90 (batch structural), E[max SR]=+1.376
+  DSR basket pool     : N=18 baskets, E[max SR]=+0.896
+==========================================================================================================================
+
+  BASKET RESULTS — equal-risk across 5 indices, ONE config applied to all
+  TF family   v mem  grPF netPF  Sharpe    DSR  maxDD   CAGR    vol  corr trades  IS_SR  OOS_SR OOS?
+  ----------------------------------------------------------------------------------------------------------------------
+  H4 macross  2   5  1.36  1.29   +1.04  0.690   5.7%   5.7%   4.4%  0.09   1166  +0.66   +1.38  YES
+  H4 macross  0   5  1.28  1.22   +0.78  0.350   8.0%   3.0%   3.1%  0.09    934  +0.21   +1.27  YES
+  H8 macross  2   5  1.33  1.29   +0.75  0.315   3.7%   2.8%   3.0%  0.08    609  +0.34   +1.08  YES
+  H4 macross  1   5  1.21  1.16   +0.49  0.093   5.9%   1.5%   2.6%  0.07    638  +0.47   +0.50  YES
+  D1 trend    0   5  1.18  1.15   +0.37  0.047   4.3%   0.8%   1.8%  0.07    448  -0.14   +0.81   no
+  D1 macross  2   5  1.25  1.22   +0.37  0.040   2.8%   0.7%   1.7%  0.05    214  +0.57   +0.19  YES
+  H8 macross  0   5  1.16  1.13   +0.34  0.037   4.4%   0.9%   2.1%  0.08    488  +0.19   +0.46  YES
+  H8 macross  1   5  1.15  1.12   +0.29  0.027   4.0%   0.6%   1.8%  0.03    337  +0.10   +0.47  YES
+  D1 macross  0   5  1.17  1.14   +0.23  0.017   2.6%   0.3%   1.1%  0.03    170  +0.54   -0.07   no
+  H8 trend    1   5  1.05  1.02   +0.07  0.005  10.2%   0.2%   2.6%  0.11    949  +0.18   -0.02   no
+  D1 trend    2   5  1.05  1.03   +0.06  0.004   7.3%   0.1%   1.8%  0.05    355  -0.25   +0.32   no
+  D1 trend    1   5  1.05  1.02   +0.05  0.004   6.6%   0.1%   1.6%  0.07    371  -0.12   +0.19   no
+  H4 trend    2   5  1.04  1.00   -0.01  0.002  11.1%  -0.2%   4.4%  0.12   1909  -0.15   +0.12   no
+  H8 trend    0   5  1.03  0.99   -0.03  0.002  12.6%  -0.2%   3.0%  0.12   1203  -0.12   +0.06   no
+  H8 trend    2   5  1.01  0.98   -0.06  0.001  14.6%  -0.3%   3.2%  0.11   1003  +0.01   -0.13   no
+  H4 trend    0   5  1.03  0.97   -0.15  0.001  15.6%  -0.9%   4.3%  0.14   2383  -0.46   +0.13   no
+  H4 trend    1   5  1.01  0.96   -0.21  0.000  14.5%  -1.0%   3.7%  0.12   1825  -0.43   -0.00   no
+  D1 macross  1   5  0.90  0.88   -0.22  0.000   6.5%  -0.3%   1.1%  0.02    131  -0.07   -0.35   no
+
+  BENCHMARKS — buy-and-hold, same window, spread crossed once
+  instrument    B&H Sharpe  B&H maxDD  B&H CAGR
+  ----------------------------------------------
+  NAS100             +0.84      35.7%     18.3%
+  US30               +0.55      37.0%      8.6%
+  SPX500             +0.63      35.0%     12.4%
+  UK100              +0.26      38.0%      3.3%
+  JP225              +0.53      32.2%     10.4%
+  EW B&H BASKET       +0.66      30.7%     11.2%
+
+==========================================================================================================================
+  HEADLINE — H4 macross v2 basket (the 2018-2025 lead cell)
+  ----------------------------------------------------------------------------------------------------------------------
+  Sharpe +1.042 | netPF 1.292 | maxDD 5.7% | CAGR 5.7% | vol 4.4% | corr 0.09
+  IS_SR +0.660 -> OOS_SR +1.376 | DSR 0.690 | trades 1166 | OOS-holds YES
+  vs EW B&H basket (+0.66): BEATS (gap +0.386) | drawdown 5.7% vs 30.7% (LOWER-better)
+
+  Written -> results/basket_configs_scored_new5.csv, results/basket_results_new5.csv
+==========================================================================================================================
+[15:08:45] new5 exit=0
+[15:08:45] DONE — results/basket_results_pre2018.csv, results/basket_results_new5.csv
