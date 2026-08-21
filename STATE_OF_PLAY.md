@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-21.** Read this file first in any new session. It is the
+**Last updated: 2026-08-21 (out-of-regime re-run complete).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -12,20 +12,27 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > what was believed, with the kill stated inline. **There is now no live lead in
 > this project.** See §7 for what that leaves.
 
-> **2026-08-19 — A NEW SURFACE IS OPEN (§9).** Four externally-sourced discretionary
-> strategies were brought in for testing. The first one mechanised — the 15-minute
-> "Sneaky Pivot" — is the only family in this project's history to post a **positive
-> gross edge in every single cell (24/24)**, best net Sharpe +0.53 at 14.7% maxDD.
-> It is **not a lead**: it fails the DSR bar, loses to buy-and-hold, and its P&L is
-> concentrated in 2025. It is **parked** until the 2013-2017 out-of-regime re-run,
-> per §7 rule 3. Read §9 before acting on any of it.
+> **2026-08-21 — THE SNEAKY PIVOT'S GROSS EDGE SURVIVED OUT OF REGIME (§9.4).**
+> The 2013-2017 re-run is done. **gross PF > 1 held in 14 of 16 cells** (mean
+> 1.321 → 1.155, best 1.536 → 1.363, one cell improved). That is the first time
+> anything in this project has survived the test that killed everything else —
+> compare the index basket, whose gross PF collapsed 1.363 → **1.006**.
+> **It is still not a lead**, and the reasons are now different and sharper: net
+> PF > 1 fell 16/16 → 3/16 at 15-17% cost_R, DSR 0/16, OOS holds 0/16, it loses to
+> buy-and-hold in BOTH regimes (+0.26 vs +1.21 out of regime), and **its P&L is
+> concentrated in a single year in each window** — +27.2R of ~+42R from 2025 in
+> regime, +29.2R of +14.8R from 2017 out of it, negative in most other years.
+> The setup finds a real repeatable inefficiency that is too small to pay for
+> itself. Read §9.4 before acting on any of it.
 
 ---
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
 
-**Across 435 systematic backtest configurations, no FTMO-viable edge was found —
-and as of 2026-08-11, no own-capital edge either (§6).**
+**Across 475 systematic backtest configurations, no FTMO-viable edge was found —
+and no own-capital edge either (§6).** The closest thing to a positive result in
+the whole project is §9.4: a setup whose GROSS edge survives out of regime but
+cannot pay its own transaction costs.
 
 Trial composition (this is the cumulative DSR trial count, N=435):
 
@@ -36,7 +43,9 @@ Trial composition (this is the cumulative DSR trial count, N=435):
 | US index sweep (5 fam × 5 TF × 2) | NAS100, US30 | 150 | 0 survive |
 | Index trend basket (2 fam × 3 TF × 6) | 6 indices | 108 | 0 survive |
 | Pre-2018 out-of-regime (2 fam × 3 TF × 5) | 5 indices | 90 | 0 survive (§6) |
-| **Total** | | **435** | **0 survive** |
+| Sneaky Pivot 2018-25 (3 inst x 2 x 2 x 2) | NAS100, US30, XAUUSD | 24 | 0 survive (§9.2) |
+| Sneaky Pivot 2013-17 out-of-regime | NAS100, US30 | 16 | 0 survive (§9.4) |
+| **Total** | | **475** | **0 survive** |
 
 Separate from that count, and also negative: 6 crypto factor studies (5 kills +
 1 overfit), 3 intraday gold FTMO strategies, 3 swing gold FTMO strategies, and 2
@@ -530,40 +539,106 @@ Neither fork is a defect in the 24-config run — both are honest readings, and
 crossing them adds trials to the DSR pool. They are recorded so that no future
 session mistakes the tested strategy for the strategy as written.
 
-### 9.3 The next step, and it is not optional
+### 9.3 The out-of-regime test (DONE 2026-08-21) — how it was run
 
-**§7 rule 3 applies: 2013-2017 first, not last.** The repo's M1 archive starts
-2018-01, so `scripts/download_pre2018_m1.mjs` pulls 2013-09-30 -> 2018 M1 bid+ask
-for NAS100 and US30. Until that re-run is done, nothing in §9.2 is a lead, and it
-should not be described as one.
+**§7 rule 3 applied: 2013-2017 first, not last.** The repo's M1 archive started
+2018-01, so `scripts/download_pre2018_m1.mjs` pulled 2013-09-30 → 2018 M1 bid+ask
+for NAS100 and US30, RTH-only (13:00-21:00 UTC). Both files passed the sanity gate
+and were promoted:
 
-**Download status — relaunched 2026-08-21.** The 2026-08-19 launch died the same
-night after ONE day of data: it went down with its terminal while stuck in 429
-backoff (60/120/180s). The script was then rewritten to resume at DAY granularity
-(`<NAME>.days.done`, one line per completed day) but that version had never
-actually run. Before relaunching, the month-era leftovers — `NAS100.part.csv`
-(120 rows), `NAS100.stats.json`, `NAS100-2013-09.done` — had to be deleted, or
-2013-09-30 would have been fetched again and appended a second time under the new
-marker scheme; the 33-file `cache/` was kept, and it is being reused. Relaunched
-detached (`Start-Process`, hidden, PID in `pid.txt`) so it survives the terminal,
-logging to `data/raw/pre2018_m1_tmp/download.log`.
+| | NAS100 | US30 |
+|---|---|---|
+| M1 bars | 443,449 | 467,543 |
+| sessions | 1,030 | 1,082 |
+| span | 2013-09-30 → 2017-12-29 | 2013-09-30 → 2017-12-29 |
+| per-year bars (2014-17) | 102k-110k | 109k-112k |
+| negative spreads | 0 | 0 |
 
-Expect roughly **5 hours per instrument** (~1,109 weekdays x 16 hourly archive
-requests at batch 4 / 2000 ms, plus a 700 ms day gap), so ~10 hours for both, more
-if Dukascopy issues another 429 ban. The run promotes `NAME.part.csv` to
-`data/NAME_M1RTH_2013_2017_cfd_dukascopy.csv` only after a sanity gate (per-year
-bar floors, price band, negative-spread rate) — a thin or corrupt pull throws
-rather than writing a data file.
+The gate floor is 55,000 bars/year, so both clear by roughly 2x even after the 71
+confirmed single-side archive holes (~50 lost NAS100 sessions).
 
-**Data facts probed 2026-08-19 (measured, not assumed):**
+`run_sneaky_pivot_pre2018.py` contains **no strategy, cost or scoring code**. It
+imports `run_sneaky_pivot` as a module, rebinds four names — data files, OOS split
+(2016-01-01), output paths, banner label — and calls its `main()`. Every object
+that decides a number is the one the 2018-2025 run used, so the two windows cannot
+drift. XAUUSD has no pre-2018 M1, so the grid is 16 cells rather than 24 and the
+comparison is restricted to the 16 index cells on both sides.
 
-- Pre-2018 index M1 quotes cover **only 13:30-20:00 UTC** — the US cash session,
-  ~371 bars/day — in 2013, widening to 06:00-20:00 UTC (~840/day) by 2016. Bid
-  and ask merge **100%** on timestamp.
+**RTH coverage was verified, not assumed.** The 08-19 probe note recorded pre-2018
+coverage as 13:30-20:00 UTC, which in EST months would have truncated every session
+at 15:00 ET and silently moved the force-flat exit. Measured: EST days reach 20:59
+UTC (15:59 ET), EDT days reach 20:00 UTC (16:00 ET). Full sessions in both halves,
+median 370/390 bars. `MIN_RTH_BARS=300` would NOT have caught the truncation.
+
+### 9.4 The result — the gross edge survived, and it still is not a lead
+
+**gross PF > 1: 16/16 in regime → 14/16 out of regime.** Mean 1.321 → 1.155. The
+best in-regime cell went 1.536 → 1.363, and NAS100 swing/sneaky/c3 *improved*,
+1.529 → 1.547. **No other family in this project has ever survived this test.** The
+index basket, by contrast, went 1.363 → 1.006 — its edge was gone before costs.
+
+| gate | in regime | out of regime |
+|---|---|---|
+| gross PF > 1 | 16/16 | **14/16** |
+| net PF > 1 | 16/16 | 3/16 |
+| positive net Sharpe | 16/16 | 3/16 |
+| OOS holds | 15/24 (all cells) | **0/16** |
+| DSR > 0.95 | 0/24 | **0/16** (best 0.53) |
+| look-ahead guard | PASS | 16/16 PASS |
+
+**Why it is still not a lead — three reasons, and they are not the old ones:**
+
+1. **The edge cannot pay for itself.** cost_R is 15-17% of 1R out of regime vs
+   5.8-6.8% in it, and net PF > 1 survives in only 3 of 16 cells. Note the
+   mechanism, because the earlier note in this file was wrong about it: full-window
+   spreads are **2.39 bps vs 2.31 in regime — essentially equal**. The gap is
+   stop distance. 1R is the sneaky candle's own range, 2013-2017 was a low-vol
+   grind, so stops are ~2.5x tighter and an unchanged spread eats 2.5x more of
+   them. §1's vice, reached from the other side.
+2. **One year carries each window.** In regime the NAS100 best cell earned +27.2R
+   in 2025 out of ~+42R. Out of regime the best cell earns **+29.2R in 2017 out of
+   +14.8R net total**, and is negative in 2014, 2015 and 2016. US30's best manages
+   +10.1R in 2016 against -9.1 in 2015 and -7.0 in 2017, summing **negative**.
+   This is the signature that killed §2, and it now appears in both windows.
+3. **It loses to buy-and-hold in both regimes, and by more out of regime** —
+   +0.26 vs NAS100 B&H **+1.21** and US30 **+1.05**, against +0.53 vs +0.84 in
+   regime. Two indices, two windows, four comparisons, four losses.
+
+**The honest summary: the setup finds a real, repeatable gross inefficiency — 14/16
+positive-gross cells across two instruments and two disjoint windows is not a
+best-of-N artefact — that is too small to clear its own transaction costs, too
+concentrated to trust, and beaten by holding the index.** That is a more
+interesting result than a kill, and it is still not something to trade.
+
+### 9.5 Data facts from the pre-2018 pull
+
+**Measured, not assumed:**
+
+- Pre-2018 index M1 quotes cover the US cash session only. The 08-19 probe recorded
+  this as "13:30-20:00 UTC", which is the **EDT** picture; re-measured 2026-08-21
+  across the finished pull, **EST days run to 20:59 UTC (15:59 ET)** and EDT days to
+  20:00 UTC (16:00 ET). The full 09:30-16:00 ET session is present in both halves of
+  the year — median 370 (EST) / 390 (EDT) bars. Taking the original note literally
+  would have truncated every winter session an hour early, and `MIN_RTH_BARS=300`
+  would not have caught it. Bid and ask merge **100%** on timestamp.
 - That is sufficient for an RTH-anchored strategy, and it retroactively justifies
   the RTH session choice: the same definition is testable in both regimes. A
   23-hour "absolute range" variant is a *different* strategy, not a parameter, and
   cannot be tested pre-2018 at all.
-- Dukascopy rate-limits M1 hard: batch 40 / 300 ms draws **HTTP 429** within
-  minutes. The downloader runs at batch 8 / 1500 ms with minute-scale 429 backoff,
-  an on-disk archive cache, and month-granularity resume markers.
+- **The M1 "rate limit" was mostly self-inflicted, and this is worth carrying
+  forward.** Batch 40 / 300 ms does draw a real HTTP 429. But the 70-minute stall
+  on 2026-08-21 was not a ban: `retryCount: 4` makes dukascopy-node fire four
+  internal retries back-to-back, with NO pause, for every hourly file — and on a
+  day the archive has no data for, every file fails, so ~32 requests go out in ~3
+  seconds and trip the burst limiter. **The library manufactures a rate-limit
+  error out of a no-data day.** Isolated by varying one flag: retry 0 → 0 bars in
+  278 ms; retry 4 → 429 in 3,270 ms, cache irrelevant. A single probe returned 60
+  bars in 128 ms from the same IP while the run sat wedged. Fix: `retryCount: 0`,
+  and let the outer loop retry, which paces itself. After it, batch 4 / 2000 ms
+  ran ~60 days/min to completion. **Rule: before believing a 429, probe once from
+  a fresh process.**
+- Pre-2018 index M1 has **genuine single-side holes** — one side present, the
+  other absent for a whole day, scattered through 2015-2017. 71 confirmed; three
+  paced re-fetches recovered **0 of them**, so they are archive facts, not
+  transient failures. Cost NAS100 ~50 sessions out of 1,080. Per-year bar counts
+  still clear the gate by ~2x.

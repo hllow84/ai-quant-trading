@@ -46,32 +46,27 @@ WHAT DIFFERS FROM THE IN-REGIME RUN, AND WHY (all forced, none chosen)
    pool is the headline, the project-cumulative pool is contrast only
    (`research/dsr.py` BUG 2).
 
-COSTS ARE NOT COMPARABLE ACROSS THE TWO WINDOWS — MEASURED, NOT ASSUMED
+COSTS BITE HARDER OUT OF REGIME -- BUT NOT FOR THE REASON FIRST RECORDED
 ------------------------------------------------------------------------
-Smoke-tested 2026-08-21 on the partial download (NAS100, 2013-09 -> 2015-01,
-319 sessions). Spreads in the early archive are MUCH wider:
+An earlier note here, written from the PARTIAL download (2013-09 -> 2015-01),
+said spreads were 2.5x wider out of regime (5.71 vs 2.31 bps) and put cost at
+21-25% of 1R. The finished pull corrects both numbers:
 
     NAS100 median spread   2018-2025:  3.224 pts = 2.31 bps
-                           2013-2015:  2.129 pts = 5.71 bps   (2.5x wider in bps)
+                           2013-2017:  1.062 pts = 2.39 bps   <- essentially EQUAL
 
     cost as % of 1R        2018-2025:  5.8 - 6.8%
-                           2013-2015:  21 - 25%               (~3.5x)
+                           2013-2017:  15 - 17%               (~2.5x)
 
-That is the §1 vice in its purest form, and it means **the net numbers from this
-run are structurally crushed before any question of edge is reached.** Do not
-read a net-PF collapse as a kill: at 2013 spreads this strategy is undeployable
-on its stop distances no matter how good the signal, which is a fact about 2013
-execution costs, not about the signal.
+Spreads were wide in 2013-2014 and tightened through 2015-2017; the partial
+window caught only the wide half. Over the full window spreads are the same as
+in regime, so the cost gap is NOT a spread story -- it is a STOP-DISTANCE story.
+1R is the sneaky candle's own range, and 2013-2017 was a low-volatility grind, so
+stops are ~2.5x tighter in relative terms and an unchanged spread eats 2.5x more
+of them. Same vice as STATE_OF_PLAY section 1, arrived at from the other side.
 
-**Therefore the verdict rests on GROSS PF, and the run should be read that way.**
-Net numbers are reported for completeness and to show the cost wall, not as the
-gate. (Contrast the basket pre-2018 test, where cost_R moved only 3.56% -> 5.05%
-and the net comparison stayed meaningful; that is not the situation here.)
-
-Early and NOT a result — 8 cells on 15 months of partial data, n=28-44 trades
-each — gross PF came in at 0.96-1.26 with 6/8 above 1.00, against 24/24 at
-1.17-1.55 in regime. Too little data to mean anything; noted only so the finished
-run can be checked against it rather than surprising anyone.
+The consequence for reading this run is unchanged: net numbers are structurally
+penalised out of regime, so the verdict rests on GROSS PF.
 
 WHAT WOULD COUNT AS SURVIVING
 -----------------------------
