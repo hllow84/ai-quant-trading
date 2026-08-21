@@ -68,6 +68,9 @@ from strategies.sneaky_pivot import sneaky_pivot, TARGETS, STOPS, TRIGGERS
 
 BARS_PER_YEAR = 252
 OOS_SPLIT = pd.Timestamp("2023-01-01", tz="UTC")
+# Printed in the banner. The out-of-regime driver patches this so a re-run cannot
+# silently report the wrong data window (run_sneaky_pivot_pre2018.py).
+WINDOW_LABEL = "2018-2025"
 MIN_OOS_TRADES = 20
 DSR_BAR = 0.95
 
@@ -297,7 +300,7 @@ def analyze(df: pd.DataFrame, bh: dict, trades_all: pd.DataFrame | None = None):
 
     W = 122
     print("\n" + "=" * W)
-    print("  STRATEGY 2 — 15-MINUTE SNEAKY PIVOT | real Dukascopy M1 with spread, 2018-2025, RTH 09:30-16:00 ET")
+    print(f"  STRATEGY 2 — 15-MINUTE SNEAKY PIVOT | real Dukascopy M1 with spread, {WINDOW_LABEL}, RTH 09:30-16:00 ET")
     print(f"  Cost: REAL per-bar spread + {COST_BPS['commission']} bps commission (round-turn) + "
           f"{COST_BPS['slip_normal']}/{COST_BPS['slip_news']} bps per-side slippage (indices); "
           f"$0.07/oz + $0.03/$0.10 per side (gold) | 1% risk/trade | NO tuning")
