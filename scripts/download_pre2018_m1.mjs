@@ -57,9 +57,29 @@ const RTH_TO_H   = 21;                     // 21:00 UTC — after  16:00 ET in E
 // Throttle. Measured 2026-08-19: batch 40 / 300 ms -> 429 within one month;
 // batch 8 / 1500 ms -> still 429. M1 is one file per hour, so the limiter is
 // requests-per-second, not bytes. These settings are deliberately slow.
+//
+// REVISED 2026-08-21 after a 70-minute stall at day 330. Diagnosis: batch 4 /
+// 2000 ms still averages ~3.5 req/s, because pauseBetweenBatchesMs applies
+// BETWEEN batches inside one call -- an 8-hour day is only 2 batches per side,
+// so the pause fires twice per ~16 requests. The limiter is cumulative: ~5,000
+// requests bought a stall of over an hour.
+//
+// The stall is NOT an IP ban. Probed 2026-08-21 while the run was wedged: a
+// fresh single request returned 60 bars in 128 ms from the same host and IP.
+// So the wedge is self-inflicted by this process's own request pattern, and a
+// slower steady rate is strictly better than a fast rate plus hour-long stalls
+// -- especially because a persistent 429 burns the 5-pass retry budget and can
+// abandon an instrument outright.
+// Restored to the 08-19 rate once retryCount was identified as the real cause:
+// 330 consecutive days ran clean at these settings and wedged the moment they met
+// a no-data day, so throughput was never the problem.
 const BATCH = 4;
 const PAUSE_MS = 2000;
 const DAY_GAP_MS = 700;
+
+// Asymmetric-empty recovery. See the day loop for why this exists.
+const ASYM_RETRIES = 3;
+const ASYM_GAP_MS = 4000;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -85,7 +105,18 @@ async function fetchSide(inst, side, day) {
         priceType: side, format: 'json', utcOffset: 0,
         volumes: true, volumeUnits: 'units',
         batchSize: BATCH, pauseBetweenBatchesMs: PAUSE_MS,
-        retryCount: 4, retryOnEmpty: false,
+        // retryCount MUST be 0. Isolated 2026-08-21: on a day with no archive
+        // (e.g. 2015-01-05, a real hole), every hourly file fails, and
+        // dukascopy-node fires its internal retries back-to-back with NO pause
+        // -- ~32 requests in ~3s -- which trips the burst limiter and returns
+        // HTTP 429. The library manufactures a rate-limit error out of a
+        // NO-DATA day. Proven by holding everything else fixed:
+        //     retry 0, no cache   -> OK, 0 bars, 278ms
+        //     retry 4, no cache   -> 429 in 3270ms
+        //     retry 0, with cache -> OK, 0 bars, 263ms
+        //     retry 4, with cache -> 429 in 3313ms
+        // Retrying is the OUTER loop's job (fetchSide below), which paces itself.
+        retryCount: 0, retryOnEmpty: false,
         useCache: true, cacheFolderPath: CACHE,
       });
       // With DNS fixed, a reachable server returning nothing means this
@@ -95,7 +126,10 @@ async function fetchSide(inst, side, day) {
     } catch (e) {
       lastErr = e;
       // A 429 cooldown outlasts any second-scale retry, so back off in minutes.
-      const wait = /429/.test(e.message || '') ? 90_000 * attempt : 5_000 * attempt;
+      // 429 here means we out-ran the limiter, and it takes minutes to clear.
+      // Escalate in 3-minute steps rather than 90-second ones; a tight retry
+      // loop is what wedged the 2026-08-19 and first 08-21 runs.
+      const wait = /429/.test(e.message || '') ? 180_000 * attempt : 5_000 * attempt;
       process.stdout.write(`  retry ${inst} ${side} ${day.toISOString().slice(0, 10)} `
         + `(attempt ${attempt}: ${e.message}) — sleeping ${Math.round(wait / 1000)}s\n`);
       await sleep(wait);
@@ -135,8 +169,38 @@ async function buildInstrument(inst) {
     const tag = day.toISOString().slice(0, 10);
     if (done.has(tag)) continue;
 
-    const bid = await fetchSide(inst, 'bid', day);
-    const ask = await fetchSide(inst, 'ask', day);
+    let bid = await fetchSide(inst, 'bid', day);
+    let ask = await fetchSide(inst, 'ask', day);
+
+    // ONE side empty while the other has data: re-fetch the empty side, paced,
+    // before believing it. This exists to TELL APART two things that look
+    // identical in the output -- a swallowed transient fetch, and a genuine
+    // single-side hole in the archive. That distinction is the standing lesson
+    // of the 2026-08-10 probe work, and it must be settled by evidence.
+    //
+    // What the evidence says here (2026-08-21): these days are REAL HOLES. Three
+    // paced retries recovered 0 of the first 5 asymmetric days. The initial guess
+    // was transience -- pass 1 had shown 0 asymmetric days in 330 while this pass
+    // showed 10 in 130 -- but that comparison was invalid: pass 1 stopped at
+    // 2015-01-05 and every asymmetric day falls in 2015+, a stretch it never
+    // reached. The retry stays because confirming a hole costs 3 requests on the
+    // rare asymmetric day and turns an assumption into a measurement.
+    //
+    // Separately and independently: retryCount MUST stay 0 in fetchSide's call
+    // above. That was proven by parameter isolation, not inferred from this.
+    for (let k = 1; k <= ASYM_RETRIES && (bid.length === 0) !== (ask.length === 0); k++) {
+      const side = bid.length === 0 ? 'bid' : 'ask';
+      await sleep(ASYM_GAP_MS * k);
+      const again = await fetchSide(inst, side, day);
+      if (side === 'bid') bid = again; else ask = again;
+      if (again.length) {
+        console.log(`  recovered ${name} ${tag} ${side} on asym retry ${k}: ${again.length} bars`);
+      } else if (k === ASYM_RETRIES) {
+        console.log(`  ASYM-EMPTY ${name} ${tag} ${side} still empty after ${k} paced retries `
+          + `-- recording as a genuine hole`);
+      }
+    }
+
     const askByTs = new Map(ask.map(a => [a.timestamp, a]));
 
     const lines = [];
@@ -169,6 +233,30 @@ async function buildInstrument(inst) {
         + `merged=${n} (rows ${st.rows}, days ${st.days})`);
     }
     await sleep(DAY_GAP_MS);
+  }
+
+  // Days can land out of order -- an asymmetric-empty day is re-fetched later in
+  // the same pass, and a resume re-enters at an arbitrary point -- so the part
+  // file is NOT guaranteed chronological. Every downstream loader assumes a
+  // monotonic index. Sort and dedupe on timestamp before the gate.
+  {
+    const raw = fs.readFileSync(part, 'utf8').split(/\r?\n/).filter(Boolean);
+    const header = raw.shift();
+    const seen = new Set();
+    const rows = [];
+    for (const ln of raw) {
+      const ts = ln.slice(0, ln.indexOf(','));
+      if (seen.has(ts)) continue;
+      seen.add(ts);
+      rows.push([Number(ts), ln]);
+    }
+    rows.sort((a, b) => a[0] - b[0]);
+    const NL = String.fromCharCode(10);
+    fs.writeFileSync(part, header + NL + rows.map(r => r[1]).join(NL) + NL);
+    if (rows.length !== raw.length) {
+      console.log(`${name}: dropped ${raw.length - rows.length} duplicate timestamps`);
+    }
+    st.rows = rows.length;
   }
 
   // ── Sanity gates before the part file is promoted to a real data file ───────
