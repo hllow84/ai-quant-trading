@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-11.** Read this file first in any new session. It is the
+**Last updated: 2026-08-21.** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -11,6 +11,14 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > a favourable regime, not a discovered edge. §2 is retained below as a record of
 > what was believed, with the kill stated inline. **There is now no live lead in
 > this project.** See §7 for what that leaves.
+
+> **2026-08-19 — A NEW SURFACE IS OPEN (§9).** Four externally-sourced discretionary
+> strategies were brought in for testing. The first one mechanised — the 15-minute
+> "Sneaky Pivot" — is the only family in this project's history to post a **positive
+> gross edge in every single cell (24/24)**, best net Sharpe +0.53 at 14.7% maxDD.
+> It is **not a lead**: it fails the DSR bar, loses to buy-and-hold, and its P&L is
+> concentrated in 2025. It is **parked** until the 2013-2017 out-of-regime re-run,
+> per §7 rule 3. Read §9 before acting on any of it.
 
 ---
 
@@ -429,3 +437,133 @@ the bid**, so availability must be probed per side, never assumed from one.
 - Environment: Python 3.14, pandas/numpy/scipy/matplotlib, Node/npx for
   `dukascopy-node`. Banned permanently: `vectorbt`, QuantConnect API,
   `yfinance GC=F` (futures, no real spread).
+
+---
+
+## 9. THE FOUR-STRATEGY BRIEF (opened 2026-08-19)
+
+Four externally-sourced discretionary strategies were handed in for testing:
+
+1. **5-Step Option Trading Framework** — day/swing options on NVDA, MU, SPY, QQQ.
+2. **15-Minute "Sneaky Pivot"** — rules-based 3-candle reversal at prior-day levels.
+3. **S&P 500 Futures Reversal** — 1-minute trend-break + engulfing reversal into
+   pre-marked 15-minute zones.
+4. **Thematic Catalyst Trend Following** — multi-week holds in leading growth stocks.
+
+### 9.1 Feasibility triage — what this repo can and cannot honestly test
+
+| # | Testable here? | Binding constraint |
+|---|---|---|
+| 2 | **YES, fully** | Entirely mechanical. Done — §9.2. |
+| 3 | **Mostly** | SPX500 has no M1 in the repo (H1 only); NAS100/US30 M1 stand in for ES. "Draw a trendline and wait for the break" and "a powerful engulfing candle" need mechanising, and each mechanisation is a fork to state. |
+| 1 | **Underlying only** | The option layer is **not testable at any price we have**. Delta 0.30-0.35 selection, a 25% contract-drawdown stop and "sell half at +100%" are all functions of the option's own path — implied vol, theta, the surface. There is no free historical intraday option chain. The entry logic (15-min ORB break, 30-minute pivot off the 21 EMA) IS testable on the underlying, but **a positive result there would not validate the options version**: theta and the option spread can convert a small positive underlying edge into a loser, and the asymmetric exits change the payoff shape entirely. Also NVDA/MU are single stocks — no data in the repo. |
+| 4 | **NO, not honestly** | Two blockers, neither fixable with data on hand. (a) **Hindsight themes.** Choosing "AI, memory, optics, space" in 2026 and backtesting from 2018 is look-ahead of the purest kind; a legitimate test needs a point-in-time rule that would have *selected* those themes contemporaneously. (b) **Survivorship.** It needs a point-in-time US equity universe including delisted names. Strip both away and what remains — RS-line highs, 21/50/200 MA regime, base breakouts — is the macross/trend family that §2 and §6 already killed. **Do not run a hindsight-theme backtest and report a number from it.** |
+
+### 9.2 Strategy 2 — the 15-minute Sneaky Pivot (2018-2025 run complete)
+
+24 configs: 3 instruments (NAS100, US30, XAUUSD) x 2 targets x 2 stops x 2 trigger
+windows. Every axis is a fork the brief leaves open; **no numeric parameter is
+fitted**. Session RTH 09:30-16:00 ET, real per-bar spread + commission + slippage,
+1% risk/trade, M1 resolution. Full detail in `research_log.md` (2026-08-19).
+
+| | Result |
+|---|---|
+| gross PF > 1 | **24 / 24** (1.170 - 1.548) |
+| net PF > 1 | 20 / 24 |
+| positive net Sharpe | 20 / 24 |
+| OOS holds (2023 split) | 15 / 24 |
+| DSR > 0.95 | **0 / 24** |
+| look-ahead guard | 24 / 24 PASS |
+
+**Best config — NAS100, swing target, sneaky-candle stop, session trigger:**
+gross PF 1.536, net PF 1.384, net Sharpe **+0.53**, maxDD 14.7%, 189 trades,
+win rate 40.7%, IS PF 1.26 / OOS PF 1.60, cost_R 6.6% of 1R.
+
+**What is genuinely new here.** No other family in this project has been positive
+gross in *every* cell. 435 prior trials produced gross PF clustered at 1.00-1.05;
+this one runs 1.17-1.55 across three different instruments and eight structural
+variants. Sign-consistency across independent instruments is not a best-of-N
+artefact — DSR tests the maximum, and says nothing about it.
+
+**Why it is still NOT a lead — four independent reservations:**
+
+1. **DSR 0.42 against a 0.95 bar.** Structural pool = this batch's own 24 a priori
+   cells, E[max SR] +0.590. The best config scores +0.53 — *below* the best-of-24
+   you would expect from noise. (The project-cumulative 459-trial pool gives
+   E[max SR] +7.08 and is meaningless: it is exactly the sigma-contamination
+   `research/dsr.py` BUG 2 documents. Earlier runners used it as their gate,
+   which is why every one of them reported DSR 0.000.)
+2. **Loses to buy-and-hold on all three instruments** — NAS100 +0.53 vs +0.84,
+   US30 +0.32 vs +0.55, XAUUSD +0.21 vs +1.19 — though at 2-3x lower drawdown.
+3. **Regime concentration, the exact signature that killed §2.** The NAS100 best
+   config earns **+27.2R in 2025 alone** out of ~+42R total, and is negative in
+   2020 (-5.9R) and 2024 (-7.1R). US30's best is -14.8R in 2023.
+4. **The best cells are not quite the strategy as written.** "Swing target" configs
+   post the highest gross R but hit that target **3 times in 189 trades**. In
+   practice they are "hold to the cash close with a stop". The extra R comes from
+   letting winners run to the bell, not from the swing line.
+
+Costs behave exactly as §1 predicts: 5.7-8.2% of 1R on the indices (a non-issue),
+14.4-17.3% on gold — and all four net-negative configs are XAUUSD.
+
+**Two forks in the brief were NOT crossed (identified 2026-08-21 by diffing the
+code against the source text, now stored verbatim at `notes/four_strategy_brief.md`
+with a full delta table):**
+
+1. **Range High/Low is RTH, the brief says *absolute*.** The text reads "the
+   previous day's absolute highest and lowest printed price points";
+   `strategies/sneaky_pivot.py` uses the prior 09:30-16:00 ET session extremes.
+   On a 23-hour index CFD the overnight extreme frequently exceeds the cash one,
+   so these are genuinely different lines and "a flush into the Range Low" is a
+   different event. The RTH choice is defensible and deliberate — the pre-2018
+   archive is cash-session only, so an absolute-range variant can never be
+   regime-tested, and "the opening candle of the day" is meaningless against a
+   23-hour session — but **the absolute-range variant IS testable on 2018-2025
+   and has never been run.**
+2. **"Aggressively" is unquantified.** The brief wants C1 to "plow aggressively"
+   into the zone; the code requires only that C1 trades at/through the line and is
+   directional into it, with no magnitude threshold. That is the right
+   conservative call (any threshold is a fitted number) but it means the tested
+   setup fires on gentle drifts as well as real flushes.
+
+Neither fork is a defect in the 24-config run — both are honest readings, and
+crossing them adds trials to the DSR pool. They are recorded so that no future
+session mistakes the tested strategy for the strategy as written.
+
+### 9.3 The next step, and it is not optional
+
+**§7 rule 3 applies: 2013-2017 first, not last.** The repo's M1 archive starts
+2018-01, so `scripts/download_pre2018_m1.mjs` pulls 2013-09-30 -> 2018 M1 bid+ask
+for NAS100 and US30. Until that re-run is done, nothing in §9.2 is a lead, and it
+should not be described as one.
+
+**Download status — relaunched 2026-08-21.** The 2026-08-19 launch died the same
+night after ONE day of data: it went down with its terminal while stuck in 429
+backoff (60/120/180s). The script was then rewritten to resume at DAY granularity
+(`<NAME>.days.done`, one line per completed day) but that version had never
+actually run. Before relaunching, the month-era leftovers — `NAS100.part.csv`
+(120 rows), `NAS100.stats.json`, `NAS100-2013-09.done` — had to be deleted, or
+2013-09-30 would have been fetched again and appended a second time under the new
+marker scheme; the 33-file `cache/` was kept, and it is being reused. Relaunched
+detached (`Start-Process`, hidden, PID in `pid.txt`) so it survives the terminal,
+logging to `data/raw/pre2018_m1_tmp/download.log`.
+
+Expect roughly **5 hours per instrument** (~1,109 weekdays x 16 hourly archive
+requests at batch 4 / 2000 ms, plus a 700 ms day gap), so ~10 hours for both, more
+if Dukascopy issues another 429 ban. The run promotes `NAME.part.csv` to
+`data/NAME_M1RTH_2013_2017_cfd_dukascopy.csv` only after a sanity gate (per-year
+bar floors, price band, negative-spread rate) — a thin or corrupt pull throws
+rather than writing a data file.
+
+**Data facts probed 2026-08-19 (measured, not assumed):**
+
+- Pre-2018 index M1 quotes cover **only 13:30-20:00 UTC** — the US cash session,
+  ~371 bars/day — in 2013, widening to 06:00-20:00 UTC (~840/day) by 2016. Bid
+  and ask merge **100%** on timestamp.
+- That is sufficient for an RTH-anchored strategy, and it retroactively justifies
+  the RTH session choice: the same definition is testable in both regimes. A
+  23-hour "absolute range" variant is a *different* strategy, not a parameter, and
+  cannot be tested pre-2018 at all.
+- Dukascopy rate-limits M1 hard: batch 40 / 300 ms draws **HTTP 429** within
+  minutes. The downloader runs at batch 8 / 1500 ms with minute-scale 429 backoff,
+  an on-disk archive cache, and month-granularity resume markers.
