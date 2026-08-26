@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-21 (out-of-regime re-run complete).** Read this file first in any new session. It is the
+**Last updated: 2026-08-26 (Opening Range Breakout tested and killed, §10).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -25,16 +25,28 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > The setup finds a real repeatable inefficiency that is too small to pay for
 > itself. Read §9.4 before acting on any of it.
 
+> **2026-08-26 — THE OPENING RANGE BREAKOUT IS DEAD, AND IT DIED HARDER THAN
+> ANYTHING BEFORE IT (§10).** ORB was tested in its real, evidence-backed form —
+> anchored to the **US cash open, 09:30 ET**, which no prior sweep in this project
+> had isolated. In regime it looks like a find: **gross PF > 1 in 12 of 12 cells**
+> (1.100–1.174). Out of regime it does not shrink, it **inverts**: **12/12 → 2/12**,
+> mean gross PF **1.141 → 0.960** — the average cell now loses money *before costs*.
+> Put the three out-of-regime tests side by side and ORB is the worst of them:
+> index basket 1.363 → 1.006, Sneaky Pivot 1.321 → 1.155 (14/16 held), **ORB
+> 1.141 → 0.960 (2/12 held)**. It also fails every other gate in regime — net PF
+> 5/12, DSR 0/12, OOS holds 1/12, single-year concentration 0/12, and it loses to
+> buy-and-hold in all four instrument×window comparisons. **This is a clean kill.**
+
 ---
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
 
-**Across 475 systematic backtest configurations, no FTMO-viable edge was found —
+**Across 499 systematic backtest configurations, no FTMO-viable edge was found —
 and no own-capital edge either (§6).** The closest thing to a positive result in
 the whole project is §9.4: a setup whose GROSS edge survives out of regime but
 cannot pay its own transaction costs.
 
-Trial composition (this is the cumulative DSR trial count, N=435):
+Trial composition (this is the cumulative DSR trial count, N=499):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -45,7 +57,9 @@ Trial composition (this is the cumulative DSR trial count, N=435):
 | Pre-2018 out-of-regime (2 fam × 3 TF × 5) | 5 indices | 90 | 0 survive (§6) |
 | Sneaky Pivot 2018-25 (3 inst x 2 x 2 x 2) | NAS100, US30, XAUUSD | 24 | 0 survive (§9.2) |
 | Sneaky Pivot 2013-17 out-of-regime | NAS100, US30 | 16 | 0 survive (§9.4) |
-| **Total** | | **475** | **0 survive** |
+| ORB @ US cash open 2018-25 (2 inst x 2 OR x 3 tgt) | NAS100, US30 | 12 | 0 survive (§10) |
+| ORB @ US cash open 2013-17 out-of-regime | NAS100, US30 | 12 | 0 survive (§10) |
+| **Total** | | **499** | **0 survive** |
 
 Separate from that count, and also negative: 6 crypto factor studies (5 kills +
 1 overfit), 3 intraday gold FTMO strategies, 3 swing gold FTMO strategies, and 2
@@ -313,6 +327,8 @@ double-counted.
 | Gold/index systematic sweeps + HTF breakout | 237 | 0 survive |
 | Index trend basket, 2018-25 | 108 | 0 clear DSR; best was the §2 lead |
 | **Index trend basket, out of regime** | **90** | **lead's Sharpe flips negative** |
+| 15-min Sneaky Pivot, both windows | 40 | gross edge survives, cannot pay its costs (§9.4) |
+| **ORB @ the US cash open, both windows** | **24** | **gross edge INVERTS out of regime (§10)** |
 
 The honest summary is that **price-only technical strategies on gold and equity
 indices have been searched thoroughly and nothing survived.** The one candidate
@@ -333,7 +349,12 @@ not another price-pattern variant:
    Test 2013-2017 first, not last.
 
 **Do NOT** re-run FTMO price-pattern variants, timeframe sweeps, single-instrument
-gold work, or basket-widening. All are closed; §1 and §6 explain why.
+gold work, or basket-widening. All are closed; §1 and §6 explain why. As of
+2026-08-26 add **opening-range breakouts** to that list in their plain form —
+§10 tested the one version the prior sweeps had never isolated (the 09:30 ET cash
+open) and it is the hardest kill in the project, going gross-NEGATIVE out of
+regime. A filtered or differently-costed ORB is a different strategy with its own
+trials, and rule 3 applies to it: **test 2013-2017 first.**
 
 ---
 
@@ -642,3 +663,188 @@ interesting result than a kill, and it is still not something to trade.
   paced re-fetches recovered **0 of them**, so they are archive facts, not
   transient failures. Cost NAS100 ~50 sessions out of 1,080. Per-year bar counts
   still clear the gate by ~2x.
+
+
+---
+
+## 10. THE OPENING RANGE BREAKOUT AT THE US CASH OPEN — tested 2026-08-26, killed
+
+### Why it was worth one clean test
+
+§1 killed a *generic* breakout family: an arbitrary rolling range on an arbitrary
+timeframe, plus one gold "London opening range" variant anchored to 07:00–08:00
+UTC. **None of those isolates the US cash open**, and the ORB claim is narrower
+and specific: the 09:30 ET auction concentrates overnight information into a
+short high-volume window, and the first extension beyond that window persists.
+External evidence (a documented NQ ORB survivor) said this particular version
+clears honest gates where the generic family did not. That is a different
+proposition, so it got one clean test under §7 rule 3 — **out of regime first,
+not last.**
+
+### The strategy, every default stated, nothing tuned
+
+| axis | setting | note |
+|---|---|---|
+| Opening range | first **N = 15** or **30** minutes after 09:30 ET | both canonical; neither chosen by result |
+| Entry | resting **stop order at the OR extreme**, armed only from 09:30+N | first break of the day wins; opposite side cancelled |
+| Stop | **the opposite side of the OR**, so **1R = the OR range** | the brief's "or a stated fraction of it" was NOT used, so no fraction is a free parameter |
+| Target | **1R**, **2R**, or **hold to the cash close** with the stop live | |
+| Exit | force-flat at the **16:00 ET** cash close | no overnight holds |
+| Frequency | **one position per day per instrument** | no re-entry, no reversal |
+
+**12 configs per window** (2 instruments × 2 OR × 3 targets). No numeric
+optimisation anywhere. `run_orb_pre2018.py` holds **no** strategy, cost or scoring
+code — it imports `run_orb` and rebinds five names, so both windows execute the
+*same objects*. Both indices have M1 in both windows, so unlike the Sneaky Pivot
+test (which lost gold) the grid is **identical on both sides**.
+
+### DST — the thing that silently breaks this strategy, handled and verified
+
+09:30 ET is **13:30 UTC under EDT** and **14:30 UTC under EST**. A fixed offset
+would build the "opening range" from 08:30–08:45 ET (pre-market) all winter and
+10:30–10:45 ET (an hour into the session) all summer — two different strategies,
+neither of them ORB, for half the sample each.
+
+Every bar is converted with `tz_convert("America/New_York")`, which carries the
+full IANA DST history per timestamp. **`scripts/verify_orb_sessions.py` is a hard
+gate that proves it from the data rather than asserting it**, and it exits 1:
+
+| check | NAS100 18-25 | US30 18-25 | NAS100 13-17 | US30 13-17 |
+|---|---|---|---|---|
+| UTC clock of the 09:30 ET bar | **13:30 / 14:30 only** | same | same | same |
+| EDT / EST sessions | 1,075 / 604 | 1,087 / 512 | 645 / 368 | 678 / 391 |
+| opening bar present | 100.0% | 99.9% | 98.5% | 98.9% |
+| OR15 has ≥13 of 15 bars | 100.0% | 99.6% | 98.1% | 98.3% |
+| reaches 15:59 ET | 99.0% | 99.0% | 96.0% | 96.0% |
+| median RTH bars/session | 390 | 390 | 390 | 390 |
+
+The observed offset flips land on the first session after the **2nd Sunday in
+March** and the **1st Sunday in November** in all eight years — the correct US
+rule, read off the data, not assumed.
+
+### Costs — including the one place this study departs from the repo default
+
+Real per-bar Dukascopy spread (round-turn) + 0.35 bps commission + per-side
+slippage, 1% risk/trade. **The departure is slippage, and it was necessary.** The
+engine's `NEWS_HOURS_UTC` windows are fixed in UTC, so under EST they end at
+*exactly* 09:30 ET — every winter ORB entry would have been charged NORMAL
+slippage in the single most volatile minute of its day. So this run supplies an
+**ET-anchored** slippage function: **1.00 bps per side for entries 09:30–10:30 ET**
+(2× the repo's news figure, ~6.7× normal, ≈ 2 index points on NAS100 at 20,000),
+0.15 bps after. `simulate_trades` gained an **optional** `slip_bps_fn`; default
+`None` reproduces the old branch exactly, verified by synthetic regression
+(default == explicit-None, and `cost_R` == the original formula to 1e-15).
+**No prior result in this repo moves.**
+
+| | in regime | out of regime |
+|---|---|---|
+| cost_R (% of 1R) | **5.7 – 9.9%** | **11.9 – 17.5%** |
+| median 1R (bps of price) | 32 – 60 | 23 – 41 |
+
+Same vice as §1, reached a third time: 1R is the OR's own range, 2013–2017 was a
+low-vol grind, so stops are tighter and an unchanged spread eats more of them.
+**But costs are NOT what kills this** — out of regime the *gross* number is
+negative on its own.
+
+A **0.50 bps sensitivity** (the repo's existing news figure) is reported on the
+same trades — a re-scoring, not new trials, so it adds nothing to the DSR pool.
+It lifts net PF by only **+0.035 to +0.066**, moves two more in-regime cells above
+1.00, and **changes no verdict**.
+
+### The result
+
+**In regime (2018-01-03 → 2025-12-31, split 2023-01-01), 12 configs:**
+
+| gate | result |
+|---|---|
+| look-ahead guard | **12/12 PASS** |
+| gross PF > 1 | **12/12** (1.100–1.174, mean 1.141) |
+| net PF > 1 | 5/12 |
+| positive net Sharpe | 5/12 |
+| OOS holds | 1/12 |
+| DSR > 0.95 | **0/12** (best 0.381) |
+| top year ≤ 60% of net R | **0/12** |
+| beats buy-and-hold | **0/12** |
+| **SURVIVORS** | **0/12** |
+
+Best cell — **NAS100, OR30, 2R target**: gross PF 1.174, net PF 1.039, net Sharpe
+**+0.23**, maxDD 33.5%, 1,609 trades, win 46.1%, cost_R 5.7%, IS PF 0.99 / OOS PF
+1.11. DSR pool **stated**: structural = this batch's own 12 a priori cells,
+E[max SR] **+0.341** (μ −0.153, σ 0.297). The 487-Sharpe cumulative pool
+(E[max SR] +7.00) is printed for contrast only — it is `research/dsr.py` BUG 2.
+
+**Out of regime (2013-09-30 → 2017-12-29, split 2016-01-01), the same 12 cells:**
+
+| | in regime | out of regime |
+|---|---|---|
+| gross PF > 1 | 12/12 | **2/12** |
+| mean gross PF | 1.141 | **0.960** |
+| net PF > 1 | 5/12 | **0/12** |
+| positive net Sharpe | 5/12 | **0/12** |
+| mean net Sharpe | −0.153 | **−2.316** |
+| best in-regime cell (NAS100 OR30 2R) | grPF 1.174 / netPF 1.039 / SR +0.23 | **grPF 0.965 / netPF 0.730 / SR −2.13** |
+| cells positive-gross in BOTH windows | — | **2/12** |
+| cells net-profitable in BOTH windows | — | **0/12** |
+
+### Why this is the hardest kill in the project
+
+Line the three out-of-regime tests up:
+
+| candidate | gross PF, in → out | cells still gross-positive | reading |
+|---|---|---|---|
+| Index trend basket (§6) | 1.363 → **1.006** | 2/18 baskets +SR | edge annihilated; it was regime |
+| Sneaky Pivot (§9.4) | 1.321 → **1.155** | **14/16** | edge real, too small to pay its costs |
+| **ORB (this section)** | 1.141 → **0.960** | **2/12** | **edge inverts — gross-negative out of regime** |
+
+ORB is the only one whose *mean* gross PF ends **below 1**. The basket lost its
+edge; ORB acquires a negative one.
+
+Two more independent failures, both in regime:
+
+- **Single-year concentration, 0/12 — the third appearance of the signature that
+  killed the last two candidates.** The best cell earns **+21.3R of its +28.9R
+  total in 2023 alone (74%)** and is negative in 2018, 2019, 2020 and 2025. Three
+  other net-positive NAS100 cells have a single year worth **154%, 180% and 193%**
+  of their total — one good year larger than the entire P&L. **All six US30 cells
+  sum negative** over 2018–2025.
+- **Loses to buy-and-hold 4 times out of 4**, on Sharpe *and* on drawdown:
+  NAS100 +0.23 vs **+0.84**, US30 −0.20 vs **+0.55** in regime; −1.37 vs **+1.21**
+  and −1.70 vs **+1.05** out of regime, at 33.5–61.0% maxDD against 35.7%/37.0%.
+
+### On the external evidence, stated fairly
+
+The documented NQ ORB survivor is **not reproduced here**. What the data does show
+is that the in-regime gross signature is exactly what such a study would report —
+12/12 gross-positive cells on 2018–2025, net-positive on NAS100 — **and that it
+does not exist before 2018**. That is consistent with, though not proof of, the
+published result being a 2018–2025 artefact: the same failure mode as this
+project's own last two candidates.
+
+A *different* ORB remains possible — a trend or VWAP filter, volatility-scaled
+sizing, a stated stop fraction, NQ futures costs rather than index-CFD costs.
+Each of those is a **different strategy carrying its own trials**, and §7 rule 3
+applies to each: test 2013–2017 first. The plain, evidence-backed form tested
+here does not survive.
+
+### What could not be tested, stated plainly
+
+**SPX500 was asked for and is absent for a data reason, not a choice.** The repo
+holds SPX500 at **H1 only**; a 15-minute opening range cannot be built from hourly
+bars, and adding it needs a fresh multi-hundred-MB M1 pull. NAS100 and US30 are
+the two indices with M1 in **both** windows — which is exactly what makes the
+out-of-regime test possible at all. Pre-2009 is unreachable for the same reason
+§6 gives: the Dukascopy index CFD archive does not go back that far with a real
+ask side.
+
+### Files
+
+| file | what it is |
+|---|---|
+| `strategies/orb.py` | the strategy; every mechanisation fork stated in the docstring |
+| `run_orb.py` | 2018-2025, 12 configs, all gates, cost sensitivity, per-year table |
+| `run_orb_pre2018.py` | out-of-regime driver — rebinds 5 names, no logic of its own |
+| `scripts/verify_orb_sessions.py` | **hard gate**: DST mapping + OR/close coverage |
+| `scripts/run_orb.sh` / `.cmd` | detached chained runner (verify → in regime → out of regime, ~80 s) |
+| `results/orb*.csv`, `results/orb_run.log` | the numeric evidence behind this section |
+
+**Cumulative trials: N=499** (475 prior + 12 in regime + 12 out of regime).

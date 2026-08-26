@@ -55,12 +55,21 @@ def simulate_trades(
     trades: list[dict],
     strictly_after: bool = False,
     cost_bps: dict | None = None,
+    slip_bps_fn=None,
 ) -> pd.DataFrame:
     """
     Resolve each candidate trade on a mid-OHLC resolution frame.
 
     `m1_mid` is any OHLC frame (M1 for intraday fidelity, or H4 for swing speed)
     with columns mid_high, mid_low, mid_close, spread.
+
+    slip_bps_fn : OPTIONAL. `f(entry_timestamp) -> slippage in bps PER SIDE`.
+        Used only when `cost_bps` is supplied. When None (the default) the
+        existing NEWS_HOURS_UTC rule is applied unchanged, so every prior study
+        in this repo reproduces byte-identically. It exists because the
+        NEWS_HOURS_UTC windows are fixed in UTC and therefore drift an hour
+        against the US cash open across DST — for a strategy anchored to 09:30
+        ET the slippage regime has to be defined in ET, not UTC.
 
     strictly_after : if True, resolution starts at the first bar STRICTLY AFTER
         entry_time. Use this when the resolution frame is the SAME frame the signal
@@ -144,7 +153,9 @@ def simulate_trades(
             cost_price = spread_at_entry + 2.0 * _slip_per_side(entry_time) + COMMISSION_PER_OZ
         else:
             # instrument-agnostic bps-of-price model for the multi-asset sweep
-            slip_side = cost_bps["slip_news"] if _in_news(entry_time) else cost_bps["slip_normal"]
+            slip_side = (slip_bps_fn(entry_time) if slip_bps_fn is not None
+                         else (cost_bps["slip_news"] if _in_news(entry_time)
+                               else cost_bps["slip_normal"]))
             total_bps = (spread_at_entry / entry_mid) * 1e4 + cost_bps["commission"] + 2.0 * slip_side
             cost_price = total_bps / 1e4 * entry_mid
         cost_R = cost_price / risk

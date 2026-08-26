@@ -1,0 +1,363 @@
+[14:12:24] STEP 1/3 — verify ORB sessions + DST mapping (hard gate)
+================================================================================================
+  ORB SESSION / DST VERIFICATION — 09:30 America/New_York cash open
+  Rule: 09:30 ET = 13:30 UTC under EDT, 14:30 UTC under EST. Handled per bar by
+  pandas tz_convert('America/New_York'), which carries the full IANA DST history.
+================================================================================================
+
+  [NAS100 2018-2025]  2,211,511 bars  2018-01-03 -> 2025-12-31  | 1,679 ET sessions
+    UTC clock time of the 09:30 ET bar (should be ONLY 13:30 and 14:30):
+      13:30 UTC  x1,075  (EDT)
+      14:30 UTC  x604  (EST)
+    session open bar present : 1,679/1,679 (100.0%)
+    OR15 >=13 of 15 bars     : 1,679/1,679 (100.0%)
+    OR30 >=27 of 30 bars     : 1,678/1,679 (99.9%)
+    reaches 15:59 ET         : 1,663/1,679 (99.0%)
+    RTH bars/session median  : 390
+
+  [US30 2018-2025]  2,090,818 bars  2018-01-02 -> 2025-12-31  | 1,604 ET sessions
+    UTC clock time of the 09:30 ET bar (should be ONLY 13:30 and 14:30):
+      13:30 UTC  x1,087  (EDT)
+      14:30 UTC  x512  (EST)
+    session open bar present : 1,603/1,604 (99.9%)
+    OR15 >=13 of 15 bars     : 1,598/1,604 (99.6%)
+    OR30 >=27 of 30 bars     : 1,598/1,604 (99.6%)
+    reaches 15:59 ET         : 1,588/1,604 (99.0%)
+    RTH bars/session median  : 390
+
+  [NAS100 2013-2017]  443,449 bars  2013-09-30 -> 2017-12-29  | 1,029 ET sessions
+    UTC clock time of the 09:30 ET bar (should be ONLY 13:30 and 14:30):
+      13:30 UTC  x645  (EDT)
+      14:30 UTC  x368  (EST)
+    session open bar present : 1,014/1,029 (98.5%)
+    OR15 >=13 of 15 bars     : 1,009/1,029 (98.1%)
+    OR30 >=27 of 30 bars     : 1,010/1,029 (98.2%)
+    reaches 15:59 ET         : 988/1,029 (96.0%)
+    RTH bars/session median  : 390
+
+  [US30 2013-2017]  467,543 bars  2013-09-30 -> 2017-12-29  | 1,082 ET sessions
+    UTC clock time of the 09:30 ET bar (should be ONLY 13:30 and 14:30):
+      13:30 UTC  x678  (EDT)
+      14:30 UTC  x391  (EST)
+    session open bar present : 1,070/1,082 (98.9%)
+    OR15 >=13 of 15 bars     : 1,064/1,082 (98.3%)
+    OR30 >=27 of 30 bars     : 1,063/1,082 (98.2%)
+    reaches 15:59 ET         : 1,039/1,082 (96.0%)
+    RTH bars/session median  : 390
+
+  Observed DST transitions (first ET session at each new UTC offset):
+    2018-03-12  ->  UTC-4  EDT (-4)
+    2018-11-05  ->  UTC-5  EST (-5)
+    2019-03-11  ->  UTC-4  EDT (-4)
+    2019-11-04  ->  UTC-5  EST (-5)
+    2020-03-10  ->  UTC-4  EDT (-4)
+    2020-11-02  ->  UTC-5  EST (-5)
+    2021-03-15  ->  UTC-4  EDT (-4)
+    2021-11-08  ->  UTC-5  EST (-5)
+    2022-03-14  ->  UTC-4  EDT (-4)
+    2022-11-07  ->  UTC-5  EST (-5)
+    2023-03-13  ->  UTC-4  EDT (-4)
+    2023-11-06  ->  UTC-5  EST (-5)
+    2024-03-12  ->  UTC-4  EDT (-4)
+    2024-11-04  ->  UTC-5  EST (-5)
+    2025-03-10  ->  UTC-4  EDT (-4)
+    2025-11-03  ->  UTC-5  EST (-5)
+
+================================================================================================
+  GATE PASS — all files map 09:30 ET correctly and cover the opening range.
+[14:12:52] verify PASS
+[14:12:52] STEP 2/3 — ORB 2018-2025 (in regime)
+[NAS100] loading M1 ...
+[NAS100] 2,211,511 M1 bars 2018-01-03 -> 2025-12-31 | median spread 3.224 (2.31 bps) | B&H SR +0.84
+  NAS100 OR=15m tgt=1R    cands=1616 n=1616 grPF=1.129 netPF=0.953 SR=-0.33 guard=PASS
+  NAS100 OR=15m tgt=2R    cands=1616 n=1616 grPF=1.164 netPF=1.014 SR=+0.09 guard=PASS
+  NAS100 OR=15m tgt=close cands=1616 n=1616 grPF=1.164 netPF=1.019 SR=+0.11 guard=PASS
+  NAS100 OR=30m tgt=1R    cands=1609 n=1609 grPF=1.164 netPF=1.014 SR=+0.09 guard=PASS
+  NAS100 OR=30m tgt=2R    cands=1609 n=1609 grPF=1.174 netPF=1.039 SR=+0.23 guard=PASS
+  NAS100 OR=30m tgt=close cands=1609 n=1609 grPF=1.172 netPF=1.039 SR=+0.22 guard=PASS
+[US30] loading M1 ...
+[US30] 2,090,818 M1 bars 2018-01-02 -> 2025-12-31 | median spread 3.972 (1.18 bps) | B&H SR +0.55
+    US30 OR=15m tgt=1R    cands=1540 n=1540 grPF=1.126 netPF=0.907 SR=-0.67 guard=PASS
+    US30 OR=15m tgt=2R    cands=1540 n=1540 grPF=1.139 netPF=0.956 SR=-0.29 guard=PASS
+    US30 OR=15m tgt=close cands=1540 n=1540 grPF=1.142 netPF=0.965 SR=-0.20 guard=PASS
+    US30 OR=30m tgt=1R    cands=1530 n=1530 grPF=1.100 netPF=0.924 SR=-0.52 guard=PASS
+    US30 OR=30m tgt=2R    cands=1530 n=1530 grPF=1.108 netPF=0.952 SR=-0.30 guard=PASS
+    US30 OR=30m tgt=close cands=1530 n=1530 grPF=1.108 netPF=0.954 SR=-0.26 guard=PASS
+
+================================================================================================================================
+  OPENING RANGE BREAKOUT — US CASH OPEN 09:30 ET | real Dukascopy M1 with spread, 2018-2025
+  OR = first N min after 09:30 America/New_York (per-bar DST-correct); entry = stop order at the OR
+  extreme, armed only from 09:30+N; stop = opposite side of the OR (so 1R = the OR range);
+  flat at the 16:00 ET cash close; ONE position per day per instrument.
+  Cost: REAL per-bar spread (round-turn) + 0.35 bps commission + 1.0/0.15 bps per-side slippage (09:30-10:30 ET / after), 1% risk/trade, NO tuning
+  Configs THIS BATCH: 12  |  CUMULATIVE PROJECT TRIALS (DSR N): 475 prior + 12 = 487
+  DSR pool (HEADLINE) = STRUCTURAL: this batch's 12 a priori cells -> E[max SR] +0.341 (mu -0.153, sd 0.297)
+  DSR pool (CONTRAST) = project-cumulative 487 [sweep_progress.csv:75, htf_breakout.csv:12, sweep_indices.csv:150, basket_configs.csv:108, basket_configs_scored_pre2018.csv:90, sneaky_pivot.csv:24, sneaky_pivot_pre2018.csv:16] -> E[max SR] +7.002 (mu -1.381, sd 2.754)
+                        ^ NOT a gate: sigma-contaminated by legacy structurally-doomed
+                          configs (research/dsr.py BUG 2). Shown so the difference is visible.
+  Gates: guard PASS + gross PF>1 + net PF>1 + SR>0 + DSR>0.95 + OOS holds + top year <= 60% of net R + beats B&H
+================================================================================================================================
+    inst  OR target cands trades   grPF  netPF  Sharpe   DSR  maxDD  win%  costR%  top% OOS?  B&H? guard
+  ----------------------------------------------------------------------------------------------------------------------------
+  NAS100  30     2R  1609   1609  1.174  1.039   +0.23  0.38  33.5% 46.1%    5.7%   74%   no  lose  PASS
+  NAS100  30  close  1609   1609  1.172  1.039   +0.22  0.37  40.4% 45.1%    5.7%   79%   no  lose  PASS
+  NAS100  15  close  1616   1616  1.164  1.019   +0.11  0.26  37.0% 38.7%    7.9%  180%   no  lose  PASS
+  NAS100  30     1R  1609   1609  1.164  1.014   +0.09  0.24  30.6% 52.8%    5.7%  193%   no  lose  PASS
+  NAS100  15     2R  1616   1616  1.164  1.014   +0.09  0.24  31.0% 41.5%    7.9%  154%  YES  lose  PASS
+    US30  15  close  1540   1540  1.142  0.965   -0.20  0.07  56.4% 37.9%    9.9%   n/a   no  lose  PASS
+    US30  30  close  1530   1530  1.108  0.954   -0.26  0.05  57.6% 42.7%    7.3%   n/a   no  lose  PASS
+    US30  15     2R  1540   1540  1.139  0.956   -0.29  0.04  56.6% 40.9%    9.9%   n/a   no  lose  PASS
+    US30  30     2R  1530   1530  1.108  0.952   -0.30  0.04  53.1% 43.7%    7.3%   n/a   no  lose  PASS
+  NAS100  15     1R  1616   1616  1.129  0.953   -0.33  0.03  48.2% 52.5%    7.9%   n/a   no  lose  PASS
+    US30  30     1R  1530   1530  1.100  0.924   -0.52  0.01  57.3% 51.4%    7.3%   n/a   no  lose  PASS
+    US30  15     1R  1540   1540  1.126  0.907   -0.67  0.00  61.0% 52.0%    9.9%   n/a   no  lose  PASS
+================================================================================================================================
+
+  GROSS vs NET R — is there an edge BEFORE costs? (the test that killed the last lead)
+    inst  OR target  grossR/trd  costR/trd  netR/trd  cost as %R  1R (bps)  tgt/stop/time
+  --------------------------------------------------------------------------------------------
+  NAS100  15     1R     +0.0568     0.0792   -0.0224        7.9%      45.8    773/688/155
+  NAS100  15     2R     +0.0870     0.0792   +0.0078        7.9%      45.8    376/816/424
+  NAS100  15  close     +0.0907     0.0792   +0.0115        7.9%      45.8      0/850/766
+  NAS100  30     1R     +0.0632     0.0574   +0.0058        5.7%      60.1    634/553/422
+  NAS100  30     2R     +0.0754     0.0574   +0.0179        5.7%      60.1    204/617/788
+  NAS100  30  close     +0.0760     0.0574   +0.0186        5.7%      60.1      0/628/981
+    US30  15     1R     +0.0548     0.0994   -0.0447        9.9%      32.1    725/641/174
+    US30  15     2R     +0.0736     0.0994   -0.0259        9.9%      32.1    358/771/411
+    US30  15  close     +0.0778     0.0994   -0.0216        9.9%      32.1      0/800/740
+    US30  30     1R     +0.0401     0.0730   -0.0328        7.3%      40.3    602/546/382
+    US30  30     2R     +0.0491     0.0730   -0.0239        7.3%      40.3    229/615/686
+    US30  30  close     +0.0499     0.0730   -0.0230        7.3%      40.3      0/625/905
+
+  COST SENSITIVITY — opening-hour slippage 1.00 bps/side (headline) vs 0.50 bps/side (repo news figure)
+  config                      costR%   netPF |  costR%   netPF  d netPF   open-hr entries
+  ----------------------------------------------------------------------------------------
+  NAS100 OR30 2R                5.7%   1.039 |    4.2%   1.074   +0.035               84%
+  NAS100 OR30 close             5.7%   1.039 |    4.2%   1.074   +0.035               84%
+  NAS100 OR15 close             7.9%   1.019 |    5.6%   1.059   +0.040               97%
+  NAS100 OR30 1R                5.7%   1.014 |    4.2%   1.053   +0.039               84%
+  NAS100 OR15 2R                7.9%   1.014 |    5.6%   1.055   +0.042               97%
+  US30 OR15 close               9.9%   0.965 |    6.7%   1.018   +0.054               95%
+  US30 OR30 close               7.3%   0.954 |    5.1%   0.998   +0.044               82%
+  US30 OR15 2R                  9.9%   0.956 |    6.7%   1.011   +0.056               95%
+  US30 OR30 2R                  7.3%   0.952 |    5.1%   0.996   +0.045               82%
+  NAS100 OR15 1R                7.9%   0.953 |    5.6%   1.002   +0.049               97%
+  US30 OR30 1R                  7.3%   0.924 |    5.1%   0.975   +0.050               82%
+  US30 OR15 1R                  9.9%   0.907 |    6.7%   0.974   +0.066               95%
+
+  VERDICT
+  ------------------------------------------------------------------------------------------
+  NO config cleared all gates.
+  Best raw net Sharpe: NAS100 OR30 tgt=2R -> SR +0.23
+    - gross PF 1.174 -> edge exists before costs
+    - net PF   1.039  (cost 5.7% of 1R)
+    - DSR 0.381 (need > 0.95) -> FAIL: inside the noise of this batch
+    - OOS holds: NO (IS PF 0.99 / OOS PF 1.11, OOS SR +0.75, OOS trades 665)
+    - single-year concentration: top year = 74% of net R (FAIL, bar 60%)
+    - vs buy-and-hold: LOSES TO it
+
+  vs BUY-AND-HOLD (same file, same window):
+    NAS100: best strategy SR +0.23 (maxDD 33.5%) vs B&H SR +0.84 (maxDD 35.7%) -> LOSES TO B&H
+      US30: best strategy SR -0.20 (maxDD 56.4%) vs B&H SR +0.55 (maxDD 37.0%) -> LOSES TO B&H
+
+  YEAR-BY-YEAR net R, ALL configs (single-year concentration = gate 6)
+  config                        2018    2019    2020    2021    2022    2023    2024    2025    total   top%
+  ----------------------------------------------------------------------------------------------------------
+  NAS100 OR30 2R               -10.8    -4.0   -13.9    +8.8   +13.7   +21.3   +18.7    -5.0    +28.9    74%
+  NAS100 OR30 close             -5.4   -16.6   -15.9    +8.5   +23.5   +14.6   +16.8    +4.3    +29.9    79%
+  NAS100 OR15 close             +5.4    -9.9   -23.5   +18.5   +33.5    -9.1    -1.5    +5.2    +18.6   180%
+  NAS100 OR30 1R               -20.3    +4.8    +1.5    -3.4   +15.0    -2.2   +17.9    -4.0     +9.3   193%
+  NAS100 OR15 2R               -10.2    -0.2   -17.2   +17.8   +19.4   -21.2    +8.2   +15.9    +12.6   154%
+  US30 OR15 close               -1.0   -29.1   +20.8    +6.2   +17.0   -24.5   -25.7    +3.0    -33.3    n/a
+  US30 OR30 close              +16.3   -21.2   +21.2    -9.7    -4.1    -7.3   -34.0    +3.6    -35.3    n/a
+  US30 OR15 2R                 -12.1   -23.2   +26.1    +6.8    -1.6    +1.4   -43.3    +6.0    -39.9    n/a
+  US30 OR30 2R                  +8.4   -10.6   +18.7   -10.2    -3.9    -8.3   -34.4    +3.9    -36.5    n/a
+  NAS100 OR15 1R               -17.1    -0.1   -15.6    -1.0    +0.8   -20.2    +8.7    +8.1    -36.2    n/a
+  US30 OR30 1R                 +12.5    +0.5    +7.1    -5.9   -10.8   -16.4   -25.7   -11.5    -50.2    n/a
+  US30 OR15 1R                  -2.0   -13.4   +12.7    +6.3   -16.7   -19.0   -34.4    -2.3    -68.8    n/a
+  Read: net R per calendar year. 'top%' = best single year as a share of the
+  total; > 60% fails gate 6. 'n/a' means the total is <= 0, so the ratio
+  is undefined — that is a worse outcome than concentration, not a pass.
+
+  Batch summary:
+    look-ahead guard    : 12 / 12 PASS
+    gross PF > 1        : 12 / 12
+    net PF > 1          : 5 / 12
+    positive net Sharpe : 5 / 12
+    OOS holds           : 1 / 12
+    not year-concentrated: 0 / 12
+    beats buy-and-hold  : 0 / 12
+    clears DSR haircut  : 0 / 12 (structural pool; contaminated cumulative pool: 0)
+    SURVIVORS (all gates): 0 / 12
+
+  Results -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb.csv
+  Scored  -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_scored.csv
+[14:13:23] in-regime run complete
+[14:13:23] STEP 3/3 — ORB 2013-2017 (out of regime) + comparison
+[NAS100] loading M1 ...
+[NAS100] 443,449 M1 bars 2013-09-30 -> 2017-12-29 | median spread 1.062 (2.39 bps) | B&H SR +1.21
+  NAS100 OR=15m tgt=1R    cands= 974 n= 974 grPF=0.891 netPF=0.607 SR=-3.71 guard=PASS
+  NAS100 OR=15m tgt=2R    cands= 974 n= 974 grPF=1.022 netPF=0.750 SR=-2.05 guard=PASS
+  NAS100 OR=15m tgt=close cands= 974 n= 974 grPF=1.064 netPF=0.798 SR=-1.37 guard=PASS
+  NAS100 OR=30m tgt=1R    cands= 970 n= 970 grPF=0.918 netPF=0.666 SR=-2.90 guard=PASS
+  NAS100 OR=30m tgt=2R    cands= 970 n= 970 grPF=0.965 netPF=0.730 SR=-2.13 guard=PASS
+  NAS100 OR=30m tgt=close cands= 970 n= 970 grPF=0.985 netPF=0.753 SR=-1.70 guard=PASS
+[US30] loading M1 ...
+[US30] 467,543 M1 bars 2013-09-30 -> 2017-12-29 | median spread 2.026 (1.14 bps) | B&H SR +1.05
+    US30 OR=15m tgt=1R    cands=1025 n=1025 grPF=0.924 netPF=0.649 SR=-3.21 guard=PASS
+    US30 OR=15m tgt=2R    cands=1025 n=1025 grPF=0.962 netPF=0.721 SR=-2.33 guard=PASS
+    US30 OR=15m tgt=close cands=1025 n=1025 grPF=0.987 netPF=0.753 SR=-1.72 guard=PASS
+    US30 OR=30m tgt=1R    cands=1016 n=1016 grPF=0.892 netPF=0.667 SR=-2.88 guard=PASS
+    US30 OR=30m tgt=2R    cands=1016 n=1016 grPF=0.947 netPF=0.733 SR=-2.08 guard=PASS
+    US30 OR=30m tgt=close cands=1016 n=1016 grPF=0.960 netPF=0.751 SR=-1.70 guard=PASS
+
+================================================================================================================================
+  OPENING RANGE BREAKOUT — US CASH OPEN 09:30 ET | real Dukascopy M1 with spread, 2013-2017 OUT OF REGIME
+  OR = first N min after 09:30 America/New_York (per-bar DST-correct); entry = stop order at the OR
+  extreme, armed only from 09:30+N; stop = opposite side of the OR (so 1R = the OR range);
+  flat at the 16:00 ET cash close; ONE position per day per instrument.
+  Cost: REAL per-bar spread (round-turn) + 0.35 bps commission + 1.0/0.15 bps per-side slippage (09:30-10:30 ET / after), 1% risk/trade, NO tuning
+  Configs THIS BATCH: 12  |  CUMULATIVE PROJECT TRIALS (DSR N): 487 prior + 12 = 499
+  DSR pool (HEADLINE) = STRUCTURAL: this batch's 12 a priori cells -> E[max SR] -1.131 (mu -2.316, sd 0.712)
+  DSR pool (CONTRAST) = project-cumulative 499 [sweep_progress.csv:75, htf_breakout.csv:12, sweep_indices.csv:150, basket_configs.csv:108, basket_configs_scored_pre2018.csv:90, sneaky_pivot.csv:24, sneaky_pivot_pre2018.csv:16, orb.csv:12] -> E[max SR] +6.916 (mu -1.404, sd 2.726)
+                        ^ NOT a gate: sigma-contaminated by legacy structurally-doomed
+                          configs (research/dsr.py BUG 2). Shown so the difference is visible.
+  Gates: guard PASS + gross PF>1 + net PF>1 + SR>0 + DSR>0.95 + OOS holds + top year <= 60% of net R + beats B&H
+================================================================================================================================
+    inst  OR target cands trades   grPF  netPF  Sharpe   DSR  maxDD  win%  costR%  top% OOS?  B&H? guard
+  ----------------------------------------------------------------------------------------------------------------------------
+  NAS100  15  close   974    974  1.064  0.798   -1.37  0.33  80.6% 34.2%   17.5%   n/a   no  lose  PASS
+  NAS100  30  close   970    970  0.985  0.753   -1.70  0.16  77.4% 39.1%   12.9%   n/a   no  lose  PASS
+    US30  30  close  1016   1016  0.960  0.751   -1.70  0.15  79.1% 38.5%   11.9%   n/a   no  lose  PASS
+    US30  15  close  1025   1025  0.987  0.753   -1.72  0.14  85.5% 34.6%   16.2%   n/a   no  lose  PASS
+  NAS100  15     2R   974    974  1.022  0.750   -2.05  0.04  81.7% 37.4%   17.5%   n/a   no  lose  PASS
+    US30  30     2R  1016   1016  0.947  0.733   -2.08  0.03  78.6% 40.1%   11.9%   n/a   no  lose  PASS
+  NAS100  30     2R   970    970  0.965  0.730   -2.13  0.03  79.0% 40.3%   12.9%   n/a   no  lose  PASS
+    US30  15     2R  1025   1025  0.962  0.721   -2.33  0.01  86.5% 37.9%   16.2%   n/a   no  lose  PASS
+    US30  30     1R  1016   1016  0.892  0.667   -2.88  0.00  82.4% 45.5%   11.9%   n/a   no  lose  PASS
+  NAS100  30     1R   970    970  0.918  0.666   -2.90  0.00  80.3% 45.7%   12.9%   n/a   no  lose  PASS
+    US30  15     1R  1025   1025  0.924  0.649   -3.21  0.00  87.9% 47.0%   16.2%   n/a   no  lose  PASS
+  NAS100  15     1R   974    974  0.891  0.607   -3.71  0.00  89.5% 45.9%   17.5%   n/a   no  lose  PASS
+================================================================================================================================
+
+  GROSS vs NET R — is there an edge BEFORE costs? (the test that killed the last lead)
+    inst  OR target  grossR/trd  costR/trd  netR/trd  cost as %R  1R (bps)  tgt/stop/time
+  --------------------------------------------------------------------------------------------
+  NAS100  15     1R     -0.0525     0.1748   -0.2274       17.5%      31.6    400/449/125
+  NAS100  15     2R     +0.0118     0.1748   -0.1630       17.5%      31.6    204/503/267
+  NAS100  15  close     +0.0366     0.1748   -0.1382       17.5%      31.6      0/525/449
+  NAS100  30     1R     -0.0346     0.1294   -0.1640       12.9%      41.3    324/358/288
+  NAS100  30     2R     -0.0161     0.1294   -0.1455       12.9%      41.3    111/393/466
+  NAS100  30  close     -0.0073     0.1294   -0.1367       12.9%      41.3      0/401/569
+    US30  15     1R     -0.0367     0.1625   -0.1992       16.2%      23.0    436/469/120
+    US30  15     2R     -0.0208     0.1625   -0.1833       16.2%      23.0    206/535/284
+    US30  15  close     -0.0075     0.1625   -0.1700       16.2%      23.0      0/559/466
+    US30  30     1R     -0.0463     0.1187   -0.1651       11.9%      28.5    342/383/291
+    US30  30     2R     -0.0244     0.1187   -0.1432       11.9%      28.5    124/410/482
+    US30  30  close     -0.0190     0.1187   -0.1377       11.9%      28.5      0/423/593
+
+  COST SENSITIVITY — opening-hour slippage 1.00 bps/side (headline) vs 0.50 bps/side (repo news figure)
+  config                      costR%   netPF |  costR%   netPF  d netPF   open-hr entries
+  ----------------------------------------------------------------------------------------
+  NAS100 OR15 close            17.5%   0.798 |   14.2%   0.841   +0.043               97%
+  NAS100 OR30 close            12.9%   0.753 |   10.7%   0.788   +0.036               83%
+  US30 OR30 close              11.9%   0.751 |    8.8%   0.799   +0.049               79%
+  US30 OR15 close              16.2%   0.753 |   11.6%   0.812   +0.059               96%
+  NAS100 OR15 2R               17.5%   0.750 |   14.2%   0.795   +0.044               97%
+  US30 OR30 2R                 11.9%   0.733 |    8.8%   0.783   +0.050               79%
+  NAS100 OR30 2R               12.9%   0.730 |   10.7%   0.766   +0.036               83%
+  US30 OR15 2R                 16.2%   0.721 |   11.6%   0.782   +0.061               96%
+  US30 OR30 1R                 11.9%   0.667 |    8.8%   0.720   +0.053               79%
+  NAS100 OR30 1R               12.9%   0.666 |   10.7%   0.705   +0.039               83%
+  US30 OR15 1R                 16.2%   0.649 |   11.6%   0.718   +0.070               96%
+  NAS100 OR15 1R               17.5%   0.607 |   14.2%   0.653   +0.047               97%
+
+  VERDICT
+  ------------------------------------------------------------------------------------------
+  NO config cleared all gates.
+  Best raw net Sharpe: NAS100 OR15 tgt=close -> SR -1.37
+    - gross PF 1.064 -> edge exists before costs
+    - net PF   0.798  (cost 17.5% of 1R)
+    - DSR 0.331 (need > 0.95) -> FAIL: inside the noise of this batch
+    - OOS holds: NO (IS PF 0.74 / OOS PF 0.87, OOS SR -0.81, OOS trades 460)
+    - single-year concentration: n/a — total net R <= 0
+    - vs buy-and-hold: LOSES TO it
+
+  vs BUY-AND-HOLD (same file, same window):
+    NAS100: best strategy SR -1.37 (maxDD 80.6%) vs B&H SR +1.21 (maxDD 16.6%) -> LOSES TO B&H
+      US30: best strategy SR -1.70 (maxDD 79.1%) vs B&H SR +1.05 (maxDD 14.5%) -> LOSES TO B&H
+
+  YEAR-BY-YEAR net R, ALL configs (single-year concentration = gate 6)
+  config                        2013    2014    2015    2016    2017    total   top%
+  ----------------------------------------------------------------------------------
+  NAS100 OR15 close             -1.8   -54.9   -39.6    -7.7   -30.6   -134.6    n/a
+  NAS100 OR30 close             -4.8   -47.2   -47.1   -16.1   -17.3   -132.6    n/a
+  US30 OR30 close               -8.3   -31.0   -35.7   -35.0   -29.9   -139.9    n/a
+  US30 OR15 close               -4.7   -31.4   -36.8   -59.4   -41.9   -174.2    n/a
+  NAS100 OR15 2R                -9.7   -58.9   -35.5   -22.9   -31.8   -158.8    n/a
+  US30 OR30 2R                  -5.8   -31.6   -34.4   -41.6   -32.0   -145.5    n/a
+  NAS100 OR30 2R                -2.2   -43.8   -39.2   -31.4   -24.4   -141.1    n/a
+  US30 OR15 2R                  -8.1   -44.7   -33.8   -65.9   -35.4   -187.9    n/a
+  US30 OR30 1R                 -12.0   -29.9   -45.7   -45.7   -34.5   -167.7    n/a
+  NAS100 OR30 1R                -4.3   -60.4   -42.2   -27.8   -24.2   -159.0    n/a
+  US30 OR15 1R                 -12.4   -47.9   -34.1   -66.2   -43.6   -204.2    n/a
+  NAS100 OR15 1R               -10.9   -77.9   -43.7   -38.5   -50.6   -221.5    n/a
+  Read: net R per calendar year. 'top%' = best single year as a share of the
+  total; > 60% fails gate 6. 'n/a' means the total is <= 0, so the ratio
+  is undefined — that is a worse outcome than concentration, not a pass.
+
+  Batch summary:
+    look-ahead guard    : 12 / 12 PASS
+    gross PF > 1        : 2 / 12
+    net PF > 1          : 0 / 12
+    positive net Sharpe : 0 / 12
+    OOS holds           : 0 / 12
+    not year-concentrated: 0 / 12
+    beats buy-and-hold  : 0 / 12
+    clears DSR haircut  : 0 / 12 (structural pool; contaminated cumulative pool: 0)
+    SURVIVORS (all gates): 0 / 12
+
+  Results -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_pre2018.csv
+  Scored  -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_scored_pre2018.csv
+
+==============================================================================================================================
+  OUT-OF-REGIME COMPARISON — same code, same 12 cells, only the data window changes
+  IN  = 2018-2025 (results/orb.csv)   OUT = 2013-09-30 -> 2017-12-29 (this run)
+==============================================================================================================================
+    inst  OR target  grPF in  grPF out       d |  netPF in  netPF out |   SR in  SR out       d |  costR% in    out |  n out
+  --------------------------------------------------------------------------------------------------------------------------
+  NAS100  30     2R    1.174     0.965  -0.208 |     1.039      0.730 |   +0.23   -2.13   -2.37 |       5.7%  12.9% |    970
+  NAS100  30  close    1.172     0.985  -0.188 |     1.039      0.753 |   +0.22   -1.70   -1.92 |       5.7%  12.9% |    970
+  NAS100  15  close    1.164     1.064  -0.100 |     1.019      0.798 |   +0.11   -1.37   -1.48 |       7.9%  17.5% |    974
+  NAS100  30     1R    1.164     0.918  -0.246 |     1.014      0.666 |   +0.09   -2.90   -2.99 |       5.7%  12.9% |    970
+  NAS100  15     2R    1.164     1.022  -0.142 |     1.014      0.750 |   +0.09   -2.05   -2.14 |       7.9%  17.5% |    974
+    US30  15  close    1.142     0.987  -0.155 |     0.965      0.753 |   -0.20   -1.72   -1.52 |       9.9%  16.2% |   1025
+    US30  30  close    1.108     0.960  -0.148 |     0.954      0.751 |   -0.26   -1.70   -1.44 |       7.3%  11.9% |   1016
+    US30  15     2R    1.139     0.962  -0.177 |     0.956      0.721 |   -0.29   -2.33   -2.03 |       9.9%  16.2% |   1025
+    US30  30     2R    1.108     0.947  -0.161 |     0.952      0.733 |   -0.30   -2.08   -1.77 |       7.3%  11.9% |   1016
+  NAS100  15     1R    1.129     0.891  -0.237 |     0.953      0.607 |   -0.33   -3.71   -3.38 |       7.9%  17.5% |    974
+    US30  30     1R    1.100     0.892  -0.208 |     0.924      0.667 |   -0.52   -2.88   -2.36 |       7.3%  11.9% |   1016
+    US30  15     1R    1.126     0.924  -0.202 |     0.907      0.649 |   -0.67   -3.21   -2.54 |       9.9%  16.2% |   1025
+==============================================================================================================================
+
+  gross PF > 1 :  12/12 in regime  ->  2/12 out of regime
+  net   PF > 1 :  5/12  ->  0/12
+  net Sharpe>0 :  5/12  ->  0/12
+  mean gross PF:  1.141  ->  0.960
+  mean Sharpe  :  -0.153  ->  -2.316
+  mean cost_R  :  7.7%  ->  14.6%   (median 1R: 45 bps -> 31 bps)
+
+  IN-REGIME BEST CELL — NAS100 OR30 tgt=2R
+    gross PF 1.174 -> 0.965   net PF 1.039 -> 0.730   Sharpe +0.23 -> -2.13
+
+  CELLS POSITIVE-GROSS IN BOTH WINDOWS : 2/12
+  CELLS NET-PROFITABLE IN BOTH WINDOWS : 0/12
+
+  HOW TO READ THIS (write the verdict against these lines, not against a hope):
+    * A gross PF that collapses toward 1.00 means the edge was 2018-2025, not the
+      strategy — the exact failure that killed the index basket (1.363 -> 1.006).
+    * Sharpe falling while gross PF holds is a COST/regime-vol story, not an edge
+      story — that is what the Sneaky Pivot turned out to be.
+    * A survivor must be net-profitable in BOTH windows, not merely gross-positive.
+==============================================================================================================================
+[14:13:34] ALL DONE — results/orb.csv, orb_pre2018.csv, orb_scored*.csv, orb_trades*.csv
