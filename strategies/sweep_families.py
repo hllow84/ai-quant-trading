@@ -163,7 +163,18 @@ FAMILIES = {
 }
 
 TIMEFRAMES = {"M5": "5min", "M15": "15min", "M30": "30min", "H1": "1h", "H4": "4h"}
+
+# M1 is DELIBERATELY ABSENT from TIMEFRAMES above. run_sweep.py and
+# run_sweep_indices.py iterate TIMEFRAMES to build their grids and are resumable
+# against completed CSVs; adding a sixth key here would silently re-open both of
+# those finished batches and change their stated config counts (75 and 150).
+# The M1 row is therefore driven by run_sweep_m1.py, which supplies its own
+# frequency string and reads TF_DELTA["M1"] below. Same families, same variants,
+# same engine — only the execution timeframe differs.
+TIMEFRAMES_M1 = {"M1": "1min"}
+
 TF_DELTA = {
+    "M1": pd.Timedelta(minutes=1),
     "M5": pd.Timedelta(minutes=5), "M15": pd.Timedelta(minutes=15),
     "M30": pd.Timedelta(minutes=30), "H1": pd.Timedelta(hours=1),
     "H4": pd.Timedelta(hours=4),

@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-26 (Opening Range Breakout tested and killed, §10).** Read this file first in any new session. It is the
+**Last updated: 2026-08-27 (the M1 row of the timeframe sweep run and killed, §11).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -37,16 +37,37 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > 5/12, DSR 0/12, OOS holds 1/12, single-year concentration 0/12, and it loses to
 > buy-and-hold in all four instrument×window comparisons. **This is a clean kill.**
 
+> **2026-08-27 — THE M1 ROW IS RUN, AND IT IS THE FIRST CANDIDATE TO FAIL THE
+> GROSS TEST *IN* REGIME (§11).** Every timeframe sweep in this project started at
+> M5; the 1-minute bar was never tested. It has been now — same 5 families, same
+> stated variants, same engine, 45 cells in regime and 30 out of it. **Mean gross
+> PF is 0.996 in regime and 0.988 out of it: below 1.00 in BOTH windows.** The
+> three previous candidates each had a real in-regime gross edge that later shrank
+> (Sneaky Pivot), collapsed (index basket) or inverted (ORB). M1 never had one to
+> lose, so the out-of-regime run *confirms* rather than *reveals*. Two findings
+> worth carrying, and they are separate:
+> **(1)** a gross edge at M1 does exist and is statistically real — XAUUSD
+> mean-reversion earns **+0.0398 R/trade at t = +9.6 (daily-block), p = 5.5e-12** —
+> but it is **~3% of the cost it must pay**. The family ordering is systematic:
+> **mean-reversion 8/9 cells gross-positive, breakout 0/9**. The M1 tape reverts;
+> breakouts fail.
+> **(2)** the cost gradient is confirmed on like-for-like data (M1 cost_R
+> **2.6-2.7x** M5, steeper than the sqrt-5 prediction) **and then flattens
+> completely once the overnight tape is removed** — restricted to the US cash
+> session, M1 cost_R is **26.4%** against M5's 27.8%, a ratio of **0.95x**. M1 is
+> not intrinsically more cost-punished than M5; trading M1 across the 23-hour tape
+> is. Neither finding rescues anything, and **0/45 configs survive.**
+
 ---
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
 
-**Across 499 systematic backtest configurations, no FTMO-viable edge was found —
+**Across 574 systematic backtest configurations, no FTMO-viable edge was found —
 and no own-capital edge either (§6).** The closest thing to a positive result in
 the whole project is §9.4: a setup whose GROSS edge survives out of regime but
 cannot pay its own transaction costs.
 
-Trial composition (this is the cumulative DSR trial count, N=499):
+Trial composition (this is the cumulative DSR trial count, N=574):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -59,7 +80,13 @@ Trial composition (this is the cumulative DSR trial count, N=499):
 | Sneaky Pivot 2013-17 out-of-regime | NAS100, US30 | 16 | 0 survive (§9.4) |
 | ORB @ US cash open 2018-25 (2 inst x 2 OR x 3 tgt) | NAS100, US30 | 12 | 0 survive (§10) |
 | ORB @ US cash open 2013-17 out-of-regime | NAS100, US30 | 12 | 0 survive (§10) |
-| **Total** | | **499** | **0 survive** |
+| M1 row, in regime (5 fam × 3 var × 3) | XAUUSD, NAS100, US30 | 45 | 0 survive (§11) |
+| M1 row, 2013-17 out-of-regime | NAS100, US30 | 30 | 0 survive (§11) |
+| **Total** | | **574** | **0 survive** |
+
+The 30 RTH-matched control cells in §11 are a **re-scoring** of the already-counted
+2018-2025 M1 grid on a data subset, not new trials, and are excluded from the total
+— the same treatment §6 gave its matched 5-index window.
 
 Separate from that count, and also negative: 6 crypto factor studies (5 kills +
 1 overfit), 3 intraday gold FTMO strategies, 3 swing gold FTMO strategies, and 2
@@ -329,6 +356,7 @@ double-counted.
 | **Index trend basket, out of regime** | **90** | **lead's Sharpe flips negative** |
 | 15-min Sneaky Pivot, both windows | 40 | gross edge survives, cannot pay its costs (§9.4) |
 | **ORB @ the US cash open, both windows** | **24** | **gross edge INVERTS out of regime (§10)** |
+| **The M1 row, both windows** | **75** | **gross PF < 1.00 in BOTH windows — no edge to lose (§11)** |
 
 The honest summary is that **price-only technical strategies on gold and equity
 indices have been searched thoroughly and nothing survived.** The one candidate
@@ -349,7 +377,9 @@ not another price-pattern variant:
    Test 2013-2017 first, not last.
 
 **Do NOT** re-run FTMO price-pattern variants, timeframe sweeps, single-instrument
-gold work, or basket-widening. All are closed; §1 and §6 explain why. As of
+gold work, or basket-widening. As of 2026-08-27 the timeframe sweep is **complete**
+— M1 was the last unrun row and §11 closes it, so "try a faster timeframe" is now
+an answered question, not an open one. All are closed; §1 and §6 explain why. As of
 2026-08-26 add **opening-range breakouts** to that list in their plain form —
 §10 tested the one version the prior sweeps had never isolated (the 09:30 ET cash
 open) and it is the hardest kill in the project, going gross-NEGATIVE out of
@@ -403,6 +433,8 @@ confirmed by price probe — never guess these):
 | `run_sweep_indices.py` | NAS100/US30 150-config sweep; `--analyze` re-prints without re-running |
 | `run_basket_trend.py` | The former lead (§2, now killed). 6 indices × H4/H8/D1 × trend+macross = 108 configs + 18 equal-risk baskets + benchmarks |
 | `run_basket_pre2018.py` | **The kill shot (§6).** Same strategy code, `--suffix`/`--split`/`--tag` select the window. 5 indices × H4/H8/D1 × trend+macross = 90 configs + 18 baskets |
+| `run_sweep_m1.py` | **The M1 row (§11).** 3 instruments x 5 families x 3 variants = 45 configs at the 1-minute bar; `--rth` runs the session-matched control |
+| `run_sweep_m1_pre2018.py` | M1 out-of-regime driver — matched RTH control then 2013-2017; rebinds names only, no logic of its own |
 | `recompute_dsr.py` | Recomputes DSR under the corrected gate; prints old vs fixed side by side |
 | `run_ftmo.py`, `run_ftmo_swing.py` | Gold FTMO strategies A/B/C, intraday and swing |
 | `baseline_gold_spot.py` | SMA-200 gold baseline vs buy-and-hold (supersedes `baseline_sma200.py`) |
@@ -848,3 +880,237 @@ ask side.
 | `results/orb*.csv`, `results/orb_run.log` | the numeric evidence behind this section |
 
 **Cumulative trials: N=499** (475 prior + 12 in regime + 12 out of regime).
+
+
+---
+
+## 11. THE M1 ROW — the last unrun timeframe, tested 2026-08-27, killed
+
+### Why it was worth one clean test
+
+Every timeframe sweep in this project deliberately started at M5. The 75-config
+gold sweep, the 150-config index sweep and the basket work all span M5→H4 or
+H4→D1. **M1 was never run**, which left one honest gap in an otherwise complete
+grid and left a prediction untested. That is a small, cheap, falsifiable question,
+and unlike a new strategy family it adds no new degrees of freedom: the families,
+the variants and every numeric parameter are imported unchanged.
+
+### The grid, every default stated, nothing tuned
+
+| axis | setting | note |
+|---|---|---|
+| Instruments | XAUUSD, NAS100, US30 | the three with M1 on disk |
+| Timeframe | **M1**, execution and signal on the same frame | `strictly_after=True`, as M5-H4 |
+| Families | trend, breakout, meanrev, momentum, macross | imported from `strategies/sweep_families.py` |
+| Variants | **3 stated per family**, unchanged | no numeric parameter re-tuned for M1 |
+| Risk | 1% / trade, `de_overlap` (one position at a time) | repo convention |
+| Costs | XAUUSD legacy $/oz model; indices 0.35 bps commission + 0.15/0.50 bps per-side slippage | **each instrument keeps the model it already used at M5-H4** |
+| Split | 2023-01-01 in regime, 2016-01-01 out of regime | fixed, no peeking |
+
+**45 configs in regime, 30 out of regime.** `run_sweep_m1_pre2018.py` holds no
+strategy, cost or scoring code — it rebinds names on `run_sweep_m1` and calls its
+`main()`, so both windows execute the *same objects*.
+
+**What "the same variants at M1" actually means, stated because it is material.**
+Every parameter in the grid is expressed in BARS, so running it at M1 rescales all
+of them: ATR 14 → 14 minutes, EMA 200 → 200 minutes, max hold H → **12-96
+MINUTES**. That is the correct and only honest way to add a row to a timeframe
+sweep — it is what each of M5 through H4 did in its turn — and it does mean the M1
+row is a set of ultra-short-hold systems.
+
+### Two things that had to be right before any number could be read
+
+**`scripts/verify_m1.py` is a hard gate (exits 1) and proves both from the data
+rather than asserting them.**
+
+1. **The execution-frame identity.** `resample_mid(m1, "1min")` is verified to be
+   *exactly* the native bar relabelled to its close time — checked on 200k-row
+   slices of all five files. So M1 runs the identical convention as M5-H4 and
+   leaks nothing.
+2. **The annualisation factor.** This is the single easiest number at M1 to
+   inflate by ~30x. Headline Sharpe uses **calendar-daily aggregated returns
+   annualised at 252**, because the factor is a property of the *return series*,
+   not of the signal timeframe — an M1 system and a D1 system both emit one return
+   per trading day.
+
+| | XAUUSD | NAS100 | US30 |
+|---|---|---|---|
+| M1 bars | 1,827,147 | 2,211,511 | 2,090,818 |
+| **measured** M1 bars/year | 228,550 | 276,723 | 261,531 |
+| daily observations | 1,601 | 2,018 | 1,922 |
+| factor used | **252** | **252** | **252** |
+| Sharpe if per-bar returns were annualised instead | −724.34 | −658.25 | −705.30 |
+| **inflation avoided** | **30.1x** | **33.1x** | **32.2x** |
+
+Note also that `metrics.py::BARS_PER_YEAR["1m"] = 525,600` assumes a 24/7 year and
+**overstates the real M1 bar count by 1.9-2.3x**. It is not used anywhere in this
+run, and it is the wrong number even for the wrong method.
+
+### FINDING (1) — there IS a gross edge at M1, it is statistically real, and it is ~3% of its cost
+
+This is the useful result, and it is *not* "no edge". `scripts/m1_gross_significance.py`
+tests gross R per trade against zero on the best cell of each family, with a
+daily-block t so intraday clustering cannot inflate the count:
+
+| instrument | family | gross R / trade | t (per-trade) | t (daily-block) | p | **edge as % of its cost** |
+|---|---|---|---|---|---|---|
+| XAUUSD | meanrev | **+0.0398** | +6.89 | **+9.61** | 5.5e-12 | **2.96%** |
+| NAS100 | macross | +0.0288 | +3.66 | +6.48 | 2.5e-04 | 3.41% |
+| NAS100 | trend | +0.0178 | +3.12 | +3.78 | 1.8e-03 | 3.49% |
+| NAS100 | momentum | +0.0107 | +1.65 | +2.83 | marginal | 1.68% |
+| NAS100 | breakout | −0.0040 | −0.76 | −0.03 | 0.45 | −0.50% |
+
+**And the family ordering is systematic, not a best-of-N artefact:**
+
+| family | cells gross-positive (of 9) | mean gross R / trade | mean gross PF |
+|---|---|---|---|
+| meanrev | **8/9** | **+0.0169** | 1.0323 |
+| macross | 6/9 | +0.0059 | 1.0087 |
+| trend | 6/9 | +0.0049 | 1.0088 |
+| momentum | 4/9 | +0.0004 | 1.0004 |
+| breakout | **0/9** | **−0.0154** | 0.9744 |
+
+**The M1 tape mean-reverts and breakouts fail** — negative on every one of nine
+cells across three different instruments. That is a clean structural anti-finding
+with no counterpart at M5-H4, and it is the opposite sign to what the ORB study
+(§10) was looking for one timeframe up. It is also, in the end, worth nothing:
+a 3%-of-cost edge cannot pay a cost of any size.
+
+### FINDING (2) — the cost gradient is confirmed, then flattens completely once the overnight tape is removed
+
+**The prediction, stated before the run.** Cost per trade is fixed while 1R is an
+ATR-scaled stop, and ATR scales roughly with the square root of bar duration, so
+cost_R should scale ~1/sqrt(TF) and the M5→M1 step should multiply it by
+sqrt(5) = 2.24x.
+
+**On the 23-hour session-agnostic data the M5-H4 rows used, it holds — and is
+steeper than predicted:**
+
+| instrument | H4 | H1 | M30 | M15 | M5 | **M1** | M5→M1 | predicted | error |
+|---|---|---|---|---|---|---|---|---|---|
+| XAUUSD | 3.7% | 7.6% | 11.4% | 17.3% | 32.7% | **88.5%** | **2.71x** | 73.2% | +20.9% |
+| NAS100 | 2.7% | 5.4% | 8.9% | 14.4% | 27.8% | **71.5%** | **2.57x** | 62.2% | +15.0% |
+| US30 | 2.5% | 5.1% | 8.2% | 13.4% | 26.0% | **68.6%** | **2.64x** | 58.1% | +18.0% |
+
+**45/45 cells sit above the 20% cost_R band that killed M5.**
+
+**But restrict M1 to the US cash session and the gradient vanishes.** The matched
+control re-runs the same 2018-2025 files on [13:00, 21:00) UTC — the liquid tape a
+real M1 trader would use, and the window the pre-2018 archive forces:
+
+| | NAS100 | US30 |
+|---|---|---|
+| M1 cost_R, 23-hour | 71.5% | 68.6% |
+| **M1 cost_R, cash session only** | **26.4%** | **26.5%** |
+| M5 cost_R (23-hour, for reference) | 27.8% | 26.0% |
+| **M5 → M1 ratio, like-for-like session** | **0.95x** | **1.02x** |
+
+Two effects compound: the cash session's median spread is **2.2x tighter** (1.03
+vs 2.31 bps on NAS100) *and* its 1R is **1.9x larger** (11.2 vs 6.0 bps), because
+cash-session minutes are more volatile. **So the honest statement is that M1 is
+not intrinsically more cost-punished than M5 — trading M1 across the 23-hour tape
+is.** This qualifies, rather than overturns, the §1 vice: the cost gradient is real
+down to M5, and the extra penalty at M1 is a session-liquidity effect, not a
+timeframe effect.
+
+It rescues nothing. At 26% cost_R the net PF is still **0/30**.
+
+> **A correction worth carrying.** The gradient often quoted as "gold cost_R: M5
+> 60%, M15 32%, M30 21%" comes from `htf_breakout.csv` — the HTF-gated breakout
+> batch, whose stop is *the breakout bar's own range* and therefore much tighter.
+> Verified: HTF breakout M5 60.3% / M15 32.5% / M30 21.9%; the **5-family sweep**
+> this row extends runs M5 32.7% / M15 17.3% / M30 11.4% / H1 7.6% / H4 3.7%.
+> Both are real. The family-sweep gradient is the correct baseline for §11.
+
+### The result
+
+**In regime (2018-01 → 2025-12, split 2023-01-01), 45 configs:**
+
+| gate | result |
+|---|---|
+| look-ahead guard | **45/45 PASS** |
+| gross PF > 1 | 24/45 (mean **1.0049**, median 1.0024, range 0.946-1.071) |
+| net PF > 1 | **0/45** |
+| positive net Sharpe | **0/45** |
+| DSR > 0.95 | 0/45 |
+| OOS holds | 0/45 |
+| top year ≤ 60% of net R | 0/45 |
+| beats buy-and-hold | **0/45** |
+| **SURVIVORS** | **0/45** |
+
+Best cell — NAS100 macross v1: gross PF 1.0278, net PF 0.4398, net Sharpe
+**−13.72**, cost_R 60.5%. Buy-and-hold beats every config on every instrument:
+XAUUSD +1.19, NAS100 +0.84, US30 +0.55.
+
+**Out of regime (2013-09-30 → 2017-12-29), 30 cells against the RTH-matched control:**
+
+| | in regime (RTH-matched) | out of regime |
+|---|---|---|
+| gross PF > 1 | 16/30 | 9/30 |
+| **mean gross PF** | **0.9960** | **0.9879** |
+| net PF > 1 | **0/30** | **0/30** |
+| mean net PF | 0.647 | 0.412 |
+| mean net Sharpe | −10.37 | −15.22 |
+| mean cost_R | 26.5% | 57.1% |
+| median 1R | 8.8 bps | 6.1 bps |
+| cells positive-gross in BOTH windows | — | **3/30** (all NAS100 macross) |
+| cells net-profitable in BOTH windows | — | **0/30** |
+
+cost_R doubles out of regime on the same **stop-distance** mechanism §9.4 and §10
+found from the other side: 1R falls 8.8 → 6.1 bps in the low-vol 2013-2017 grind
+while the spread widens 1.03 → 2.39 bps.
+
+### Where this sits against the project's other out-of-regime tests
+
+| candidate | mean gross PF, in → out | cells holding | reading |
+|---|---|---|---|
+| Index trend basket (§6) | 1.363 → **1.006** | 2/18 | edge annihilated; it was regime |
+| Sneaky Pivot (§9.4) | 1.321 → **1.155** | 14/16 | edge real, too small to pay its costs |
+| ORB @ cash open (§10) | 1.141 → **0.960** | 2/12 | edge inverts — gross-negative out of regime |
+| **M1 row (this section)** | **0.996 → 0.988** | **3/30** | **no in-regime edge to lose** |
+
+M1 is the **first candidate in this project to fail the gross test *in* regime**.
+The other three all looked like finds on 2018-2025 and were undone by the second
+window. M1 is undone by the first, so the out-of-regime run confirms rather than
+reveals — which is itself a useful data point about the value of §7 rule 3: it
+catches artefacts, but a candidate this weak never needed it.
+
+### Two things that are NOT usable numbers in this batch, stated plainly
+
+- **maxDD and the equity curve are invalid here.** At 1% risk/trade M1 fires ~25
+  trades/day, so **27/45 cells contain a day that loses ≥ 100% of equity** (which
+  sends `(1+r).cumprod()` non-positive) and **45/45 end below 1% of starting
+  equity**. Sharpe *is* leverage-invariant (μ/σ cancels the scale) and so are gross
+  PF, net PF, cost_R and R/trade — the verdict rests on those. The mechanism is
+  stark: mean net R per trade reaches **−1.076 R** on the worst cells, i.e. the
+  cost alone exceeds the entire risk unit.
+- **DSR is not informative here and is doing no work.** The structural pool (this
+  batch's own 45 a priori cells) has mean Sharpe **−20.01**, sd 2.86, E[max SR]
+  **−13.61**. When every cell is catastrophic, a merely *less* catastrophic one can
+  post a high-looking DSR while losing money on every trade. SURVIVOR requires net
+  PF > 1 **and** Sharpe > 0, both of which bind long before DSR does. The
+  project-cumulative 544-Sharpe pool (E[max SR] +14.95) is printed for contrast
+  only — the exact σ-contamination `research/dsr.py` BUG 2 documents.
+
+### Data caveat, reported not hidden
+
+US30 2013-2017 holds **1 bar of 467,543 (0.0002%) with a spread of exactly zero**
+(bid == ask at that minute's close). There are **zero negative spreads in any
+file**. A zero spread hands that one trade a free round-turn, which *flatters* the
+strategy — the safe direction to be wrong for a kill — and `verify_m1.py` now caps
+zero-spread bars at 0.01% of a file rather than ignoring them.
+
+### Files
+
+| file | what it is |
+|---|---|
+| `run_sweep_m1.py` | 45 in-regime configs, all gates, both findings, per-year table |
+| `run_sweep_m1_pre2018.py` | matched RTH control + out-of-regime driver; **rebinds names only** |
+| `scripts/verify_m1.py` | **hard gate**: data + execution-frame identity + annualisation identity |
+| `scripts/m1_gross_significance.py` | is the gross edge real? t-tests, per-trade and daily-block |
+| `scripts/probe_m1.py`, `scripts/smoke_test_m1.py` | pre-flight and end-to-end pipeline checks |
+| `scripts/run_m1.sh` / `.cmd` | detached chained runner (gate → in regime → control + out of regime, ~13 min) |
+| `results/sweep_m1*.csv`, `results/m1_gross_significance.csv`, `results/m1_run.log` | the numeric evidence behind this section |
+
+**Cumulative trials: N=574** (499 prior + 45 in regime + 30 out of regime; the 30
+RTH-matched control cells are a re-scoring, not new trials).
