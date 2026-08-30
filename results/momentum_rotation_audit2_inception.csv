@@ -1,0 +1,29 @@
+ticker,known_inception,data_first_valid,gap_days,data_before_inception,note
+SPY,1993-01-22,1993-01-29,7,False,legal inception; first trading day widely reported as 1993-01-29
+XLK,1998-12-16,1998-12-22,6,False,"original 9 Select Sector SPDRs launched 1998-12-16, trading commenced 1998-12-22"
+XLF,1998-12-16,1998-12-22,6,False,same as XLK
+XLE,1998-12-16,1998-12-22,6,False,same as XLK
+XLV,1998-12-16,1998-12-22,6,False,same as XLK
+XLI,1998-12-16,1998-12-22,6,False,same as XLK
+XLY,1998-12-16,1998-12-22,6,False,same as XLK
+XLP,1998-12-16,1998-12-22,6,False,same as XLK
+XLU,1998-12-16,1998-12-22,6,False,same as XLK
+XLB,1998-12-16,1998-12-22,6,False,same as XLK
+XLRE,2015-10-07,2015-10-08,1,False,
+XLC,2018-06-18,2018-06-19,1,False,
+TLT,2002-07-22,2002-07-30,8,False,
+IEF,2002-07-22,2002-07-30,8,False,
+GLD,2004-11-18,2004-11-18,0,False,
+IWM,2000-05-22,2000-05-26,4,False,
+EFA,2001-08-14,2001-08-27,13,False,
+EEM,2003-04-07,2003-04-14,7,False,
+DBC,2006-02-03,2006-02-06,3,False,
+USO,2006-04-10,2006-04-10,0,False,
+UNG,2007-04-18,2007-04-18,0,False,
+SLV,2006-04-21,2006-04-28,7,False,
+VGK,2005-03-04,2005-03-10,6,False,
+INDA,2012-02-02,2012-02-03,1,False,
+FXI,2004-10-05,2004-10-08,3,False,"renamed from 'iShares FTSE/Xinhua China 25' to 'iShares China Large-Cap' in 2011 -- SAME ticker/fund/data series, name only"
+MTUM,2013-04-16,2013-04-18,2,False,
+VTV,2004-01-26,2004-01-30,4,False,
+MDY,1995-05-04,1995-05-04,0,False,

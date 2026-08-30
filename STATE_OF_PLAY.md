@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-30 (momentum rotation audited §12.1 — bug found and fixed, verdict narrows to DSR-only; widened universe tested §12.2, verdict unchanged).** Read this file first in any new session. It is the
+**Last updated: 2026-08-30 (momentum rotation SECOND audit §12.3 — 6 more checks, no new bugs, filter and cost robustness both PASS).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -94,6 +94,16 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > (Sharpe 0.51-0.54 across all four cells) — a real, robust finding with no
 > single config extreme enough to be statistically distinguishable from a
 > 4-trial null.
+>
+> **SECOND AUDIT (§12.3, same day) ran 6 more checks — trial-count honesty,
+> ticker inception integrity on all 27 instruments, a filter-design
+> perturbation test (150d/250d SMA, bi-monthly rebalance), a 4x cost
+> bracket, sized survivorship, and DSR pool re-derivation. No new bug.
+> The two mechanism-stress-tests both came back ROBUST: full-period Sharpe
+> spans only 0.566-0.639 and stress Sharpe 0.523-0.610 across all filter
+> variants (none flips sign or collapses), and doubling transaction costs
+> moves the CAGR margin over SPY by only -0.25pp. Verdict unchanged: KILL
+> on DSR alone, now the most thoroughly-audited result in this project.**
 >
 > **SAME-DAY AUDIT (§12.1) FOUND A REAL BUG IN THE ABOVE.** Full-period
 > metrics had been computed over the strategy's entire 1993-2026 data span
@@ -1817,3 +1827,204 @@ Files: `scripts/download_momentum_universe_expanded.py`, `research/momentum_rota
 **Cumulative trials: N=638** (630 prior + 4 full period + 4 stress window,
 expanded-universe grid; this is a genuinely new a priori design choice — a
 different, wider instrument set — not a re-scoring of section 12's 8 trials).
+
+---
+
+## 12.3 SECOND AUDIT — six more checks, no new bugs found, two robustness tests both PASS
+
+The first audit (§12.1) found and fixed one real bug. Passing five prior
+checks is not evidence nothing else is wrong, so this is a second, independent
+pass, assuming more could remain. `scripts/audit_momentum_rotation_2.py`, full
+output in `results/momentum_rotation_audit2_run.log`.
+
+### Audit 6 — honest trial count behind the grid
+
+`git log --oneline --all -- research/momentum_rotation.py run_momentum_rotation.py
+scripts/download_momentum_universe.py` shows **exactly two commits ever touched
+this strategy's code**: the initial implementation and the audit-1 fix +
+widened-universe commit. `git show <first-commit>:research/momentum_rotation.py`
+confirms the **first committed version already contains** `SMA_WINDOW=200`,
+monthly rebalance, and `GRID=[(n,k) for n in (6,12) for k in (3,5)]` — the
+exact parameters specified verbatim in the task prompt that opened this line
+of work. No other commit, branch, stash, or reflog entry touches this file,
+and no other `run_momentum_rotation*.py` variant exists in the repository
+before that first commit.
+
+**Conclusion: the grid was chosen before any result was seen, with HIGH
+confidence from git history — not proof.** A value could in principle have
+been explored interactively and never saved to any file; no evidence of that
+exists, and none can be ruled out with absolute certainty from a git history
+alone. Stated honestly rather than asserted. If such unsaved exploration had
+occurred, the true trial count behind the reported 4-cell pool would be
+**understated**, E[max SR] would be **higher**, and DSR would be **harder to
+clear** — so any residual doubt here pushes the verdict further toward the
+kill, never away from it. This is not counted as a new trial batch.
+
+### Audit 7 — ticker inception integrity, all 27 tickers cross-checked externally
+
+Every ticker's `first_valid_index()` in the loaded panel was compared against
+its real fund inception date, sourced independently (web search against
+stockanalysis.com, etfdb.com, ishares.com, ssga.com, Vanguard fund
+documentation, and SEC filings — not taken from the original download script's
+own reporting).
+
+| ticker | known inception | data first-valid | gap |
+|---|---|---|---|
+| SPY | 1993-01-22 | 1993-01-29 | +7d |
+| XLK/XLF/XLE/XLV/XLI/XLY/XLP/XLU/XLB | 1998-12-16 | 1998-12-22 (all 9) | +6d |
+| XLRE | 2015-10-07 | 2015-10-08 | +1d |
+| XLC | 2018-06-18 | 2018-06-19 | +1d |
+| TLT / IEF | 2002-07-22 | 2002-07-30 | +8d |
+| GLD | 2004-11-18 | 2004-11-18 | +0d |
+| IWM | 2000-05-22 | 2000-05-26 | +4d |
+| EFA | 2001-08-14 | 2001-08-27 | +13d |
+| EEM | 2003-04-07 | 2003-04-14 | +7d |
+| DBC | 2006-02-03 | 2006-02-06 | +3d |
+| USO | 2006-04-10 | 2006-04-10 | +0d |
+| UNG | 2007-04-18 | 2007-04-18 | +0d |
+| SLV | 2006-04-21 | 2006-04-28 | +7d |
+| VGK | 2005-03-04 | 2005-03-10 | +6d |
+| INDA | 2012-02-02 | 2012-02-03 | +1d |
+| FXI | 2004-10-05 | 2004-10-08 | +3d |
+| MTUM | 2013-04-16 | 2013-04-18 | +2d |
+| VTV | 2004-01-26 | 2004-01-30 | +4d |
+| MDY | 1995-05-04 | 1995-05-04 | +0d |
+
+**Every one of 27 gaps is ≥ 0 — data never begins before a ticker's known
+inception, anywhere.** Gaps range 0–13 days and reflect the standard
+distinction between a fund's legal registration date and its first trading
+day (the direction is always "data starts a few days to two weeks LATER than
+the fund legally existed," never earlier) — expected, not a red flag. No
+evidence of backfilled, interpolated, or placeholder pre-inception data in
+either the base or widened universe.
+
+### Audit 8 — filter perturbation test: ROBUST
+
+Three one-shot alternative designs, none chosen to flatter the result, tested
+against N=12/K=5 (the strongest audited cell) on the base 17-instrument
+universe, same live-window methodology, same cost model:
+
+| variant | full Sharpe | full CAGR | full maxDD | stress Sharpe | stress CAGR | stress maxDD |
+|---|---|---|---|---|---|---|
+| ORIGINAL (200d SMA, monthly) | 0.608 | 8.07% | 39.03% | 0.610 | 9.08% | 39.03% |
+| 150-day SMA, monthly | 0.639 | 8.37% | 39.78% | 0.573 | 8.30% | 39.78% |
+| 250-day SMA, monthly | 0.599 | 7.89% | 44.10% | 0.523 | 7.28% | 44.10% |
+| 200-day SMA, bi-monthly rebalance | 0.566 | 7.65% | 39.03% | 0.586 | 8.61% | 39.03% |
+
+Full-period Sharpe spans **0.566–0.639** (spread 0.073) and stress-window
+Sharpe spans **0.523–0.610** (spread 0.087) across all four variants — none
+collapses, none inverts sign, none drops below SPY's full-period Sharpe by
+more than a rounding error (150d SMA actually improves on the original; 250d
+SMA and bi-monthly are the softest but stay firmly positive and in the same
+range as the original). **AUDIT 8 VERDICT: ROBUST.** The mechanism (defensive
+tilt via a long moving-average filter, monthly-ish rebalance) is not a knife's
+edge that only works at exactly 200 days and exactly monthly — it is a real,
+broad effect across the entire neighbourhood of reasonable filter choices.
+
+### Audit 9 — cost sensitivity: ROBUST
+
+N=12/K=5, base universe, cost swept from half to double the original 6bps
+round-turn assumption (a wide bracket, not a narrow one):
+
+| cost assumption | full Sharpe | full vol-matched CAGR margin vs SPY | stress Sharpe | stress vol-matched CAGR margin vs SPY |
+|---|---|---|---|---|
+| HALF (3bps round-turn) | 0.614 | **+2.12pp** | 0.614 | **+12.82pp** |
+| ORIGINAL (6bps round-turn) | 0.608 | +2.00pp | 0.610 | +12.73pp |
+| DOUBLE (12bps round-turn) | 0.596 | **+1.75pp** | 0.604 | **+12.57pp** |
+
+Doubling the cost assumption moves the full-period Sharpe by only **−0.012**
+and the vol-matched CAGR margin over SPY by only **−0.25 percentage points** —
+the strategy's low turnover (monthly rebalance) means transaction costs were
+never close to the margin of the finding, exactly as the structural hypothesis
+predicted back in section 12. **AUDIT 9 VERDICT: ROBUST — the conclusion
+(beats SPY risk-adjusted, and on vol-matched CAGR) survives even the
+pessimistic cost case, in both windows, by a wide margin.**
+
+### Audit 10 — survivorship, sized rather than left as a generic disclaimer
+
+None of the 27 tickers has ever been delisted, merged, or liquidated — all 27
+trade actively as of 2026. The one identified corporate action is **FXI's 2011
+rename** from "iShares FTSE/Xinhua China 25" to "iShares China Large-Cap ETF"
+— same ticker, same fund, same continuous price series, no data gap, no
+restatement, no effect on this backtest. The original 9 Select Sector SPDRs
+(1998) are the oldest and structurally most stable US sector-ETF family in
+existence; XLRE (2015) and XLC (2018) are new launches following real GICS
+sector splits, correctly excluded from the ranking pool before their real
+launch dates (audit 7), not survivorship-biased inclusions of funds that
+"happened" to survive. The residual bias is **universe selection**, not
+individual-fund survivorship: this backtest cannot include a sector or
+asset-class ETF that was discontinued before 2026 and is unknown to this
+audit. For the specific instrument class tested — large, liquid, well-known
+SPDR/iShares/Vanguard/Invesco funds — closures in this category are rare, but
+no exhaustive historical-closure search was performed. **Sized as small, not
+proven zero.**
+
+### Audit 11 — DSR pool construction, re-verified explicitly
+
+`research/dsr.py::structural_pool()` is built for the timeframe×family grid
+used by the price-pattern strategies elsewhere in this repo; the
+momentum-rotation driver does not call it by name (an N×K grid isn't a
+timeframe×family grid) but builds the same-intent a priori pool manually —
+this batch's own 4 cells, no outcome selection. Re-derived one more time,
+explicitly, from the corrected (post-audit-1) live-window simulation:
+
+**FULL pool:** `[0.595921, 0.581640, 0.577558, 0.607983]` (N6K3, N6K5, N12K3,
+N12K5) — identical to the values audit 1 reported, confirmed not stale.
+**STRESS pool:** `[0.695629, 0.684052, 0.562532, 0.610368]` — also identical.
+DSR values recomputed from these pools match audit 1 to 4 decimal places
+(best full 0.5053, best stress 0.4889). **No discrepancy found.**
+
+### Updated verdict after the second audit
+
+**No new bug was found.** Six additional checks — trial-count honesty, ticker
+inception integrity across all 27 instruments, a filter-design perturbation
+test, a wide cost-sensitivity bracket, a sized survivorship estimate, and an
+explicit DSR pool re-derivation — all came back clean, and the two checks that
+actually stress-test the finding (audits 8 and 9) both came back **ROBUST**,
+not fragile.
+
+**What this thoroughness means, plainly:** the section-12/12.1 finding — a
+monthly-rebalance, SPY-200-SMA-filtered cross-sectional momentum rotation
+beats SPY buy-and-hold on a risk-adjusted (Sharpe) and vol-matched-CAGR basis
+in both the full period and the 2000-2009 stress window — is not a fragile
+artefact of one exact filter length, one exact rebalance cadence, or an
+optimistic cost assumption. It holds across a 150–250 day SMA neighbourhood,
+survives a switch to bi-monthly rebalancing, and survives a 4x cost bracket
+(half to double the assumed round-turn cost) with the CAGR margin over SPY
+barely moving. The universe is free of look-ahead-contaminating pre-inception
+data and free of any identified survivorship distortion for the specific 27
+funds used.
+
+**What this thoroughness does NOT mean:** it does not make the strategy
+DSR-significant — the N/K grid (and every perturbation tested here) clusters
+in the same narrow Sharpe band (roughly 0.52–0.64 full period), so no single
+configuration is a statistical outlier against even its own tiny a priori
+pool, and that is a property of the grid, not something audits 6-11 could
+fix. It does not model leverage financing cost or overnight/gap risk for the
+vol-matched comparison. It does not correct for universe-selection
+survivorship (small, unproven-zero). And it is not evidence that this
+specific 4-cell configuration, rather than the broader class of "monthly
+cross-sectional rotation with a long-SMA defensive filter," is what should be
+deployed — the perturbation test's message is that the MECHANISM is robust,
+not that N=12/K=5/200-day/monthly is a privileged point worth over-trusting
+relative to its neighbours.
+
+**Verdict: still KILL, on DSR alone, and now the most thoroughly-audited
+result in this project's history.** Two independent audits, eleven checks,
+one real bug found and fixed (narrowing, not flipping, the kill), zero
+fragility found in the two mechanism-stress-tests that matter most.
+
+Files: `scripts/audit_momentum_rotation_2.py`. Results:
+`results/momentum_rotation_audit2_inception.csv`,
+`momentum_rotation_audit2_perturbation.csv`,
+`momentum_rotation_audit2_cost_sensitivity.csv`,
+`momentum_rotation_audit2_run.log`. `research/momentum_rotation.py` gained two
+additive optional parameters (`sma_window`, `rebalance_step` on
+`build_weights()`); default values reproduce sections 12/12.1/12.2
+byte-identically. Reproduce: `python scripts/audit_momentum_rotation_2.py`.
+
+Not a new trial batch — audits 6, 7, 10, 11 are verification with no new
+backtest cells, and audits 8-9's perturbation/sensitivity runs are one-shot
+robustness checks explicitly excluded from the DSR pool (same treatment as
+the ORB implementation audit, §10.1-10.3). **Cumulative trial count unchanged:
+N=638.**

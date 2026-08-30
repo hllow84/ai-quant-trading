@@ -65,6 +65,8 @@ def build_weights(
     top_k: int,
     market_filter: bool = True,
     universe: list[str] | None = None,
+    sma_window: int = SMA_WINDOW,
+    rebalance_step: int = 1,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """
     Returns (weights_at_exec, turnover_at_exec):
@@ -75,13 +77,20 @@ def build_weights(
 
     `universe` overrides the module-level UNIVERSE (e.g. the widened universe
     test) -- DEFENSIVE (IEF) must be a member of whatever list is passed.
+    `sma_window` overrides the 200-day market-filter SMA length (audit 8
+    perturbation test -- 150/250 alternatives). `rebalance_step` keeps only
+    every Nth month-end signal date (audit 8 perturbation test -- step=2 gives
+    a bi-monthly rebalance); the N-month trailing-return lookback is unchanged,
+    only the frequency at which a new decision is made.
     """
     uni = universe if universe is not None else UNIVERSE
     daily_index = adjclose.index
     sig_dates = month_end_signal_dates(daily_index)
+    if rebalance_step > 1:
+        sig_dates = sig_dates[::rebalance_step]
 
     spy = adjclose[BENCHMARK]
-    spy_sma200 = spy.rolling(SMA_WINDOW, min_periods=SMA_WINDOW).mean()
+    spy_sma200 = spy.rolling(sma_window, min_periods=sma_window).mean()
 
     rows = []
     exec_dates = []

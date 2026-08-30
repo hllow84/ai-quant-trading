@@ -1,0 +1,147 @@
+==============================================================================
+AUDIT 6 -- HONEST TRIAL COUNT BEHIND THE GRID (from git history + session record)
+==============================================================================
+git log --oneline --all -- research/momentum_rotation.py run_momentum_rotation.py
+scripts/download_momentum_universe.py  ->  only 2 commits exist for this strategy's code:
+  c32cb7f (initial implementation) and a4203d2 (audit 1 fix + widened universe).
+`git show c32cb7f:research/momentum_rotation.py` and `run_momentum_rotation.py` show the FIRST
+committed version ALREADY contains SMA_WINDOW=200, monthly rebalance, and GRID=[(n,k) for n in
+(6,12) for k in (3,5)] -- i.e. the exact parameters as specified verbatim in the user's ORIGINAL
+task prompt that opened this line of work ('N=6 and N=12', 'K=3 and K=5', 'SPY... below its own
+200-day SMA', 'Monthly rebalance'). No other SMA length, rebalance frequency, N, or K value was
+EVER coded, run, or discarded prior to this commit -- there is no other commit, branch, stash, or
+reflog entry touching this file, and no other run_momentum_rotation*.py variant exists in the repo
+before c32cb7f. Within this session's own record, the grid was implemented directly from the task
+instructions and executed once before any result was seen.
+CONCLUSION: the grid was chosen BEFORE any result was seen, with HIGH confidence from git history
+(single commit, parameters match the original prompt exactly) -- but this cannot be proven to
+ABSOLUTE certainty, since a value could in principle have been explored interactively outside any
+saved file and never committed. No evidence of that exists. Stated honestly: HIGH confidence, not
+proof. If such unsaved exploration had occurred, the effective trial count behind the reported
+4-cell pool would be UNDERSTATED and the true DSR would be LOWER (more trials, higher E[max SR],
+a harder bar) -- so any doubt here pushes the verdict further toward the kill, not away from it.
+==============================================================================
+AUDIT 7 -- TICKER INCEPTION INTEGRITY
+==============================================================================
+  SPY    known=1993-01-22  data_first_valid=1993-01-29  gap=  +7d  
+  XLK    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLF    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLE    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLV    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLI    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLY    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLP    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLU    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLB    known=1998-12-16  data_first_valid=1998-12-22  gap=  +6d  
+  XLRE   known=2015-10-07  data_first_valid=2015-10-08  gap=  +1d  
+  XLC    known=2018-06-18  data_first_valid=2018-06-19  gap=  +1d  
+  TLT    known=2002-07-22  data_first_valid=2002-07-30  gap=  +8d  
+  IEF    known=2002-07-22  data_first_valid=2002-07-30  gap=  +8d  
+  GLD    known=2004-11-18  data_first_valid=2004-11-18  gap=  +0d  
+  IWM    known=2000-05-22  data_first_valid=2000-05-26  gap=  +4d  
+  EFA    known=2001-08-14  data_first_valid=2001-08-27  gap= +13d  
+  EEM    known=2003-04-07  data_first_valid=2003-04-14  gap=  +7d  
+  DBC    known=2006-02-03  data_first_valid=2006-02-06  gap=  +3d  
+  USO    known=2006-04-10  data_first_valid=2006-04-10  gap=  +0d  
+  UNG    known=2007-04-18  data_first_valid=2007-04-18  gap=  +0d  
+  SLV    known=2006-04-21  data_first_valid=2006-04-28  gap=  +7d  
+  VGK    known=2005-03-04  data_first_valid=2005-03-10  gap=  +6d  
+  INDA   known=2012-02-02  data_first_valid=2012-02-03  gap=  +1d  
+  FXI    known=2004-10-05  data_first_valid=2004-10-08  gap=  +3d  
+  MTUM   known=2013-04-16  data_first_valid=2013-04-18  gap=  +2d  
+  VTV    known=2004-01-26  data_first_valid=2004-01-30  gap=  +4d  
+  MDY    known=1995-05-04  data_first_valid=1995-05-04  gap=  +0d  
+
+Any ticker with data BEFORE its known inception: False
+Gap range across all 27 tickers: 0 to 13 days (all gaps are >= 0, i.e. data always starts ON OR AFTER the known inception date -- no evidence of backfilled/interpolated/placeholder pre-inception data anywhere).
+Gaps of several days to ~2 weeks (e.g. EFA +13d, VGK +6d, TLT/IEF +8d) reflect the common distinction between a fund's LEGAL inception/registration date and its first TRADING day -- expected, not a red flag, since the direction is always 'data starts later than the fund legally existed', never earlier.
+
+==============================================================================
+AUDIT 8 -- FILTER PERTURBATION TEST (N=12, K=5, base 17-instrument universe)
+==============================================================================
+
+--- ORIGINAL (200d SMA, monthly) (n_rebalances=299, first exec 2000-01-03) ---
+  FULL   : Sharpe 0.608 (SPY 0.511)  CAGR 8.07% (SPY 8.36%)  maxDD 39.03%
+  STRESS : Sharpe 0.610 (SPY 0.067)  CAGR 9.08% (SPY -0.91%)  maxDD 39.03%
+
+--- 150d SMA, monthly (n_rebalances=298, first exec 2000-01-03) ---
+  FULL   : Sharpe 0.639 (SPY 0.511)  CAGR 8.37% (SPY 8.36%)  maxDD 39.78%
+  STRESS : Sharpe 0.573 (SPY 0.067)  CAGR 8.30% (SPY -0.91%)  maxDD 39.78%
+
+--- 250d SMA, monthly (n_rebalances=299, first exec 2000-01-03) ---
+  FULL   : Sharpe 0.599 (SPY 0.511)  CAGR 7.89% (SPY 8.36%)  maxDD 44.10%
+  STRESS : Sharpe 0.523 (SPY 0.067)  CAGR 7.28% (SPY -0.91%)  maxDD 44.10%
+
+--- 200d SMA, BI-MONTHLY rebalance (n_rebalances=150, first exec 2000-02-01) ---
+  FULL   : Sharpe 0.566 (SPY 0.523)  CAGR 7.65% (SPY 8.51%)  maxDD 39.03%
+  STRESS : Sharpe 0.586 (SPY 0.067)  CAGR 8.61% (SPY -0.91%)  maxDD 39.03%
+
+Full-period Sharpe range across all 4 variants: 0.566 - 0.639 (spread 0.073)
+Stress-window Sharpe range across all 4 variants: 0.523 - 0.610 (spread 0.087)
+AUDIT 8 VERDICT: ROBUST
+
+==============================================================================
+AUDIT 9 -- COST SENSITIVITY (N=12, K=5, base universe)
+==============================================================================
+
+--- HALF cost (3bps round-turn) ---
+  FULL   : Sharpe 0.614 (SPY 0.511)  vol-matched CAGR 10.48% (SPY 8.36%)  margin +2.12pp
+  STRESS : Sharpe 0.614 (SPY 0.067)  vol-matched CAGR 11.90% (SPY -0.91%)  margin +12.82pp
+
+--- ORIGINAL cost (6bps round-turn) ---
+  FULL   : Sharpe 0.608 (SPY 0.511)  vol-matched CAGR 10.36% (SPY 8.36%)  margin +2.00pp
+  STRESS : Sharpe 0.610 (SPY 0.067)  vol-matched CAGR 11.82% (SPY -0.91%)  margin +12.73pp
+
+--- DOUBLE cost (12bps round-turn) ---
+  FULL   : Sharpe 0.596 (SPY 0.511)  vol-matched CAGR 10.11% (SPY 8.36%)  margin +1.75pp
+  STRESS : Sharpe 0.604 (SPY 0.067)  vol-matched CAGR 11.66% (SPY -0.91%)  margin +12.57pp
+
+At DOUBLE cost (12bps round-turn), full-period vol-matched CAGR margin over SPY: +1.75pp; stress-window margin: +12.57pp
+AUDIT 9 VERDICT: ROBUST -- conclusion survives even the pessimistic (double) cost case
+
+==============================================================================
+AUDIT 10 -- SURVIVORSHIP, SIZED (see STATE_OF_PLAY section 12.3 for the full written analysis)
+==============================================================================
+Checked (general market knowledge, not a formal corporate-actions database query):
+  - None of the 27 tickers used has EVER been delisted, merged into another fund, or liquidated.
+    All 27 are actively traded as of 2026.
+  - FXI is the one identified NAME change: 'iShares FTSE/Xinhua China 25' -> 'iShares China
+    Large-Cap ETF' (2011) -- SAME ticker, SAME fund, SAME continuous price series. No data gap,
+    no restatement. Does not affect this backtest.
+  - The original 9 Select Sector SPDRs (1998) are structurally the oldest and most stable US
+    sector-ETF family; XLRE (2015) and XLC (2018) were NEW launches following GICS sector splits,
+    correctly excluded from the ranking pool before their real launch dates (see audit 7), not
+    survivorship-biased inclusions.
+  - Residual bias is 'universe selection', not 'individual fund survivorship': this backtest could
+    not include a sector/asset-class ETF that was discontinued before 2026 and is unknown to this
+    audit. For the specific instrument CLASS tested (large, liquid, well-known SPDR/iShares/
+    Vanguard/Invesco funds), closures in this category are rare; no attempt was made to enumerate
+    every historical closure, so this is SIZED as small but not zero, not proven zero.
+
+==============================================================================
+AUDIT 11 -- RE-VERIFY THE DSR POOL CONSTRUCTION (base 17-instrument universe)
+==============================================================================
+research/dsr.py::structural_pool(df, timeframes, families) is designed for the price-pattern
+grid (timeframe x family columns) used elsewhere in this repo. The momentum-rotation driver
+does NOT call structural_pool() by name -- N/K is not a timeframe x family grid -- it builds the
+equivalent a priori pool manually: `np.array([r['net_sharpe'] for r in valid])` over exactly
+this batch's own 4 (N,K) cells, which is the same INTENT (a priori structural cells, no outcome
+selection) implemented directly rather than via the named helper. Stated precisely, not assumed.
+
+Recomputing the exact 4 Sharpe values fed into each pool, from the CORRECTED (post-audit-1,
+live-window) simulation, one more time, explicitly:
+  N=6 K=3: full_live_sharpe=0.595921  stress_sharpe=0.695629
+  N=6 K=5: full_live_sharpe=0.581640  stress_sharpe=0.684052
+  N=12 K=3: full_live_sharpe=0.577558  stress_sharpe=0.562532
+  N=12 K=5: full_live_sharpe=0.607983  stress_sharpe=0.610368
+
+FULL pool array fed to deflated_sharpe(): [0.595921, 0.58164, 0.577558, 0.607983]
+STRESS pool array fed to deflated_sharpe(): [0.695629, 0.684052, 0.562532, 0.610368]
+  FULL   N=6 K=3: sr=0.5959  E[maxSR]=0.6054  DSR=0.4803
+  FULL   N=6 K=5: sr=0.5816  E[maxSR]=0.6054  DSR=0.4508
+  FULL   N=12 K=3: sr=0.5776  E[maxSR]=0.6054  DSR=0.4429
+  FULL   N=12 K=5: sr=0.6080  E[maxSR]=0.6054  DSR=0.5053
+  STRESS N=6 K=3: sr=0.6956  E[maxSR]=0.7044  DSR=0.4889
+  STRESS N=6 K=5: sr=0.6841  E[maxSR]=0.7044  DSR=0.4744
+  STRESS N=12 K=3: sr=0.5625  E[maxSR]=0.7044  DSR=0.3271
+  STRESS N=12 K=5: sr=0.6104  E[maxSR]=0.7044  DSR=0.3833
