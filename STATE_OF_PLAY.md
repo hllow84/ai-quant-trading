@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-30 (cross-sectional momentum rotation tested and killed, §12).** Read this file first in any new session. It is the
+**Last updated: 2026-08-30 (momentum rotation audited §12.1 — bug found and fixed, verdict narrows to DSR-only; widened universe tested §12.2, verdict unchanged).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -94,22 +94,39 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > (Sharpe 0.51-0.54 across all four cells) — a real, robust finding with no
 > single config extreme enough to be statistically distinguishable from a
 > 4-trial null.
+>
+> **SAME-DAY AUDIT (§12.1) FOUND A REAL BUG IN THE ABOVE.** Full-period
+> metrics had been computed over the strategy's entire 1993-2026 data span
+> including 6.4-7.0 years before it could structurally trade (insufficient
+> lookback/SMA history) — those years sit in the return series as exact
+> zeros, which pads volatility and CAGR down. Recomputed on the correct
+> live-only window with SPY sliced identically: **the rotation beats SPY on
+> Sharpe in ALL 4 full-period configs (0.578-0.608 vs SPY's 0.511-0.518),
+> not 0/4 as first reported**, and a vol-matched (levered-to-SPY's-vol)
+> comparison beats SPY's CAGR in all 4 full-period AND all 4 stress-window
+> configs. **The verdict is still KILL — DSR alone remains unclearable
+> (best 0.505 against a 0.95 bar)** — but the reason is narrower and the
+> finding is stronger than first reported. A widened 27-instrument universe
+> (§12.2) changes nothing: still 0/4, DSR is still the only binding gate.
 
 ---
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
 
-**Across 630 systematic backtest configurations, no FTMO-viable edge was found —
+**Across 638 systematic backtest configurations, no FTMO-viable edge was found —
 and no own-capital edge either (§6).** The closest thing to a positive result in
-the whole project is §12: a portfolio-level cross-sectional momentum rotation
-whose cost and concentration profile is clean for the first time, and which
-beats buy-and-hold in the stress window, but still loses to buy-and-hold in
-the full-period benchmark and cannot clear DSR against even its own 4-cell
-pool. §9.4 (a setup whose GROSS edge survives out of regime but cannot pay
-its own transaction costs) is the closest positive result among the
-price-pattern candidates specifically.
+the whole project is §12 (audited in §12.1, widened in §12.2): a portfolio-level
+cross-sectional momentum rotation whose cost and concentration profile is clean
+for the first time, which beats SPY buy-and-hold on a risk-adjusted (Sharpe)
+basis in BOTH the full period and the stress window once a measurement bug in
+the original run is corrected, and whose vol-matched CAGR beats SPY buy-and-hold
+in all 8 tested cells across both windows — but which still cannot clear DSR
+against even its own 4-cell pool, in either the 17-instrument or the widened
+27-instrument universe. §9.4 (a setup whose GROSS edge survives out of regime
+but cannot pay its own transaction costs) is the closest positive result among
+the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=622):
+Trial composition (this is the cumulative DSR trial count, N=638):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -126,8 +143,9 @@ Trial composition (this is the cumulative DSR trial count, N=622):
 | M1 row, 2013-17 out-of-regime | NAS100, US30 | 30 | 0 survive (§11) |
 | ORB moderate-stop variant, both windows (§10.1-10.3) | NAS100, US30 | 24 | 0 survive (§10.2) |
 | ORB trend-filtered variant, both windows (§10.4) | NAS100, US30 | 24 | 0 survive (§10.4) |
-| Cross-sectional momentum rotation, full period + 2000-09 stress (§12) | 17-ETF universe, SPY benchmark | 8 | 0 survive (§12) |
-| **Total** | | **630** | **0 survive** |
+| Cross-sectional momentum rotation, full period + 2000-09 stress (§12) | 17-ETF universe, SPY benchmark | 8 | 0 survive; audited §12.1, DSR is the sole blocking gate |
+| Cross-sectional momentum rotation, widened universe (§12.2) | 27-instrument universe, SPY benchmark | 8 | 0 survive (§12.2) — same DSR ceiling |
+| **Total** | | **638** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -411,7 +429,7 @@ double-counted.
 | **The M1 row, both windows** | **75** | **gross PF < 1.00 in BOTH windows — no edge to lose (§11)** |
 | ORB moderate-stop variant, both windows | 24 | implementation audit — kill confirmed, not fixed (§10.1-10.3) |
 | ORB trend-filtered variant, both windows | 24 | filter fixes neither failure mode — same kill (§10.4) |
-| **Cross-sectional momentum rotation, full + stress** | **8** | **cost & concentration clean, beats B&H in stress, still loses to B&H full-period + fails DSR (§12)** |
+| **Cross-sectional momentum rotation, full + stress + widened universe** | **16** | **cost & concentration clean, beats B&H Sharpe in BOTH windows after an audit bug-fix (§12.1), vol-matched CAGR beats B&H in all 8 cells — still fails DSR alone, widened universe (§12.2) doesn't change it** |
 
 The honest summary is that **price-only technical strategies on gold and equity
 indices have been searched thoroughly and nothing survived.** The one candidate
@@ -1528,3 +1546,274 @@ than re-deriving that from scratch.
 Reproduce: `python scripts/download_momentum_universe.py && python run_momentum_rotation.py`
 
 **Cumulative trials: N=630** (622 prior + 4 full period + 4 stress window).
+
+> ⚠️ **2026-08-30, same day — AUDITED. The "loses to SPY on the full period"
+> finding above was a MEASUREMENT BUG, not a strategy fact — see §12.1. The
+> corrected verdict is still KILL, but for a narrower reason (DSR only), not
+> the reason stated above. Read §12.1 before citing the full-period Sharpe or
+> CAGR numbers in this section.**
+
+---
+
+## 12.1 AUDIT of section 12 — one real bug found, verdict narrows but does not flip
+
+Five checks were run against the §12 code and data, independently, after the
+original run: `scripts/audit_momentum_rotation.py`, full output in
+`results/momentum_rotation_audit_run.log`.
+
+### Audit 2 — risk-free rate consistency: PASS, no issue
+
+`research/metrics.py::sharpe()` is `mean(returns)/std(returns) * sqrt(bars_per_year)`
+— no risk-free subtraction anywhere. `run_momentum_rotation.py` calls this
+**same function** for both the rotation configs and `spy_buy_hold()`. One
+function, two call sites, so both sides are structurally guaranteed to treat
+the risk-free rate identically (zero, on both). No fix needed.
+
+### Audit 3 — total-return correctness: PASS, verified empirically
+
+`scripts/download_momentum_universe.py` pulls every ticker — the ranked
+universe, SPY, **and IEF** — through one loop and one `yf.download(...,
+auto_adjust=True)` call site; there is no branch that treats the benchmark or
+the defensive leg differently. Confirmed empirically, not just by reading the
+code (fresh pull, 2003-01-02 → 2003-05-30, `auto_adjust=True` vs `False`):
+
+| ticker | adj/raw close ratio, 2003-01-02 | adj/raw close ratio, 2003-05-30 |
+|---|---|---|
+| SPY | 0.6515 | 0.6541 |
+| IEF | 0.5030 | 0.5095 |
+
+Both ratios are far from 1.0 and drift toward 1.0 as of 2025 (the adjustment
+factor shrinks as fewer future distributions remain to be backed out) — proof
+that dividend/coupon reinvestment is baked into the adjusted series for
+**both** the equity benchmark and the bond defensive leg, not just the ranked
+universe.
+
+### Audit 4 — survivorship: stated limitation, not fixed
+
+The 17-ETF + SPY universe (and the 27-instrument expanded universe in §12.2)
+consists only of funds that exist and trade today; any sector or asset-class
+ETF that was ever delisted, merged, or never launched is absent by
+construction, and free data cannot correct this. Known, unfixed limitation —
+not fabricated around.
+
+### Audit 5 — general code review: one real bug found
+
+Re-reading `momentum_rotation.py`/`run_momentum_rotation.py` end to end
+surfaced one issue not caught by audits 1-4: **`compute_metrics()` in the
+original driver computed "full period" Sharpe/vol/CAGR over the ENTIRE
+`adjclose` span (1993-01-29 → 2026-08-28, 8,453 daily observations), but no
+config can trade before it has enough lookback history** — `build_weights()`
+correctly refuses to emit a weight row until N months of universe data and
+200 days of SPY history exist, so the **first live rebalance is 1999-07-01
+(N=6) or 2000-01-03 (N=12)**. `simulate()` fills exactly `0.0` return for
+every day before the first execution date (by construction, since
+`weights_daily` is all-zero there) — those days are real rows in the daily
+return series, not NaNs, so `dropna()` does not remove them and they entered
+every full-period statistic.
+
+This pads volatility **down** (6.4-7.0 years of exact-zero return days lower
+the sample variance) and pads CAGR **down** (the same total return gets
+divided by ~33.5 years instead of the ~27 years actually invested) — a
+conservative-direction bug, not a flattering one, but a real one, and it also
+means the original vol-mismatch reported in the section 12 banner note (which
+audit 1 was designed to check) was computed on the wrong window.
+
+No other unverified assumption survived the re-read: the causal execution
+lag, the cost model's turnover computation, the DSR pool construction, and the
+concentration calculation (which is unaffected by this bug — padding
+years contribute exactly `log(1+0)=0` to both the numerator and denominator of
+the top-year-share ratio, changing nothing) were all re-derived and match
+their stated behavior.
+
+### Audit 1 — volatility mismatch, RECOMPUTED on the corrected (live-window) period
+
+`window_metrics()` now computes both the strategy and SPY over the **identical**
+window — `[first_exec_date, panel_end]` per config — instead of SPY's full
+1993-2026 history against the strategy's zero-padded full-history series.
+
+| N | K | live window starts | corrected vol | corrected Sharpe | corrected CAGR | SPY vol (same window) | SPY Sharpe (same window) | SPY CAGR (same window) |
+|---|---|---|---|---|---|---|---|---|
+| 6 | 3 | 1999-07-01 | 15.49% | **0.596** | 8.36% | 19.23% | 0.518 | 8.43% |
+| 6 | 5 | 1999-07-01 | 13.92% | **0.582** | 7.38% | 19.23% | 0.518 | 8.43% |
+| 12 | 3 | 2000-01-03 | 15.82% | **0.578** | 8.20% | 19.27% | 0.511 | 8.36% |
+| 12 | 5 | 2000-01-03 | 14.49% | **0.608** | 8.07% | 19.27% | 0.511 | 8.36% |
+
+**The vol mismatch is real and confirmed** — the strategy runs 19-28% lower
+annualised volatility than SPY over the identical window in every cell, driven
+by the defensive filter, exactly as hypothesised. **And the correction reverses
+the original "loses to SPY" reading on RISK-ADJUSTED terms**: on the properly
+matched window, the rotation's Sharpe (0.578-0.608) **beats** SPY's Sharpe
+(0.511-0.518) in **all 4 configs**, unlevered — this did not hold in the
+original padded computation (0.514-0.541 vs SPY's full-history 0.650).
+Unlevered CAGR is still marginally below SPY's (7.4-8.4% vs 8.4-8.4%) because
+the strategy is running noticeably less risk to get there.
+
+### Vol-matched (constant-leverage) comparison — full period
+
+A single constant leverage multiplier (`SPY_vol / strategy_vol` on that
+config's live-window vol, applied to daily net returns, no re-optimisation)
+was applied to each config:
+
+| N | K | leverage to match SPY vol | vol-matched Sharpe | vol-matched CAGR | vol-matched maxDD | SPY CAGR (same window) | vol-matched CAGR vs SPY |
+|---|---|---|---|---|---|---|---|
+| 6 | 3 | 1.241x | 0.596 | **10.08%** | 40.58% | 8.43% | **BEATS by +1.65pp** |
+| 6 | 5 | 1.381x | 0.582 | **9.78%** | 42.00% | 8.43% | **BEATS by +1.35pp** |
+| 12 | 3 | 1.218x | 0.578 | **9.71%** | 52.00% | 8.36% | **BEATS by +1.35pp** |
+| 12 | 5 | 1.330x | 0.608 | **10.36%** | 49.25% | 8.36% | **BEATS by +2.00pp** |
+
+**Vol-matched CAGR beats SPY buy-and-hold in all 4 configs, full period.**
+Levered maxDD (40.6-52.0%) stays below SPY's own 55.2% in every cell despite
+matching its volatility — a symptom of the defensive filter's non-normal
+return shape (it caps downside participation, so matching *average* vol still
+leaves a smaller max loss). **Financing cost of the leverage and overnight/
+gap risk at 1.2-1.4x are NOT modelled** — the same caveat section 2 raised
+for the old macross basket lead applies here unchanged: this shows the
+volatility-adjusted comparison is fair, not that a 1.2-1.4x levered ETF
+rotation is a deployable product.
+
+### Vol-matched comparison — stress window 2000-2009 (unaffected by the padding bug)
+
+| N | K | raw Sharpe | raw CAGR | leverage | vol-matched Sharpe | vol-matched CAGR | vol-matched maxDD | SPY CAGR |
+|---|---|---|---|---|---|---|---|---|
+| 6 | 3 | 0.696 | 11.45% | 1.263x | 0.696 | **14.08%** | 41.17% | −0.91% |
+| 6 | 5 | 0.684 | 10.05% | 1.437x | 0.684 | **13.87%** | 43.37% | −0.91% |
+| 12 | 3 | 0.563 | 9.00% | 1.226x | 0.563 | **10.63%** | 52.25% | −0.91% |
+| 12 | 5 | 0.610 | 9.08% | 1.362x | 0.610 | **11.82%** | 50.19% | −0.91% |
+
+SPY's own stress-window Sharpe recomputed here is 0.067 / CAGR −0.91% (a small
+restatement from the original run's 0.071 / −0.52%, because the original
+number was also computed on the un-matched 1993-2026-length SPY series sliced
+to the window rather than a window-local recomputation — same bug, opposite
+side, immaterial to any verdict since both were already near-flat). **Vol-matched
+CAGR beats SPY by 10.9 to 15.0 percentage points a year in the stress
+window, in all 4 configs** — a far larger margin than the full-period result,
+because the filter's crash-avoidance is the dominant effect precisely when
+SPY is flat-to-negative.
+
+### DSR, recomputed on the corrected Sharpes — the gate that actually decides this
+
+| window | N | K | corrected Sharpe | DSR (own 4-cell pool) |
+|---|---|---|---|---|
+| full | 6 | 3 | 0.596 | 0.4805 |
+| full | 6 | 5 | 0.582 | 0.4512 |
+| full | 12 | 3 | 0.578 | 0.4429 |
+| full | 12 | 5 | 0.608 | **0.5053** (best) |
+| stress | 6 | 3 | 0.696 | 0.4889 |
+| stress | 6 | 5 | 0.684 | 0.4744 |
+| stress | 12 | 3 | 0.563 | 0.3271 |
+| stress | 12 | 5 | 0.610 | 0.3833 |
+
+Still **0/4 clear 0.95 in either window** — the correction moves every DSR up
+modestly (E[max SR] rose to 0.605 full / 0.704 stress on the corrected,
+tighter Sharpe cluster) but the grid remains too flat for any single cell to
+separate from a 4-trial null.
+
+### Corrected verdict
+
+Re-running the original 5 survival gates with the corrected full-period
+Sharpe:
+
+| gate | original (buggy) | corrected |
+|---|---|---|
+| DSR > 0.95, full | 0/4 | 0/4 (unchanged) |
+| DSR > 0.95, stress | 0/4 | 0/4 (unchanged) |
+| top-year ≤ 60%, full | 4/4 PASS | 4/4 PASS (unaffected by the bug) |
+| **beats SPY Sharpe, full** | **0/4 FAIL** | **4/4 PASS — the bug flipped this gate** |
+| beats SPY Sharpe, stress | 4/4 PASS | 4/4 PASS (unaffected — already inside the live window) |
+| **SURVIVORS** | **0/4** | **0/4 (unchanged)** |
+
+**The verdict does not change — still KILL — but the REASON narrows.** The
+original section 12 said the strategy loses to buy-and-hold in the regime
+that supplies most of the sample; that was an artefact of comparing SPY's true
+33.5-year Sharpe against the rotation's bug-diluted 27-year-diluted-by-6.5-
+zero-years Sharpe. On a fair, identical window, **the rotation beats SPY on a
+risk-adjusted (Sharpe) basis in the full period as well as the stress window,
+and vol-matched CAGR beats SPY in every one of 8 cells across both windows.**
+What kills it is **DSR alone**: the N/K grid is genuinely too flat (Sharpe
+0.578-0.608 full, a 0.03 spread) for any cell to be a statistical outlier
+against even its own tiny 4-trial pool. This is the same reading as the
+original section 12 closing paragraph, now on firmer ground: a real, robust
+finding with no single config extreme enough for DSR to reward it — but now
+demonstrably also a finding that **outperforms indexing** on the metric that
+matters (risk-adjusted return), not one that loses on both counts as first
+reported.
+
+Files: `scripts/audit_momentum_rotation.py`. Results:
+`results/momentum_rotation_audit_full.csv`, `momentum_rotation_audit_stress.csv`,
+`momentum_rotation_audit_run.log`. Reproduce: `python scripts/audit_momentum_rotation.py`.
+
+Not a new trial batch — this is a re-verification and bug-fix of the existing
+8 trials from section 12, run against the same data and same configs.
+Cumulative trial count unchanged by the audit itself: **N=630**.
+
+---
+
+## 12.2 WIDENED UNIVERSE — separate test, run after the audit, does not change the verdict
+
+Per the audit brief, a second and independent question: does adding more
+liquid instrument classes change the result? 10 new tickers were added to the
+17-ETF base universe (27 ranked instruments total, SPY still benchmark-only),
+same causal rebalance logic, same 4-cell grid, same cost model, same
+audit-corrected (live-window) metric methodology from the start.
+
+| category | tickers added | verified inception |
+|---|---|---|
+| commodities | DBC, USO, UNG, SLV | 2006-02, 2006-04, 2007-04, 2006-04 (GLD already in base, 2004-11) |
+| international / country | VGK, INDA, FXI | 2005-03, 2012-02, 2004-10 |
+| factor | MTUM, VTV | 2013-04, 2004-01 |
+| mid-cap breadth | MDY | 1995-05 (IWM small-cap already in base, 2000-05) |
+
+All pulled fresh via `scripts/download_momentum_universe_expanded.py` (same
+`period="max"`, `auto_adjust=True` method as the base pull), real verified
+dates, nothing fabricated or backfilled.
+
+### Full period (live window, expanded universe)
+
+| N | K | live from | Sharpe | SPY Sharpe (same window) | CAGR | SPY CAGR | maxDD | top-year share | beats SPY Sharpe |
+|---|---|---|---|---|---|---|---|---|---|
+| 6 | 3 | 1999-07-01 | 0.479 | 0.518 | 7.32% | 8.43% | 36.37% | 18.5% | **NO** |
+| 6 | 5 | 1999-07-01 | 0.558 | 0.518 | 7.70% | 8.43% | 31.77% | 13.4% | yes |
+| 12 | 3 | 2000-01-03 | 0.537 | 0.511 | 8.65% | 8.36% | 43.71% | 18.6% | yes |
+| 12 | 5 | 2000-01-03 | **0.630** | 0.511 | **9.18%** | 8.36% | 37.50% | 14.0% | yes |
+
+### Stress window 2000-2009 (same 4 configs; most new tickers only partially cover this window, stated above the numbers in the run log — INDA and MTUM are absent entirely, others phase in 2004-2007; only MDY has full coverage)
+
+| N | K | Sharpe | SPY Sharpe | CAGR | SPY CAGR | maxDD | beats SPY Sharpe |
+|---|---|---|---|---|---|---|---|
+| 6 | 3 | 0.710 | 0.067 | 12.49% | −0.91% | 33.86% | yes |
+| 6 | 5 | **0.816** | 0.067 | **13.01%** | −0.91% | 31.77% | yes |
+| 12 | 3 | 0.640 | 0.067 | 11.76% | −0.91% | 43.71% | yes |
+| 12 | 5 | 0.704 | 0.067 | 11.47% | −0.91% | 37.50% | yes |
+
+### DSR and verdict — unchanged from §12.1
+
+| window | best DSR (own 4-cell pool) |
+|---|---|
+| full | 0.5279 (N=12, K=5) |
+| stress | 0.5276 (N=6, K=5) |
+
+**0/4 survive in either window — same DSR ceiling problem as the base
+universe.** 3/4 configs beat SPY on Sharpe full-period (N=6,K=3 is the one
+exception — the widened universe hands it slightly noisier signal, not
+better), and 4/4 beat SPY in the stress window, both consistent with §12.1.
+**Widening the universe does not change the verdict**: DSR remains the sole
+binding gate, and the wider instrument set neither produces a config extreme
+enough to clear it nor changes which gate is doing the killing. This result is
+reported separately from the vol-matching test in §12.1 — the two are
+independent findings and must not be conflated: vol-matching answers "is the
+comparison to SPY fair," universe-widening answers "does more breadth help,"
+and the answers are "yes, and once fair the strategy already wins on Sharpe"
+and "no, breadth doesn't move the needle," respectively.
+
+Files: `scripts/download_momentum_universe_expanded.py`, `research/momentum_rotation.py`
+(gained an optional `universe` parameter, additive, default preserves section
+12 byte-identically), `run_momentum_rotation_expanded.py`. Data:
+`data/momentum_universe_expanded_adjclose.csv`, `data/{DBC,USO,UNG,SLV,VGK,INDA,FXI,MTUM,VTV,MDY}_daily_yfinance.csv`,
+`data/momentum_universe_expanded_report.csv`. Results:
+`results/momentum_rotation_expanded_full.csv`, `momentum_rotation_expanded_stress.csv`,
+`momentum_rotation_expanded_run.log`. Reproduce:
+`python scripts/download_momentum_universe_expanded.py && python run_momentum_rotation_expanded.py`
+
+**Cumulative trials: N=638** (630 prior + 4 full period + 4 stress window,
+expanded-universe grid; this is a genuinely new a priori design choice — a
+different, wider instrument set — not a re-scoring of section 12's 8 trials).

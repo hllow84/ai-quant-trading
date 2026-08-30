@@ -1,0 +1,87 @@
+==============================================================================
+AUDIT 2 -- RISK-FREE RATE CONSISTENCY
+==============================================================================
+research/metrics.py::sharpe(returns, bars_per_year) = mean(returns)/std(returns) * sqrt(bars_per_year)
+No risk-free subtraction anywhere in the formula.
+run_momentum_rotation.py calls the SAME function `sharpe()` for BOTH:
+  - rotation configs: sharpe(net_ret, bars_per_year=BARS_PER_YEAR)   [driver line ~82]
+  - SPY buy-and-hold: sharpe(ret, bars_per_year=BARS_PER_YEAR)       [spy_buy_hold(), line ~122]
+CONSISTENT: both use raw (non-excess) returns, zero risk-free subtraction on both sides.
+No fix needed; if a risk-free-adjusted Sharpe were desired it would need applying to BOTH
+sides identically, which the current code already guarantees structurally (one function, two callers).
+
+==============================================================================
+AUDIT 3 -- TOTAL RETURN CORRECTNESS
+==============================================================================
+scripts/download_momentum_universe.py: ONE loop over UNIVERSE = SECTOR_ETFS + ASSET_ETFS + BENCHMARK
+(BENCHMARK=['SPY'], ASSET_ETFS includes 'IEF'), single yf.download(..., auto_adjust=True) call site,
+`close` column taken post-adjustment for every ticker with no branch -- SPY and IEF go through the
+IDENTICAL code path as the ranked universe. Empirical confirmation (fresh pull, 2003-01 to 2003-06):
+  SPY: adj/raw close ratio 2003-01-02=0.6515, 2003-05-30=0.6541 (ratio != 1 and DRIFTS toward 1 as of 2025 -- proves dividend/distribution reinvestment is baked into the adjusted series for BOTH the equity benchmark and the bond defensive leg).
+  IEF: adj/raw close ratio 2003-01-02=0.5030, 2003-05-30=0.5095 (ratio != 1 and DRIFTS toward 1 as of 2025 -- proves dividend/distribution reinvestment is baked into the adjusted series for BOTH the equity benchmark and the bond defensive leg).
+
+==============================================================================
+AUDIT 4 -- SURVIVORSHIP
+==============================================================================
+The 17-ETF + SPY universe consists only of funds that exist and trade TODAY; any sector/asset-class
+ETF that was ever delisted, merged, or never launched is absent by construction, and free data cannot
+correct this -- stated as a known, unfixed limitation, not fabricated around.
+
+==============================================================================
+AUDIT 1 + BUG FIX -- VOLATILITY MISMATCH, computed on the CORRECT (live-window) period
+==============================================================================
+
+Original SPY full-period (1993-2026, as reported in section 12): vol 18.547%, Sharpe 0.650, CAGR 10.86%, n_obs 8451
+
+--- N=6 K=3 (first live rebalance 1999-07-01) ---
+  ORIGINAL (padded, 1993 start) : vol 13.930%  Sharpe 0.536  CAGR 6.70%  n_obs 8453 (33.5y)
+  CORRECTED (live window)       : vol 15.493%  Sharpe 0.596  CAGR 8.36%  maxDD 33.86%  n_obs 6832 (27.1y)
+  SPY, SAME live window          : vol 19.226%  Sharpe 0.518  CAGR 8.43%  maxDD 55.19%
+  Vol-matched leverage needed     : 1.241x  (strategy vol 15.493% -> SPY's 19.226%)
+  VOL-MATCHED strategy            : vol 19.226%  Sharpe 0.596  CAGR 10.08%  maxDD 40.58%  total_ret 1250.8%
+  SPY total return, same window   : 796.2%
+  VOL-MATCHED CAGR BEATS SPY CAGR on live-window full period (10.08% vs 8.43%)
+
+--- N=6 K=5 (first live rebalance 1999-07-01) ---
+  ORIGINAL (padded, 1993 start) : vol 12.514%  Sharpe 0.523  CAGR 5.93%  n_obs 8453 (33.5y)
+  CORRECTED (live window)       : vol 13.918%  Sharpe 0.582  CAGR 7.38%  maxDD 31.98%  n_obs 6832 (27.1y)
+  SPY, SAME live window          : vol 19.226%  Sharpe 0.518  CAGR 8.43%  maxDD 55.19%
+  Vol-matched leverage needed     : 1.381x  (strategy vol 13.918% -> SPY's 19.226%)
+  VOL-MATCHED strategy            : vol 19.226%  Sharpe 0.582  CAGR 9.78%  maxDD 42.00%  total_ret 1154.3%
+  SPY total return, same window   : 796.2%
+  VOL-MATCHED CAGR BEATS SPY CAGR on live-window full period (9.78% vs 8.43%)
+
+--- N=12 K=3 (first live rebalance 2000-01-03) ---
+  ORIGINAL (padded, 1993 start) : vol 14.088%  Sharpe 0.514  CAGR 6.45%  n_obs 8453 (33.5y)
+  CORRECTED (live window)       : vol 15.818%  Sharpe 0.578  CAGR 8.20%  maxDD 44.57%  n_obs 6704 (26.6y)
+  SPY, SAME live window          : vol 19.270%  Sharpe 0.511  CAGR 8.36%  maxDD 55.19%
+  Vol-matched leverage needed     : 1.218x  (strategy vol 15.818% -> SPY's 19.270%)
+  VOL-MATCHED strategy            : vol 19.270%  Sharpe 0.578  CAGR 9.71%  maxDD 52.00%  total_ret 1077.1%
+  SPY total return, same window   : 746.1%
+  VOL-MATCHED CAGR BEATS SPY CAGR on live-window full period (9.71% vs 8.36%)
+
+--- N=12 K=5 (first live rebalance 2000-01-03) ---
+  ORIGINAL (padded, 1993 start) : vol 12.907%  Sharpe 0.541  CAGR 6.35%  n_obs 8453 (33.5y)
+  CORRECTED (live window)       : vol 14.492%  Sharpe 0.608  CAGR 8.07%  maxDD 39.03%  n_obs 6704 (26.6y)
+  SPY, SAME live window          : vol 19.270%  Sharpe 0.511  CAGR 8.36%  maxDD 55.19%
+  Vol-matched leverage needed     : 1.330x  (strategy vol 14.492% -> SPY's 19.270%)
+  VOL-MATCHED strategy            : vol 19.270%  Sharpe 0.608  CAGR 10.36%  maxDD 49.25%  total_ret 1275.4%
+  SPY total return, same window   : 746.1%
+  VOL-MATCHED CAGR BEATS SPY CAGR on live-window full period (10.36% vs 8.36%)
+
+==============================================================================
+VOL-MATCHED comparison, STRESS WINDOW 2000-01-01 -> 2009-12-31 (unaffected by the padding bug --
+this window sits entirely inside the live-trading period for all 4 configs)
+==============================================================================
+
+SPY stress: vol 22.438%  Sharpe 0.067  CAGR -0.91%  maxDD 55.19%
+
+N=6 K=3: raw vol 17.764% Sharpe 0.696 CAGR 11.45%  |  lev 1.263x -> vol-matched Sharpe 0.696 CAGR 14.08% maxDD 41.17%  BEATS SPY CAGR -0.91%
+
+N=6 K=5: raw vol 15.613% Sharpe 0.684 CAGR 10.05%  |  lev 1.437x -> vol-matched Sharpe 0.684 CAGR 13.87% maxDD 43.37%  BEATS SPY CAGR -0.91%
+
+N=12 K=3: raw vol 18.302% Sharpe 0.563 CAGR 9.00%  |  lev 1.226x -> vol-matched Sharpe 0.563 CAGR 10.63% maxDD 52.25%  BEATS SPY CAGR -0.91%
+
+N=12 K=5: raw vol 16.472% Sharpe 0.610 CAGR 9.08%  |  lev 1.362x -> vol-matched Sharpe 0.610 CAGR 11.82% maxDD 50.19%  BEATS SPY CAGR -0.91%
+
+Saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\momentum_rotation_audit_full.csv, C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\momentum_rotation_audit_stress.csv

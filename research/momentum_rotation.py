@@ -64,14 +64,19 @@ def build_weights(
     n_months: int,
     top_k: int,
     market_filter: bool = True,
+    universe: list[str] | None = None,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """
     Returns (weights_at_exec, turnover_at_exec):
       weights_at_exec  -- DataFrame indexed by EXECUTION date (t+1), columns
-                           = UNIVERSE, target portfolio weights.
+                           = universe (default module UNIVERSE), target weights.
       turnover_at_exec -- Series of one-way turnover (sum |delta weight|) at
                            each execution date, for cost calculation.
+
+    `universe` overrides the module-level UNIVERSE (e.g. the widened universe
+    test) -- DEFENSIVE (IEF) must be a member of whatever list is passed.
     """
+    uni = universe if universe is not None else UNIVERSE
     daily_index = adjclose.index
     sig_dates = month_end_signal_dates(daily_index)
 
@@ -80,7 +85,7 @@ def build_weights(
 
     rows = []
     exec_dates = []
-    prev_w = pd.Series(0.0, index=UNIVERSE)
+    prev_w = pd.Series(0.0, index=uni)
 
     for t in sig_dates:
         # trailing N-month return needs a signal date >= n_months back with data
@@ -94,8 +99,8 @@ def build_weights(
             continue
         t_past = past_candidates[-1]
 
-        px_now = adjclose.loc[t, UNIVERSE]
-        px_past = adjclose.loc[t_past, UNIVERSE]
+        px_now = adjclose.loc[t, uni]
+        px_past = adjclose.loc[t_past, uni]
         valid = px_now.notna() & px_past.notna() & (px_past != 0)
         if valid.sum() < top_k:
             continue
@@ -112,10 +117,10 @@ def build_weights(
                 continue  # not enough SPY history yet to evaluate the filter
             risk_off = spy_close_t < sma_t
 
-        w = pd.Series(0.0, index=UNIVERSE)
+        w = pd.Series(0.0, index=uni)
         if risk_off:
-            w[DEFENSIVE] = 1.0 if DEFENSIVE in UNIVERSE else 0.0
-            # DEFENSIVE (IEF) is in UNIVERSE already; if for some reason price
+            w[DEFENSIVE] = 1.0 if DEFENSIVE in uni else 0.0
+            # DEFENSIVE (IEF) is in `uni` already; if for some reason price
             # missing on this date, skip (park nothing traded, stay in prior wt)
             if pd.isna(adjclose.loc[t, DEFENSIVE]):
                 continue
@@ -131,9 +136,9 @@ def build_weights(
         exec_dates.append(ed)
         prev_w = w
 
-    weights_at_exec = pd.DataFrame(rows, index=pd.DatetimeIndex(exec_dates), columns=UNIVERSE)
+    weights_at_exec = pd.DataFrame(rows, index=pd.DatetimeIndex(exec_dates), columns=uni)
     turnover_at_exec = pd.Series(
-        [float((weights_at_exec.iloc[i] - (weights_at_exec.iloc[i - 1] if i > 0 else pd.Series(0.0, index=UNIVERSE))).abs().sum())
+        [float((weights_at_exec.iloc[i] - (weights_at_exec.iloc[i - 1] if i > 0 else pd.Series(0.0, index=uni))).abs().sum())
          for i in range(len(weights_at_exec))],
         index=weights_at_exec.index,
     )
@@ -145,13 +150,15 @@ def simulate(
     weights_at_exec: pd.DataFrame,
     turnover_at_exec: pd.Series,
     cost_bps_per_side: float = COST_BPS_PER_SIDE,
+    universe: list[str] | None = None,
 ) -> dict[str, pd.Series]:
     """
     Builds gross and net daily portfolio return series over the FULL span of
     adjclose (weights ffilled from first exec date onward; zero return -- flat
     -- before the first exec date).
     """
-    daily_rets = adjclose[UNIVERSE].pct_change()
+    uni = universe if universe is not None else UNIVERSE
+    daily_rets = adjclose[uni].pct_change()
     weights_daily = weights_at_exec.reindex(adjclose.index).ffill().fillna(0.0)
 
     gross_ret = (weights_daily.shift(1) * daily_rets).sum(axis=1)
