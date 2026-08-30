@@ -73,6 +73,21 @@ OR_MINUTES = (15, 30)                 # the two canonical opening ranges
 TARGETS = ("1R", "2R", "close")       # fixed R, or hold to the bell with the stop live
 NO_TARGET_R = 1000.0                  # sentinel for "close": unreachable by construction
 
+# ── AUDIT 4 — the MODERATE, cost-sensible stop ───────────────────────────────
+# The OR-range stop (above) was never chosen for its cost properties: 1R is
+# "whatever the opening range happened to be" that day, which measured out to
+# 32-60 bps of price in regime and 23-41 bps out of regime (see STATE_OF_PLAY
+# section 10), giving cost_R 5.7-9.9% in regime purely as a side effect of
+# geometry, not by design. MODERATE_STOP_BPS is a DELIBERATE, cost-informed
+# choice instead: round-turn cost per ORB trade (real spread + 0.35 bps
+# commission + 2x1.00 bps opening-hour slippage) measures ~2.9-3.6 bps of price
+# across all four in-regime cells (results/orb_scored.csv: cost_R_mean * risk_med_bps).
+# Solving cost_R = cost_bps / R_bps for the middle of the requested 10-15% band
+# (12.5%) at the measured ~3.3 bps average cost gives R_bps = 3.3/0.125 = 26.4,
+# rounded to a stated 25 bps. This is a FIXED price-relative stop (0.25% of the
+# entry price), not a function of the day's opening range.
+MODERATE_STOP_BPS = 25.0
+
 
 def rth_m1(m1_mid: pd.DataFrame) -> pd.DataFrame:
     """M1 mid frame restricted to the RTH cash session, with ET date/minute columns.
@@ -89,6 +104,34 @@ def rth_m1(m1_mid: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+TREND_SMA_LENGTH = 50   # sessions (~10 weeks), the canonical "intermediate trend" length
+
+
+def daily_trend_direction(rth: pd.DataFrame, length: int = TREND_SMA_LENGTH) -> pd.Series:
+    """
+    CAUSAL daily trend direction, +1 (uptrend) / -1 (downtrend) / NaN (insufficient
+    warmup), indexed by et_date.
+
+    Defined entirely from the CASH-SESSION close (the RTH frame's last mid_close
+    per ET date), not the 23-hour CFD close, so the same definition is available
+    on BOTH windows — the in-regime file is 23-hour but the pre-2018 file is
+    RTH-only (13:00-21:00 UTC), and using the cash close for both avoids the
+    window-mismatch caveat run_orb_pre2018.py already documents for buy-and-hold.
+
+    Causality: the value assigned to session D is sign(close_{D-1} - SMA_{length}(
+    closes through D-1)) — an explicit .shift(1) on the (close, SMA) pair BEFORE
+    comparison, so nothing about session D's own price (including its cash close)
+    ever enters the trend value used to gate session D's trade. This is checked,
+    not merely asserted, by the look-ahead guard in the runner (correlation of the
+    gated position series with same/next-bar returns) plus a direct index-alignment
+    assertion in scripts/run_orb_trend.py.
+    """
+    sess_close = rth.groupby("et_date")["mid_close"].last().sort_index()
+    sma = sess_close.rolling(length, min_periods=length).mean()
+    direction = np.sign(sess_close - sma)
+    return direction.shift(1)
+
+
 def opening_ranges(rth: pd.DataFrame, or_minutes: int) -> pd.DataFrame:
     """Per ET session: the opening range high/low and its bar coverage."""
     lo, hi = RTH_OPEN_MIN, RTH_OPEN_MIN + or_minutes
@@ -102,15 +145,23 @@ def opening_ranges(rth: pd.DataFrame, or_minutes: int) -> pd.DataFrame:
     })
 
 
-def orb(m1_mid: pd.DataFrame, params: dict) -> list[dict]:
+def orb(m1_mid: pd.DataFrame, params: dict, trend_dir: pd.Series | None = None) -> list[dict]:
     """
     Generate ORB candidate trades. Each dict is what
     research/ftmo_engine.simulate_trades consumes.
 
-    params: or_minutes in {15, 30}, target in {"1R", "2R", "close"}.
+    params: or_minutes in {15, 30}, target in {"1R", "2R", "close"},
+            stop_mode in {"or_range" (default), "moderate"} — see MODERATE_STOP_BPS.
+    trend_dir: OPTIONAL, output of daily_trend_direction(), indexed by et_date.
+        When given, a long break is taken only if trend_dir[day] == +1 and a
+        short break only if trend_dir[day] == -1; NaN (warmup) or a mismatched
+        sign skips the day entirely (no trade, not a reversed one). When None
+        (the default) no trend gate is applied — reproduces the audited
+        section-10 behaviour byte-identically.
     """
     or_minutes = int(params["or_minutes"])
     target_mode = str(params["target"])
+    stop_mode = str(params.get("stop_mode", "or_range"))
 
     rth = rth_m1(m1_mid)
     if rth.empty:
@@ -153,15 +204,34 @@ def orb(m1_mid: pd.DataFrame, params: dict) -> list[dict]:
         if i_up != -1 and i_dn != -1 and i_up == i_dn:
             continue
         if i_dn == -1 or (i_up != -1 and i_up < i_dn):
-            side, k, entry, stop = "long", i_up, or_hi, or_lo
+            side, k, entry = "long", i_up, or_hi
         else:
-            side, k, entry, stop = "short", i_dn, or_lo, or_hi
+            side, k, entry = "short", i_dn, or_lo
+
+        # TREND FILTER (optional): gate on the CAUSAL direction only, computed
+        # entirely from sessions strictly before this one (daily_trend_direction).
+        # A day whose trend is unknown (warmup) or opposite the break's side is
+        # dropped, not reversed — this is a filter, not a second strategy.
+        if trend_dir is not None:
+            td = trend_dir.get(day, np.nan)
+            if not np.isfinite(td):
+                continue
+            if (side == "long" and td <= 0) or (side == "short" and td >= 0):
+                continue
+
+        # ENTRY (the OR extreme) and the breakout DETECTION above are unchanged
+        # by stop_mode — only the stop distance, and therefore 1R, differs.
+        if stop_mode == "moderate":
+            r_price = MODERATE_STOP_BPS / 1e4 * entry
+        else:
+            r_price = rng
+        stop = entry - r_price if side == "long" else entry + r_price
 
         if target_mode == "close":
             r_mult = NO_TARGET_R
         else:
             r_mult = float(target_mode.rstrip("R"))
-        target = entry + r_mult * rng if side == "long" else entry - r_mult * rng
+        target = entry + r_mult * r_price if side == "long" else entry - r_mult * r_price
 
         out.append({
             "entry_time": idx[k],

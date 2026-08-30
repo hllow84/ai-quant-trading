@@ -1,0 +1,133 @@
+==============================================================================================================
+RE-RUN — 12 original (or_range) + 12 moderate-stop cells, both windows
+==============================================================================================================
+  [in_regime] NAS100 OR=15 tgt=1R    stop=or_range  n=1616 grPF=1.129 netPF=0.953 SR=-0.33 guard=PASS
+  [in_regime] NAS100 OR=15 tgt=1R    stop=moderate  n=1616 grPF=1.094 netPF=0.834 SR=-1.27 guard=PASS
+  [in_regime] NAS100 OR=15 tgt=2R    stop=or_range  n=1616 grPF=1.164 netPF=1.014 SR=+0.09 guard=PASS
+  [in_regime] NAS100 OR=15 tgt=2R    stop=moderate  n=1616 grPF=1.119 netPF=0.914 SR=-0.62 guard=PASS
+  [in_regime] NAS100 OR=15 tgt=close stop=or_range  n=1616 grPF=1.164 netPF=1.019 SR=+0.11 guard=PASS
+  [in_regime] NAS100 OR=15 tgt=close stop=moderate  n=1616 grPF=1.256 netPF=1.059 SR=+0.29 guard=PASS
+  [in_regime] NAS100 OR=30 tgt=1R    stop=or_range  n=1609 grPF=1.164 netPF=1.014 SR=+0.09 guard=PASS
+  [in_regime] NAS100 OR=30 tgt=1R    stop=moderate  n=1609 grPF=1.086 netPF=0.842 SR=-1.20 guard=PASS
+  [in_regime] NAS100 OR=30 tgt=2R    stop=or_range  n=1609 grPF=1.174 netPF=1.039 SR=+0.23 guard=PASS
+  [in_regime] NAS100 OR=30 tgt=2R    stop=moderate  n=1609 grPF=1.146 netPF=0.946 SR=-0.37 guard=PASS
+  [in_regime] NAS100 OR=30 tgt=close stop=or_range  n=1609 grPF=1.172 netPF=1.039 SR=+0.22 guard=PASS
+  [in_regime] NAS100 OR=30 tgt=close stop=moderate  n=1609 grPF=1.239 netPF=1.051 SR=+0.25 guard=PASS
+  [in_regime]   US30 OR=15 tgt=1R    stop=or_range  n=1540 grPF=1.126 netPF=0.907 SR=-0.67 guard=PASS
+  [in_regime]   US30 OR=15 tgt=1R    stop=moderate  n=1540 grPF=1.123 netPF=0.879 SR=-0.90 guard=PASS
+  [in_regime]   US30 OR=15 tgt=2R    stop=or_range  n=1540 grPF=1.139 netPF=0.956 SR=-0.29 guard=PASS
+  [in_regime]   US30 OR=15 tgt=2R    stop=moderate  n=1540 grPF=1.134 netPF=0.936 SR=-0.44 guard=PASS
+  [in_regime]   US30 OR=15 tgt=close stop=or_range  n=1540 grPF=1.142 netPF=0.965 SR=-0.20 guard=PASS
+  [in_regime]   US30 OR=15 tgt=close stop=moderate  n=1540 grPF=1.163 netPF=0.976 SR=-0.12 guard=PASS
+  [in_regime]   US30 OR=30 tgt=1R    stop=or_range  n=1530 grPF=1.100 netPF=0.924 SR=-0.52 guard=PASS
+  [in_regime]   US30 OR=30 tgt=1R    stop=moderate  n=1530 grPF=1.056 netPF=0.840 SR=-1.21 guard=PASS
+  [in_regime]   US30 OR=30 tgt=2R    stop=or_range  n=1530 grPF=1.108 netPF=0.952 SR=-0.30 guard=PASS
+  [in_regime]   US30 OR=30 tgt=2R    stop=moderate  n=1530 grPF=1.100 netPF=0.917 SR=-0.57 guard=PASS
+  [in_regime]   US30 OR=30 tgt=close stop=or_range  n=1530 grPF=1.108 netPF=0.954 SR=-0.26 guard=PASS
+  [in_regime]   US30 OR=30 tgt=close stop=moderate  n=1530 grPF=1.062 netPF=0.898 SR=-0.57 guard=PASS
+  [out_regime] NAS100 OR=15 tgt=1R    stop=or_range  n= 974 grPF=0.891 netPF=0.607 SR=-3.71 guard=PASS
+  [out_regime] NAS100 OR=15 tgt=1R    stop=moderate  n= 974 grPF=0.954 netPF=0.613 SR=-3.67 guard=PASS
+  [out_regime] NAS100 OR=15 tgt=2R    stop=or_range  n= 974 grPF=1.022 netPF=0.750 SR=-2.05 guard=PASS
+  [out_regime] NAS100 OR=15 tgt=2R    stop=moderate  n= 974 grPF=0.988 netPF=0.705 SR=-2.58 guard=PASS
+  [out_regime] NAS100 OR=15 tgt=close stop=or_range  n= 974 grPF=1.064 netPF=0.798 SR=-1.37 guard=PASS
+  [out_regime] NAS100 OR=15 tgt=close stop=moderate  n= 974 grPF=1.072 netPF=0.795 SR=-1.36 guard=PASS
+  [out_regime] NAS100 OR=30 tgt=1R    stop=or_range  n= 970 grPF=0.918 netPF=0.666 SR=-2.90 guard=PASS
+  [out_regime] NAS100 OR=30 tgt=1R    stop=moderate  n= 970 grPF=0.960 netPF=0.627 SR=-3.48 guard=PASS
+  [out_regime] NAS100 OR=30 tgt=2R    stop=or_range  n= 970 grPF=0.965 netPF=0.730 SR=-2.13 guard=PASS
+  [out_regime] NAS100 OR=30 tgt=2R    stop=moderate  n= 970 grPF=1.015 netPF=0.731 SR=-2.29 guard=PASS
+  [out_regime] NAS100 OR=30 tgt=close stop=or_range  n= 970 grPF=0.985 netPF=0.753 SR=-1.70 guard=PASS
+  [out_regime] NAS100 OR=30 tgt=close stop=moderate  n= 970 grPF=1.049 netPF=0.779 SR=-1.50 guard=PASS
+  [out_regime]   US30 OR=15 tgt=1R    stop=or_range  n=1025 grPF=0.924 netPF=0.649 SR=-3.21 guard=PASS
+  [out_regime]   US30 OR=15 tgt=1R    stop=moderate  n=1025 grPF=0.881 netPF=0.648 SR=-3.21 guard=PASS
+  [out_regime]   US30 OR=15 tgt=2R    stop=or_range  n=1025 grPF=0.962 netPF=0.721 SR=-2.33 guard=PASS
+  [out_regime]   US30 OR=15 tgt=2R    stop=moderate  n=1025 grPF=0.913 netPF=0.707 SR=-2.42 guard=PASS
+  [out_regime]   US30 OR=15 tgt=close stop=or_range  n=1025 grPF=0.987 netPF=0.753 SR=-1.72 guard=PASS
+  [out_regime]   US30 OR=15 tgt=close stop=moderate  n=1025 grPF=0.901 netPF=0.708 SR=-2.08 guard=PASS
+  [out_regime]   US30 OR=30 tgt=1R    stop=or_range  n=1016 grPF=0.892 netPF=0.667 SR=-2.88 guard=PASS
+  [out_regime]   US30 OR=30 tgt=1R    stop=moderate  n=1016 grPF=0.970 netPF=0.727 SR=-2.32 guard=PASS
+  [out_regime]   US30 OR=30 tgt=2R    stop=or_range  n=1016 grPF=0.947 netPF=0.733 SR=-2.08 guard=PASS
+  [out_regime]   US30 OR=30 tgt=2R    stop=moderate  n=1016 grPF=0.984 netPF=0.769 SR=-1.79 guard=PASS
+  [out_regime]   US30 OR=30 tgt=close stop=or_range  n=1016 grPF=0.960 netPF=0.751 SR=-1.70 guard=PASS
+  [out_regime]   US30 OR=30 tgt=close stop=moderate  n=1016 grPF=0.994 netPF=0.789 SR=-1.39 guard=PASS
+
+======================================================================================================================================================
+IN REGIME 2018-2025
+======================================================================================================================================================
+    inst  OR target      stop     n   grPF  netPF  Sharpe   DSR  costR%  top% OOS?  B&H?  guard
+  NAS100  15     1R  moderate  1616  1.094  0.834   -1.27  0.00   13.4%   n/a   no  lose   PASS
+  NAS100  15     2R  moderate  1616  1.119  0.914   -0.62  0.00   13.4%   n/a   no  lose   PASS
+  NAS100  15  close  moderate  1616  1.256  1.059   +0.29  0.21   13.4%   87%   no  lose   PASS
+  NAS100  30     1R  moderate  1609  1.086  0.842   -1.20  0.00   12.5%   n/a   no  lose   PASS
+  NAS100  30     2R  moderate  1609  1.146  0.946   -0.37  0.00   12.5%   n/a   no  lose   PASS
+  NAS100  30  close  moderate  1609  1.239  1.051   +0.25  0.18   12.5%  120%  YES  lose   PASS
+    US30  15     1R  moderate  1540  1.123  0.879   -0.90  0.00   11.8%   n/a   no  lose   PASS
+    US30  15     2R  moderate  1540  1.134  0.936   -0.44  0.00   11.8%   n/a   no  lose   PASS
+    US30  15  close  moderate  1540  1.163  0.976   -0.12  0.03   11.8%   n/a   no  lose   PASS
+    US30  30     1R  moderate  1530  1.056  0.840   -1.21  0.00   10.9%   n/a   no  lose   PASS
+    US30  30     2R  moderate  1530  1.100  0.917   -0.57  0.00   10.9%   n/a   no  lose   PASS
+    US30  30  close  moderate  1530  1.062  0.898   -0.57  0.00   10.9%   n/a   no  lose   PASS
+  NAS100  15     1R  or_range  1616  1.129  0.953   -0.33  0.01    7.9%   n/a   no  lose   PASS
+  NAS100  15     2R  or_range  1616  1.164  1.014   +0.09  0.09    7.9%  154%  YES  lose   PASS
+  NAS100  15  close  or_range  1616  1.164  1.019   +0.11  0.09    7.9%  180%   no  lose   PASS
+  NAS100  30     1R  or_range  1609  1.164  1.014   +0.09  0.09    5.7%  193%   no  lose   PASS
+  NAS100  30     2R  or_range  1609  1.174  1.039   +0.23  0.17    5.7%   74%   no  lose   PASS
+  NAS100  30  close  or_range  1609  1.172  1.039   +0.22  0.16    5.7%   79%   no  lose   PASS
+    US30  15     1R  or_range  1540  1.126  0.907   -0.67  0.00    9.9%   n/a   no  lose   PASS
+    US30  15     2R  or_range  1540  1.139  0.956   -0.29  0.01    9.9%   n/a   no  lose   PASS
+    US30  15  close  or_range  1540  1.142  0.965   -0.20  0.02    9.9%   n/a   no  lose   PASS
+    US30  30     1R  or_range  1530  1.100  0.924   -0.52  0.00    7.3%   n/a   no  lose   PASS
+    US30  30     2R  or_range  1530  1.108  0.952   -0.30  0.01    7.3%   n/a   no  lose   PASS
+    US30  30  close  or_range  1530  1.108  0.954   -0.26  0.01    7.3%   n/a   no  lose   PASS
+
+======================================================================================================================================================
+OUT OF REGIME 2013-2017
+======================================================================================================================================================
+    inst  OR target      stop     n   grPF  netPF  Sharpe   DSR  costR%  top% OOS?  B&H?  guard
+  NAS100  15     1R  moderate   974  0.954  0.613   -3.67  0.00   20.9%   n/a   no  lose   PASS
+  NAS100  15     2R  moderate   974  0.988  0.705   -2.58  0.00   20.9%   n/a   no  lose   PASS
+  NAS100  15  close  moderate   974  1.072  0.795   -1.36  0.19   20.9%   n/a   no  lose   PASS
+  NAS100  30     1R  moderate   970  0.960  0.627   -3.48  0.00   19.9%   n/a   no  lose   PASS
+  NAS100  30     2R  moderate   970  1.015  0.731   -2.29  0.00   19.9%   n/a   no  lose   PASS
+  NAS100  30  close  moderate   970  1.049  0.779   -1.50  0.13   19.9%   n/a   no  lose   PASS
+    US30  15     1R  moderate  1025  0.881  0.648   -3.21  0.00   13.6%   n/a   no  lose   PASS
+    US30  15     2R  moderate  1025  0.913  0.707   -2.42  0.00   13.6%   n/a   no  lose   PASS
+    US30  15  close  moderate  1025  0.901  0.708   -2.08  0.01   13.6%   n/a   no  lose   PASS
+    US30  30     1R  moderate  1016  0.970  0.727   -2.32  0.00   12.4%   n/a   no  lose   PASS
+    US30  30     2R  moderate  1016  0.984  0.769   -1.79  0.03   12.4%   n/a   no  lose   PASS
+    US30  30  close  moderate  1016  0.994  0.789   -1.39  0.17   12.4%   n/a   no  lose   PASS
+  NAS100  15     1R  or_range   974  0.891  0.607   -3.71  0.00   17.5%   n/a   no  lose   PASS
+  NAS100  15     2R  or_range   974  1.022  0.750   -2.05  0.01   17.5%   n/a   no  lose   PASS
+  NAS100  15  close  or_range   974  1.064  0.798   -1.37  0.18   17.5%   n/a   no  lose   PASS
+  NAS100  30     1R  or_range   970  0.918  0.666   -2.90  0.00   12.9%   n/a   no  lose   PASS
+  NAS100  30     2R  or_range   970  0.965  0.730   -2.13  0.01   12.9%   n/a   no  lose   PASS
+  NAS100  30  close  or_range   970  0.985  0.753   -1.70  0.08   12.9%   n/a   no  lose   PASS
+    US30  15     1R  or_range  1025  0.924  0.649   -3.21  0.00   16.2%   n/a   no  lose   PASS
+    US30  15     2R  or_range  1025  0.962  0.721   -2.33  0.00   16.2%   n/a   no  lose   PASS
+    US30  15  close  or_range  1025  0.987  0.753   -1.72  0.06   16.2%   n/a   no  lose   PASS
+    US30  30     1R  or_range  1016  0.892  0.667   -2.88  0.00   11.9%   n/a   no  lose   PASS
+    US30  30     2R  or_range  1016  0.947  0.733   -2.08  0.01   11.9%   n/a   no  lose   PASS
+    US30  30  close  or_range  1016  0.960  0.751   -1.70  0.06   11.9%   n/a   no  lose   PASS
+
+======================================================================================================================================================
+OLD vs CORRECTED — side by side
+======================================================================================================================================================
+
+ IN REGIME
+
+  OLD (or_range, original 12 cells): n=12  gross>1=12/12  net>1=5/12  SR>0=5/12  DSR>0.95=0/12  OOSholds=1/12  notConc=0/12  beatsBH=0/12  SURVIVORS=0/12  meanGrPF=1.141  meanSR=-0.153
+
+  NEW (moderate stop, 12 cells): n=12  gross>1=12/12  net>1=2/12  SR>0=2/12  DSR>0.95=0/12  OOSholds=1/12  notConc=0/12  beatsBH=0/12  SURVIVORS=0/12  meanGrPF=1.131  meanSR=-0.561
+
+ OUT OF REGIME
+
+  OLD (or_range, original 12 cells): n=12  gross>1=2/12  net>1=0/12  SR>0=0/12  DSR>0.95=0/12  OOSholds=0/12  notConc=0/12  beatsBH=0/12  SURVIVORS=0/12  meanGrPF=0.960  meanSR=-2.316
+
+  NEW (moderate stop, 12 cells): n=12  gross>1=3/12  net>1=0/12  SR>0=0/12  DSR>0.95=0/12  OOSholds=0/12  notConc=0/12  beatsBH=0/12  SURVIVORS=0/12  meanGrPF=0.973  meanSR=-2.340
+
+======================================================================================================================================================
+DSR pools (structural, this run's own 24 a-priori cells per window)
+======================================================================================================================================================
+  in regime : E[max SR] +0.570 (mu -0.357, sd 0.469), n=24
+  out regime: E[max SR] -0.872 (mu -2.328, sd 0.735), n=24
+
+Saved: results/orb_rerun_in_scored.csv, results/orb_rerun_out_scored.csv

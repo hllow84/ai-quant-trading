@@ -1,0 +1,65 @@
+Loading momentum universe panel ...
+Panel: 8453 rows x 18 cols, 1993-01-29 -> 2026-08-28
+  XLK: data from 1998-12-22
+  XLF: data from 1998-12-22
+  XLE: data from 1998-12-22
+  XLV: data from 1998-12-22
+  XLI: data from 1998-12-22
+  XLY: data from 1998-12-22
+  XLP: data from 1998-12-22
+  XLU: data from 1998-12-22
+  XLB: data from 1998-12-22
+  XLRE: data from 2015-10-08
+  XLC: data from 2018-06-19
+  TLT: data from 2002-07-30
+  GLD: data from 2004-11-18
+  IEF: data from 2002-07-30
+  IWM: data from 2000-05-26
+  EFA: data from 2001-08-27
+  EEM: data from 2003-04-14
+  SPY: data from 1993-01-29
+
+=== FULL PERIOD ===
+
+=== STRESS WINDOW 2000-01-01 -> 2009-12-31 ===
+Tickers with data covering all/part of the stress window:
+  XLK: FULL
+  XLF: FULL
+  XLE: FULL
+  XLV: FULL
+  XLI: FULL
+  XLY: FULL
+  XLP: FULL
+  XLU: FULL
+  XLB: FULL
+  XLRE: NOT AVAILABLE until 2015-10-08 -- absent from stress-window ranking entirely
+  XLC: NOT AVAILABLE until 2018-06-19 -- absent from stress-window ranking entirely
+  TLT: PARTIAL from 2002-07-30
+  GLD: PARTIAL from 2004-11-18
+  IEF: PARTIAL from 2002-07-30
+  IWM: PARTIAL from 2000-05-26
+  EFA: PARTIAL from 2001-08-27
+  EEM: PARTIAL from 2003-04-14
+  SPY: FULL
+
+SPY buy-and-hold FULL: Sharpe 0.650, CAGR 10.86%, maxDD 55.19%, n_obs 8451
+SPY buy-and-hold STRESS: Sharpe 0.071, CAGR -0.52%, maxDD 55.19%, n_obs 2514
+
+=== CONFIG TABLE (4 cells) ===
+ N_months  K_holdings  full_gross_cagr_pct  full_net_cagr_pct  full_gross_sharpe  full_net_sharpe  full_dsr  full_maxDD_pct  full_top_year  full_top_year_share_pct  full_cost_pct_of_gross  full_vs_spy_bh_sharpe  full_beats_spy_bh  look_ahead_guard_pass  stress_gross_sharpe  stress_net_sharpe  stress_dsr  stress_maxDD_pct  stress_net_cagr_pct  stress_top_year_share_pct  stress_vs_spy_bh_sharpe  stress_beats_spy_bh
+        6           3             6.912317           6.704473           0.549645         0.535679  0.486678       33.862284           2013                12.357492                7.070132              -0.114312              False                   True             0.704053           0.695629    0.488938         33.862284            11.452891                  24.773360                 0.624546                 True
+        6           5             6.107763           5.926996           0.536494         0.522845  0.457112       31.982529           2003                13.727528                6.440552              -0.127146              False                   True             0.692648           0.684052    0.474370         31.982529            10.047100                  28.086512                 0.612969                 True
+       12           3             6.618874           6.450681           0.525534         0.514286  0.437516       44.567354           2013                13.442426                5.838156              -0.135705              False                   True             0.568291           0.562532    0.327050         44.567354             9.001713                  32.090484                 0.491449                 True
+       12           5             6.487916           6.345998           0.551737         0.541370  0.499820       39.029389           2013                13.827149                4.979344              -0.108622              False                   True             0.616888           0.610368    0.383238         39.029389             9.084933                  29.688399                 0.539285                 True
+
+=== SURVIVAL GATES ===
+N=6 K=3: {'dsr_gt_0.95': False, 'top_year_le_60pct': True, 'beats_spy_full': False, 'beats_spy_stress': True, 'stress_dsr_gt_0.95': False} -> fails
+N=6 K=5: {'dsr_gt_0.95': False, 'top_year_le_60pct': True, 'beats_spy_full': False, 'beats_spy_stress': True, 'stress_dsr_gt_0.95': False} -> fails
+N=12 K=3: {'dsr_gt_0.95': False, 'top_year_le_60pct': True, 'beats_spy_full': False, 'beats_spy_stress': True, 'stress_dsr_gt_0.95': False} -> fails
+N=12 K=5: {'dsr_gt_0.95': False, 'top_year_le_60pct': True, 'beats_spy_full': False, 'beats_spy_stress': True, 'stress_dsr_gt_0.95': False} -> fails
+
+Survivors: 0/4
+VERDICT: KILL. No config clears the full deflated-Sharpe + concentration + out-of-regime buy-and-hold bar.
+
+Saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\momentum_rotation_configs.csv
+Cumulative trial count: 622 + 8 (4 FULL + 4 STRESS) = 630

@@ -1,0 +1,142 @@
+
+====================================================================================================
+Loading NAS100_2018_2025 ...
+
+  [NAS100_2018_2025 OR15] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1677
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 980/1677 = 58.4%
+    mean (close - level) in direction of breakout: +1.4464 price units = +2.41% of 1R (OR range)
+    median: +1.0435 price units = +1.77% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 697/1677 = 41.6%
+
+  [NAS100_2018_2025 OR30] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1668
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 1003/1668 = 60.1%
+    mean (close - level) in direction of breakout: +1.7962 price units = +1.97% of 1R (OR range)
+    median: +1.1800 price units = +1.66% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 665/1668 = 39.9%
+
+====================================================================================================
+Loading US30_2018_2025 ...
+
+  [US30_2018_2025 OR15] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1595
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 903/1595 = 56.6%
+    mean (close - level) in direction of breakout: +1.4899 price units = +1.64% of 1R (OR range)
+    median: +1.0000 price units = +1.01% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 692/1595 = 43.4%
+
+  [US30_2018_2025 OR30] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1583
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 904/1583 = 57.1%
+    mean (close - level) in direction of breakout: +1.8321 price units = +1.35% of 1R (OR range)
+    median: +1.2660 price units = +1.03% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 679/1583 = 42.9%
+
+====================================================================================================
+Loading NAS100_2013_2017 ...
+
+  [NAS100_2013_2017 OR15] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1009
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 546/1009 = 54.1%
+    mean (close - level) in direction of breakout: +0.2534 price units = +1.69% of 1R (OR range)
+    median: +0.1015 price units = +0.76% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 463/1009 = 45.9%
+
+  [NAS100_2013_2017 OR30] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1005
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 570/1005 = 56.7%
+    mean (close - level) in direction of breakout: +0.3611 price units = +1.56% of 1R (OR range)
+    median: +0.2000 price units = +1.17% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 435/1005 = 43.3%
+
+====================================================================================================
+Loading US30_2013_2017 ...
+
+  [US30_2013_2017 OR15] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1059
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 597/1059 = 56.4%
+    mean (close - level) in direction of breakout: +1.0472 price units = +2.48% of 1R (OR range)
+    median: +0.5775 price units = +1.42% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 462/1059 = 43.6%
+
+  [US30_2013_2017 OR30] AUDIT 1 — intrabar entry vs bar-close of the breakout minute
+    n breakout bars: 1051
+    same-bar CLOSE also clears the level (close-only would fire on the SAME bar): 584/1051 = 55.6%
+    mean (close - level) in direction of breakout: +1.2140 price units = +2.09% of 1R (OR range)
+    median: +0.5665 price units = +1.10% of 1R
+    fraction of breakout bars where close snaps BACK inside the range (close-only would MISS or delay this trade): 467/1051 = 44.4%
+
+
+====================================================================================================
+AUDIT 2 — FIRE RATE TABLE (per instrument/window/OR-minutes/year)
+====================================================================================================
+           label  or_minutes  year  total_days  truncated  or_incomplete  degenerate  no_data_after_or  or_complete_days  no_breakout  tie  traded  fire_rate_of_valid  fire_rate_of_all
+NAS100_2018_2025          15  2018         144          6              0           0                 0               138            0    0     138            1.000000          0.958333
+NAS100_2018_2025          15  2019         160          7              0           0                 0               153            0    0     153            1.000000          0.956250
+NAS100_2018_2025          15  2020         190          7              0           0                 0               183            0    0     183            1.000000          0.963158
+NAS100_2018_2025          15  2021         233          7              0           0                 0               226            0    1     225            0.995575          0.965665
+NAS100_2018_2025          15  2022         257          8              0           0                 0               249            0    0     249            1.000000          0.968872
+NAS100_2018_2025          15  2023         225          7              0           0                 0               218            0    0     218            1.000000          0.968889
+NAS100_2018_2025          15  2024         216         10              0           0                 0               206            0    0     206            1.000000          0.953704
+NAS100_2018_2025          15  2025         254         10              0           0                 0               244            0    0     244            1.000000          0.960630
+NAS100_2018_2025          30  2018         144          6              0           0                 0               138            1    0     137            0.992754          0.951389
+NAS100_2018_2025          30  2019         160          7              0           0                 0               153            1    0     152            0.993464          0.950000
+NAS100_2018_2025          30  2020         190          7              0           0                 0               183            0    0     183            1.000000          0.963158
+NAS100_2018_2025          30  2021         233          7              0           0                 0               226            1    1     224            0.991150          0.961373
+NAS100_2018_2025          30  2022         257          8              0           0                 0               249            1    0     248            0.995984          0.964981
+NAS100_2018_2025          30  2023         225          7              0           0                 0               218            2    0     216            0.990826          0.960000
+NAS100_2018_2025          30  2024         216         10              0           0                 0               206            0    0     206            1.000000          0.953704
+NAS100_2018_2025          30  2025         254         10              1           0                 0               243            0    0     243            1.000000          0.956693
+  US30_2018_2025          15  2018         197          8              2           0                 0               187            0    0     187            1.000000          0.949239
+  US30_2018_2025          15  2019         202          8              0           0                 0               194            0    0     194            1.000000          0.960396
+  US30_2018_2025          15  2020         166          5              3           0                 0               158            0    0     158            1.000000          0.951807
+  US30_2018_2025          15  2021         136          3              0           0                 0               133            0    0     133            1.000000          0.977941
+  US30_2018_2025          15  2022         155          4              0           0                 0               151            0    0     151            1.000000          0.974194
+  US30_2018_2025          15  2023         232          7              0           0                 0               225            2    0     223            0.991111          0.961207
+  US30_2018_2025          15  2024         259         10              0           0                 0               249            0    0     249            1.000000          0.961390
+  US30_2018_2025          15  2025         257         10              1           0                 0               246            1    0     245            0.995935          0.953307
+  US30_2018_2025          30  2018         197          8              2           0                 0               187            0    0     187            1.000000          0.949239
+  US30_2018_2025          30  2019         202          8              0           0                 0               194            1    0     193            0.994845          0.955446
+  US30_2018_2025          30  2020         166          5              3           0                 0               158            0    0     158            1.000000          0.951807
+  US30_2018_2025          30  2021         136          3              0           0                 0               133            1    0     132            0.992481          0.970588
+  US30_2018_2025          30  2022         155          4              0           0                 0               151            1    0     150            0.993377          0.967742
+  US30_2018_2025          30  2023         232          7              0           0                 0               225            3    0     222            0.986667          0.956897
+  US30_2018_2025          30  2024         259         10              0           0                 0               249            4    0     245            0.983936          0.945946
+  US30_2018_2025          30  2025         257         10              1           0                 0               246            3    0     243            0.987805          0.945525
+NAS100_2013_2017          15  2013          61         15              3           0                 0                43            0    0      43            1.000000          0.704918
+NAS100_2013_2017          15  2014         256         12              1           0                 0               243            0    0     243            1.000000          0.949219
+NAS100_2013_2017          15  2015         237          7              2           0                 0               228            0    0     228            1.000000          0.962025
+NAS100_2013_2017          15  2016         235          7              0           0                 0               228            0    0     228            1.000000          0.970213
+NAS100_2013_2017          15  2017         240          8              0           0                 0               232            0    0     232            1.000000          0.966667
+NAS100_2013_2017          30  2013          61         15              2           0                 0                44            1    0      43            0.977273          0.704918
+NAS100_2013_2017          30  2014         256         12              1           0                 0               243            2    0     241            0.991770          0.941406
+NAS100_2013_2017          30  2015         237          7              2           0                 0               228            0    0     228            1.000000          0.962025
+NAS100_2013_2017          30  2016         235          7              0           0                 0               228            2    0     226            0.991228          0.961702
+NAS100_2013_2017          30  2017         240          8              0           0                 0               232            0    0     232            1.000000          0.966667
+  US30_2013_2017          15  2013          61          9              7           0                 0                45            2    0      43            0.955556          0.704918
+  US30_2013_2017          15  2014         253         12              1           0                 0               240            1    0     239            0.995833          0.944664
+  US30_2013_2017          15  2015         255          8              1           0                 0               246            0    0     246            1.000000          0.964706
+  US30_2013_2017          15  2016         256          7              0           0                 0               249            0    0     249            1.000000          0.972656
+  US30_2013_2017          15  2017         257          8              0           0                 0               249            1    0     248            0.995984          0.964981
+  US30_2013_2017          30  2013          61          9              7           0                 0                45            2    0      43            0.955556          0.704918
+  US30_2013_2017          30  2014         253         12              1           0                 0               240            6    0     234            0.975000          0.924901
+  US30_2013_2017          30  2015         255          8              1           0                 0               246            2    0     244            0.991870          0.956863
+  US30_2013_2017          30  2016         256          7              0           0                 0               249            0    0     249            1.000000          0.972656
+  US30_2013_2017          30  2017         257          8              0           0                 0               249            3    0     246            0.987952          0.957198
+
+
+====================================================================================================
+AUDIT 2 — POOLED (all years) per instrument/window/OR
+====================================================================================================
+           label  or_minutes  total_days  truncated  or_incomplete  degenerate  no_data_after_or  or_complete_days  no_breakout  tie  traded  fire_rate_of_valid  fire_rate_of_all
+NAS100_2013_2017          15        1029         49              6           0                 0               974            0    0     974            1.000000          0.946550
+NAS100_2013_2017          30        1029         49              5           0                 0               975            5    0     970            0.994872          0.942663
+NAS100_2018_2025          15        1679         62              0           0                 0              1617            0    1    1616            0.999382          0.962478
+NAS100_2018_2025          30        1679         62              1           0                 0              1616            6    1    1609            0.995668          0.958309
+  US30_2013_2017          15        1082         44              9           0                 0              1029            4    0    1025            0.996113          0.947320
+  US30_2013_2017          30        1082         44              9           0                 0              1029           13    0    1016            0.987366          0.939002
+  US30_2018_2025          15        1604         55              6           0                 0              1543            3    0    1540            0.998056          0.960100
+  US30_2018_2025          30        1604         55              6           0                 0              1543           13    0    1530            0.991575          0.953865
+
+Saved -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\audit_orb_fire_rate.csv

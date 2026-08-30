@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-27 (the M1 row of the timeframe sweep run and killed, §11).** Read this file first in any new session. It is the
+**Last updated: 2026-08-30 (cross-sectional momentum rotation tested and killed, §12).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -58,16 +58,58 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > not intrinsically more cost-punished than M5; trading M1 across the 23-hour tape
 > is. Neither finding rescues anything, and **0/45 configs survive.**
 
+> **2026-08-29/30 — ORB'S KILL SURVIVES AN IMPLEMENTATION AUDIT AND A
+> TREND-FILTERED VARIANT (§10.1-10.4).** Two follow-on tests, neither changes
+> the §10 verdict. **(1) Implementation audit:** checked whether the kill
+> reflected a real absence of edge or a conservative bug — entry timing was
+> already intrabar (not close-confirmed), the fire rate was 93.9-100% (no
+> hidden filter), the stop-first tie rule affected **zero** of 30,840 trades,
+> and a deliberately-designed cost-sane MODERATE stop (25 bps fixed, replacing
+> the OR-width geometry) made the in-regime numbers **worse**, not better
+> (net PF>1 5/12→2/12). **(2) Trend filter:** gating breaks to only trade with
+> a causal 50-session daily trend fixed **neither** failure mode that killed
+> the plain version — out-of-regime gross PF stays under 1.00 on average
+> (0.960→0.979), and single-year concentration gets two cells **worse** (top
+> year ≥100% of net R, up from none) because a direction filter concentrates
+> INTO trending years rather than spreading P&L. **0/48 cells survive across
+> both follow-on batches.** No code-level or filter-based reason remains to
+> doubt the §10 kill.
+
+> **2026-08-30 — CROSS-SECTIONAL MOMENTUM ROTATION TESTED, KILLED, BUT
+> STRUCTURALLY DIFFERENT FROM EVERYTHING ABOVE (§12).** A portfolio-level,
+> monthly-rebalance sector/asset-class rotation (rank 17 ETFs by trailing
+> 6/12-month return, hold top 3/5, market-timed to cash via SPY's 200-day
+> SMA) was tested on fresh yfinance daily data — the first non-price-pattern
+> structure and the first new data source in this project since the crypto
+> factor studies. **Two gates PASS for the first time ever:** cost is a
+> genuine non-issue (5-7% of gross return, confirming the a priori hypothesis
+> that monthly turnover is a different cost regime from every intraday
+> family), and single-year P&L concentration is **0/4 triggered** — the
+> first candidate in this project whose profit is not carried by one year.
+> It also **beats SPY buy-and-hold 4/4 in the 2000-2009 stress window**
+> (Sharpe 0.56-0.70 vs SPY's 0.071) while every prior candidate lost to
+> buy-and-hold in its stress window. **Still killed:** it loses to SPY
+> buy-and-hold in the full 1998-2026 period (0/4), and DSR cannot clear 0.95
+> even against its own 4-cell pool because the N/K grid is nearly flat
+> (Sharpe 0.51-0.54 across all four cells) — a real, robust finding with no
+> single config extreme enough to be statistically distinguishable from a
+> 4-trial null.
+
 ---
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
 
-**Across 574 systematic backtest configurations, no FTMO-viable edge was found —
+**Across 630 systematic backtest configurations, no FTMO-viable edge was found —
 and no own-capital edge either (§6).** The closest thing to a positive result in
-the whole project is §9.4: a setup whose GROSS edge survives out of regime but
-cannot pay its own transaction costs.
+the whole project is §12: a portfolio-level cross-sectional momentum rotation
+whose cost and concentration profile is clean for the first time, and which
+beats buy-and-hold in the stress window, but still loses to buy-and-hold in
+the full-period benchmark and cannot clear DSR against even its own 4-cell
+pool. §9.4 (a setup whose GROSS edge survives out of regime but cannot pay
+its own transaction costs) is the closest positive result among the
+price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=574):
+Trial composition (this is the cumulative DSR trial count, N=622):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -82,7 +124,17 @@ Trial composition (this is the cumulative DSR trial count, N=574):
 | ORB @ US cash open 2013-17 out-of-regime | NAS100, US30 | 12 | 0 survive (§10) |
 | M1 row, in regime (5 fam × 3 var × 3) | XAUUSD, NAS100, US30 | 45 | 0 survive (§11) |
 | M1 row, 2013-17 out-of-regime | NAS100, US30 | 30 | 0 survive (§11) |
-| **Total** | | **574** | **0 survive** |
+| ORB moderate-stop variant, both windows (§10.1-10.3) | NAS100, US30 | 24 | 0 survive (§10.2) |
+| ORB trend-filtered variant, both windows (§10.4) | NAS100, US30 | 24 | 0 survive (§10.4) |
+| Cross-sectional momentum rotation, full period + 2000-09 stress (§12) | 17-ETF universe, SPY benchmark | 8 | 0 survive (§12) |
+| **Total** | | **630** | **0 survive** |
+
+**Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
+2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
+— and should have been added to this table and to `run_orb.py`'s `PRIOR_TRIALS`
+at the time. It was not; this table now includes it retroactively (574 → 598 →
+622 with the trend-filter batch below). No verdict changes: both added batches
+scored 0/24 and 0/24 survivors.
 
 The 30 RTH-matched control cells in §11 are a **re-scoring** of the already-counted
 2018-2025 M1 grid on a data subset, not new trials, and are excluded from the total
@@ -357,6 +409,9 @@ double-counted.
 | 15-min Sneaky Pivot, both windows | 40 | gross edge survives, cannot pay its costs (§9.4) |
 | **ORB @ the US cash open, both windows** | **24** | **gross edge INVERTS out of regime (§10)** |
 | **The M1 row, both windows** | **75** | **gross PF < 1.00 in BOTH windows — no edge to lose (§11)** |
+| ORB moderate-stop variant, both windows | 24 | implementation audit — kill confirmed, not fixed (§10.1-10.3) |
+| ORB trend-filtered variant, both windows | 24 | filter fixes neither failure mode — same kill (§10.4) |
+| **Cross-sectional momentum rotation, full + stress** | **8** | **cost & concentration clean, beats B&H in stress, still loses to B&H full-period + fails DSR (§12)** |
 
 The honest summary is that **price-only technical strategies on gold and equity
 indices have been searched thoroughly and nothing survived.** The one candidate
@@ -881,6 +936,193 @@ ask side.
 
 **Cumulative trials: N=499** (475 prior + 12 in regime + 12 out of regime).
 
+### 10.1 IMPLEMENTATION AUDIT (2026-08-29/30) — the kill is real, not an artefact of the code
+
+Five audits were run against the ORB implementation to check whether the kill in
+§10 reflects a real absence of edge or an overly conservative translation into
+code. **Verdict: the implementation is sound. The kill holds.** None of the four
+things checked changed the verdict; the fifth (a deliberately re-designed stop)
+made the in-regime result *worse*, not better.
+
+1. **Entry timing — already intrabar, not close-confirmed.** `strategies/orb.py`
+   fires the instant a bar's `mid_high`/`mid_low` touches the OR level (a resting
+   stop order), not on bar close — exactly what a live trader watching the tape
+   would get. Measured on all 4 datasets x 2 OR windows (5,933 breakout bars): if
+   the code had instead required CLOSE-beyond-level confirmation, **41.6-45.9% of
+   real breakout bars would have been missed or delayed** (price closes back
+   inside the range in the same minute). The current code is the *less*
+   conservative, more realistic choice, not the reverse — there was no slippage
+   to quantify because the assumption audited for was never made.
+2. **Fire rate — clean, no filtered-out-setup problem.** Per instrument/year/OR,
+   fire rate against valid (complete, non-degenerate) opening ranges is
+   **93.9-100%**, far above the 85-90% sanity bar, in both windows
+   (`scripts/audit_orb.py`, `results/audit_orb_fire_rate.csv`). Days lost to
+   filters are negligible and stated separately from "no breakout": truncated
+   sessions 44-62/window (data-completeness, not a strategy filter),
+   OR-incomplete 0-9, degenerate range 0, same-minute entry ties 0-13. True
+   no-breakout (inside) days are 0-13 per instrument/window — ORB's core premise
+   (price usually clears the OR somewhere in a 6.5-hour session) holds
+   empirically; there is no hidden filter suppressing trades.
+3. **Stop-first tie rule — provably inert on this data.** Re-resolving all 12
+   configs x 2 windows (30,840 total trades) under the OPPOSITE convention
+   (target-first) changed **zero** trades — `n_true_ties = 0` in every one of 24
+   cells (`scripts/audit_orb_tiebreak.py`, `results/audit_orb_tiebreak.csv`). At
+   M1 resolution the OR range (32-60 bps in regime) is always far larger than a
+   single minute's high-low range, so stop and target are never hit in the same
+   bar. The conservative assumption costs nothing because the situation it
+   guards against never occurs.
+4. **The OR-width stop was never cost-informed — confirmed, and tested against a
+   deliberate alternative.** It was geometry, not design: 1R is "whatever the
+   opening range happened to be," which is exactly what the code comment already
+   said. A new MODERATE stop was added (`strategies/orb.py` `MODERATE_STOP_BPS =
+   25`, `stop_mode='moderate'`): a FIXED 25 bps of entry price, solved from the
+   batch's own measured round-turn cost (~2.9-3.6 bps) to land cost_R at the
+   middle of a stated 10-15% target band (25 bps -> ~11-13% cost_R, measured
+   10.9-13.4% in regime). This is the ONE new variant the audit called for,
+   tested at the same 2x2x3 breadth (12 more cells, both windows) as the
+   original grid, entry/breakout-detection logic unchanged.
+
+### 10.2 RE-RUN — same 12 original cells + 12 moderate-stop cells, both windows, same gates
+
+`scripts/run_orb_rerun.py`. Nothing about `orb()`'s DEFAULT behaviour changed
+(`stop_mode` defaults to `'or_range'`), so `results/orb.csv` /
+`orb_pre2018.csv` are unaffected and reproduce byte-identically.
+
+| | IN REGIME — OLD (or_range) | IN REGIME — NEW (moderate) | OUT OF REGIME — OLD | OUT OF REGIME — NEW |
+|---|---|---|---|---|
+| gross PF > 1 | 12/12 | 12/12 | 2/12 | 3/12 |
+| net PF > 1 | 5/12 | **2/12** | 0/12 | 0/12 |
+| positive Sharpe | 5/12 | **2/12** | 0/12 | 0/12 |
+| DSR > 0.95 | 0/12 | 0/12 | 0/12 | 0/12 |
+| OOS holds | 1/12 | 1/12 | 0/12 | 0/12 |
+| not year-concentrated | 0/12 | 0/12 | 0/12 | 0/12 |
+| beats buy-and-hold | 0/12 | 0/12 | 0/12 | 0/12 |
+| **SURVIVORS** | **0/12** | **0/12** | **0/12** | **0/12** |
+| mean gross PF | 1.141 | 1.131 | 0.960 | 0.973 |
+| mean net Sharpe | −0.153 | **−0.561** | −2.316 | −2.340 |
+
+DSR structural pool (this run's own 24 a-priori cells): in regime E[max SR]
+**+0.570**, out of regime E[max SR] **−0.872** (n=24 each).
+
+**The corrections do not change the verdict — and the one substantive change
+(the moderate stop) makes the in-regime picture WORSE, not better**: net PF>1
+and positive Sharpe both fall from 5/12 to 2/12, and mean net Sharpe drops from
+−0.153 to −0.561. The tighter, cost-calibrated stop trades more often into the
+same fixed round-turn cost per trade at a *smaller* R, which is the vice from
+§1 stated the other way round — a stop chosen to keep cost_R in a "sane" 10-15%
+band is still a stop that lets a fixed cost eat a larger share of a smaller R
+than the geometric OR width did (which was already cheaper, at 5.7-9.9%). Out
+of regime both variants stay dead on every gate. **0/48 cells survive across
+old + new, both windows.**
+
+### 10.3 Plain verdict
+
+**ORB's kill in §10 reflects a real absence of edge, not a flawed or overly
+conservative implementation.** Every audited assumption was checked against the
+data and either (a) was already the realistic, non-conservative choice (entry
+timing), (b) provably never bound (the stop-first tie rule, the fire-rate
+filters), or (c) was replaced with a deliberately different, cost-motivated
+design and made no cell survive — indeed made the in-regime numbers worse. There
+is no code-level reason left to doubt the kill.
+
+### Files
+
+| file | what it is |
+|---|---|
+| `scripts/audit_orb.py` | AUDIT 1 (intrabar vs close) + AUDIT 2 (fire-rate table), all 4 datasets |
+| `scripts/audit_orb_tiebreak.py` | AUDIT 3 (stop-first vs target-first tie sensitivity) |
+| `scripts/run_orb_rerun.py` | AUDIT 4 re-run — 12 original + 12 moderate-stop cells, both windows |
+| `results/audit_orb_fire_rate.csv`, `audit_orb_tiebreak.csv` | AUDIT 2/3 evidence |
+| `results/orb_rerun_in_scored.csv`, `orb_rerun_out_scored.csv` | AUDIT 4 re-run evidence |
+
+### 10.4 TREND-FILTERED VARIANT (tested 2026-08-30) — killed the same way, for the same two reasons
+
+**Question:** does gating ORB to trend-aligned breaks only (long breaks taken
+only above a causal daily trend average, short only below) survive where the
+plain version died? The plain kill was driven by two specific failures — (a)
+out-of-regime gross PF reversal, (b) single-year P&L concentration — and a
+direction-only filter has no mechanism to fix either on its own. This was
+tested empirically rather than assumed.
+
+**Filter, stated and causal.** Daily 50-session SMA (`strategies/orb.py`
+`daily_trend_direction()`, `TREND_SMA_LENGTH=50`, ~10 weeks, the canonical
+"intermediate trend" length — not fitted) of the **cash-session close** (not the
+23-hour CFD close, so the same definition applies identically on both windows —
+the pre-2018 file is RTH-only). Long breaks require the PRIOR session's close
+above its own (also prior-only) SMA; short breaks require below. The value used
+for session D is built with an explicit `.shift(1)`, so nothing from D itself
+can leak in. Checked two ways, not just asserted: the existing statistical
+look-ahead guard (run on the filtered position series, 24/24 PASS) plus a direct
+`assert_causal()` re-derivation in `scripts/run_orb_trend.py` that recomputes the
+UNSHIFTED sign(close−SMA) from the prior session alone for every surviving
+candidate and confirms it matches. Breakout detection, entry, target, and
+`stop_mode='or_range'` (the audited default, not the §10.1 moderate stop) are
+byte-identical to §10 — the filter only removes candidates, it never re-prices
+or re-times a surviving one.
+
+**Grid.** Same 12 cells as §10 (2 instruments × 2 OR × 3 targets), both windows,
+run alongside a same-run recompute of the 12 unfiltered cells for a clean
+side-by-side (`scripts/run_orb_trend.py`; the unfiltered recompute matches
+`results/orb.csv` / `orb_pre2018.csv`).
+
+**What the filter actually did.** It is a real, substantial filter, not a
+token gate: it removed roughly **half** the trades in regime (787-800 of
+1,530-1,616, i.e. NAS100 OR15 1616→816, US30 OR30 1530→754) and **~49-51%**
+out of regime (472-529 of 970-1,025). Removed-vs-kept win rate and mean net R
+are close and sign-mixed across cells — e.g. NAS100 OR15 1R in regime: removed
+win rate 52.2% vs kept 52.7%, removed mean net R −0.0257 vs kept −0.0192; US30
+OR15 close in regime: removed mean net R **+0.0295** (removed trades were
+better) vs kept **−0.0751**. **The filter is not disproportionately removing
+losers** — full table in `results/orb_trend_run.log` and both
+`orb_trend_*_scored.csv` files.
+
+| gate | IN REGIME unfiltered | IN REGIME trend-filtered | OUT OF REGIME unfiltered | OUT OF REGIME trend-filtered |
+|---|---|---|---|---|
+| gross PF > 1 | 12/12 | 12/12 | 2/12 | **5/12** |
+| net PF > 1 | 5/12 | 4/12 | 0/12 | 0/12 |
+| positive Sharpe | 5/12 | 4/12 | 0/12 | 0/12 |
+| DSR > 0.95 | 0/12 | 0/12 | 0/12 | 0/12 |
+| OOS holds | 1/12 | 2/12 | 0/12 | 0/12 |
+| top-year ≤ 60% | 0/12 | 1/12 | 0/12 | 0/12 |
+| top-year ≥ 100% (extreme) | — | 2/12 | — | 0/12 |
+| beats buy-and-hold | 0/12 | 0/12 | 0/12 | 0/12 |
+| **SURVIVORS** | **0/12** | **0/12** | **0/12** | **0/12** |
+| mean gross PF | 1.141 | 1.132 | 0.960 | 0.979 |
+| mean net Sharpe | −0.153 | −0.149 | −2.316 | −1.614 |
+
+DSR structural pool = this batch's own 12 a priori cells: in regime E[max SR]
+**+0.314** (mu −0.149, sd 0.278); out of regime E[max SR] **−0.730** (mu −1.614,
+sd 0.531).
+
+**Verdict — plain kill, and for the predicted reasons.** The trend filter fixes
+**neither** of the two failures that killed the plain version:
+
+1. **Out-of-regime gross PF is still broken.** It nudges up (mean 0.960 → 0.979,
+   gross-positive cells 2/12 → 5/12) but stays under 1.00 on average and every
+   net gate stays at 0/12 — net PF, positive Sharpe, OOS holds, beats-B&H all
+   0/12, identical to the unfiltered result. A direction filter cannot manufacture
+   an edge in price action that was not there pre-2018, and it did not.
+2. **Single-year concentration is not fixed — it gets locally better and locally
+   worse.** In regime `not_concentrated` improves from 0/12 to 1/12 (still fails
+   11/12), but two cells now show EXTREME concentration (top year ≥ 100% of net
+   R: NAS100 OR30 1R at 256%, NAS100 OR30 2R at 103%) that were not extreme
+   before — consistent with the predicted mechanism: a trend filter concentrates
+   exposure INTO trending years, it does not spread P&L more evenly.
+
+Both predicted failure modes hold exactly as stated before the test ran. **This
+is a valid, clean kill** — no config was crowned for a net-PF tick when it still
+failed concentration or the out-of-regime gate. **0/24 trend-filtered cells
+survive across both windows.**
+
+### Files (10.4)
+
+| file | what it is |
+|---|---|
+| `strategies/orb.py` | `daily_trend_direction()` + `orb(..., trend_dir=...)` — the filter, additive, default `None` reproduces §10 byte-identically |
+| `scripts/run_orb_trend.py` | the trend-filtered runner, both windows, filter-impact analysis, `assert_causal()` |
+| `results/orb_trend_in_regime_scored.csv`, `orb_trend_out_regime_scored.csv` | filtered results |
+| `results/orb_trend_*_unfiltered_reference.csv` | same-run unfiltered recompute, for the side-by-side |
+| `results/orb_trend_run.log` | full run log incl. the removed-vs-kept trade table |
 
 ---
 
@@ -1114,3 +1356,175 @@ zero-spread bars at 0.01% of a file rather than ignoring them.
 
 **Cumulative trials: N=574** (499 prior + 45 in regime + 30 out of regime; the 30
 RTH-matched control cells are a re-scoring, not new trials).
+
+---
+
+## 12. CROSS-SECTIONAL MOMENTUM ROTATION — tested 2026-08-30, killed but structurally different
+
+### Why this got a clean test after §1-§11 killed everything else
+
+Sections 1-11 all tested **price-pattern strategies on a single instrument at a
+time**: an intraday signal (breakout, reversal, MA cross) applied to gold or one
+or two equity index CFDs, at timeframes from M1 to D1. This is a different
+species entirely — **portfolio-level**, **monthly rebalance** (not intraday),
+and it **ranks many instruments against each other** rather than reading one
+instrument's own price history. It is also the first test in this project on a
+**genuinely new data source** (yfinance daily adjusted close on liquid US-listed
+ETFs) rather than Dukascopy CFD spot/bid-ask. Brendan's own surviving strategy
+type is this family, so it earned an independent, honest test here rather than
+being assumed to work.
+
+### The strategy, every default stated, nothing tuned beyond the grid
+
+| axis | setting | note |
+|---|---|---|
+| Universe | 11 SPDR sector ETFs (XLK XLF XLE XLV XLI XLY XLP XLU XLB XLRE XLC) + 6 asset-class ETFs (TLT GLD IEF IWM EFA EEM) | SPY is benchmark-only, never ranked or held |
+| Rebalance | monthly, on the **last trading day actually present in the data** each calendar month | not a calendar-day approximation |
+| Ranking signal | trailing **N-month total return**, month-end close to month-end close | **N = 6 and N = 12**, both tested |
+| Holdings | top **K**, equal-weighted | **K = 3 and K = 5**, both tested |
+| Market filter | **100% into IEF** (intermediate treasuries) whenever SPY's close on the signal date is below SPY's own causal 200-day SMA | SMA computed from daily closes through the signal date only |
+| Grid | **N x K = 4 configs**, no other filters, no numeric optimisation | |
+
+### Causality — the ranking date lag, stated and verified
+
+Signal is measured at **close(t)**, where t is the last trading day of the
+month. The trade is modelled as **executed at close(t+1)** — the next trading
+day, never the same close used to rank it — so the **first live return earned
+is close(t+2)/close(t+1) − 1**, a full extra trading day of lag beyond the
+minimum. Implemented in `research/momentum_rotation.py::simulate()` as
+`weights_daily.shift(1) . daily_returns`, where `weights_daily` is itself
+built from weights indexed at the execution date and forward-filled — so a
+rebalance's weights can never touch the daily return that produced its own
+ranking. `look_ahead_guard()` asserts every execution date's *own preceding
+trading day* (its signal date, by construction) is strictly before it, for
+every one of the 4 configs. **PASS 4/4.**
+
+### Data — pulled fresh, no gaps, no backfilling
+
+`scripts/download_momentum_universe.py` pulled `period="max"` daily OHLCV via
+yfinance, `auto_adjust=True` (dividend/split-adjusted close), with retry on
+failure. Actual verified start dates (not assumed):
+
+| ticker | data from | ticker | data from |
+|---|---|---|---|
+| SPY | 1993-01-29 | XLRE | 2015-10-08 |
+| XLK/XLF/XLE/XLV/XLI/XLY/XLP/XLU/XLB | 1998-12-22 (all 9) | XLC | 2018-06-19 |
+| IWM | 2000-05-26 | TLT / IEF | 2002-07-30 |
+| EFA | 2001-08-27 | GLD | 2004-11-18 |
+| EEM | 2003-04-14 | | |
+
+No gaps beyond weekends/holidays in any file (verified programmatically, flagged
+threshold >3 calendar days). XLRE and XLC are genuinely newer instruments, as
+their inception dates show — not backfilled or estimated. A ticker without data
+at a given signal date is simply absent from that date's ranking pool, exactly
+as it would have been unavailable to a real portfolio manager at the time.
+
+### Costs — confirmed structurally different, as predicted
+
+Real per-bar bid-ask spreads are not available from yfinance (it reports
+close, not bid/ask), so a **stated conservative assumption** stands in: 2 bps
+per side spread (typical of these highly liquid SPDR/major ETFs) + 1 bp per
+side commission-equivalent = **3 bps per side, 6 bps round-turn**, applied to
+turnover at every rebalance even though monthly rebalancing is inherently
+low-turnover.
+
+| | full period | stress window |
+|---|---|---|
+| cost as % of gross return | **5.0 – 7.1%** | (embedded in net figures below) |
+
+**This confirms explicitly what the brief predicted**: monthly rebalancing
+sits in a completely different cost regime from every intraday family tested
+in this project. Compare cost_R elsewhere: M1 breakout 60.5%, ORB 5.7-17.5%,
+Sneaky Pivot 5.8-17.3%. Cross-sectional rotation's cost load is **roughly an
+order of magnitude smaller** than the typical intraday candidate, and this is
+the structural reason the family survives where the others didn't — even
+though the final verdict is still a kill (below).
+
+### The result — full period
+
+| gate | result |
+|---|---|
+| look-ahead guard | **4/4 PASS** |
+| net Sharpe (range across 4 cells) | **0.514 – 0.541** (a tight cluster — N/K barely matters) |
+| gross Sharpe | 0.526 – 0.550 |
+| net CAGR | 5.9 – 6.7% |
+| maxDD | 32.0 – 44.6% |
+| top single year ≤ 60% of total net log-return | **4/4 PASS** (12.4 – 13.8%) — first candidate in this project to clear this gate at all |
+| DSR > 0.95 (structural pool = this batch's own 4 a priori cells) | **0/4** (best 0.500, E[max SR] +0.541) |
+| beats SPY buy-and-hold (Sharpe 0.650, CAGR 10.86%, maxDD 55.2%) | **0/4** |
+| **SURVIVORS** | **0/4** |
+
+The DSR pool is tiny (N=4) and still cannot be cleared, because the four
+cells' Sharpes (0.514-0.541) are so close together that none of them is an
+outlier even against a 4-trial null — a genuinely flat, robust result rather
+than a lucky best-of-4.
+
+### The result — stress window, 2000-01-01 → 2009-12-31, SAME 4 configs, unchanged
+
+Per STATE_OF_PLAY section 7 rule 3 (test the stress window, don't skip it).
+Universe availability in this window, stated plainly:
+
+| coverage | tickers |
+|---|---|
+| full coverage (pre-2000 start) | SPY, the 9 original SPDR sectors, IWM |
+| partial coverage (phases in mid-window at real inception) | EFA (2001-08), TLT/IEF (2002-07), EEM (2003-04), GLD (2004-11) |
+| **not available at all** | XLRE (2015), XLC (2018) — absent from ranking entirely for the whole window |
+
+| gate | result |
+|---|---|
+| net Sharpe (range) | **0.562 – 0.696** — HIGHER than the full-period range |
+| net CAGR | 9.0 – 11.5% |
+| maxDD | same figures as full period (the stress window sits inside the worst full-period drawdown) |
+| DSR > 0.95 (this batch's own 4-cell stress pool) | **0/4** (best 0.489) |
+| beats SPY buy-and-hold (Sharpe **0.071**, CAGR **−0.52%** over the decade) | **4/4 PASS** |
+
+The market filter is doing real work here: SPY buy-and-hold is essentially flat
+over the dot-com crash + financial crisis decade, while the rotation earns a
+Sharpe in the 0.56-0.70 range **by sidestepping the two crashes**, not by
+picking better sectors during them.
+
+### Why this is a kill, and why it is a more interesting kill than §1-§11
+
+Two gates that killed every prior candidate — cost and single-year
+concentration — **do not fire here at all**. That is a genuinely new outcome
+in this project. But two other gates still bind:
+
+1. **Loses to SPY buy-and-hold in the regime that supplies most of the
+   sample.** The 1998-2026 full period is dominated by a multi-decade equity
+   bull market with two sharp-but-short crashes (2008, 2020) that a monthly
+   200-day-SMA filter reacts to with a lag; SPY's own Sharpe (0.650) simply
+   outruns a diversified, partially-defensive rotation across that much
+   history. This is the mirror image of the stress-window result: the filter
+   that saves the strategy in 2000-2009 costs it Sharpe in the 27-year
+   aggregate.
+2. **DSR cannot clear 0.95 even against a 4-cell pool**, because the grid is
+   flat. This is the opposite failure mode from every prior candidate (which
+   typically failed DSR by being mediocre against a *demanding* pool of dozens
+   of cells). Here the pool is minimal and the bar is still not cleared,
+   because there is no standout cell to reward — the finding (rotation +
+   trend filter helps in equity stress regimes) is more robust than any
+   single N/K choice within it, and DSR by construction refuses credit for
+   that kind of flat robustness.
+
+**Verdict: KILL, same standard as every other section.** It does not clear
+DSR, and it loses to the simplest possible benchmark (SPY buy-and-hold) over
+the period that matters most for total return. It is recorded in detail
+because it is the first candidate whose cost and concentration profile
+resembles a genuinely deployable strategy, and because a future session
+revisiting cross-sectional rotation should start from "the mechanism helps in
+crashes, and still loses to indexing across a multi-decade bull market" rather
+than re-deriving that from scratch.
+
+### Files
+
+| file | what it is |
+|---|---|
+| `scripts/download_momentum_universe.py` | yfinance daily pull, retry-on-failure, per-ticker report |
+| `research/momentum_rotation.py` | ranking, weighting, market filter, causal simulation, look-ahead guard |
+| `run_momentum_rotation.py` | driver: full period + stress window, DSR, concentration, buy-and-hold comparison, verdict |
+| `data/momentum_universe_adjclose.csv`, `data/*_daily_yfinance.csv`, `data/momentum_universe_report.csv` | raw + merged data |
+| `results/momentum_rotation_configs.csv`, `results/momentum_rotation_summary.txt`, `results/momentum_rotation_run.log` | the numeric evidence behind this section |
+
+Reproduce: `python scripts/download_momentum_universe.py && python run_momentum_rotation.py`
+
+**Cumulative trials: N=630** (622 prior + 4 full period + 4 stress window).

@@ -1,0 +1,123 @@
+[in_regime/NAS100] loading M1 ...
+[in_regime/NAS100] 1679 sessions | trend: 50 warmup/NaN, 1149 up-days, 480 down-days
+  [in_regime] NAS100 OR=15 tgt=1R    UNF n=1616 grPF=1.129 netPF=0.953 | FILT n= 816 grPF=1.137 netPF=0.960 SR=-0.21 guard=PASS removed=800
+  [in_regime] NAS100 OR=15 tgt=2R    UNF n=1616 grPF=1.164 netPF=1.014 | FILT n= 816 grPF=1.134 netPF=0.986 SR=-0.07 guard=PASS removed=800
+  [in_regime] NAS100 OR=15 tgt=close UNF n=1616 grPF=1.164 netPF=1.019 | FILT n= 816 grPF=1.206 netPF=1.056 SR=+0.23 guard=PASS removed=800
+  [in_regime] NAS100 OR=30 tgt=1R    UNF n=1609 grPF=1.164 netPF=1.014 | FILT n= 822 grPF=1.174 netPF=1.021 SR=+0.10 guard=PASS removed=787
+  [in_regime] NAS100 OR=30 tgt=2R    UNF n=1609 grPF=1.174 netPF=1.039 | FILT n= 822 grPF=1.174 netPF=1.038 SR=+0.17 guard=PASS removed=787
+  [in_regime] NAS100 OR=30 tgt=close UNF n=1609 grPF=1.172 netPF=1.039 | FILT n= 822 grPF=1.201 netPF=1.064 SR=+0.26 guard=PASS removed=787
+[in_regime/US30] loading M1 ...
+[in_regime/US30] 1604 sessions | trend: 50 warmup/NaN, 1081 up-days, 473 down-days
+  [in_regime]   US30 OR=15 tgt=1R    UNF n=1540 grPF=1.126 netPF=0.907 | FILT n= 753 grPF=1.175 netPF=0.947 SR=-0.26 guard=PASS removed=787
+  [in_regime]   US30 OR=15 tgt=2R    UNF n=1540 grPF=1.139 netPF=0.956 | FILT n= 753 grPF=1.083 netPF=0.909 SR=-0.44 guard=PASS removed=787
+  [in_regime]   US30 OR=15 tgt=close UNF n=1540 grPF=1.142 netPF=0.965 | FILT n= 753 grPF=1.043 netPF=0.878 SR=-0.53 guard=PASS removed=787
+  [in_regime]   US30 OR=30 tgt=1R    UNF n=1530 grPF=1.100 netPF=0.924 | FILT n= 754 grPF=1.117 netPF=0.934 SR=-0.32 guard=PASS removed=776
+  [in_regime]   US30 OR=30 tgt=2R    UNF n=1530 grPF=1.108 netPF=0.952 | FILT n= 754 grPF=1.082 netPF=0.926 SR=-0.34 guard=PASS removed=776
+  [in_regime]   US30 OR=30 tgt=close UNF n=1530 grPF=1.108 netPF=0.954 | FILT n= 754 grPF=1.064 netPF=0.911 SR=-0.37 guard=PASS removed=776
+[out_regime/NAS100] loading M1 ...
+[out_regime/NAS100] 1029 sessions | trend: 50 warmup/NaN, 745 up-days, 234 down-days
+  [out_regime] NAS100 OR=15 tgt=1R    UNF n= 974 grPF=0.891 netPF=0.607 | FILT n= 480 grPF=0.913 netPF=0.616 SR=-2.53 guard=PASS removed=494
+  [out_regime] NAS100 OR=15 tgt=2R    UNF n= 974 grPF=1.022 netPF=0.750 | FILT n= 480 grPF=1.073 netPF=0.786 SR=-1.23 guard=PASS removed=494
+  [out_regime] NAS100 OR=15 tgt=close UNF n= 974 grPF=1.064 netPF=0.798 | FILT n= 480 grPF=1.110 netPF=0.828 SR=-0.84 guard=PASS removed=494
+  [out_regime] NAS100 OR=30 tgt=1R    UNF n= 970 grPF=0.918 netPF=0.666 | FILT n= 498 grPF=0.898 netPF=0.649 SR=-2.24 guard=PASS removed=472
+  [out_regime] NAS100 OR=30 tgt=2R    UNF n= 970 grPF=0.965 netPF=0.730 | FILT n= 498 grPF=0.937 netPF=0.705 SR=-1.74 guard=PASS removed=472
+  [out_regime] NAS100 OR=30 tgt=close UNF n= 970 grPF=0.985 netPF=0.753 | FILT n= 498 grPF=0.947 netPF=0.718 SR=-1.54 guard=PASS removed=472
+[out_regime/US30] loading M1 ...
+[out_regime/US30] 1082 sessions | trend: 50 warmup/NaN, 749 up-days, 283 down-days
+  [out_regime]   US30 OR=15 tgt=1R    UNF n=1025 grPF=0.924 netPF=0.649 | FILT n= 496 grPF=1.011 netPF=0.704 SR=-1.85 guard=PASS removed=529
+  [out_regime]   US30 OR=15 tgt=2R    UNF n=1025 grPF=0.962 netPF=0.721 | FILT n= 496 grPF=1.021 netPF=0.758 SR=-1.40 guard=PASS removed=529
+  [out_regime]   US30 OR=15 tgt=close UNF n=1025 grPF=0.987 netPF=0.753 | FILT n= 496 grPF=1.055 netPF=0.801 SR=-0.94 guard=PASS removed=529
+  [out_regime]   US30 OR=30 tgt=1R    UNF n=1016 grPF=0.892 netPF=0.667 | FILT n= 497 grPF=0.879 netPF=0.646 SR=-2.19 guard=PASS removed=519
+  [out_regime]   US30 OR=30 tgt=2R    UNF n=1016 grPF=0.947 netPF=0.733 | FILT n= 497 grPF=0.920 netPF=0.698 SR=-1.71 guard=PASS removed=519
+  [out_regime]   US30 OR=30 tgt=close UNF n=1016 grPF=0.960 netPF=0.751 | FILT n= 497 grPF=0.982 netPF=0.758 SR=-1.16 guard=PASS removed=519
+
+======================================================================================================================================================
+TREND-FILTERED — 2018-2025 (in_regime)
+======================================================================================================================================================
+    inst  OR target     n   grPF  netPF  Sharpe   DSR  maxDD  win%  costR%   top% OOS?  B&H?            guard
+  NAS100  15     1R   816  1.137  0.960   -0.21  0.07  35.9% 52.7%    7.9%    n/a   no  lose             PASS
+  NAS100  15     2R   816  1.134  0.986   -0.07  0.15  35.4% 41.5%    7.9%    n/a   no  lose             PASS
+  NAS100  15  close   816  1.206  1.056   +0.23  0.41  27.3% 39.8%    7.9%    52%  YES  lose             PASS
+  NAS100  30     1R   822  1.174  1.021   +0.10  0.27  25.5% 54.0%    5.8%   256%   no  lose             PASS
+  NAS100  30     2R   822  1.174  1.038   +0.17  0.34  30.1% 47.8%    5.8%   103%   no  lose             PASS
+  NAS100  30  close   822  1.201  1.064   +0.26  0.44  25.7% 47.3%    5.8%    72%  YES  lose             PASS
+    US30  15     1R   753  1.175  0.947   -0.26  0.06  20.5% 53.1%    9.9%    n/a   no  lose             PASS
+    US30  15     2R   753  1.083  0.909   -0.44  0.02  41.6% 40.5%    9.9%    n/a   no  lose             PASS
+    US30  15  close   753  1.043  0.878   -0.53  0.01  48.0% 38.1%    9.9%    n/a   no  lose             PASS
+    US30  30     1R   754  1.117  0.934   -0.32  0.04  33.9% 52.0%    7.5%    n/a   no  lose             PASS
+    US30  30     2R   754  1.082  0.926   -0.34  0.04  33.4% 43.9%    7.5%    n/a   no  lose             PASS
+    US30  30  close   754  1.064  0.911   -0.37  0.04  40.4% 43.1%    7.5%    n/a   no  lose             PASS
+
+  Batch summary [in_regime]: n=12  gross>1=12/12  net>1=4/12  SR>0=4/12  DSR>0.95=0/12  OOSholds=2/12  notConc(<=60%)=1/12  extremeConc(>=100%)=2/12  beatsBH=0/12  SURVIVORS=0/12  meanGrPF=1.132  meanSR=-0.149  E[maxSR]=+0.314 (mu -0.149, sd 0.278, n=12)
+
+======================================================================================================================================================
+TREND-FILTERED — 2013-2017 (out_regime)
+======================================================================================================================================================
+    inst  OR target     n   grPF  netPF  Sharpe   DSR  maxDD  win%  costR%   top% OOS?  B&H?            guard
+  NAS100  15     1R   480  0.913  0.616   -2.53  0.00  66.3% 46.9%   17.8%    n/a   no  lose             PASS
+  NAS100  15     2R   480  1.073  0.786   -1.23  0.17  54.6% 39.0%   17.8%    n/a   no  lose             PASS
+  NAS100  15  close   480  1.110  0.828   -0.84  0.42  54.3% 35.8%   17.8%    n/a   no  lose             PASS
+  NAS100  30     1R   498  0.898  0.649   -2.24  0.00  59.4% 45.8%   13.0%    n/a   no  lose             PASS
+  NAS100  30     2R   498  0.937  0.705   -1.74  0.03  57.5% 41.0%   13.0%    n/a   no  lose             PASS
+  NAS100  30  close   498  0.947  0.718   -1.54  0.07  58.7% 39.8%   13.0%    n/a   no  lose             PASS
+    US30  15     1R   496  1.011  0.704   -1.85  0.01  57.3% 49.2%   16.6%    n/a   no  lose             PASS
+    US30  15     2R   496  1.021  0.758   -1.40  0.10  56.6% 39.1%   16.6%    n/a   no  lose             PASS
+    US30  15  close   496  1.055  0.801   -0.94  0.35  57.7% 35.3%   16.6%    n/a   no  lose             PASS
+    US30  30     1R   497  0.879  0.646   -2.19  0.00  59.7% 45.7%   12.5%    n/a   no  lose             PASS
+    US30  30     2R   497  0.920  0.698   -1.71  0.03  57.0% 40.6%   12.5%    n/a   no  lose             PASS
+    US30  30  close   497  0.982  0.758   -1.16  0.22  52.8% 39.2%   12.5%    n/a   no  lose             PASS
+
+  Batch summary [out_regime]: n=12  gross>1=5/12  net>1=0/12  SR>0=0/12  DSR>0.95=0/12  OOSholds=0/12  notConc(<=60%)=0/12  extremeConc(>=100%)=0/12  beatsBH=0/12  SURVIVORS=0/12  meanGrPF=0.979  meanSR=-1.614  E[maxSR]=-0.730 (mu -1.614, sd 0.531, n=12)
+
+======================================================================================================================================================
+FILTER IMPACT — trades removed vs unfiltered, per cell
+======================================================================================================================================================
+
+ [in_regime]
+    inst  OR target  n_unf n_filt removed  rm win%  kp win%  rm meanNetR  kp meanNetR
+  NAS100  15     1R   1616    816     800    52.2%    52.7%      -0.0257      -0.0192
+  NAS100  15     2R   1616    816     800    41.4%    41.5%      +0.0240      -0.0081
+  NAS100  15  close   1616    816     800    37.6%    39.8%      -0.0109      +0.0335
+  NAS100  30     1R   1609    822     787    51.6%    54.0%      +0.0030      +0.0085
+  NAS100  30     2R   1609    822     787    44.2%    47.8%      +0.0186      +0.0174
+  NAS100  30  close   1609    822     787    42.7%    47.3%      +0.0071      +0.0296
+    US30  15     1R   1540    753     787    51.0%    53.1%      -0.0638      -0.0247
+    US30  15     2R   1540    753     787    41.3%    40.5%      +0.0012      -0.0542
+    US30  15  close   1540    753     787    37.7%    38.1%      +0.0295      -0.0751
+    US30  30     1R   1530    754     776    50.9%    52.0%      -0.0371      -0.0284
+    US30  30     2R   1530    754     776    43.6%    43.9%      -0.0110      -0.0371
+    US30  30  close   1530    754     776    42.4%    43.1%      -0.0016      -0.0451
+
+ [out_regime]
+    inst  OR target  n_unf n_filt removed  rm win%  kp win%  rm meanNetR  kp meanNetR
+  NAS100  15     1R    974    480     494    44.9%    46.9%      -0.2356      -0.2189
+  NAS100  15     2R    974    480     494    35.8%    39.0%      -0.1874      -0.1380
+  NAS100  15  close    974    480     494    32.6%    35.8%      -0.1599      -0.1160
+  NAS100  30     1R    970    498     472    45.6%    45.8%      -0.1539      -0.1735
+  NAS100  30     2R    970    498     472    39.6%    41.0%      -0.1314      -0.1588
+  NAS100  30  close    970    498     472    38.3%    39.8%      -0.1176      -0.1547
+    US30  15     1R   1025    496     529    45.0%    49.2%      -0.2346      -0.1614
+    US30  15     2R   1025    496     529    36.7%    39.1%      -0.2099      -0.1549
+    US30  15  close   1025    496     529    34.0%    35.3%      -0.2026      -0.1352
+    US30  30     1R   1016    497     519    45.3%    45.7%      -0.1539      -0.1767
+    US30  30     2R   1016    497     519    39.5%    40.6%      -0.1258      -0.1614
+    US30  30  close   1016    497     519    37.8%    39.2%      -0.1421      -0.1331
+
+======================================================================================================================================================
+OLD (unfiltered, section 10 audited) vs NEW (trend-filtered) — side by side
+======================================================================================================================================================
+
+ 2018-2025 (in_regime)
+  UNFILTERED (this run's recompute, should match results/orb.csv): gross>1=12/12  net>1=5/12  SURVIVORS=0/12  meanGrPF=1.141  meanSR=-0.153
+  TREND-FILTERED (new)                                   : gross>1=12/12  net>1=4/12  SURVIVORS=0/12  meanGrPF=1.132  meanSR=-0.149
+
+ 2013-2017 (out_regime)
+  UNFILTERED (this run's recompute, should match results/orb_pre2018.csv): gross>1=2/12  net>1=0/12  SURVIVORS=0/12  meanGrPF=0.960  meanSR=-2.316
+  TREND-FILTERED (new)                                   : gross>1=5/12  net>1=0/12  SURVIVORS=0/12  meanGrPF=0.979  meanSR=-1.614
+
+======================================================================================================================================================
+VERDICT
+======================================================================================================================================================
+  Total trend-filtered SURVIVORS across both windows: 0/24
+  Saved: results/orb_trend_in_regime_scored.csv, orb_trend_out_regime_scored.csv,
+         results/orb_trend_*_unfiltered_reference.csv

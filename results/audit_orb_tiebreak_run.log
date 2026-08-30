@@ -1,0 +1,43 @@
+
+====================================================================================================
+IN REGIME 2018-2025
+====================================================================================================
+  NAS100 OR15 1R    n=1616 ties(stop-run)=  0 netPF stop-first=0.953 target-first=0.953 d=+0.0000
+  NAS100 OR15 2R    n=1616 ties(stop-run)=  0 netPF stop-first=1.014 target-first=1.014 d=+0.0000
+  NAS100 OR15 close n=1616 ties(stop-run)=  0 netPF stop-first=1.019 target-first=1.019 d=+0.0000
+  NAS100 OR30 1R    n=1609 ties(stop-run)=  0 netPF stop-first=1.014 target-first=1.014 d=+0.0000
+  NAS100 OR30 2R    n=1609 ties(stop-run)=  0 netPF stop-first=1.039 target-first=1.039 d=+0.0000
+  NAS100 OR30 close n=1609 ties(stop-run)=  0 netPF stop-first=1.039 target-first=1.039 d=+0.0000
+    US30 OR15 1R    n=1540 ties(stop-run)=  0 netPF stop-first=0.907 target-first=0.907 d=+0.0000
+    US30 OR15 2R    n=1540 ties(stop-run)=  0 netPF stop-first=0.956 target-first=0.956 d=+0.0000
+    US30 OR15 close n=1540 ties(stop-run)=  0 netPF stop-first=0.965 target-first=0.965 d=+0.0000
+    US30 OR30 1R    n=1530 ties(stop-run)=  0 netPF stop-first=0.924 target-first=0.924 d=+0.0000
+    US30 OR30 2R    n=1530 ties(stop-run)=  0 netPF stop-first=0.952 target-first=0.952 d=+0.0000
+    US30 OR30 close n=1530 ties(stop-run)=  0 netPF stop-first=0.954 target-first=0.954 d=+0.0000
+
+====================================================================================================
+OUT OF REGIME 2013-2017
+====================================================================================================
+  NAS100 OR15 1R    n= 974 ties(stop-run)=  0 netPF stop-first=0.607 target-first=0.607 d=+0.0000
+  NAS100 OR15 2R    n= 974 ties(stop-run)=  0 netPF stop-first=0.750 target-first=0.750 d=+0.0000
+  NAS100 OR15 close n= 974 ties(stop-run)=  0 netPF stop-first=0.798 target-first=0.798 d=+0.0000
+  NAS100 OR30 1R    n= 970 ties(stop-run)=  0 netPF stop-first=0.666 target-first=0.666 d=+0.0000
+  NAS100 OR30 2R    n= 970 ties(stop-run)=  0 netPF stop-first=0.730 target-first=0.730 d=+0.0000
+  NAS100 OR30 close n= 970 ties(stop-run)=  0 netPF stop-first=0.753 target-first=0.753 d=+0.0000
+    US30 OR15 1R    n=1025 ties(stop-run)=  0 netPF stop-first=0.649 target-first=0.649 d=+0.0000
+    US30 OR15 2R    n=1025 ties(stop-run)=  0 netPF stop-first=0.721 target-first=0.721 d=+0.0000
+    US30 OR15 close n=1025 ties(stop-run)=  0 netPF stop-first=0.753 target-first=0.753 d=+0.0000
+    US30 OR30 1R    n=1016 ties(stop-run)=  0 netPF stop-first=0.667 target-first=0.667 d=+0.0000
+    US30 OR30 2R    n=1016 ties(stop-run)=  0 netPF stop-first=0.733 target-first=0.733 d=+0.0000
+    US30 OR30 close n=1016 ties(stop-run)=  0 netPF stop-first=0.751 target-first=0.751 d=+0.0000
+
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+  in_regime: total trades=18885, true same-bar ties=0 (0.00% of trades)
+    mean net PF stop-first=0.978  target-first=0.978  d=+0.0000
+  out_regime: total trades=11955, true same-bar ties=0 (0.00% of trades)
+    mean net PF stop-first=0.715  target-first=0.715  d=+0.0000
+
+Saved -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\audit_orb_tiebreak.csv
