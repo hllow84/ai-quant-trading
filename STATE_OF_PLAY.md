@@ -3675,3 +3675,133 @@ If the only question is "how often is a calendar period green and how bad is the
 Files: `report_year_by_year_returns.py`, `results/year_by_year_full_history.csv`,
 `results/year_by_year_postcovid.csv`, `results/year_by_year_annual_R_only.csv`.
 Reproduce: `python report_year_by_year_returns.py`. **No trials added — N=946.**
+
+## 23. WIN RATE > 50% — every config across the project, reported 2026-08-31
+
+Reporting task on **saved results only** — nothing re-run, **cumulative
+trial count UNCHANGED at N=946**. Driver: `report_winrate_over_50.py`.
+Scans every scored result CSV for configs whose **net per-trade win rate**
+(fraction of trades with net R > 0, verified against `orb_trades.csv` to 3
+dp) is strictly above 50%, regardless of the ultimate kill verdict. `avgWin`
+/ `avgLoss` in R are reconstructed exactly from `(win_rate, net_pf,
+net_R_mean)` — an identity given those definitions, cross-checked against
+the raw ORB trade file (NAS100 OR15 1R → +0.868 / −1.006 R both ways).
+
+### What could and could not be assessed
+
+| batch | win-rate data | # configs with win rate > 50% |
+|---|---|---|
+| Individual US stocks §14 (90 in-regime + 90 OOS) | saved | **20** (9 in-regime, 11 OOS) |
+| Index trend/macross single-instrument configs §2 / §6 (108 + 90) | saved | **12** (7 in-regime §2, 5 OOS §6) |
+| ORB §10 original (12) + §10.2 moderate-stop (12) + §10.4 trend-filtered (12) | saved | **11** (4 + 4 + 3, all in-regime; 0 out-of-regime) |
+| Gold/index 5-family sweep §1 (150) | saved | 0 (max win rate **exactly 50.0%** — nothing strictly above) |
+| XAUUSD HTF breakout §1 (12) | saved | 0 (max 42.2%) |
+| M1 row §11 (45 + 30) | saved | 0 (max 37–39%) |
+| Crypto 5-family sweep §13 (90) | saved | 0 (max 45.1%) |
+| 15-min Sneaky Pivot §9 (24 + 16) | saved | 0 (max 42.1%) |
+| Positioning-extreme reversal §18 (8) | saved | 0 (max 40.8%) |
+| **XAUUSD 5-family sweep §1 (75)** | **NOT saved** | **unknowable** — `sweep_progress.csv` never stored a win-rate column (only gross/net PF, Sharpe, IS/OOS). Cannot be recovered without a re-run. |
+
+**43 trade-based configs total** clear the 50% win-rate bar. **14 of the 43
+sit on fewer than 40 trades** (daily strategies over ~8 years) — those win
+rates are statistically noisy and flagged `!thin` below.
+
+### TABLE A — the 43 configs with net win rate > 50% (sorted by win rate; representative rows)
+
+Full list in `results/winrate_over_50_trade_configs.csv`. `avgWin`/`avgLoss`/`netMeanR` in R; `netPF`/`netSR` after real costs.
+
+| sec | win % | avgWin R | avgLoss R | net PF | net SR | trades | strategy — config — window | killed by |
+|---|---|---|---|---|---|---|---|---|
+| 14 | **73.3%** | +0.97 | −0.60 | 4.44 | +0.91 | **15** !thin | US stock — XOM D1 meanrev v1 — OOS 2010-17 | DSR + loses to B&H |
+| 6 | 66.7% | +1.59 | −1.01 | 3.16 | +0.85 | **9** !thin | Index — US30 D1 macross v1 — OOS 2013-17 | family gross PF collapses OOS + DSR |
+| 14 | 63.2% | +1.99 | −1.01 | 3.38 | +0.83 | **19** !thin | US stock — AAPL D1 macross v1 — OOS 2010-17 | DSR + B&H |
+| 14 | 62.5% | +1.62 | −1.01 | 2.67 | +0.81 | **32** !thin | US stock — WMT D1 macross v0 — in 2018-25 | DSR + B&H |
+| 2 | 62.5% | +1.88 | −1.01 | 3.10 | +0.74 | **16** !thin | Index — NAS100 D1 macross v1 — in 2018-25 | family gross PF collapses OOS + DSR |
+| **2** | **60.0%** | **+1.27** | **−0.85** | **2.25** | **+1.07** | **80** | **Index — NAS100 D1 trend v0 — in 2018-25** | **family gross PF collapses OOS (1.363→1.006, §6) + DSR 0.21–0.45** |
+| 2 | 58.2% | +1.27 | −0.99 | 1.78 | +0.78 | 67 | Index — NAS100 D1 trend v1 — in 2018-25 | family gross PF collapses OOS + DSR |
+| 14 | 55.7% | +1.26 | −0.93 | 1.72 | +0.69 | 70 | US stock — AAPL D1 trend v0 — in 2018-25 | DSR (best 0.45) + B&H |
+| 14 | 55.0% | +1.94 | −1.01 | 2.35 | +0.84 | 40 | US stock — CAT D1 momentum v1 — in 2018-25 | DSR + B&H |
+| 14 | 55.0% | +1.33 | −1.01 | 1.60 | +0.84 | 111 | US stock — CAT D1 momentum v2 — OOS 2010-17 | DSR + B&H |
+| 14 | 54.7% | +1.80 | −1.01 | 2.15 | +0.97 | 64 | US stock — CAT D1 breakout v1 — in 2018-25 | DSR + B&H |
+| 14 | 54.5% | +1.22 | −0.95 | 1.54 | +0.73 | 112 | US stock — AAPL D1 breakout v2 — in 2018-25 | DSR + B&H |
+| 10.4 | 54.0% | +0.76 | −0.88 | 1.02 | +0.10 | 822 | ORB trend-filtered — NAS100 OR30 1R — in 2018-25 | OOS gross <1 + concentration + DSR |
+| 10 | 52.8% | +0.79 | −0.87 | 1.01 | +0.09 | 1609 | ORB original — NAS100 OR30 1R — in 2018-25 | OOS gross inverts + concentration 0/12 + B&H 4/4 + DSR |
+| 10.2 | 52.1% | +0.86 | −1.12 | 0.83 | −1.27 | 1616 | ORB moderate-stop — NAS100 OR15 1R — in 2018-25 | moderate stop made in-regime **worse** + all §10 kills |
+
+…and 28 more (mostly §14 US-stock D1 cells at 50–56% win and §2/§6 index D1/H8 macross+trend cells), every one carrying `DSR` and either `B&H` or `OOS-INV(family)`.
+
+**Only 7 of the 43 are simultaneously > 50% win, net PF > 1, positive net Sharpe, AND on ≥ 40 trades:**
+NAS100 D1 trend v0 (§2, SR +1.07 / 80 tr), NAS100 D1 trend v1 (§2, +0.78 / 67), CAT D1 breakout v1 (§14, +0.97 / 64), CAT D1 momentum v1 (§14, +0.84 / 40), CAT D1 momentum v2 (§14 OOS, +0.84 / 111), AAPL D1 trend v0 (§14, +0.69 / 70), AAPL D1 breakout v2 (§14, +0.73 / 112). **All 7 are D1 trend/breakout/momentum on an index or a single stock, and all 7 are killed by DSR — plus buy-and-hold (§14 stocks) or the §6 out-of-regime family collapse (§2 index).**
+
+### ORB specifics
+
+Of ORB's 11 in-regime configs above 50% win, **only two are net-profitable at all** — NAS100 OR30 1R original (net PF 1.01, SR +0.09) and its trend-filtered twin (net PF 1.02, SR +0.10) — both statistically indistinguishable from break-even on ~1,600 / ~820 trades. Every other ORB > 50%-win config (all the OR15 1R and US30 cells, and every moderate-stop cell) is **net-losing**. **No ORB config exceeds 50% win rate on the 2013-17 out-of-regime window** (max 47–49%) — consistent with §10's finding that the edge inverts there.
+
+### TABLE B — portfolio / period strategies (no per-trade win rate)
+
+Momentum rotation §12/§12.2/§17 and volatility premium §20/§21 are period strategies. Period analogue used: **% of calendar years with a positive absolute return**, from `results/year_by_year_full_history.csv` (§22 reslice, not recomputed).
+
+| % positive years | pos/total | avg + year | avg − year | best yr | worst yr | total ret | max DD | strategy | killed by |
+|---|---|---|---|---|---|---|---|---|---|
+| **81.2%** | 13/16 | n/s | n/s | +24% | −25.8% | +69% | −29.0% | VRP §21-A fixed 20% sizing | §21: edge shrinks below usefulness once sized to survive; loses to SPY; DSR 0.15 |
+| **81.2%** | 13/16 | n/s | n/s | +11% | −13.4% | +32% | −15.3% | VRP §21-A fixed 10% sizing | §21: same — CAGR ~2%, < T-bills; DSR 0.01 |
+| **74.1%** | 20/27 | **+15.3%** | **−9.8%** | +33% | −18.9% | +688% | −39.0% | MomoRot US-sector §12 (N12/K5) | §12: DSR never clears 0.95; §12.5: vs-SPY edge is entirely pre-2009 |
+| 71.4% | 5/7 | n/s | n/s | +1696% | −45.1% | +4101% | −57.0% | MomoRot crypto-sectors §17 | §17: 2021-bull artefact; DSR; loses to its own equal-weight basket |
+| 70.4% | 19/27 | n/s | n/s | +39% | −13.2% | +934% | −37.5% | MomoRot US-sector widened §12.2 | §12.2: same DSR ceiling as §12 |
+| 68.8% | 11/16 | +44.1% | −25.9% | +165% | **−91.6%** | +98% | **−93.1%** | VRP naked SVXY §20 (thr 1.2) | §20: tail risk — −83% in one 2018 session; loses to SPY |
+| 68.8% | 11/16 | n/s | n/s | +104% | −18.6% | +563% | −48.9% | VRP §21-B vol-of-vol breaker +20% | §21: still breaches −20% weekly bar on the Brexit gap; 53–69% false alarms |
+| 61.1% | 11/18 | n/s | n/s | +26% | −15.4% | +118% | −24.8% | MomoRot country-ETFs §17 | §17: DSR; loses to equal-weight basket |
+| 50.0% | 8/16 | +25.5% | −20.6% | +66% | −87.2% | −70% | −91.8% | VRP naked SVXY §20 (thr 1.5) | §20: tail risk; net total return negative |
+| 0.0% | 0/16 | — | — | −0% | −85.1% | −99% | −99.0% | VRP §21-C paired VIXY hedge h=1.0 | §21: hedge carry −45 to −71%/yr; still mistimed against the tail |
+
+(n/s = per-year series for avg +/− year not separately persisted in §22; only summary stats.)
+
+### TABLE C — momentum rotation §12 (N12/K5): recent sub-period breakout
+
+From `results/momentum_rotation_walkforward.csv` (§12.5 walk-forward, **resliced, not re-run**). Data ends 2026-08-28, so 2026 is partial (Jan–Aug).
+
+| period | years | positive years (abs) | "win rate" (abs) | beat SPY | avg year | worst | best | strategy cum | SPY cum | avg within-year SR |
+|---|---|---|---|---|---|---|---|---|---|---|
+| last **3** calendar years (2024–2026) | 3 | 3 | **100%** | **1 / 3 (33%)** | +15.3% | +10.6% | +18.2% | **+53.2%** | +67.1% | +1.37 |
+| last **4** calendar years (2023–2026) | 4 | 4 | **100%** | **1 / 4 (25%)** | +13.3% | +7.0% | +18.2% | **+64.0%** | +110.9% | +1.19 |
+| last 3 **complete** years (2023–2025) | 3 | 3 | **100%** | 1 / 3 (33%) | +14.2% | +7.0% | +18.2% | +48.3% | +85.5% | +1.25 |
+
+Momentum rotation has been **positive in absolute terms every one of the last 3–4 years** (a 100% period "win rate"), with a healthy ~+1.2–1.4 average within-year Sharpe — but it **beat SPY in only one of them** and its cumulative return over each recent window is 14–47 percentage points *behind* SPY. This is the same picture §12.5's full walk-forward gave: the strategy makes money in a bull market, just less of it than the index, and its genuine edge (crash defence) has had nothing to do since 2008.
+
+### VERDICT — did any config have win rate > 50% AND survive every gate?
+
+**NO. Unambiguously not.** STATE_OF_PLAY §1: *946 configs, 0 survive.* Zero
+configs survived every honesty gate, so by construction none of the 43
+trade-based configs above 50% win rate, and none of the period strategies
+above 50% positive-years, did either.
+
+- The **43 trade-based > 50%-win configs** are dominated by **D1 trend /
+  macross / breakout / momentum** on individual US large-caps (§14) and US /
+  EU index CFDs (§2). Every one is killed by **DSR** (a flat 90-cell or
+  18-basket a-priori pool in which no single config is a statistical
+  outlier), and additionally by **losing to buy-and-hold** (§14) or by the
+  **§6 out-of-regime family collapse** (§2). The single best on
+  risk-adjusted terms — NAS100 D1 trend v0, 60% win, net PF 2.25, net SR
+  +1.07, 80 trades — is one of the exact cells §6 demonstrated was a
+  2018-2025 regime artefact (its family's gross PF falls to 1.006 on
+  2013-17).
+- The **highest win rates of all** (73%, 67%, 63%) sit on **9–19 trades** —
+  noise, not evidence.
+- **ORB**: only two > 50%-win configs are even break-even (net PF ≈ 1.01,
+  SR ≈ +0.09), and none exceeds 50% win out of regime.
+- The **XAUUSD 5-family sweep §1 (75 configs)** cannot be assessed at all —
+  win rate was never saved for that batch.
+- **Period strategies**: VRP fixed-fraction sleeves (81% positive years)
+  and US-sector momentum rotation (74%) look consistent, but the VRP
+  sleeves earn ~2–4% CAGR (below T-bills) precisely because they hold
+  80–90% cash, and momentum rotation loses to SPY (§12.5). Both killed.
+
+A high win rate has never been a scarce ingredient in this project — 43
+configs have one. What none of them also have is a deflated-Sharpe-
+significant, cost-surviving, regime-robust, better-than-buy-and-hold edge.
+
+Files: `report_winrate_over_50.py`,
+`results/winrate_over_50_trade_configs.csv`,
+`results/winrate_over_50_period_strategies.csv`,
+`results/winrate_over_50_momentum_recent.csv`. Reproduce:
+`python report_winrate_over_50.py`. **No trials added — N = 946.**
