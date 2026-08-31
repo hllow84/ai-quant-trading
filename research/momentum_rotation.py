@@ -67,6 +67,8 @@ def build_weights(
     universe: list[str] | None = None,
     sma_window: int = SMA_WINDOW,
     rebalance_step: int = 1,
+    benchmark: str = BENCHMARK,
+    defensive: str = DEFENSIVE,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """
     Returns (weights_at_exec, turnover_at_exec):
@@ -76,12 +78,19 @@ def build_weights(
                            each execution date, for cost calculation.
 
     `universe` overrides the module-level UNIVERSE (e.g. the widened universe
-    test) -- DEFENSIVE (IEF) must be a member of whatever list is passed.
-    `sma_window` overrides the 200-day market-filter SMA length (audit 8
-    perturbation test -- 150/250 alternatives). `rebalance_step` keeps only
-    every Nth month-end signal date (audit 8 perturbation test -- step=2 gives
-    a bi-monthly rebalance); the N-month trailing-return lookback is unchanged,
-    only the frequency at which a new decision is made.
+    test) -- `defensive` (default DEFENSIVE="IEF") must be a member of
+    whatever list is passed. `sma_window` overrides the 200-day market-filter
+    SMA length (audit 8 perturbation test -- 150/250 alternatives).
+    `rebalance_step` keeps only every Nth month-end signal date (audit 8
+    perturbation test -- step=2 gives a bi-monthly rebalance); the N-month
+    trailing-return lookback is unchanged, only the frequency at which a new
+    decision is made. `benchmark` (default BENCHMARK="SPY") overrides which
+    ticker's causal 200-day SMA drives the risk-on/risk-off market filter --
+    added for the cross-universe generalisation test (crypto and country-ETF
+    universes have no reason to filter on SPY's regime); both `benchmark` and
+    `defensive` default to the original module constants, so every existing
+    call site reproduces sections 12/12.1/12.2/12.3 byte-identically. Same
+    additive-parameter convention already used for `sma_window`/`rebalance_step`.
     """
     uni = universe if universe is not None else UNIVERSE
     daily_index = adjclose.index
@@ -89,7 +98,7 @@ def build_weights(
     if rebalance_step > 1:
         sig_dates = sig_dates[::rebalance_step]
 
-    spy = adjclose[BENCHMARK]
+    spy = adjclose[benchmark]
     spy_sma200 = spy.rolling(sma_window, min_periods=sma_window).mean()
 
     rows = []
@@ -128,10 +137,10 @@ def build_weights(
 
         w = pd.Series(0.0, index=uni)
         if risk_off:
-            w[DEFENSIVE] = 1.0 if DEFENSIVE in uni else 0.0
-            # DEFENSIVE (IEF) is in `uni` already; if for some reason price
+            w[defensive] = 1.0 if defensive in uni else 0.0
+            # `defensive` is in `uni` already; if for some reason price is
             # missing on this date, skip (park nothing traded, stay in prior wt)
-            if pd.isna(adjclose.loc[t, DEFENSIVE]):
+            if pd.isna(adjclose.loc[t, defensive]):
                 continue
         else:
             w[chosen] = 1.0 / top_k

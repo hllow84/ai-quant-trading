@@ -19,3 +19,9 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 # set is ~330 KB. Without these a fresh clone has the conclusions but not the
 # data they rest on.
 !results/*.csv
+
+# Live trading secrets and runtime state -- NEVER commit API keys or local state.
+.env
+live/.env
+live/state/
+

@@ -123,7 +123,7 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
 
-**Across 638 systematic backtest configurations, no FTMO-viable edge was found —
+**Across 934 systematic backtest configurations, no FTMO-viable edge was found —
 and no own-capital edge either (§6).** The closest thing to a positive result in
 the whole project is §12 (audited in §12.1, widened in §12.2): a portfolio-level
 cross-sectional momentum rotation whose cost and concentration profile is clean
@@ -136,7 +136,7 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=638):
+Trial composition (this is the cumulative DSR trial count, N=946):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -155,7 +155,16 @@ Trial composition (this is the cumulative DSR trial count, N=638):
 | ORB trend-filtered variant, both windows (§10.4) | NAS100, US30 | 24 | 0 survive (§10.4) |
 | Cross-sectional momentum rotation, full period + 2000-09 stress (§12) | 17-ETF universe, SPY benchmark | 8 | 0 survive; audited §12.1, DSR is the sole blocking gate |
 | Cross-sectional momentum rotation, widened universe (§12.2) | 27-instrument universe, SPY benchmark | 8 | 0 survive (§12.2) — same DSR ceiling |
-| **Total** | | **638** | **0 survive** |
+| Crypto, 5 fam × 3 var × 3 TF (§13) | BTCUSDT, ETHUSDT | 90 | 0 survive (§13) — cost-vs-stop-distance kills it, same mechanism as §11 |
+| Individual US stocks, in regime (§14) | AAPL, JPM, XOM, JNJ, WMT, CAT | 90 | 0 survive (§14) — DSR + buy-and-hold both bind |
+| Individual US stocks, 2010-17 out-of-regime (§14) | AAPL, JPM, XOM, JNJ, WMT, CAT | 90 | 0 survive (§14) — most durable gross edge in the project, still killed |
+| Regime-adaptive strategy selection, safeguarded (§15) | BTCUSDT, ETHUSDT | 4 | 0 survive (§15) — new failure mode: switching signal too noisy for hysteresis to bind |
+| Regime-switch lookback expansion, 12/24mo (§16) | BTCUSDT, ETHUSDT | 4 | 0 survive (§16) — confirms §15 across the full lookback range |
+| Momentum rotation generalization (§17) | crypto sectors (4), country ETFs (4) | 8 | 0 survive (§17) — kills on both, for two different reasons |
+| Positioning-extreme contrarian reversal (§18) | BTCUSDT, ETHUSDT | 8 | 0 survive (§18) — first non-price-based signal tested, clean kill |
+| Volatility risk premium harvest (§20) | SVXY (VIX vs SPY realized vol) | 2 | 0 survive (§20) — KILLED ON TAIL RISK: -83% single-day loss (2018 Volmageddon), regardless of headline Sharpe |
+| Protected VRP structures (§21) | SVXY + cash / VIX circuit breaker / VIXY hedge | 12 | 0 survive (§21) — only small fixed sizing (f=0.10) stays inside the account bar, and it shrinks CAGR to ~2% at SR +0.43 < SPY; breaker & hedge are blind to same-day gap events |
+| **Total** | | **946** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -2028,3 +2037,1390 @@ backtest cells, and audits 8-9's perturbation/sensitivity runs are one-shot
 robustness checks explicitly excluded from the DSR pool (same treatment as
 the ORB implementation audit, §10.1-10.3). **Cumulative trial count unchanged:
 N=638.**
+
+---
+
+## 12.4 LIVE (paper-first) DEPLOYMENT INFRASTRUCTURE — built 2026-08-31, engineering only, no new trials
+
+Per Brendan's own explicit judgment call (STATE_OF_PLAY §12.3's own read: the
+finding is not DSR-significant but the mechanism is robust and beats SPY
+risk-adjusted across every audited perturbation), a paper-first live pipeline
+was built for the strongest audited cell: **N=12, K=5, 200-day SMA, monthly
+rebalance, base 17-ETF universe.** This is engineering, not research — no
+new backtest cells, no re-tuning. `research/momentum_rotation.py::build_weights()`
+is imported and called unchanged; `live/signals.py`'s module docstring
+documents exactly how a live signal for "today" is extracted from it without
+modifying that file (a single NaN placeholder row dated into the next
+calendar month, so `build_weights()` has an execution-date label to attach
+today's weights to — the placeholder's price is never read).
+
+Broker: Alpaca (paper trading environment, genuine live-API mirror, not a
+separate simulator). Price data for the signal itself stays on yfinance —
+the same source the backtest was validated against — Alpaca is used only for
+account state, the trading calendar, and order execution.
+
+**Hard risk limits, code-enforced (`live/risk.py`):** 25% per-ETF position
+cap (stated departure from the audited 100%-IEF defensive allocation —
+excess in a risk-off signal sits in cash, never redistributed), a 15%
+drawdown-from-peak kill switch that halts all new orders until manually
+cleared, and a target-weight sanity check (sum to 1.0±1%, no negatives) that
+refuses to trade on a malformed signal rather than placing it.
+
+**Paper-trading gate:** `live/config.py`'s `PAPER_ONLY = True` must be
+manually edited to place any real order, gated additionally on 3 logged
+paper monthly rebalances and an interactive real-money confirmation phrase
+(a non-interactive/scheduled run cannot satisfy either the paper-count gate
+or the confirmation prompt). First 3 rebalances (paper or live) require a
+manual keypress review of the printed trade list.
+
+**Monitoring:** `live/monitor.py` computes trailing Sharpe/CAGR from monthly
+equity snapshots, compares against the audited 0.51-0.64 Sharpe range and
+SPY buy-and-hold, and states a plain stop-live rule (2 consecutive monitor
+runs with negative trailing Sharpe AND >10pp CAGR underperformance vs SPY).
+
+Files: `live/config.py`, `broker.py`, `signals.py`, `risk.py`, `state.py`,
+`logging_utils.py`, `rebalance.py`, `monitor.py`, `run_rebalance.bat`,
+`README.md`, `.env.example`. Setup and scheduling documented in
+`live/README.md`. **No trials added — cumulative trial count unchanged: N=638.**
+
+## 13. CRYPTO — the same 5-family sweep on a genuinely new instrument class, tested 2026-08-31, killed
+
+### Why this run exists
+
+Every price-pattern kill in sections 1-11 was tested on gold and index CFDs
+only. Crypto is a structurally different instrument class: 24/7/365 trading
+(no session structure to be session-agnostic ABOUT), and — the important
+one — a fee-dominated cost structure rather than a spread-dominated one.
+That second difference makes it a genuine, non-redundant test of the
+cost-vs-stop-distance mechanism section 11 established, not just "the same
+test on a different ticker."
+
+### Why M15/H1/H4, not M1 — stated, as required
+
+M1 is deliberately excluded. Section 11 found a clean, **instrument-agnostic**
+mechanism: cost per trade is fixed while 1R (an ATR-scaled stop) shrinks with
+the square root of bar duration, so cost_R blows out and kills every M1
+config regardless of instrument (gold, two different index CFDs). That
+mechanism is about stop distance vs. fixed cost, not about any one
+instrument's tape — running M1 again here would re-confirm an already-
+established structural conclusion, not test anything new. H1 is the anchor
+(the mid-point of the M5-H4 ladder); M15 and H4 bracket it.
+
+### The grid, every default stated, nothing tuned
+
+| axis | setting | note |
+|---|---|---|
+| Instruments | BTCUSDT, ETHUSDT | Binance spot, via ccxt |
+| Timeframes | M15, H1, H4 | native Binance candles, NOT resampled from an M1 archive |
+| Families | trend, breakout, meanrev, momentum, macross | imported from `strategies/sweep_families.py`, UNCHANGED |
+| Variants | 3 stated per family, unchanged | no parameter re-tuned for crypto |
+| Window | 2018-01-01 to 2026-08-31 | matches this repo's standard "2018-2025" window |
+| Risk | 1% / trade, `de_overlap` (one position at a time) | repo convention |
+| Grid | 2 x 3 x 5 x 3 = **90 configs** | |
+
+### Data — real Binance spot, verified, spread stated honestly
+
+`scripts/download_crypto_ohlcv.py` pulled native OHLCV via ccxt's Binance
+adapter, paginated, from 2018-01-01 through today. Both BTC/USDT and
+ETH/USDT trade continuously since 2017-08-17 (verified via `since=0`).
+
+| | M15 bars | H1 bars | H4 bars | gaps > 1.5x bar spacing |
+|---|---|---|---|---|
+| BTCUSDT | 303,218 | 75,816 | 18,969 | 27 (H1), a handful of documented exchange-outage windows (e.g. 2018-02-09), none exceeding ~1.5 days |
+| ETHUSDT | 303,218 | 75,816 | 18,969 | 27 (H1), same dates |
+
+**Spread — real, not fabricated, but honestly limited.** Free historical
+per-bar bid/ask for crypto is not available via ccxt/Binance REST
+(`fetchOHLCV` is trade-based, not quote-based) — the same limitation
+section 12 documented for yfinance ETF data. What IS real: a live
+top-of-book spread, measured fresh at pull time (BTCUSDT 0.0013 bps,
+ETHUSDT 0.041 bps), applied as a constant historical assumption. This
+matters little in practice: it is negligible next to the 20 bps taker-fee
+assumption below, which is the real cost driver for crypto — the opposite
+of every FX/index/ETF instrument in this project, where spread dominates
+and commission is near-zero.
+
+**Costs.** Binance spot taker fee, no BNB/VIP discount (the conservative
+default a retail account actually pays): **10 bps per side, 20 bps
+round-turn.** Plus 1 bps/side normal slippage, 2 bps/side in the repo's
+existing `NEWS_HOURS_UTC` windows (reused unchanged as a conservative, not
+crypto-specific, proxy for elevated-volatility periods).
+
+### Out-of-regime — stated honestly: crypto cannot get the same treatment FX/indices did
+
+STATE_OF_PLAY section 7 rule 3 calls for a genuine pre-sample holdout.
+Binance BTC/USDT and ETH/USDT both begin 2017-08-17 — four months before
+this project's 2018 baseline. There is no clean multi-year pre-2018 window
+to hold out. **This run does not claim a genuine out-of-regime test for
+crypto.** Instead, as the task explicitly allowed ("as far back as clean
+data allows"), the single 2018-2025 window is split into two regimes
+within itself (2018-21 vs 2022-25) by **re-slicing the same simulated
+trades** — not a new simulation grid, so **not counted as new trials**
+(same treatment section 11 gave its RTH-matched control) — and explicitly
+weaker evidence than a true holdout.
+
+### The result
+
+| gate | result |
+|---|---|
+| look-ahead guard | **90/90 PASS** |
+| gross PF > 1 | 62/90 (mean 1.021) |
+| net PF > 1 | **12/90** |
+| net Sharpe > 0 | **12/90** |
+| DSR > 0.95 (structural pool = this batch's own 90 a priori cells) | **0/90** (best ~0, batch mean Sharpe -2.75) |
+| OOS holds (2023-01-01 split) | 5/90 |
+| regime split holds (2018-21 vs 22-25, informational only) | 5/90 |
+| top year <= 60% of net R | 7/90 |
+| beats buy-and-hold | 1/90 (ETHUSDT H4 breakout v1 only) |
+| **SURVIVORS** | **0/90** |
+
+**Cost gradient, confirming section 11's mechanism on a fourth/fifth
+instrument with a completely different cost structure:**
+
+| timeframe | mean cost_R (% of 1R) |
+|---|---|
+| M15 | 37.5% |
+| H1 | 16.6% |
+| H4 | 7.6% |
+
+The same 1/sqrt(TF) shape section 11 established on spread-dominated FX/index
+costs reappears on a fee-dominated crypto cost model. **maxDD reaches
+99-100% on most M15/H1 cells — verified NOT an equity-curve artefact**:
+0/90 cells have a single day losing >=100% of equity (`n_ruin_days`), so
+these are genuine, valid catastrophic drawdowns from repeated fee-eaten
+losses compounding, not a broken statistic (contrast section 11, where
+maxDD WAS invalid at M1 for this reason).
+
+Best cell: **ETHUSDT H4 breakout v1** — net Sharpe +0.56, net PF 1.209,
+cost_R 7.0%, DSR 0.000, beats ETH buy-and-hold (Sharpe +0.56 vs +0.49).
+BTCUSDT's best cell (H4 macross v1, Sharpe +0.48) loses to BTC buy-and-hold
+(+0.53). Buy-and-hold itself is brutal here: BTC maxDD 81.2%, ETH maxDD
+94.0%, over this window.
+
+### Verdict
+
+**KILL, 0/90 survivors.** The mechanism established structurally in
+section 11 — fixed cost per trade against an ATR-scaled stop that shrinks
+with the square root of bar duration — reproduces cleanly on crypto despite
+a completely different cost regime (taker fee, not spread). This is not a
+redundant re-test: it confirms the finding generalizes across the specific
+economic source of the cost, not just across instruments that happen to
+share Dukascopy-style spread data. **Extends the "no price-pattern edge"
+conclusion to a fourth/fifth instrument class.**
+
+Files: `scripts/download_crypto_ohlcv.py`, `run_sweep_crypto.py`. Data:
+`data/BTCUSDT_*_2018_2025_binance.csv`, `data/ETHUSDT_*_2018_2025_binance.csv`,
+`data/crypto_ohlcv_report.csv`. Results: `results/sweep_crypto.csv`,
+`sweep_crypto_scored.csv`. Reproduce:
+`python scripts/download_crypto_ohlcv.py && python run_sweep_crypto.py`.
+
+**Cumulative trials: N=728** (638 prior + 90 crypto).
+
+> ⚠️ **2026-08-31, follow-up session — ANNUALISATION FACTOR CORRECTION,
+> flagged not re-run.** Crypto trades every calendar day, so the daily
+> return series above has a real observation on all 365 days/year, not 252
+> trading days/year like every FX/index/equity series in this repo. This
+> section used the repo-wide default `BARS_PER_YEAR=252` on that
+> 365-observation series, which UNDERSTATES the correct annualisation
+> factor by sqrt(252/365)=0.831x — true Sharpe magnitude throughout this
+> section is ~1.204x larger, same sign, than reported above. **This does
+> not flip the verdict**: best crypto DSR was ~0 (best cell Sharpe +0.56,
+> corrected ~+0.67), nowhere near the 0.95 bar either way, and every
+> SURVIVOR gate besides raw Sharpe sign is unaffected by a constant
+> rescaling — still 0/90 survivors. Found while building section 15
+> (`research/regime_switch.py`, which uses the correct 365 factor
+> throughout); the 90-cell grid above is NOT re-run (out of scope, verdict
+> unaffected) — flagged here rather than silently carried forward.
+
+---
+
+## 14. INDIVIDUAL US STOCKS — the same 5-family sweep, tested 2026-08-31, killed — but the most durable gross edge in the project
+
+### Why this run exists
+
+Every price-pattern kill in this project was tested on gold and index CFDs.
+Individual equities are a structurally different instrument class:
+idiosyncratic single-name risk, earnings gaps, no 24-hour session, and (for
+this small 6-name test) no survivorship concern since all 6 are chosen for
+liquidity/diversity, still trading today, not picked with hindsight of
+which looked good in a backtest.
+
+### Universe and why daily bars, stated as a limitation not worked around
+
+6 large-cap, diverse-sector S&P 500 names: **AAPL** (Technology), **JPM**
+(Financials), **XOM** (Energy), **JNJ** (Health Care), **WMT** (Consumer
+Staples), **CAT** (Industrials).
+
+yfinance intraday history was checked empirically before choosing a
+resolution: **60-minute bars covers about 1 year of history, 15-minute bars
+about 60 days.** Neither is remotely enough for this repo's standing
+8-year-in-regime + multi-year-holdout convention (section 7 rule 3). Per
+the task's explicit fallback, **daily bars are used instead** — a real,
+stated limitation. The 5-family grid's parameters (all expressed in bars)
+rescale to trading days instead of minutes/hours, the same honest rescaling
+section 11 did in the opposite direction (ATR 14 -> 14 trading days, EMA
+200 -> 200 trading days ~10 months, max hold H -> 12-96 trading days ~2-19
+weeks).
+
+### The grid and costs
+
+| axis | setting |
+|---|---|
+| Instruments | AAPL, JPM, XOM, JNJ, WMT, CAT |
+| Timeframe | D1 only (yfinance daily, `auto_adjust=True`) |
+| Families/variants | imported UNCHANGED from `strategies/sweep_families.py` |
+| Windows | in regime 2018-01-01 to 2025-12 (OOS split 2023-01-01); out of regime 2010-01-01 to 2017-12-31 (OOS split 2016-01-01) — a GENUINE multi-year holdout, unlike crypto, since all 6 tickers have clean daily data back to 2010 |
+| Costs | 2 bps stated round-turn spread (conservative for these 6 liquid names) + 1 bps commission + 0.5-1.5 bps slippage |
+| Grid | 6 x 1 x 5 x 3 = **90 configs per window** |
+
+`run_sweep_stocks_pre2018.py` holds no strategy/cost/scoring code — it
+rebinds names on `run_sweep_stocks` and calls its `main()`, same pattern as
+`run_sweep_m1_pre2018.py`.
+
+### The result — in regime (2018-2025)
+
+| gate | result |
+|---|---|
+| look-ahead guard | **90/90 PASS** |
+| gross PF > 1 | 58/90 |
+| net PF > 1 | 55/90 |
+| net Sharpe > 0 | 55/90 |
+| DSR > 0.95 | **0/90** (best 0.45, CAT breakout v1) |
+| OOS holds | 25/90 |
+| top year <= 60% of net R | 18/90 |
+| beats buy-and-hold | 3/90 (WMT macross v0, CAT breakout v1, CAT momentum v1) |
+| **SURVIVORS** | **0/90** |
+
+Best raw net Sharpe: CAT breakout v1, +0.97 (gross PF 2.19, net PF 2.15,
+cost_R 1.2%, DSR 0.45, OOS holds YES). AAPL's best config (SR +0.73) loses
+to AAPL buy-and-hold (SR +0.94) despite being a genuinely strong trading
+system — AAPL simply compounded harder than any of these 15 mechanical
+configs traded it.
+
+### The result — out of regime (2010-2017), and the persistence finding
+
+| gate | result |
+|---|---|
+| gross PF > 1 | 58/90 (mean PF **rose** 1.142 -> 1.201) |
+| net PF > 1 | 55/90 (unchanged count) |
+| mean net Sharpe | +0.074 -> **+0.082** (rose) |
+| DSR > 0.95 | **0/90** (best 0.19) |
+| beats buy-and-hold | 7/90 |
+| **SURVIVORS** | **0/90** |
+
+**43/90 cells are gross-positive in BOTH windows; 38/90 are net-profitable
+in BOTH windows.** This is the strongest cross-regime persistence of ANY
+candidate this project has tested — compare the index basket's 2/18, ORB's
+2/12, the M1 row's 3/30; only the Sneaky Pivot's 14/16 (on a much smaller
+16-cell grid) comes close. Mean gross PF did not merely survive the
+holdout, it improved.
+
+**Family ordering, and a genuine structural contrast with section 11:**
+
+| family | mean gross PF (in regime) | mean Sharpe (in regime) |
+|---|---|---|
+| breakout | 1.303 | +0.336 |
+| macross | 1.271 | +0.123 |
+| momentum | 1.167 | +0.128 |
+| trend | 1.131 | +0.094 |
+| meanrev | **0.838** | **-0.311** |
+
+Mean-reversion is the WORST family here, the only one with negative mean
+Sharpe — individual large-cap stocks trend on daily bars more than they
+mean-revert. This is the **opposite** finding from section 11's M1 row,
+where meanrev was the single best family (8/9 gross-positive cells) and
+breakout was the single worst (0/9). Same families, same code, opposite
+ranking at a different timeframe on a different instrument class — a real
+structural fact about market microstructure at these two scales, not a
+contradiction in the harness.
+
+### Verdict
+
+**KILL, 0/90 + 0/90 survivors in both windows — but this is the most
+durable gross edge this project has found on any price-pattern family.**
+It survives a genuine 8-year holdout not just intact but slightly stronger.
+It is still not tradeable, because two gates bind independently of cost or
+regime: **DSR never approaches 0.95 in either window** (the grid is too
+flat/noisy relative to its own 90-cell pool for any single config to be a
+statistical outlier), and **most cells lose to buy-and-hold** (AAPL, JPM,
+JNJ and WMT all compounded harder over these windows than any of the 15
+mechanical systems traded them; CAT and XOM are the exceptions). Extends
+the "no exploitable price-pattern edge" conclusion to a fourth instrument
+class, on the strongest evidence this project has produced for any
+single-name or basket price-pattern family.
+
+Files: `scripts/download_us_stocks.py`, `run_sweep_stocks.py`,
+`run_sweep_stocks_pre2018.py`. Data:
+`data/{AAPL,JPM,XOM,JNJ,WMT,CAT}_D1_2010_2025_yfinance.csv`,
+`data/us_stocks_report.csv`. Results: `results/sweep_stocks.csv`,
+`sweep_stocks_scored.csv`, `sweep_stocks_pre2018.csv`,
+`sweep_stocks_pre2018_scored.csv`. Reproduce:
+`python scripts/download_us_stocks.py && python run_sweep_stocks.py && python run_sweep_stocks_pre2018.py`.
+
+**Cumulative trials: N=908** (728 prior + 90 in regime + 90 out of regime).
+
+## 15. REGIME-ADAPTIVE STRATEGY SELECTION (BTC/ETH) — safeguards worked as designed, killed for a NEW reason, tested 2026-08-31
+
+### Why this run exists
+
+Every family/instrument in this project has been tested as a single static
+system. This asks a different question: can SWITCHING between the same 5
+families over time, using only trailing performance and with anti-whipsaw
+safeguards **designed in from the start**, beat both doing nothing
+(buy-and-hold) and picking one thing and sticking with it (the best static
+config from section 13)?
+
+### The design, every safeguard stated and how it was implemented
+
+| safeguard | implementation |
+|---|---|
+| Rank by trailing Sharpe, not raw return | `trailing_sharpe()` on each family's own daily net-return series, causal (`index < as_of` only) |
+| Hysteresis | challenger must exceed the incumbent's trailing Sharpe by **> 0.30** before a family-to-family switch is taken |
+| Minimum hold | decision dates are spaced **exactly one lookback window apart** (3mo or 6mo) — a switch cannot physically happen more often than once per window; this is structural, not a post-hoc check |
+| Circuit breaker | if the best candidate's trailing Sharpe is **< 0.0**, go to CASH instead of the least-bad loser |
+| Switching cost | 20bps (one Binance taker round-turn), charged only on an actual switch, kept separate from each family's own internal per-trade cost |
+
+Candidates: the same 5 families (`strategies/sweep_families.py`), variant v0
+of each (the first stated variant, same index for every family/instrument,
+chosen a priori, never cherry-picked), on **H4** — section 13's lowest-cost
+crypto timeframe (mean cost_R 7.6%), the only realistic base for a real
+switching system. Instruments: BTCUSDT, ETHUSDT. Lookbacks tested: 3 and 6
+months. Grid: 2 x 2 = **4 configs**.
+
+### A genuine correction to section 13, found and fixed here
+
+Crypto trades every calendar day, so the daily return series built for each
+family has a real observation on all 365 days/year, not 252 trading
+days/year like every FX/index/equity series in this repo. Section 13 used
+the repo-wide default `BARS_PER_YEAR=252` on that 365-observation series,
+which **understates** the correct annualisation factor — true Sharpe
+magnitude there is ~1.204x larger (sqrt(365/252)), same sign. **This does
+not flip section 13's verdict**: its best crypto DSR was ~0 (best cell
+Sharpe +0.56, corrected ~+0.67), nowhere near the 0.95 bar either way, and
+every other SURVIVOR gate is unaffected by a constant rescaling. This
+module uses the correct factor (365) throughout; section 13's 90-cell grid
+is flagged here rather than silently re-used, not re-run (out of this
+session's scope, verdict unaffected).
+
+### Causality — verified explicitly, not asserted
+
+`research/regime_switch.py::verify_causality()` independently re-derives
+every decision date's trailing Sharpe from the raw family return series and
+confirms (a) it matches the value the switching loop actually used, and
+(b) the window it was computed from contains no date on or after the
+decision date. **4/4 configs PASS.**
+
+### The result
+
+| inst | lookback | Sharpe(365) | DSR | net PF | maxDD | total ret | switches/decisions | switches/yr | time in cash | regime split holds |
+|---|---|---|---|---|---|---|---|---|---|---|
+| BTCUSDT | 3mo | -0.60 | 0.09 | 0.835 | 49.1% | -42.0% | 22/34 | 2.54 | 2.8% | no |
+| BTCUSDT | 6mo | -0.63 | 0.07 | 0.830 | 47.3% | -43.1% | 13/17 | 1.50 | 5.7% | no |
+| ETHUSDT | 3mo | -0.26 | 0.35 | 0.923 | 37.4% | -22.1% | 27/34 | 3.12 | 10.5% | no |
+| ETHUSDT | 6mo | -0.11 | 0.52 | 0.968 | 35.9% | -12.8% | 14/17 | 1.62 | 17.3% | no |
+
+**All 4 configs lose to both benchmarks:**
+
+| instrument | adaptive best | buy-and-hold | best static H4 (section 13) |
+|---|---|---|---|
+| BTCUSDT | SR -0.60 (3mo) | SR +0.64 | macross v1, SR +0.48 |
+| ETHUSDT | SR -0.11 (6mo) | SR +0.58 | breakout v1, SR +0.56 |
+
+**SURVIVORS: 0/4.** DSR does not clear 0.95 (best 0.52), the internal
+regime split (2018-21 vs 2022-25, informational — no genuine pre-2018
+crypto holdout exists, same limitation as section 13) does not hold in any
+of the 4 configs, and the adaptive approach beats neither benchmark on
+either instrument at either lookback.
+
+### Did the safeguards work as designed? YES, mechanically — switching frequency was NOT low, and here is exactly why
+
+The task's own prediction was that switching frequency should come out LOW
+given the safeguards. It did not: **22/34 (65%) and 13/17 (76%) of decision
+points resulted in a switch for BTCUSDT; 27/34 (79%) and 14/17 (82%) for
+ETHUSDT** — 1.5 to 3.1 switches per year. This was measured, not assumed,
+and it is worth explaining precisely rather than just reporting the number.
+
+**The minimum-hold safeguard worked exactly as designed** — a switch
+literally cannot occur more often than once per lookback window, by
+construction of the decision-date spacing, and `verify_causality()`
+confirms no decision ever used a future return. **The hysteresis safeguard
+also worked exactly as designed** — it correctly blocked every switch where
+the challenger's edge over the incumbent was ≤0.30 (median gap on a HOLD
+decision: 0.34; median gap when a switch actually fired: 0.80-0.91, well
+clear of the threshold — the gate itself is not leaking).
+
+**What failed is the ASSUMPTION that "differences of ≥0.3 trailing Sharpe
+are meaningful, not noise" on this data.** Measured directly: the median
+gap between the best and second-best of the 5 families' trailing Sharpe, at
+ANY decision point, is **0.67** — more than double the hysteresis margin.
+Individual family trailing Sharpes routinely swing by 2-5 points from one
+quarter to the next (e.g. BTCUSDT momentum: +2.19 -> +1.82 -> +0.76 ->
++1.31 -> -1.04 across five consecutive quarters in 2018-19). At the scale
+of a single family's daily-return series over a 3-6 month window on a
+noisy, high-volatility instrument, the SAMPLING NOISE of the trailing-
+Sharpe estimator is simply larger than any hysteresis margin that would
+still leave the system able to switch at all. A 0.3 margin was chosen as
+"a real gap, not a coin-flip margin" in the abstract, and it IS — the
+problem is that on this specific signal, real (non-noise) week-to-week
+regime persistence turns out to be weaker than the ESTIMATION noise of a
+5-way trailing-Sharpe horse race, so the hysteresis filter has almost
+nothing low-signal to filter out: nearly every quarter genuinely does
+present a large, non-marginal gap between the top candidate and whatever
+is currently held, but that gap mostly reflects estimator noise, not
+persistent skill.
+
+**This is a genuinely NEW failure mode, not a repeat of whipsaw or
+late-chasing** (both of which were the two mechanisms this design was built
+specifically to prevent, and did prevent — see above). The mechanism here
+is: **trailing Sharpe over 3-6 months, computed on 5 already-marginal
+strategies applied to a volatile instrument, is not a stable enough signal
+for even a real (non-coin-flip) hysteresis margin to produce low turnover.**
+The fix implied is not a bigger margin (an even larger hysteresis would
+just push the system further toward "always hold cash or the first pick,"
+which is a different design, not a validation of this one) — it is that
+none of the five candidate families has enough of an underlying edge (per
+section 13, none is close to a real DSR-significant edge) for a
+performance-chasing selector, however well-guarded, to have real signal to
+rotate on. Circuit breaker time-in-cash (2.8-17.3%) stayed low precisely
+because family trailing Sharpes cross zero individually often enough that
+SOME family usually looks positive even when none of them has a real edge
+— which is itself consistent with section 13's finding that these are five
+marginal, noisy systems, not the expected behaviour of a genuinely working
+regime detector.
+
+### Verdict
+
+**KILL, 0/4 survivors — for a new, precisely quantified reason: the
+switching signal (trailing Sharpe of five already-marginal crypto systems)
+is too noisy for a real, non-coin-flip hysteresis margin to produce low
+turnover, not because the safeguards leaked.** Both mechanically-verified
+mechanisms (minimum hold, hysteresis threshold) performed exactly as
+specified. The adaptive approach loses to both buy-and-hold and the single
+best static config on both instruments at both lookbacks tested.
+
+Files: `research/regime_switch.py` (engine), `run_regime_switch.py`
+(driver). Results: `results/regime_switch.csv` (per-config metrics),
+`results/regime_switch_decisions.csv` (every decision, every family's
+trailing Sharpe, every action — the full audit trail). Reproduce:
+`python run_regime_switch.py`.
+
+**Cumulative trials: N=912** (908 prior + 4 regime-switch cells).
+
+## 16. REGIME-SWITCH FOLLOW-UP — longer lookbacks (still no relief) and a seasonality test (clean negative), tested 2026-08-31
+
+Two extensions of section 15, requested as a genuinely separate question
+each: does a longer trailing-Sharpe lookback fix the switching-frequency
+problem (Part A), and does a completely different selection mechanism —
+calendar seasonality instead of recent performance — find any real signal
+(Part B)? `research/regime_switch.py`'s engine (hysteresis 0.30, circuit
+breaker floor 0.0, switch cost 20bps, minimum hold structural) is reused
+byte-for-byte unchanged in Part A; Part B is a genuinely different
+mechanism and is tested on its own terms, not forced through the same
+switching engine.
+
+### PART A — longer lookbacks (12mo, 24mo), does switching frequency drop?
+
+**Prediction being tested**: if section 15's high switching frequency
+(65-82% of decisions) was purely a small-sample noise artefact of 3-6
+month trailing-Sharpe windows, lengthening the window should push it down
+toward something sane (the task's own bar: <20%).
+
+| lookback | switching frequency (pooled, 2 instruments) | decisions (total) |
+|---|---|---|
+| 3mo | 72.1% | 68 |
+| 6mo | 79.4% | 34 |
+| 12mo | **62.5%** | 16 |
+| 24mo | 87.5% | 8 |
+
+**It did not drop toward sane.** 12-month lookback is the best of the four
+(62.5%), still more than 3x the task's own "sane" bar of 20%. 24-month
+lookback — caveat: only 8 total decisions across both instruments, so this
+number is itself noisy (one flip moves it 12.5 points) — came back UP to
+87.5%, the highest of any lookback tested. There is no monotonic
+improvement with window length in this data.
+
+**Full comparison table, all 4 lookbacks:**
+
+| inst | LB | Sharpe(365) | DSR | net PF | maxDD | total ret | switches/decisions | switch% | time in cash | regime holds |
+|---|---|---|---|---|---|---|---|---|---|---|
+| BTCUSDT | 3mo | -0.60 | 0.09 | 0.835 | 49.1% | -42.0% | 22/34 | 64.7% | 2.8% | no |
+| BTCUSDT | 6mo | -0.63 | 0.07 | 0.830 | 47.3% | -43.1% | 13/17 | 76.5% | 5.7% | no |
+| BTCUSDT | 12mo | -0.37 | 0.25 | 0.866 | 26.2% | -23.5% | 5/8 | 62.5% | 23.1% | no |
+| BTCUSDT | 24mo | -0.19 | 0.43 | 0.911 | 26.2% | -11.5% | 3/4 | 75.0% | 46.2% | no |
+| ETHUSDT | 3mo | -0.26 | 0.35 | 0.923 | 37.4% | -22.1% | 27/34 | 79.4% | 10.5% | no |
+| ETHUSDT | 6mo | -0.11 | 0.52 | 0.968 | 35.9% | -12.8% | 14/17 | 82.4% | 17.3% | no |
+| ETHUSDT | 12mo | -0.12 | 0.51 | 0.963 | 27.3% | -12.7% | 5/8 | 62.5% | 19.2% | no |
+| ETHUSDT | 24mo | -0.35 | 0.27 | 0.895 | 40.2% | -26.5% | 4/4 | 100.0% | 30.7% | no |
+
+**All 8 cells still lose to buy-and-hold AND to the best static section-13
+config, on both instruments, at every lookback tested.** Best per instrument:
+BTCUSDT SR -0.19 (24mo) vs B&H +0.64 vs best static +0.48; ETHUSDT SR -0.11
+(6mo) vs B&H +0.58 vs best static +0.56. DSR does drift up somewhat with
+longer lookback (0.07-0.09 at 3-6mo -> 0.25-0.52 at 12-24mo) simply because
+fewer, chunkier decisions reduce estimation noise in the DSR calculation
+itself — but no cell approaches 0.95, and Sharpe stays negative throughout.
+No regime split (2018-21 vs 2022-25) holds at any lookback.
+
+**Reading: longer lookbacks reduce absolute switch COUNT (fewer decision
+points exist per year by construction) but do not reduce the underlying
+PROBLEM identified in section 15** — the gap between the best and
+second-best family's trailing Sharpe remains large relative to the 0.30
+hysteresis margin at every window length tested, because family-level
+performance genuinely does not persist reliably from one evaluation period
+to the next on this data, regardless of how that period is sized. This
+confirms, rather than merely repeats, section 15's finding: the noise is
+not a 3-6 month artefact.
+
+**New trials this batch: 4** (2 instruments x {12mo, 24mo}). Files:
+`run_regime_switch_longlb.py`. Results: `results/regime_switch_longlb.csv`,
+`results/regime_switch_longlb_decisions.csv`,
+`results/regime_switch_all_lookbacks.csv` (all 4 lookbacks combined).
+Reproduce: `python run_regime_switch_longlb.py`.
+
+### PART B — seasonality: a genuinely different mechanism, tested properly, clean negative
+
+**Method, stated before any result was read** (`scripts/test_seasonality.py`):
+for each (instrument, family) — the SAME 5 families, variant v0, UNCHANGED
+— each daily H4 net-return series is aggregated into one number per
+(calendar year, calendar quarter): the sum of daily returns in that
+quarter, restricted to COMPLETE quarters only (2026 Q3 excluded — the data
+ends 2026-08-31, partway through Jul-Sep). A Kruskal-Wallis test (chosen
+because per-quarter sums are not assumed Gaussian) is run per
+(instrument, family) across the 4 quarter groups (~8-9 year-observations
+each): H0 = the calendar quarter makes no difference to that family's
+return distribution. **5 families x 2 instruments = 10 independent tests,
+Bonferroni-corrected: alpha = 0.05/10 = 0.005**, decided before any
+p-value was read.
+
+| result | value |
+|---|---|
+| tests run | 10 (5 families x BTCUSDT/ETHUSDT) |
+| pairs clearing Bonferroni threshold (p < 0.005) | **0/10** |
+| pairs clearing even the UNCORRECTED alpha=0.05 | **0/10** |
+| smallest raw p-value observed | **0.258** (BTCUSDT macross) — not close to either bar |
+| largest KW statistic | 4.032 (BTCUSDT macross) |
+
+**CONCLUSION: no statistically real seasonal pattern exists in this test —
+a clean negative, not a near-miss dressed up as a finding.** Per the task's
+explicit instruction, no seasonal selection rule was built or backtested:
+picking the smallest-p-value cell (BTCUSDT macross, p=0.258) and
+backtesting it anyway would be exactly the "eyeball a table and pick the
+best-looking cell" failure mode this test exists to prevent, and at p=0.258
+there is nothing there to pick even informally — a quarter effect this
+weak is indistinguishable from chance with ~8-9 years of data per group.
+
+**This is still a real, disclosed part of the project's search space, even
+though it produced no backtest.** 10 genuine a priori statistical
+hypotheses were tested. Because none produced a Sharpe-bearing backtested
+configuration, **these 10 tests are NOT added to the Sharpe/DSR trial
+pool** (DSR requires an actual Sharpe value; forcing an entry for a pure
+hypothesis test with none would corrupt, not honestly extend, that pool) —
+but they ARE disclosed here as a separately-tracked multiple-comparisons
+budget, exactly the same principle this project applies to every other
+batch: state the search that was actually done, not just the one config
+that would look best if reported alone.
+
+Files: `scripts/test_seasonality.py`. Results: `results/seasonality_test.csv`
+(all 10 KW tests), `results/seasonality_quarter_means.csv` (the per-quarter
+means the tests were run on, for anyone who wants to verify the negative
+result by eye). Reproduce: `python scripts/test_seasonality.py`.
+
+### Combined verdict
+
+**Both parts KILL. Neither failure mode is new-new relative to what
+sections 13/15 already established, but each closes a real, previously-open
+question honestly:**
+- Part A: a longer lookback does not rescue safeguarded switching —
+  confirms section 15's diagnosis holds across the whole reasonable
+  lookback range (3-24 months), not just the two originally tested.
+- Part B: seasonality is a genuinely different, independently-tested
+  hypothesis, and it is cleanly negative — the five families do not have
+  detectable calendar-quarter structure on this crypto data, at any
+  reasonable significance bar.
+
+**Cumulative trials: N=916** (912 prior + 4 lookback-expansion cells; the
+10 seasonality hypothesis tests are disclosed above but not added to the
+Sharpe/DSR trial count, since none produced a backtested Sharpe).
+
+## 17. MOMENTUM ROTATION — DOES THE MECHANISM GENERALIZE TO NEW UNIVERSES? Tested 2026-08-31, killed on both, differently
+
+### Why this run exists
+
+Sections 12/12.1-12.4 established that the audited momentum-rotation
+mechanism (trailing N-month return ranking + a causal long-SMA market
+filter) beats SPY on a risk-adjusted basis on the original 17-ETF US-sector
+universe, survives two independent audits, and is robust to filter/cost
+perturbation — but never clears DSR against even its own 4-cell pool, and
+was never tested on any universe besides US sector/asset-class ETFs. This
+asks the obvious next question: is the MECHANISM general, or is it a
+property of that one universe?
+
+### A necessary, additive change to `research/momentum_rotation.py` — verified non-breaking
+
+`build_weights()` hardcoded `BENCHMARK="SPY"` and `DEFENSIVE="IEF"` as
+module constants, which cannot work for a universe with no SPY column
+(crypto) or where SPY is itself a ranked competitor (country ETFs, per this
+task's own design). Two optional parameters, `benchmark` and `defensive`,
+were added — same additive convention already used twice before in this
+file (`sma_window`, `rebalance_step`, section 12.3) — defaulting to the
+original constants, so every existing call site is unaffected. **Verified,
+not assumed**: `build_weights(adjclose, 6, 3)` and `build_weights(adjclose,
+12, 5)` on the original 17-ETF panel reproduce first-execution dates
+1999-07-01 and 2000-01-03 exactly, matching section 12.1's audited values,
+before any new-universe result was trusted. The ranking logic, the causal
+filter logic, the execution lag, and `simulate()`'s cost model are all
+**byte-for-byte unchanged**.
+
+### Grid and methodology — identical to the audited (corrected) original
+
+N in {6, 12} months, K in {3, 5} holdings — same 4-cell grid per universe.
+Same causal execution lag (unchanged code). Metrics computed on each
+config's own live window from the start (the section-12.1 correction is
+built in from the beginning here, not repeated as a bug and then fixed).
+Look-ahead guard reused unchanged (`look_ahead_guard()`): **8/8 PASS.**
+
+### Universe A — crypto sectors
+
+11 ranked instruments across 6 categories (real Binance spot, verified
+inception dates): **ETH, SOL, BNB, ADA, AVAX** (L1 smart-contract
+platforms), **UNI, AAVE** (DeFi), **LINK** (oracle/infrastructure),
+**SAND, MANA** (gaming/metaverse), **DOGE** (meme-coin). Benchmark/filter
+basis: **BTC** (excluded from ranking — crypto's own SPY-equivalent "is the
+market risk-on" gauge). Defensive leg: **CASH_USD**, a synthetic
+constant-price (0% return, no yield) column — no crypto equivalent of IEF
+exists; stated as a conservative simplification (real stablecoin holdings
+typically earn some yield, so this understates the true defensive return —
+the safe direction to be wrong). Costs: **12 bps/side (24 bps round-turn)**
+— Binance spot taker fee (10bps) + a 2bps slippage cushion, reflecting
+section 13's finding that crypto cost is fee-dominated, not
+spread-dominated; a genuinely different, honestly-derived cost input from
+the ETF study's 3bps/side, not a copy-paste.
+
+| N | K | first live exec | Sharpe | DSR | CAGR | maxDD | top-year share | beats BTC bench | beats equal-wt basket |
+|---|---|---|---|---|---|---|---|---|---|
+| 6 | 3 | 2018-06-01 | +0.695 | 0.22 | 25.9% | 65.8% | **74%** | YES | YES |
+| 6 | 5 | 2019-08-01 | +0.812 | 0.36 | 37.4% | 65.7% | **92%** | YES | YES |
+| 12 | 3 | 2018-12-01 | +0.764 | 0.31 | 30.1% | 66.5% | **78%** | no | no |
+| 12 | 5 | 2020-02-01 | +0.944 | 0.54 | 48.0% | 57.0% | **77%** | YES | YES |
+
+**Gate tally: guard 4/4, Sharpe>0 4/4, DSR>0.95 0/4, not concentrated 0/4,
+beats bench 3/4, beats basket 3/4 — SURVIVORS 0/4.**
+
+**Stress window: 2022-01-01 → 2022-12-31 (LUNA collapse May 2022, FTX
+collapse Nov 2022)** — crypto's own severe stress period; crypto data does
+not reach back to a decade-scale holdout the way the original 2000-2009
+test did, stated honestly rather than faked. Result, and precisely what it
+means: the strategy posts Sharpe +0.76 to +0.78 and near-zero maxDD (0.2%)
+in this window, decisively beating both BTC buy-and-hold (Sharpe **-1.07**)
+and the equal-weight basket (**-0.61 to -0.74**) — **but this is because
+the BTC-based 200-day SMA filter flags risk-off almost immediately and the
+strategy sits in CASH_USD for effectively the entire year** (verified
+directly: 363 of 365 days in the window carry exactly zero net return,
+across every N/K config, since the filter is N/K-independent). This is a
+real, correctly-computed, mechanistically coherent result — the defensive
+filter does exactly its job — but it is a "the filter went to cash and 0%
+beat a crash" result, not "the ranking picked resilient crypto sectors
+during the stress period." Worth stating precisely rather than reporting
+the flattering Sharpe number without its mechanism.
+
+**What actually kills it: single-year concentration, badly.** Top calendar
+year carries 74-92% of total log-return across all 4 configs — none comes
+close to the 60% bar every other candidate in this project is held to, and
+by a wide margin. This is the SAME failure signature that killed the index
+trend basket (section 6), Sneaky Pivot (section 9), and ORB (section 10) —
+a real gross/risk-adjusted edge that is not a best-of-N artefact (it beats
+its own benchmarks in 3/4 configs) but is concentrated in one dominant
+period (almost certainly the 2020-2021 bull run) rather than being a
+repeatable, diversified source of return.
+
+### Universe B — country/region equity ETFs
+
+10 ranked instruments: **EWJ** (Japan), **EWG** (Germany), **EWU** (UK),
+**EWZ** (Brazil), **INDA** (India), **FXI** (China), **EFA** (developed
+ex-US, broad), **EEM** (emerging markets, broad), **SPY** (United States —
+explicitly a ranked competitor here, per the task's instruction, unlike
+the original study where it was the excluded benchmark), **IEF**
+(defensive leg, the SAME instrument the original study used, reused
+unchanged). New benchmark/filter basis: **ACWI** (MSCI All-Country World
+Index, global, excluded from ranking — SPY could no longer play this role
+since it is now a ranked competitor). Costs: same 3bps/side as the
+original study — same instrument class, no reason to re-derive.
+
+| N | K | first live exec | Sharpe | DSR | CAGR | maxDD | top-year share | beats ACWI bench | beats equal-wt basket |
+|---|---|---|---|---|---|---|---|---|---|
+| 6 | 3 | 2009-02-02 | +0.354 | 0.39 | 4.40% | 29.7% | 29% | no | no |
+| 6 | 5 | 2009-02-02 | +0.425 | 0.51 | 5.26% | 26.4% | 26% | no | no |
+| 12 | 3 | 2009-02-02 | +0.312 | 0.33 | 3.63% | 25.4% | 32% | no | no |
+| 12 | 5 | 2009-02-02 | +0.385 | 0.44 | 4.54% | 24.8% | 30% | no | no |
+
+**Gate tally: guard 4/4, Sharpe>0 4/4, DSR>0.95 0/4, not concentrated 4/4,
+beats bench 0/4, beats basket 0/4 — SURVIVORS 0/4.**
+
+All 4 configs start live on the same date (2009-02-02) because ACWI's
+2008-03-28 inception plus the 200-day SMA warmup sets a single binding
+constraint regardless of N/K — a genuine data-depth artefact of choosing a
+2008-launched global benchmark, stated not hidden.
+
+**Stress window: 2008-01-01 → 2012-12-31 (GFC + Eurozone debt crisis)** —
+the earliest stress period available, constrained by ACWI's 2008-03-28
+inception (a real limitation: this cannot reach back to the original
+study's full 2000-2009 window because its NEW benchmark didn't exist for
+most of it). Unlike crypto, the strategy stays genuinely invested through
+this window (mean stress Sharpe +0.04 to +0.15, weakly positive, not a
+cash-parking artefact) but **loses to both ACWI (Sharpe +0.775) and the
+equal-weight basket (+0.713) in every cell** — the opposite failure mode
+from crypto: here concentration is NOT the problem (best-in-project-class
+26-32% top-year share, comfortably under the 60% bar), but the risk-adjusted
+return itself is simply mediocre — not badly wrong, just consistently
+behind both of the things it needs to beat.
+
+### Full comparison — original US-sector ETFs vs the two new universes
+
+| metric (best cell) | original US-sector ETFs (§12.1) | crypto sectors | country ETFs |
+|---|---|---|---|
+| Sharpe (best cell) | 0.608 (N12K5) | 0.944 (N12K5) | 0.425 (N6K5) |
+| DSR (best cell) | 0.505 | 0.54 | 0.51 |
+| beats own benchmark (Sharpe) | **4/4** | 3/4 | **0/4** |
+| beats equal-weight basket | n/a (not tested in §12) | 3/4 | **0/4** |
+| top-year concentration | **4/4 PASS** (12.4-13.8%) | **0/4 PASS** (74-92%) | **4/4 PASS** (26-32%) |
+| stress-window behavior | filter avoids two crashes while STAYING partly invested; beats SPY 4/4 | filter goes ~100% cash for the whole stress year; "beats" BTC by not participating, not by better picks | stays invested; weakly positive but loses to both benchmarks |
+| DSR > 0.95 | 0/4 | 0/4 | 0/4 |
+| **SURVIVORS** | 0/4 | **0/4** | **0/4** |
+
+### Verdict
+
+**KILL on both new universes — but for two DIFFERENT, informative reasons,
+neither of which is simply "the original US-sector result, restated."**
+
+- **Crypto sectors**: the mechanism produces a real, benchmark-beating
+  gross/risk-adjusted edge (3/4 cells beat both BTC and the equal-weight
+  basket) — but it is catastrophically single-year concentrated (74-92%,
+  worse than every other candidate this project has tested, including the
+  ones killed specifically for concentration). It also does not clear DSR.
+  The stress-window "win" is a cash-parking artefact of the defensive
+  filter, not evidence the ranking works well in a crypto crash.
+- **Country ETFs**: concentration is genuinely NOT a problem (the best
+  result in this project's history on that specific gate), and the
+  strategy stays meaningfully invested through its own stress window — but
+  the risk-adjusted return is simply not good enough: it loses to buy-and-
+  hold ACWI and to an equal-weight country basket in every single cell,
+  both in the full period and the stress window. DSR does not clear
+  either.
+
+**Neither universe validates the mechanism as general.** The original
+US-sector result's specific combination — a real edge that beats its
+benchmark on Sharpe AND is not concentrated AND (per section 12.1) beats
+SPY's CAGR on a vol-matched basis — does not reproduce on either new
+cross-section tested here. This narrows, rather than broadens, what can
+honestly be claimed for the mechanism: it worked, imperfectly (DSR-
+insignificant even there), on the ONE universe it was originally built and
+audited on, and neither of two structurally different cross-sections
+(crypto sectors, global equity regions) reproduces that same combination
+of strengths.
+
+Files: `research/momentum_rotation.py` (additive `benchmark`/`defensive`
+params, verified non-breaking), `scripts/download_crypto_momentum_universe.py`,
+`scripts/download_momentum_countries.py`,
+`run_momentum_rotation_generalization.py`. Data:
+`data/momentum_crypto_adjclose.csv`, `data/momentum_crypto_report.csv`,
+`data/momentum_countries_adjclose.csv`, `data/momentum_countries_report.csv`.
+Results: `results/momentum_rotation_generalization.csv`. Reproduce:
+`python scripts/download_crypto_momentum_universe.py && python scripts/download_momentum_countries.py && python run_momentum_rotation_generalization.py`.
+
+**Cumulative trials: N=924** (916 prior + 8 generalization cells: 4 crypto
++ 4 country-ETF configs).
+
+## 18. POSITIONING-EXTREME CONTRARIAN REVERSAL — funding rate + open interest, BTC/ETH, tested 2026-08-31, killed cleanly
+
+### Why this run exists
+
+Every candidate tested so far in this project — sections 1-11 (price-pattern
+families on gold/indices), section 13 (the same families on crypto),
+section 17 (momentum rotation on new universes) — trades PRICE SHAPE: some
+function of past OHLC. This tests a genuinely different information
+category: a bet on OTHER TRADERS' POSITIONING. Mechanism, stated in one
+sentence (also in `strategies/positioning_reversal.py`'s docstring): when
+funding rate sits at an extreme percentile of its own trailing distribution
+AND open interest is elevated (many traders crowded onto the side paying
+that extreme funding), the crowd is prone to a forced unwind/squeeze as the
+extreme resolves — this trades a documented phenomenon (crowded-positioning
+squeezes / funding-rate mean reversion), not an arbitrary rule.
+
+### Data — reused, not re-derived, from the prior checkpointed probe
+
+`notes/crypto_data_availability.md` (probed 2026-08-22) already established
+the binding constraint, reused here verbatim: **Binance's own open-interest
+history is ~30-day retention only** (verified: any `startTime` before
+~2026-07-25 returns HTTP 400 `-1130`) — unusable for a multi-year study.
+Open interest comes from **Bybit v5** instead (funding rate stays on
+Binance, which has full history). This cross-venue split (funding=Binance,
+OI=Bybit) is stated, not hidden, per repo convention (data venue != execution
+venue). Fresh pull (`scripts/download_crypto_funding_oi.py`), verified
+depth matching the prior probe closely:
+
+| symbol | funding obs (Binance, 8h) | funding start | OI obs (Bybit, 1h) | OI start | OI gaps > 3h |
+|---|---|---|---|---|---|
+| BTCUSDT | 7,641 | 2019-09-10 | 53,228 | 2020-08-04 | 0 |
+| ETHUSDT | 7,407 | 2019-11-27 | 51,355 | 2020-10-21 | 0 |
+
+**Bybit OI is the shallow leg and sets the usable window, exactly as the
+prior probe predicted** — years shorter than the H1 price panel already on
+disk (2018-01-01) or the funding-only history (2019). After a further
+90-day rolling-percentile warmup, the actual usable start is
+**2020-11-02 (BTC)** and **2021-01-19 (ETH)** — stated plainly, not
+silently shortened.
+
+### Causality — the real risk in this study, verified explicitly (not the usual position-series guard alone)
+
+The novel risk here is a leaked FEATURE value (a funding/OI observation
+used before it was actually knowable), a different failure mode from a
+leaked trade resolution. Both funding_pctl and oi_pctl are computed on
+each feature's own native timestamps using a strictly causal rolling
+window (funding: trailing 270 obs = 90 days @ 8h; OI: trailing 2160 obs =
+90 days @ 1h — each observation's percentile rank uses only observations
+at or before it), aligned onto the H1 price index via `merge_asof`
+(backward match: each bar gets the latest feature value at or before its
+own timestamp), **then lagged by one additional full H1 bar** as an
+explicit conservative safety buffer beyond the already-causal merge.
+`verify_feature_causality()` asserts, for every bar actually used, that the
+feature's source timestamp is strictly before that bar's own timestamp —
+**PASS for both features, both instruments.** The existing position-series
+look-ahead guard (`research/backtest.py`) is also reused unchanged and
+independently confirms no held position correlates with future returns:
+**8/8 PASS.**
+
+### Strategy — every threshold stated, grid small and a priori
+
+| parameter | value | note |
+|---|---|---|
+| funding_bar | **5%, 10%** (grid axis) | each tail of funding rate's own trailing 90-day percentile distribution |
+| oi_bar | **70th percentile** (fixed, not swept) | "elevated" open interest = top 30% of its own trailing 90-day distribution |
+| direction | contrarian | funding extreme HIGH (crowded longs) -> SHORT; extreme LOW (crowded shorts) -> LONG |
+| stop | 1.0 x ATR(14), H1 | tighter than the trend-family stops — a squeeze thesis expects a fast move |
+| target | **1.5R, 2.0R** (grid axis) | |
+| max hold | 48 bars (H1) = 2 days | funding resets every 8h; an unwind is expected to resolve fast if it's going to |
+| costs | SAME as section 13's crypto sweep — `CRYPTO_COST_BPS` (20bps taker-fee-dominated round-turn), imported unchanged | |
+| ann. factor | 365 (section-13 correction, applied correctly from the start) | |
+
+2 instruments x 4 grid cells (funding_bar x R) = **8 configs.**
+
+### The result — headline numbers, then immediately qualified by concentration and OOS (per the task's explicit instruction)
+
+| inst | v | funding_bar | R | trades | gross PF | net PF | Sharpe | DSR | maxDD | cost_R% | top-yr | OOS holds | vs B&H |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| BTCUSDT | 0 | 5 | 1.5 | 419 | 1.042 | 0.598 | -2.13 | 0.05 | 75.7% | 34.3% | n/a | no | lose |
+| BTCUSDT | 1 | 5 | 2.0 | 414 | 1.055 | 0.655 | -1.74 | 0.27 | 74.2% | 33.8% | n/a | no | lose |
+| BTCUSDT | 2 | 10 | 1.5 | 541 | 1.032 | 0.589 | -2.44 | 0.01 | 83.5% | 34.6% | n/a | no | lose |
+| BTCUSDT | 3 | 10 | 2.0 | 531 | 1.035 | 0.640 | -2.07 | 0.08 | 82.3% | 34.1% | n/a | no | lose |
+| ETHUSDT | 0 | 5 | 1.5 | 392 | 0.971 | 0.651 | -1.76 | 0.26 | 67.2% | 24.8% | n/a | no | lose |
+| ETHUSDT | 1 | 5 | 2.0 | 381 | 0.978 | 0.686 | -1.52 | 0.47 | 67.6% | 24.9% | n/a | no | lose |
+| ETHUSDT | 2 | 10 | 1.5 | 508 | 0.982 | 0.657 | -1.93 | 0.15 | 76.3% | 25.0% | n/a | no | lose |
+| ETHUSDT | 3 | 10 | 2.0 | 494 | 0.980 | 0.685 | -1.73 | 0.29 | 76.9% | 25.1% | n/a | no | lose |
+
+**There is barely a gross edge to begin with** (gross PF 0.971-1.055 —
+essentially the coin-flip baseline every family sweep in this project uses
+as its own reference point for "no signal"), and what little exists is
+consumed by cost (cost_R 24.8-34.6% of 1R — the same cost-vs-stop-distance
+mechanism sections 11 and 13 established, now confirmed on a genuinely
+different signal type: a 1x-ATR H1 stop is tight enough that even this
+strategy's own inherently low trade frequency (funding/OI extremes are
+rare) does not protect it from the fixed-cost-vs-tight-stop problem).
+
+### CONCENTRATION — reported prominently, per the task's explicit instruction, not as a footnote
+
+**"top%" is n/a for all 8 configs — worse than concentration, not a pass**:
+total net R is negative in every single cell, so the top-year-share ratio
+is undefined by this project's own stated convention (a losing config must
+not be waved through by an undefined ratio). The per-year breakdown shows
+why plainly: every config is net-negative in **every calendar year from
+2022 onward**, with the single largest loss cluster in **2023** (-40 to
+-54 net R across all 8 configs) — not a concentration story where one bad
+year explains an otherwise-good result, but a strategy that simply loses
+money in most years it traded. This is the CLEAN opposite of the
+"deceptively concentrated" pattern sections 6/9/10 and — most recently —
+section 17's crypto-sectors result exhibited (a real edge hiding behind one
+dominant year): here there is no edge to hide, in any year.
+
+### OUT-OF-REGIME SPLIT — 2023-01-01, same convention as sections 11/13/16
+
+| inst | v | IS trades | IS PF | IS Sharpe | OOS trades | OOS PF | OOS Sharpe | holds? |
+|---|---|---|---|---|---|---|---|---|
+| BTCUSDT | 0 | 201 | 0.722 | -3.41 | 218 | 0.502 | -7.02 | no |
+| BTCUSDT | 1 | 199 | 0.780 | -2.53 | 215 | 0.558 | -5.93 | no |
+| BTCUSDT | 2 | 255 | 0.682 | -3.92 | 286 | 0.517 | -6.67 | no |
+| BTCUSDT | 3 | 252 | 0.742 | -3.08 | 279 | 0.561 | -5.85 | no |
+| ETHUSDT | 0 | 199 | 0.768 | -2.75 | 193 | 0.549 | -5.82 | no |
+| ETHUSDT | 1 | 190 | 0.845 | -1.70 | 191 | 0.553 | -5.76 | no |
+| ETHUSDT | 2 | 248 | 0.793 | -2.35 | 260 | 0.547 | -5.97 | no |
+| ETHUSDT | 3 | 237 | 0.832 | -1.83 | 257 | 0.570 | -5.66 | no |
+
+**Negative in-sample AND negative out-of-sample, every cell — and it gets
+WORSE out of sample**, not just fails to improve. There is no regime in
+this window where the strategy worked; 0/8 hold by any definition.
+
+### DSR — computed, but the same caveat this project has applied before when a pool is uniformly bad
+
+Structural pool = this batch's own 8 a priori cells: E[max SR] **-1.491**
+(mean -1.916, sd 0.291) — a deeply negative pool. As sections 11 and 13
+already established, when every cell in the pool is bad, DSR is not doing
+informative work and a merely-less-catastrophic cell can post a
+higher-looking DSR (best here: ETHUSDT v1, DSR 0.474) while still losing
+money on every trade — **SURVIVOR requires net PF>1 and Sharpe>0, both of
+which bind long before DSR does, and neither one clears on any cell.**
+
+### Verdict
+
+**KILL, 0/8 survivors, cleanly and completely** — every gate fails except
+the causality/look-ahead guards (8/8 PASS, confirming the test itself is
+methodologically sound, not merely unlucky in its result). No gross edge
+to speak of (PF ~1.00), what exists is eaten by cost, concentration is
+undefined because there's no positive return to concentrate, out-of-sample
+performance is worse than in-sample, and every config loses decisively to
+simple buy-and-hold (BTC B&H Sharpe +0.81, ETH +0.50, vs this strategy's
+best of -1.52). **The positioning-extreme contrarian hypothesis, at the
+specification tested here (H1 execution, 1x-ATR stop, 2-day max hold, 5%/
+10% funding tails, 70th-percentile OI threshold), is not real.** This is
+the first non-price-based signal tested in this project, and the answer is
+a clean, honestly-earned no — extending the "no exploitable edge in the
+free data this project can reach" conclusion to a genuinely different
+information category, not merely repeating it on another price series.
+
+Files: `scripts/download_crypto_funding_oi.py`,
+`strategies/positioning_reversal.py`, `run_positioning_reversal.py`. Data:
+`data/{BTCUSDT,ETHUSDT}_funding_binance.csv`,
+`data/{BTCUSDT,ETHUSDT}_oi_bybit.csv`, `data/crypto_funding_oi_report.csv`.
+Results: `results/positioning_reversal.csv`,
+`results/positioning_reversal_scored.csv`. Reproduce:
+`python scripts/download_crypto_funding_oi.py && python run_positioning_reversal.py`.
+
+**Cumulative trials: N=932** (924 prior + 8 positioning-reversal cells).
+
+## 19. CROSS-ASSET LEAD-LAG — a third information category, tested 2026-08-31, clean statistical negative
+
+### Why this run exists
+
+Every candidate tested so far in this project was self-referential: an
+asset predicting its own future from its own past (price patterns,
+sections 1-11/13), its own cross-sectional rank among similar assets
+(momentum rotation, sections 12/17), or its own positioning extremes
+(section 18). This tests a third, genuinely different information
+category: does ONE market's move predict ANOTHER market's move with a lag?
+
+### A real bug caught and fixed before any p-value was trusted
+
+The DXY→XAUUSD/CEW pairing initially used `searchsorted` to find "the next
+trading day after DXY's date" in the target series — but DXY's real ICE
+index history reaches back to 1971, while XAUUSD's Dukascopy archive starts
+2018 and CEW's inception is 2009. Every DXY date BEFORE the target's
+inception silently collapsed onto the target's very first available date
+(searchsorted's natural behavior at the start of an array), which would
+have paired **decades of stale, temporally meaningless DXY returns** against
+a single early target observation, corrupting the sample (n=13,965 and
+n=14,129 — nearly the whole of DXY's 1971-2026 history — for windows that
+should hold at most ~1,800-4,300 genuine daily pairs). Caught by checking
+the raw counts against what the actual overlapping window should produce,
+**before** reading any correlation or p-value. Fixed with an explicit
+"next day" sanity bound (reject any pairing more than 5 calendar days
+apart) and re-run. This is exactly the kind of look-ahead-adjacent bug the
+task warned cross-asset alignment is prone to — not a missing timestamp
+lag, but a silent index-alignment fallback that only manifests when the two
+series have different starting depths, and it would have inflated both `n`
+and (by diluting genuine signal with noise from an unrelated era)
+distorted the correlation estimate had it gone unnoticed.
+
+### Four pre-registered pairs, exact lag and causal design stated for each
+
+| # | pair | signal | target | lag |
+|---|---|---|---|---|
+| 1 | NAS100 → BTC | prior UTC-day close-to-close return (last H1 bar of day D-1 to last H1 bar of day D) | BTC's forward 4h return | entry = first BTCUSDT H1 bar strictly after NAS100's signal timestamp, **plus one further conservative H1 bar of lag** |
+| 2 | NAS100 → BTC | same | BTC's forward 8h return | same |
+| 3 | DXY → XAUUSD | prior trading-day close-to-close return (real ICE US Dollar Index) | XAUUSD's UTC-calendar-day return on the FIRST day strictly after DXY's close | next full day only, never same-day |
+| 4 | DXY → CEW | same | CEW's close-to-close return on its next NYSE trading day | same |
+
+**DXY source, stated as required**: the task offered UUP (an ETF proxy) or
+"a better free DXY source if one exists." yfinance serves **DX-Y.NYB**, the
+actual ICE US Dollar Index (not an ETF wrapper) with history to 1971 vs
+UUP's 2007 inception and its own expense-ratio/tracking-error noise on top
+— used instead of UUP for exactly that reason.
+
+**Causality — verified explicitly for every observation, not sampled**:
+`verify_causality()` asserts the entry/target timestamp is strictly after
+the signal timestamp for every row used. **All 4 pairs: PASS, 100% of
+observations**, both before and after the sanity-bound fix above.
+
+### METHOD, stated before any result was read
+
+Pearson correlation between the lagged predictor return and the forward
+target return (all non-overlapping observations — NAS100 signals are one
+per UTC day against a 4-8h target window; DXY/XAUUSD/CEW are daily-to-
+next-daily). Two-sided t-test on the correlation coefficient.
+**Bonferroni correction: alpha=0.05 / 4 tests = 0.0125**, decided before
+any p-value was read — same discipline section 16's seasonality test used.
+
+### RESULTS — the actual numbers, not just the verdict
+
+| pair | n | r | p-value | causal | significant (Bonferroni) |
+|---|---|---|---|---|---|
+| DXY → CEW (next day) | 4,339 | -0.0359 | **0.0179** | PASS | no |
+| DXY → XAUUSD (next day) | 1,764 | -0.0414 | 0.0822 | PASS | no |
+| NAS100 → BTC (4h) | 2,017 | +0.0190 | 0.3931 | PASS | no |
+| NAS100 → BTC (8h) | 2,017 | -0.0108 | 0.6270 | PASS | no |
+
+**0/4 pairs clear the Bonferroni-corrected threshold.** One pair (DXY→CEW)
+is worth naming precisely rather than glossing over: its raw p-value
+(0.0179) clears the UNCORRECTED alpha=0.05 — it would have looked like a
+"finding" under naive single-test reporting — but does not clear the
+pre-registered corrected bar (0.0125), and the correlation itself is tiny
+(r=-0.036, explaining under 0.15% of variance). This is precisely the
+scenario the Bonferroni correction exists to catch: with 4 tests run, a
+p=0.0179 result has a non-trivial chance of occurring by chance alone even
+if none of the 4 relationships is real, and the correction correctly
+declines to act on it. The other three pairs are not even close (p=0.08 to
+0.63).
+
+### CONCLUSION: NO statistically real cross-asset lead-lag relationship was found
+
+Per the task's explicit instruction, **no directional strategy was built or
+backtested on any of these 4 pairs.** Forcing a backtest onto the
+smallest-p-value pair (DXY→CEW) anyway would be exactly the failure mode
+this pre-registered test and its correction exist to prevent — and even
+that pair's own correlation (r=-0.036) is far too small to plausibly
+survive real crypto/ETF transaction costs even if it were statistically
+genuine, which the correction says it is not.
+
+### Trial accounting
+
+**This batch produced 0 backtested configurations** — same treatment as
+section 16's seasonality test: 4 genuine, pre-registered a priori
+statistical hypothesis tests are disclosed here as a real multiple-
+comparisons budget, but are NOT added to the Sharpe/DSR trial pool, since
+none produced a backtested Sharpe value to add. **Cumulative Sharpe/DSR
+trial count is unchanged: N=932.**
+
+Files: `scripts/download_dxy_cew.py`, `scripts/test_cross_asset_leadlag.py`.
+Data: `data/DXYNYB_daily_yfinance.csv`, `data/CEW_daily_yfinance.csv`,
+`data/dxy_cew_report.csv`. Results:
+`results/cross_asset_leadlag_test.csv`. Reproduce:
+`python scripts/download_dxy_cew.py && python scripts/test_cross_asset_leadlag.py`.
+
+**Reading: the third distinct information category tested in this project
+(after cross-sectional ranking and positioning) also produces no free,
+exploitable signal at the pre-registered significance bar — a clean,
+honestly-earned negative, including one genuinely close call (DXY→CEW)
+that the multiple-testing discipline correctly caught and did not act on.
+A real alignment bug was also caught and fixed in this study before any
+number was trusted, worth carrying forward as a general caution for any
+future cross-asset test in this repo: verify observation counts against
+the expected overlap window BEFORE reading any statistic, not after.**
+
+## 20. VOLATILITY RISK PREMIUM HARVEST — VIX vs realized vol, tested 2026-08-31, KILLED ON TAIL RISK
+
+### Why this run exists
+
+A fourth distinct information category: a bet on volatility being
+mispriced, not on price direction (sections 1-11/13), cross-sectional rank
+(12/17), positioning (18), or cross-asset lead-lag (19).
+
+### Base rate — confirmed BEFORE any strategy was built, per the task's explicit requirement
+
+**Documented hypothesis stated first**: implied volatility (VIX) has
+historically run persistently above subsequently-realized volatility on
+average (the "volatility risk premium") — vol sellers have, on average and
+over long periods, collected more premium than the turbulence that
+actually showed up cost them. `scripts/test_vol_risk_premium.py` confirms
+this on this project's own data, BEFORE any strategy touches it:
+
+| | value |
+|---|---|
+| sample | 8,431 trading days, 1993-02-01 → 2026-07-30 |
+| mean VIX (implied) | 19.51 vol points |
+| mean forward-realized SPY vol (20 trading days) | 15.82 vol points |
+| **mean spread (VIX − forward realized vol)** | **+3.69 vol points** |
+| % of days VIX > forward realized vol | **83.3%** |
+| t-stat on mean spread ≠ 0 | **48.5** (n=8,431) |
+| by decade | 1990s +4.11, 2000s +3.22, 2010s +3.74, 2020s +3.87 — consistent across ALL four decades, not one regime carrying the result |
+
+**CONFIRMED on this data.** This is a real, persistent, decade-consistent
+pattern, not a discovered artefact being dressed up. Building a strategy on
+it is well-motivated — which makes what follows more informative, not
+less: this is not a strategy failing because its premise was wrong.
+
+### Strategy, proxy, and costs — every choice stated
+
+**Proxy: SVXY** (ProShares Short VIX Short-Term Futures ETF, the task's
+named product), available since 2011-10-04. Its REAL historical price is
+used unmodified — expense ratio, VIX-futures roll cost/contango drag, AND
+its genuine **2018-02-05/06 near-wipeout** (ProShares deleveraged from -1x
+to -0.5x VIX-futures exposure immediately after — the fate its cousin XIV
+suffered outright, termination) are all authentically embedded in the
+price series pulled here, not modeled around or assumed away.
+
+**Signal**: causal. Trailing 20-trading-day realized SPY vol (annualized,
+same window as the base-rate check). Ratio = VIX(t) / trailing_RV(t),
+known fully at the CLOSE of day t. Position for day t+1 = LONG SVXY if
+ratio(t) > threshold, else CASH — the position is only ever exposed to
+return realized strictly AFTER the signal was known. **Causality
+re-derived independently for every day, both thresholds: PASS.**
+Thresholds tested (task-stated): **1.2x and 1.5x.**
+
+**Costs**: 5bps/side (10bps round-turn), a stated conservative assumption
+for a specialized, less-liquid-than-SPY vol ETF, charged only when the
+position actually changes. **No separate borrow/financing cost added**:
+SVXY is a LONG position (never a short sale requiring borrow) in a fund
+that itself holds the short-VIX-futures exposure internally — its roll
+cost and expense ratio are already embedded in the real price series
+pulled above, so a second "short-vol financing charge" on top would
+double-count a cost the data already reflects. Stated explicitly, not
+assumed.
+
+### TAIL RISK — reported FIRST, prominently, per the task's explicit instruction
+
+| threshold | worst single day | worst single week | 2018 Volmageddon window (Feb) | 2020 COVID window (Feb15-Apr15) |
+|---|---|---|---|---|
+| 1.2x | **-83.0%** (2018-02-06) | **-92.1%** (week of 2018-02-08) | strategy total return **-90.8%** | -11.4% |
+| 1.5x | **-83.0%** (2018-02-06) | **-85.3%** (week of 2018-02-08) | strategy total return **-84.8%** | -0.4% |
+
+**The strategy was LONG SVXY heading into 2018-02-06 at BOTH thresholds** —
+the exact real Volmageddon session in which SVXY's actual traded price fell
+83% in a single day. This is not a hypothetical stress test bolted on
+after the fact; it is what this exact causal signal, applied to this exact
+real price series, actually produced. A single day destroyed the large
+majority of whatever capital was allocated to this position — **83%+ of
+position capital gone in one session**, and the whole month of February
+2018 alone erased 85-91% of the strategy's value at that point in its
+history.
+
+### Headline numbers — shown only AFTER the tail risk above, deliberately
+
+| threshold | in-position | switches | gross SR | net SR | net PF | maxDD | total net return | top-year share | DSR |
+|---|---|---|---|---|---|---|---|---|---|
+| 1.2x | 63.8% of days | 337 | +0.45 | +0.43 | 1.119 | 93.1% | **+98.1%** (over ~15yr) | 142% (see note) | 0.56 |
+| 1.5x | 36.7% of days | 292 | +0.11 | +0.09 | 1.032 | 91.8% | **-69.9%** | n/a (total ≤ 0) | 0.14 |
+
+At threshold 1.2x, the net Sharpe (+0.43) and cumulative +98.1% return
+**would read as a plausible, unremarkable candidate if the tail-risk
+section above were skipped** — this is exactly the trap the task warned
+against: "an attractive average performance masking a real,
+undiversifiable tail risk." maxDD (93.1%) already signals something is
+badly wrong here even on the standard metric, but a headline Sharpe alone
+would not have made that obvious without the explicit worst-day/-week
+figures front and center. Top-year concentration reads a non-intuitive
+142% because the -90.8% February 2018 loss is so large relative to the
+15-year cumulative total that the ratio construction (top/total, when
+total is small and positive) produces a number over 100% — itself another
+signal of how completely one event dominates the entire multi-year result,
+not a data error.
+
+vs buy-and-hold SPY over the identical window: Sharpe +0.96, maxDD 33.7%,
+worst day -10.9% (2020-03-16, COVID), worst week -18.0%. **Both thresholds
+lose to SPY on Sharpe alone** (+0.43 and +0.09 vs +0.96) — before even
+invoking the tail-risk kill rule. SVXY buy-and-hold itself, for reference,
+carries a worse worst-day (-83.0%) and worse maxDD (95.2%) than either
+signal-gated variant, confirming the signal did at least reduce EXPOSURE
+FREQUENCY to the tail event relative to being permanently long SVXY — but
+not enough to avoid landing directly on it.
+
+### Verdict
+
+**KILL ON TAIL-RISK GROUNDS, REGARDLESS OF THE HEADLINE SHARPE, exactly as
+the task's critical instruction specifies.** Both thresholds breach the
+stated catastrophic-loss bar (single-day < -30%, single-week < -50%) by a
+wide margin — a single real historical session (2018-02-06) alone would
+have destroyed the large majority of capital allocated to this position.
+Neither threshold beats SPY on risk-adjusted return even setting the tail
+event aside, and DSR clears nowhere near 0.95 either way (best 0.56).
+**SURVIVORS: 0/2**, on tail risk alone, independent of every other gate.
+
+The confirmed base rate (VRP is real, +3.69 vol points, 83% of days, four
+consecutive decades) does NOT translate into a tradeable retail-accessible
+edge via a naked long-SVXY implementation: the well-documented mechanism by
+which volatility sellers get paid on average is precisely the same
+mechanism that occasionally, without much prior warning from a 20-day
+trailing realized-vol signal, produces a near-total loss in a single
+session. This is not a data problem, a look-ahead bug, or a cost-modeling
+issue — the causality is verified PASS, the base rate is real, the costs
+are conservative and the proxy's real price history (including its own
+survival-threatening event) was used unmodified. **The strategy family
+itself carries a structural, undiversifiable tail risk that a 20-day
+trailing signal cannot see coming, and no amount of a good-looking average
+Sharpe changes that.**
+
+Files: `scripts/download_vix_svxy.py`, `scripts/test_vol_risk_premium.py`,
+`run_vol_risk_premium.py`. Data: `data/vix_daily_yfinance.csv`,
+`data/svxy_daily_yfinance.csv`, `data/vix_svxy_report.csv`. Results:
+`results/vol_risk_premium_base_rate.csv`, `results/vol_risk_premium.csv`.
+Reproduce: `python scripts/download_vix_svxy.py && python scripts/test_vol_risk_premium.py && python run_vol_risk_premium.py`.
+
+**Cumulative trials: N=934** (932 prior + 2 threshold cells).
+
+
+## 21. PROTECTED VRP STRUCTURES — can a position structure make the real edge survivable? Tested 2026-08-31, KILLED (edge shrinks below usefulness once properly protected)
+
+### Why this run exists
+
+Section 20 confirmed the volatility risk premium is **real** (VIX averages
++3.69 vol points above forward-realized SPY vol, 83.3% of days, t=48.5,
+consistent across all four decades) but killed the naked long-SVXY harvest
+on tail risk: **-83.0% in a single session** (2018-02-06, real SVXY traded
+price) and **-85% to -92% across that week**, at both signal thresholds.
+This run keeps the confirmed edge and the signal **completely unchanged**
+(VIX(t) / trailing-20d-realized-SPY-vol(t) > threshold → LONG SVXY t+1,
+else CASH; thresholds 1.2x and 1.5x; SVXY real price; 5bps/side; full
+2011-10-04 → 2026-08-28 window including Volmageddon and COVID) and asks a
+different question: **does a protective position structure keep the edge
+survivable through that exact event without trying to predict it?**
+
+Three structures, 12 a priori cells (2 thresholds each). DSR deflation pool
+= this batch's own 12 cells (the section-20 naked references are recomputed
+here for exact comparability — they reproduce §20 to the decimal — but are
+NOT counted as new trials). Cash is assumed to earn **0%** throughout —
+conservative, it biases *against* every protected structure.
+
+### The account-level honesty bar (redefined from §20, as the task requires)
+
+§20's bar was position-level (single-day < -30%, week < -50%). §21's bar is
+**whole-account**: does the entire account ever lose **more than 15% (soft)
+/ 20% (hard) in a single week**, or **more than 15% in a single day**?
+
+### RESULTS — worst account-level day / week FIRST, per the honesty gates
+
+| structure | thr | param | worst DAY | worst WEEK | Feb-2018 | net SR | CAGR | maxDD | DSR | inside HARD bar? |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **naked §20** | 1.2x | f=1.0 | **-83.0%** | **-92.1%** | -90.8% | +0.43 | +4.7% | 93.1% | — | NO |
+| A fixed-fraction | 1.2x | **f=0.10** | **-8.3%** | **-14.3%** | -12.9% | +0.43 | +1.9% | 15.3% | 0.15 | **YES** |
+| A fixed-fraction | 1.2x | f=0.20 | -16.6% | -27.3% | -24.9% | +0.43 | +3.6% | 29.0% | 0.15 | NO |
+| B vol-of-vol breaker | 1.2x | +20%/1d, cd3 | -26.4% | -26.5% | -13.3% | +0.54 | +13.6% | 48.9% | 0.24 | NO |
+| B vol-of-vol breaker | 1.2x | +30%/1d, cd3 | -32.0% | -41.0% | -31.2% | +0.58 | +15.9% | 48.8% | 0.29 | NO |
+| C paired VIXY hedge | 1.2x | h=0.5 | -84.6% | -88.7% | -87.5% | -0.02 | -8.6% | 90.1% | 0.00 | NO |
+| C paired VIXY hedge | 1.2x | h=1.0 | -86.2% | -85.9% | -84.3% | -0.66 | -26.3% | 99.0% | 0.00 | NO |
+| **naked §20** | 1.5x | f=1.0 | -83.0% | -85.3% | -84.8% | +0.09 | -7.7% | 91.8% | — | NO |
+| A fixed-fraction | 1.5x | **f=0.10** | **-8.3%** | **-9.5%** | -9.2% | +0.09 | +0.3% | 14.0% | 0.01 | **YES** |
+| A fixed-fraction | 1.5x | f=0.20 | -16.6% | -18.8% | -18.3% | +0.09 | +0.4% | 26.8% | 0.01 | NO (day < -15%) |
+| B vol-of-vol breaker | 1.5x | +20%/1d, cd3 | -26.4% | -26.5% | -13.3% | -0.02 | -4.6% | 77.3% | 0.00 | NO |
+| B vol-of-vol breaker | 1.5x | +30%/1d, cd3 | -26.4% | -26.5% | -10.6% | +0.16 | +0.2% | 63.9% | 0.02 | NO |
+| C paired VIXY hedge | 1.5x | h=0.5 | -84.7% | -85.7% | -85.4% | -0.20 | -12.1% | 89.1% | 0.00 | NO |
+| C paired VIXY hedge | 1.5x | h=1.0 | -86.3% | -86.3% | -86.3% | -0.49 | -20.0% | 96.5% | 0.00 | NO |
+
+vs **B&H SPY** same window: Sharpe **+0.96**, maxDD 33.7%, worst day
+-10.9%, worst week -18.0%. **Every one of the 12 protected cells loses to
+SPY on Sharpe.** vs B&H SVXY: Sharpe +0.57, worst day -83.0%, worst week
+-92.1%.
+
+### STRUCTURE A — small fixed fractional sizing: works, but only by risking almost nothing
+
+Account return = f × (§20 net strategy return), rebalanced daily to a
+constant fraction f; the rest sits in cash at 0%.
+
+- **What Volmageddon costs the WHOLE ACCOUNT:** at **f=0.10** the worst
+  single day is exactly 0.10 × -83.0% = **-8.3%**, and the worst *week*
+  (daily-rebalanced compound, not a clean f-scaling) is **-14.3%** (1.2x) /
+  **-9.5%** (1.5x). At **f=0.20**: worst day **-16.6%**, worst week
+  **-27.3%** (1.2x) / -18.8% (1.5x).
+- **f=0.10 is the ONLY structure in the entire run that stays inside the
+  hard account bar** (week ≥ -20% AND day ≥ -15%) at both thresholds. f=0.20
+  already breaches it.
+- **But the edge it preserves is not useful.** Sizing does not change
+  Sharpe (still +0.43 / +0.09, both < SPY's +0.96) and it scales CAGR down
+  to **+1.9% / +0.3%** — far below just holding SPY, or T-bills, over the
+  same 15 years. DSR 0.15 / 0.01, nowhere near 0.95. Per-year: 2018 is
+  still -14% of account (1.2x, f=0.10) — the single worst year by a wide
+  margin, so even at survivable size the result is event-dominated.
+
+### STRUCTURE B — vol-of-vol circuit breaker: dodges Volmageddon, blind to same-day gaps
+
+Full sizing (f=1). If VIX(t)/VIX(t-1) − 1 > b (known at t's close, same
+causal timing as the base signal), force CASH for t+1 and hold flat for a
+3-day cooldown. b ∈ {+20%, +30%}.
+
+- **It genuinely dodges Volmageddon.** At b=+20%, the breaker fires on
+  2018-02-02's close (VIX +28.5%) and again on 2018-02-05's close (VIX
+  +115.6%), taking the account to cash across 02-05, 02-06, 02-07, 02-08 —
+  avoiding both the -32% (02-05) and the -83% (02-06) SVXY sessions. Feb
+  2018 account impact drops from -90.8% (naked) to **-13.3%**. This raises
+  net Sharpe *above* the naked version (+0.54 vs +0.43 at 1.2x) and lifts
+  CAGR to +13.6%.
+- **It is still killed by a same-day gap event it structurally cannot
+  see.** The breaker's worst day/week is **Brexit, 2016-06-24: VIX +49%
+  and SVXY -26% on the SAME day**, with the *prior* day's VIX move DOWN
+  -18%. No pre-close warning existed, so the breaker took the full -26.4%
+  no matter how long its cooldown. Worst week -26.5% breaches the -20% hard
+  account bar at every b/threshold combination. (b=+30% is worse still: it
+  misses the +28.5% pre-warning on 02-02, holds the -32% on 02-05, and
+  posts a -32.0% / -41.0% worst day/week.)
+- **False-alarm rate, stated honestly:** at b=+20%, 80 triggers over 15
+  years, only 25 followed by an SVXY 5-day drop ≤ -15% → **69% false-alarm
+  rate**. At b=+30%: 32 triggers, 15 true → 53%. The breaker pays for its
+  Volmageddon protection by sitting out dozens of ordinary
+  premium-collection windows (visible in the per-year detail: 2019, 2020,
+  2021 all turn negative or flat under the breaker where the naked strategy
+  earned).
+
+### STRUCTURE C — paired VIXY hedge: the carry bleed swamps the premium AND the tail timing defeats it
+
+Alongside the §20 SVXY position (weight 1.0 when long), hold an additional
+long-vol overlay in **VIXY** (ProShares VIX Short-Term Futures ETF, the
+direct long-vol counterpart of SVXY; chosen over VXX because VXX's current
+note only starts 2018-01-25 — see `scripts/download_vixy.py`) at weight h
+of the SVXY notional, only while the position is on. VIXY's real price
+embeds its own roll cost / expense ratio exactly as SVXY's does; the
+overlay pays 5bps/side on turnover.
+
+- **Steady-state drag, quantified:** the hedge leg loses money on **57-59%
+  of ordinary on-position days**, for an annualised drag of **-22% to -36%
+  per year at h=0.5** and **-45% to -71% per year at h=1.0**. This alone
+  turns the strategy negative: net Sharpe -0.02 to -0.66, CAGR -8.6% to
+  -26.3%.
+- **And it does not even fix the tail.** VIXY gained +32% to +67% *across*
+  Feb 2018, but SVXY's -83% fell on **2018-02-06**, the day *after* VIX's
+  +116% spike — and on that specific day VIX mean-reverted -20% and **VIXY
+  was -3.2%**. The hedge delivered almost nothing on the one day the loss
+  actually landed. Worst account day/week stays at **-85% to -88%**;
+  Feb-2018 account impact -84% to -88%. The hedge changes the tail
+  magnitude by only a few points while bleeding double-digit CAGR every
+  ordinary year.
+
+### Why B and C both fail on the same underlying mechanism
+
+Both are timing-based protections keyed to VIX moving. Volmageddon's worst
+SVXY session (02-06, -83%) was **not** a day VIX spiked — VIX *fell* -20%
+that day while SVXY collapsed on VIX-futures roll/leverage mechanics. The
+circuit breaker only escaped it because 02-06 was pre-warned by 02-05's
++116%. Brexit (2016-06-24) had **no** pre-warning — a clean overnight gap —
+and neither a prior-close breaker nor a same-day-held hedge can help with
+that. The tail risk §20 identified is not just "large", it is **partly
+unhedgeable by any instrument or trigger that acts on observable
+volatility**, because the worst realised losses are gap-driven and
+mechanics-driven rather than spike-driven.
+
+### Verdict
+
+**KILL — no structure makes the edge tradeable. SURVIVORS: 0/12.**
+
+- **Structure A (f=0.10)** is the only cell that keeps the worst
+  account-week inside a survivable bound (-14.3% / -9.5%), and it does so
+  trivially — by putting 90% of the account in cash. What survives is a
+  **+0.43 / +0.09 Sharpe that loses to SPY, a ~2% / ~0.3% CAGR that loses
+  to T-bills, and a DSR of 0.15 / 0.01.** The edge, once sized down far
+  enough to be survivable, shrinks below usefulness. This is the honest
+  outcome the task named as valid: *"a kill on all three (edge shrinks
+  below usefulness once properly protected) is also a valid outcome."*
+- **Structure B** improves raw Sharpe (+0.54) and dodges Volmageddon
+  specifically, but breaches the -20% hard account-week bar at every
+  setting via a same-day gap event (Brexit) it is structurally blind to,
+  and carries a 53-69% false-alarm rate.
+- **Structure C** is a straight loser: the long-vol carry bleeds 22-71% of
+  capital per year and the hedge is mistimed against the actual worst day.
+
+The confirmed volatility risk premium (real, +3.69 vol points, 83% of days,
+four decades) still does **not** convert into a tradeable retail edge. §20
+killed it on the naked tail; §21 shows the tail cannot be structured away
+without also structuring away the return — the protective cost (whether
+paid as forgone size, forgone premium days, or hedge carry) is of the same
+order as the premium itself.
+
+Files: `run_vol_protected_structures.py`, `scripts/download_vixy.py`. Data:
+`data/vixy_daily_yfinance.csv` (+ §20's vix/svxy/spy). Results:
+`results/vol_protected_structures.csv`. Reproduce:
+`python scripts/download_vixy.py && python run_vol_protected_structures.py`.
+
+**Cumulative trials: N=946** (934 prior + 12 structure cells).
