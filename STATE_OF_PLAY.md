@@ -123,7 +123,7 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
 
-**Across 934 systematic backtest configurations, no FTMO-viable edge was found —
+**Across 946 systematic backtest configurations, no FTMO-viable edge was found —
 and no own-capital edge either (§6).** The closest thing to a positive result in
 the whole project is §12 (audited in §12.1, widened in §12.2): a portfolio-level
 cross-sectional momentum rotation whose cost and concentration profile is clean
@@ -3578,3 +3578,100 @@ Files: `run_vol_protected_structures.py`, `scripts/download_vixy.py`. Data:
 `python scripts/download_vixy.py && python run_vol_protected_structures.py`.
 
 **Cumulative trials: N=946** (934 prior + 12 structure cells).
+
+## 22. YEAR-BY-YEAR ABSOLUTE RETURN — full history vs post-COVID, every strategy with a saved return series, reported 2026-08-31
+
+Reporting task on existing results, **not a new trial batch — cumulative
+count UNCHANGED at N=946.** Absolute calendar-period return only: not vs any
+benchmark, not risk-adjusted. Driver: `report_year_by_year_returns.py`
+(rebuilds each daily return series from the same engine / trade files the
+original sections used). Outputs: `results/year_by_year_full_history.csv`,
+`year_by_year_postcovid.csv`, `year_by_year_annual_R_only.csv`.
+
+### Which strategies can be resliced, and how finely (stated plainly, nothing forced)
+
+| tier | what it means | strategies |
+|---|---|---|
+| **1 — daily series** (annual + monthly) | full net daily return series rebuilt from `research/momentum_rotation.py` or the VRP modules | MomoRot §12 US-sector (N12/K5), §12.2 widened 27-univ, §17 crypto-sectors, §17 country-ETFs; VRP §20 naked SVXY (thr 1.2 and 1.5); VRP §21 structures A (f=0.10, f=0.20), B (breaker +20%), C (VIXY hedge h=1.0) |
+| **2 — per-trade records** (annual + monthly) | daily P&L from `ret_frac` bucketed by trade exit day (1%-risk sizing already baked in) | Sneaky Pivot §9 best cell (NAS100 swing/sneaky/session), 2018-25 **and** its 2013-17 out-of-regime run; ORB §10 best cell (NAS100 OR30 2R), 2018-25 **and** 2013-17 |
+| **2b — annual R totals only** (VIEW 1 only, R units, **no monthly**) | only `yr_YYYY` columns were persisted, no daily series | Positioning-extreme reversal §18; Individual US stocks §14; M1 row §11; Crypto 5-family sweep §13 |
+| **3 — cannot be resliced at all** | only whole-period summary metrics saved | XAUUSD 5-family sweep §1 (75), US-index sweep §1 (150), HTF breakout §1 (12), Index trend basket §2/§6 (108+90), Regime-switch §15/§16A (only `n_pos_years` saved). Seasonality §16B and Cross-asset lead-lag §19 are statistical tests, not strategies — no return series exists. |
+
+### VIEW 1 — FULL HISTORY, calendar-year absolute return
+
+Ranked by **% of years positive**, then by worst-year magnitude. `%` columns are account return; the four Tier-2b rows are in **R units** (1R ≈ 1% of account at this repo's sizing) and are **not comparable** to the `%` rows — ranked separately.
+
+| # | strategy | span | pos yrs | worst year | max DD | total return |
+|---|---|---|---|---|---|---|
+| 1 | VRP §21-A fixed **20%** sizing (thr 1.2) | 2011–2026 | **13/16 (81%)** | −25.8% (2018) | −29.0% | +69% |
+| 2 | VRP §21-A fixed **10%** sizing (thr 1.2) | 2011–2026 | **13/16 (81%)** | −13.4% (2018) | −15.3% | +32% |
+| 3 | Sneaky Pivot §9 best cell 2018–2025 | 2018–2025 | 6/8 (75%) | −7.0% (2024) | −14.7% | +47% |
+| 4 | **MomoRot US-sector §12 (N12/K5)** | 2000–2026 | 20/27 (74%) | −18.9% (2022) | −39.0% | **+688%** |
+| 5 | MomoRot crypto-sectors §17 | 2020–2026 | 5/7 (71%) | −45.1% (2025) | −57.0% | **+4101%** |
+| 6 | MomoRot US-sector widened §12.2 | 2000–2026 | 19/27 (70%) | −13.2% (2018) | −37.5% | +934% |
+| 7 | VRP naked SVXY §20 (thr 1.2) | 2011–2026 | 11/16 (69%) | **−91.6% (2018)** | **−93.1%** | +98% |
+| 8 | VRP §21-B vol-of-vol breaker +20% | 2011–2026 | 11/16 (69%) | −18.6% (2018) | −48.9% | +563% |
+| 9 | MomoRot country-ETFs §17 | 2009–2026 | 11/18 (61%) | −15.4% (2022) | −24.8% | +118% |
+| 10 | VRP naked SVXY §20 (thr 1.5) | 2011–2026 | 8/16 (50%) | −87.2% (2018) | −91.8% | −70% |
+| 11 | ORB §10 best cell 2018–2025 | 2018–2025 | 4/8 (50%) | −13.8% (2020) | −33.5% | +21% |
+| 12 | Sneaky Pivot §9.4 **2013–2017** (out-of-regime) | 2013–2017 | 2/5 (40%) | −11.1% (2015) | −27.6% | +1% |
+| 13 | VRP §21-C paired VIXY hedge h=1.0 | 2011–2026 | **0/16 (0%)** | −85.1% (2018) | −99.0% | −99% |
+| 14 | ORB §10 **2013–2017** (out-of-regime) | 2013–2017 | **0/5 (0%)** | −36.4% (2014) | −79.0% | −77% |
+
+Tier-2b, annual **R** units (ranked separately):
+
+| strategy | pos yrs | worst year | total | pre-2021 vs 2021+ |
+|---|---|---|---|---|
+| Crypto 5-family sweep §13 (best cell) | 7/9 (78%) | −3.8R (2022) | +63.1R | +38.8R vs +24.2R |
+| Individual US stocks §14 (best cell) | 6/9 (67%) | −3.0R (2019) | +33.8R | −1.9R vs +35.7R |
+| Positioning reversal §18 (best cell) | 1/6 (17%) | −45.8R (2023) | **−100.5R** | 0R vs −100.5R |
+| M1 row §11 (best cell) | 0/8 (0%) | −3002R (2024) | **−13317R** | −3993R vs −9325R |
+
+### VIEW 2 — POST-COVID ONLY (2021-01-01 → each series' own last data date), MONTHLY granularity
+
+End dates: momentum & VRP series 2026-08-28/31; Sneaky Pivot 2025-12-09; ORB 2025-12-31. Window = **68 months** (60 for the trade strategies). Tier-2b strategies (§18/§14/§11/§13) **have no monthly series and are absent from this view** — for them, "post-COVID" can only mean summing `yr_2021…yr_2026` (shown in VIEW 1's last column).
+
+Ranked by **% of months positive**, then worst-month magnitude:
+
+| # | strategy | pos months | worst month | max DD | total | **2021–2022** | **2023→latest** |
+|---|---|---|---|---|---|---|---|
+| 1 | MomoRot US-sector widened §12.2 | 46/68 (68%) | −11.2% | −25.3% | +82% | +15.4% | +57.4% |
+| 2 | MomoRot country-ETFs §17 | 41/68 (60%) | −6.6% | −22.5% | +42% | −5.1% | +49.8% |
+| 3 | MomoRot US-sector §12 (N12/K5) | 40/68 (59%) | −6.6% | −26.0% | +53% | −6.6% | +64.0% |
+| 4 | ORB §10 best cell 2018–2025 | 35/60 (58%) | −7.4% | −18.5% | +66% | +21.9% | +36.2% |
+| 5 | VRP §21-A fixed 20% sizing | 39/68 (57%) | −2.6% | −5.5% | +23% | +8.0% | +13.6% |
+| 6 | VRP §21-A fixed 10% sizing | 39/68 (57%) | −1.3% | −2.8% | +11% | +4.0% | +6.7% |
+| 7 | VRP naked SVXY §20 (thr 1.2) | 38/68 (56%) | −13.1% | −26.7% | +127% | +36.6% | +66.4% |
+| 8 | VRP §21-B vol-of-vol breaker +20% | 37/68 (54%) | −16.5% | −30.2% | +42% | +7.9% | +31.5% |
+| 9 | VRP naked SVXY §20 (thr 1.5) | 31/68 (46%) | −13.1% | −22.0% | +62% | −10.6% | +81.1% |
+| 10 | Sneaky Pivot §9 best cell 2018–2025 | 27/60 (45%) | −5.1% | −14.7% | +44% | +15.9% | +24.4% |
+| 11 | VRP §21-C paired VIXY hedge h=1.0 | 26/68 (38%) | −13.7% | −79.9% | −77% | −47.1% | −56.9% |
+| 12 | MomoRot crypto-sectors §17 | 22/68 (32%) | −38.2% | −57.0% | **+1428%** | **+1748.5%** | **−17.3%** |
+
+**Post-COVID front-loading — the explicit check the task asked for:**
+- **MomoRot crypto-sectors** is the extreme case: +1748% in 2021–2022, **−17%** in 2023→2026. Essentially all of it is 2021 (Jan +220%, Feb +118%, Apr +118%); the BTC-200SMA filter then sat in synthetic cash for all of 2022 and all of 2026-YTD. This is the same 2021-crypto-bull artefact §17 already killed it for.
+- **The three equity momentum rotations are the reverse** — flat-to-negative 2021–2022, then **+50% to +64%** in 2023→2026. That is not an edge appearing; it is the 2023–2025 equity bull. Absolute monthly hit-rate 59–68% over 2021–2026 is "stocks went up," not alpha — and §12.5's walk-forward already showed the *vs-SPY* edge has been absent since 2009.
+- **VRP naked/breaker** front-load mildly toward 2023+ (naked 1.5: −11% then +81%), driven by a calm-vol 2023–2025 with no Volmageddon-style event in the window — exactly the regime in which short-vol looks riskless right up until it doesn't (§20/§21).
+- **ORB and Sneaky Pivot** are the two that are *not* front-loaded within the post-COVID window (ORB +22% then +36%; SP +16% then +24%) — but see the disagreement note below.
+
+### DOES THE POST-COVID RANKING MATERIALLY DISAGREE WITH FULL HISTORY?
+
+Yes, four names move ≥3 places — and in every case the move is a **short-window / regime artefact**, not evidence the post-COVID world rewards something real:
+
+| strategy | full-hist rank → post-COVID rank | why it moves, and whether it means anything |
+|---|---|---|
+| **ORB §10 (2018–2025 cell)** | 11 → **4** (▲7) | Looks much better recently: +66% post-COVID, not front-loaded. **But this is the strategy §10 called "the hardest kill in the project"** — gross-*negative* out of regime (2013–2017: 0/5 positive years, −77%, −79% DD; bottom of VIEW 1). The post-COVID window is entirely *inside* the 2018–2025 regime §10 already judged, where ORB also made +21% — and still lost to buy-and-hold NAS100 and earned 74% of its P&L in one year. 60 months in one regime cannot overturn a two-window test that already ran. **Not real.** |
+| **MomoRot country-ETFs §17** | 9 → **2** (▲7) | 60% positive months, +50% since 2023. Same story as the US-sector rotation: the 2023–2025 global-equity rally, not a mechanism. §17 killed it (DSR + loses to its own equal-weight basket); nothing here changes that. |
+| **MomoRot US-sector widened §12.2** | 6 → **1** (▲5) | Top of the post-COVID table on 68% positive months. It is the 2023–2025 bull again — §12.2's own verdict (same DSR ceiling as §12) stands, and §12.5's walk-forward showed the vs-SPY edge is pre-2009 only. |
+| **Sneaky Pivot §9 (2018–2025 cell)** | 3 → **10** (▼7) | The *opposite* disagreement: looked good on **8 annual buckets** (6/8 positive years, 75%) but only 45% of **months** are positive post-COVID, and its +44% post-COVID total leans on **Oct 2025 alone (+21.2% in one month)**. The annual view flattered a concentrated record — exactly reservation 3 in §9.2. The finer (monthly) lens is the more honest one here. |
+| MomoRot crypto-sectors §17 | 5 → 12 (▼7) | 2021 carried the entire full-history record; strip the annual view's 2021 bucket and the monthly post-COVID hit-rate is 32%. Confirms the front-loading. |
+
+**Bottom line.** No strategy "looks bad over 27 years but genuinely good post-COVID." Every apparent post-COVID improvement (ORB, both surviving momentum rotations) is the **2023–2025 equity/vol-calm regime** filling a short 60–68-month window, and in each case a longer or out-of-regime test that *already exists in this project* (§10's 2013–2017 ORB inversion, §12.5's pre-2009-only momentum edge, §17's kills, §20/§21's tail) contradicts the flattering recent picture. The one genuine cross-view disagreement points the *unfavourable* way: Sneaky Pivot's annual record is more concentrated than it looks, visible only once you drop to monthly buckets. **The post-COVID window is too short and too single-regime to promote anything the full-history and out-of-regime tests already retired.**
+
+### Consistency winners on absolute return alone (for completeness, not as a recommendation)
+
+If the only question is "how often is a calendar period green and how bad is the worst one," the two structurally safe answers are the **VRP §21-A fixed-fraction sleeves** (81% of years positive full-history, worst month −1.3%/−2.6%, max DD −2.8%/−5.5% post-COVID) — because they are 90%/80% cash by construction (§21) — and, with more variance, the **US-sector momentum rotation** (74% of years positive, but −39% max DD and a vs-SPY edge that §12.5 showed is gone since 2009). Everything with a headline-grabbing total return (crypto momentum +4101%, VRP breaker +563%, momentum US +688%) carries either a −57% to −99% drawdown, a single-year/single-regime concentration, or both.
+
+Files: `report_year_by_year_returns.py`, `results/year_by_year_full_history.csv`,
+`results/year_by_year_postcovid.csv`, `results/year_by_year_annual_R_only.csv`.
+Reproduce: `python report_year_by_year_returns.py`. **No trials added — N=946.**
