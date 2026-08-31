@@ -2083,6 +2083,160 @@ Files: `live/config.py`, `broker.py`, `signals.py`, `risk.py`, `state.py`,
 `README.md`, `.env.example`. Setup and scheduling documented in
 `live/README.md`. **No trials added — cumulative trial count unchanged: N=638.**
 
+## 12.5 WALK-FORWARD VALIDATION — the year-by-year record a real allocator reads, run 2026-08-31
+
+The §12.1/§12.3 audits validated the momentum rotation against a single
+static split (full period + one 2000-2009 stress window). A walk-forward is
+the industry-standard replacement for that: repeated, rolling,
+**non-overlapping calendar-year** out-of-sample scoring, exactly the way a
+live fund experiences a strategy — one year at a time, never seeing the
+future. **Nothing is fitted** — the config is frozen at the original a priori
+/ §12.4-deployment cell (**N=12 months, K=5 holdings, 200-day SPY SMA filter,
+monthly rebalance, base 17-ETF universe**); `research.momentum_rotation`'s
+`build_weights()`/`simulate()` are called unmodified. Walk-forward re-slices
+the *same* cost-inclusive (6 bps round-turn) simulated return series by year
+and adds zero degrees of freedom — **not a new trial batch, N unchanged**.
+
+First execution date for N=12 is 2000-01-03 (needs 12 months universe history
++ 200 days SPY history — §12.1). First full walk-forward year: **2000**.
+Look-ahead guard: **PASS**.
+
+### Year-by-year record, 2000 → 2026 (2026 partial, data ends 2026-08-28)
+
+| year | strat net % | SPY B&H % | beat SPY? | % of year risk-off | cum. strat | cum. SPY | cum. (strat − SPY) |
+|---|---|---|---|---|---|---|---|
+| 2000 | −7.42 | −9.74 | **YES** | 31 | 0.926 | 0.903 | +0.023 |
+| 2001 | −10.99 | −11.76 | **YES** | 100 | 0.824 | 0.796 | +0.028 |
+| 2002 | −9.89 | −21.58 | **YES** | 90 | 0.743 | 0.625 | +0.118 |
+| 2003 | +29.39 | +28.18 | **YES** | 27 | 0.961 | 0.801 | +0.160 |
+| 2004 | +14.39 | +10.70 | **YES** | 14 | 1.099 | 0.886 | +0.213 |
+| 2005 | +19.27 | +4.83 | **YES** | 6 | 1.311 | 0.929 | +0.382 |
+| 2006 | +22.15 | +15.85 | **YES** | 8 | 1.601 | 1.076 | +0.525 |
+| 2007 | +15.94 | +5.15 | **YES** | 11 | 1.857 | 1.132 | +0.725 |
+| 2008 | +17.00 | −36.79 | **YES** | 98 | 2.172 | 0.715 | +1.457 |
+| 2009 | +9.66 | +26.35 | no | 40 | 2.382 | 0.904 | +1.478 |
+| 2010 | +16.35 | +15.06 | **YES** | 24 | 2.771 | 1.040 | +1.731 |
+| 2011 | +1.39 | +1.90 | no | 37 | 2.810 | 1.059 | +1.750 |
+| 2012 | +5.10 | +15.99 | no | 1 | 2.953 | 1.229 | +1.724 |
+| 2013 | +33.03 | +32.31 | **YES** | 0 | 3.928 | 1.626 | +2.303 |
+| 2014 | +11.33 | +13.46 | no | 2 | 4.373 | 1.845 | **+2.529 (peak)** |
+| 2015 | −6.43 | +1.23 | no | 21 | 4.092 | 1.868 | +2.225 |
+| 2016 | −3.72 | +12.00 | no | 19 | 3.940 | 2.092 | +1.849 |
+| 2017 | +19.11 | +21.71 | no | 0 | 4.693 | 2.546 | +2.148 |
+| 2018 | −11.40 | −4.57 | no | 16 | 4.158 | 2.429 | +1.729 |
+| 2019 | +3.48 | +31.22 | no | 11 | 4.303 | 3.188 | +1.115 |
+| 2020 | +19.48 | +18.33 | **YES** | 23 | 5.141 | 3.772 | +1.369 |
+| 2021 | +15.23 | +28.73 | no | 0 | 5.924 | 4.856 | +1.068 |
+| 2022 | −18.91 | −18.18 | no | 81 | 4.804 | 3.973 | +0.831 |
+| 2023 | +7.05 | +26.18 | no | 6 | 5.142 | 5.013 | +0.129 |
+| 2024 | +17.24 | +24.89 | no | 0 | 6.029 | 6.261 | −0.232 |
+| 2025 | +18.17 | +17.72 | **YES** | 17 | 7.124 | 7.370 | −0.246 |
+| 2026* | +10.56 | +13.68 | no | 7 | 7.876 | 8.378 | −0.502 |
+
+### HEADLINE METRIC — individual-year consistency vs SPY
+
+**Beat SPY in 13 of 27 years. Underperformed in 14 of 27. Walk-forward
+yearly hit rate: 48.1% — a coin flip.**
+
+The 14 losing years, stated plainly (no cherry-picking): 2009 (−16.7 pp),
+2011 (−0.5), 2012 (−10.9), 2014 (−2.1), 2015 (−7.7), 2016 (−15.7), 2017
+(−2.6), 2018 (−6.8), 2019 (−27.7), 2021 (−13.5), 2022 (−0.7), 2023 (−19.1),
+2024 (−7.7), 2026* (−3.1).
+
+### The finding the aggregate Sharpe hid: the edge is entirely pre-2009
+
+| sub-period | years beat SPY | mean annual excess |
+|---|---|---|
+| **2000–2008** | **9 / 9 (every year)** | **+11.6 pp/yr** |
+| **2009–2026** | **4 / 18** | **−8.6 pp/yr** |
+
+Cumulative (strat − SPY) climbed monotonically to **+2.53× at end-2014**,
+then declined every year since and went **negative in 2024** (−0.23) — the
+strategy now **trails SPY on cumulative growth over the full walk-forward**
+(×7.88 vs ×8.38). §12.1's "beats SPY risk-adjusted, full period" (Sharpe
+0.61 vs 0.51) is *arithmetically* still true, but the walk-forward shows
+**100% of that outperformance was banked in 2000–2008**, when the 200-day
+SMA filter parked the book in IEF through the dot-com collapse and the GFC
+(2001 100% risk-off, 2002 90%, 2008 98%). Every risk-off *majority* year in
+the record (2001, 2002, 2008, 2022) except 2022 is a large win; the filter
+is a **crash hedge**, and it has not had a crash to hedge since 2008 that it
+also called correctly (2020's drop was too fast for a monthly 200-SMA check;
+2022's slow bleed it half-caught, still lost by 0.7 pp).
+
+### Walk-forward aggregate (2000 → 2026-08), context only
+
+| | strategy | SPY B&H |
+|---|---|---|
+| CAGR | 8.07% | 8.32% |
+| Sharpe | 0.61 | 0.51 |
+| max drawdown (daily) | 39.0% | 55.2% |
+| growth multiple | ×7.88 | ×8.38 |
+| worst calendar year | −18.91% (2022) | — |
+| best / median year | +33.03% (2013) / +11.33% | — |
+
+### Robustness appendix — other 3 a priori grid cells, same walk-forward
+
+| config | years beat / 27 | hit % | CAGR | Sharpe | maxDD |
+|---|---|---|---|---|---|
+| N6/K3 | 11/27 | 40.7 | 8.22% | 0.59 | 33.9% |
+| N6/K5 | 10/27 | 37.0 | 7.51% | 0.59 | 32.0% |
+| N12/K3 | 13/27 | 48.1 | 8.20% | 0.58 | 44.6% |
+| **N12/K5 (headline)** | **13/27** | **48.1** | **8.07%** | **0.61** | **39.0%** |
+
+No cell beats SPY in more than 13 of 27 years; the front-loaded pattern is
+identical across the grid.
+
+### Verdict
+
+The walk-forward is **harsher than the §12.3 conclusion, not softer**. §12.3
+said "real, robust mechanism, killed on DSR alone." The year-by-year record a
+real allocator actually reads says: **a strategy that beat SPY every year of
+2000–2008 by parking in bonds through two bear markets, and has beaten it in
+only 4 of the 18 years since — now trailing on cumulative growth.** It is a
+**conditional crash hedge**, not a standalone alpha sleeve, and the condition
+(a bear market the 200-day SMA calls in time) has essentially not paid since
+the GFC. This does not "resurrect" the strategy — §12's KILL stands, and the
+walk-forward strengthens the case for it.
+
+### Staged real-capital plan (built anyway, per the task — and doubling as a falsification test)
+
+The plan is written against the frozen N=12/K=5 config and the `live/`
+pipeline from §12.4. Its premise is explicit: **the honest base case is "the
+edge is a crash hedge that has not paid since 2009," and the staged deploy is
+a way to find out within ~2 years whether the post-GFC drought is noise or
+the real state of the strategy. If the pre-committed gates fail, the plan
+worked.**
+
+| stage | capital | min. duration | advance only if | halt / de-scale if |
+|---|---|---|---|---|
+| **0 — paper** (running, §12.4) | $0 | ≥3 rebalances **and** ≥6 months | weights match `build_weights()` to the share; realised cost ≤15 bps round-turn (2× the 6 bps assumption); no operational failure. Paper P&L is **not** a performance gate — 6 months is too short for a monthly strategy | any plumbing failure |
+| **1 — minimum real** | $10,000 | 12 months (≥12 rebalances), no adds | live trailing Sharpe ≥ **0.35**; live 12-mo return not worse than **−19%** (worst backtest year); mean \|live − replay monthly return\| < 1.0 pp | drawdown-from-peak > 20%; **or** 2 consecutive monthly monitor runs with negative trailing Sharpe **and** CAGR >10 pp below SPY (already `live/monitor.py`'s rule); **or** operational failure |
+| **2 — scaled** | $50,000 in 2 tranches ($30k, then +$20k after 6 clean months) | 18 months | full Stage 1+2 live Sharpe (≥30 mo) inside **[0.35, 0.85]** (0.61 backtest sits mid-band; landing **above** 0.85 is *also* a flag — treat as luck, don't accelerate); live cumulative ≥ same-cashflow SPY B&H, or within 5 pp with lower drawdown; **≥1 genuine risk-off period traded live** with the filter moving to IEF as designed (extend Stage 2 until one occurs — the filter *is* the edge) | as Stage 1 |
+| **3 — full allocation** | target sleeve (e.g. $150–250k) in 3 monthly tranches | ongoing, quarterly review | — | live trailing Sharpe < 0.35 for 2 consecutive quarters → de-scale one full stage, re-observe 6 months; 20% drawdown → exit to cash, restart at Stage 1 |
+
+**Band rationale:** 0.35 is ~1 annual-Sharpe-stdev below the *worst individual
+walk-forward year's* Sharpe floor — i.e. "not outside what 27 years already
+showed." "Live Sharpe" = trailing-since-inception daily Sharpe annualised
+from monthly equity marks (`live/monitor.py` produces it).
+
+**Ladder exit condition (not indefinite paper trading):** if by **42 months**
+of live trading the strategy has not sustained a live Sharpe ≥ 0.35 **and**
+has not beaten a same-cashflow SPY buy-and-hold on either return or
+risk-adjusted return, **stop**. Given the §12.3/§12.5 prior ("small edge or
+none, and nothing since 2009"), 42 months of real money is enough to
+distinguish the two, and a clean stop is this plan's success condition, not
+its failure.
+
+Files: `run_momentum_rotation_walkforward.py`. Results:
+`results/momentum_rotation_walkforward.csv` (year table),
+`results/momentum_rotation_walkforward_configs.csv` (4-cell aggregate),
+`results/momentum_rotation_walkforward_plan.txt`. Reproduce:
+`python run_momentum_rotation_walkforward.py`.
+
+**Not a new trial batch** — frozen config, re-slices the §12 simulation by
+year, fits nothing. **Cumulative trial count unchanged: N=946.**
+
+
 ## 13. CRYPTO — the same 5-family sweep on a genuinely new instrument class, tested 2026-08-31, killed
 
 ### Why this run exists

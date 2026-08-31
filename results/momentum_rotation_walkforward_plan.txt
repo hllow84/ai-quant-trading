@@ -1,0 +1,124 @@
+ year days   strat %     SPY %   excess beat?  %r-off             filter  yrShrp  cumStrat   cumSPY    S - B
+------------------------------------------------------------------------------------------------------------
+ 2000 252     -7.42     -9.74     2.32   YES    31.0   risk-on majority   -0.28     0.926    0.903    0.023
+ 2001 248    -10.99    -11.76     0.77   YES   100.0  risk-off majority   -0.38     0.824    0.796    0.028
+ 2002 252     -9.89    -21.58    11.70   YES    89.7  risk-off majority   -0.51     0.743    0.625    0.118
+ 2003 252     29.39     28.18     1.21   YES    26.6   risk-on majority    2.05     0.961    0.801    0.160
+ 2004 252     14.39     10.70     3.69   YES    13.9   risk-on majority    1.04     1.099    0.886    0.213
+ 2005 252     19.27      4.83    14.44   YES     6.0   risk-on majority    1.32     1.311    0.929    0.382
+ 2006 251     22.15     15.85     6.30   YES     7.6   risk-on majority    1.29     1.601    1.076    0.525
+ 2007 251     15.94      5.15    10.79   YES    10.8   risk-on majority    0.85     1.857    1.132    0.725
+ 2008 253     17.00    -36.79    53.79   YES    98.0  risk-off majority    1.65     2.172    0.715    1.457
+ 2009 252      9.66     26.35   -16.69    no    40.1   risk-on majority    0.87     2.382    0.904    1.478
+ 2010 252     16.35     15.06     1.29   YES    23.8   risk-on majority    0.94     2.771    1.040    1.731
+ 2011 252      1.39      1.90    -0.50    no    36.5   risk-on majority    0.17     2.810    1.059    1.750
+ 2012 250      5.10     15.99   -10.89    no     1.2   risk-on majority    0.66     2.953    1.229    1.724
+ 2013 252     33.03     32.31     0.72   YES     0.0   risk-on majority    2.41     3.928    1.626    2.303
+ 2014 252     11.33     13.46    -2.13    no     2.0   risk-on majority    0.97     4.373    1.845    2.529
+ 2015 252     -6.43      1.23    -7.66    no    21.4   risk-on majority   -0.46     4.092    1.868    2.225
+ 2016 252     -3.72     12.00   -15.72    no    19.0   risk-on majority   -0.38     3.940    2.092    1.849
+ 2017 251     19.11     21.71    -2.59    no     0.0   risk-on majority    1.97     4.693    2.546    2.148
+ 2018 251    -11.40     -4.57    -6.83    no    16.3   risk-on majority   -0.63     4.158    2.429    1.729
+ 2019 252      3.48     31.22   -27.74    no    10.7   risk-on majority    0.45     4.303    3.188    1.115
+ 2020 253     19.48     18.33     1.14   YES    23.3   risk-on majority    1.33     5.141    3.772    1.369
+ 2021 252     15.23     28.73   -13.50    no     0.0   risk-on majority    0.95     5.924    4.856    1.068
+ 2022 251    -18.91    -18.18    -0.74    no    81.3  risk-off majority   -1.45     4.804    3.973    0.831
+ 2023 250      7.05     26.18   -19.13    no     6.4   risk-on majority    0.64     5.142    5.013    0.129
+ 2024 252     17.24     24.89    -7.65    no     0.0   risk-on majority    1.39     6.029    6.261   -0.232
+ 2025 250     18.17     17.72     0.45   YES    16.8   risk-on majority    1.72     7.124    7.370   -0.246
+ 2026*165     10.56     13.68    -3.12    no     7.3   risk-on majority    1.02     7.876    8.378   -0.502
+
+STAGED REAL-CAPITAL PLAN  (frozen config N=12/K=5/200-SMA/monthly, base 17-ETF universe)
+=======================================================================================
+READ FIRST -- what the walk-forward changed about the case for deploying at all:
+  The §12.1/§12.3 audits concluded "real, robust mechanism, beats SPY risk-adjusted,
+  killed on DSR alone." The walk-forward is HARSHER than that. Beating SPY on the
+  aggregate Sharpe (0.61 vs 0.51) is real but it is EARNED ENTIRELY in 2000-2014
+  (11/15 years beat SPY, mean +5.1 pp/yr -- the filter parking in IEF
+  through the dot-com and GFC bears). In 2015-2026 the strategy beat SPY only
+  2/12 years, mean -8.6 pp/yr, and its cumulative growth has fallen
+  from ~2.5x ahead of SPY (2014) to BEHIND SPY (2026). A real allocator reading this
+  year-by-year record would most likely NOT fund it as an alpha sleeve today -- the
+  honest base case is "the edge is a crash hedge that has not paid since 2009."
+  This plan therefore doubles as a FALSIFICATION test: deploy small, and let the
+  pre-committed gates below tell you within ~2 years whether the post-2009 drought
+  is noise or the real state of the strategy. If the gates fail, that is the plan
+  working, not a disappointment.
+
+Backtest reference numbers this plan is judged against (walk-forward 2000-2026, net of 6bps round-turn):
+  walk-forward Sharpe        : 0.61   (SPY same window 0.51)
+  walk-forward CAGR          : 8.1%  (SPY same window 8.3%)
+  years beat SPY / total     : 13/27  (48%)
+  worst single year          : -18.9%  (2022)
+  median year                : 11.3%
+  annual-return stdev        : 13.3 pp
+  within-year Sharpe range    : -1.45 (worst yr) .. 2.41 (best yr), median 0.94
+  max drawdown (daily)       : 39.0%  (SPY 55.2%)
+
+Design principle: scale capital only when LIVE results stay inside a band the backtest
+says is normal, and cut/stop on an explicit, pre-committed rule -- never "wait and see".
+"Live Sharpe" below always means trailing-since-inception daily Sharpe, annualised,
+computed from the monthly equity marks (live/monitor.py already produces this).
+
+STAGE 0 -- PAPER  (already running, live/ pipeline, §12.4)
+  Capital        : $0 (Alpaca paper)
+  Duration       : >= 3 logged monthly rebalances AND >= 6 months elapsed
+  Advance IF     : (a) executed weights each month match research.momentum_rotation
+                       .build_weights() to the share, (b) realised slippage+cost per
+                       rebalance <= 15 bps round-turn (2x the 6 bps assumption),
+                       (c) no operational failure (missed rebalance, bad fill, auth loss).
+  Note           : paper P&L is NOT a performance gate -- 6 months is too short to judge
+                   a monthly strategy. Stage 0 only proves the plumbing.
+
+STAGE 1 -- MINIMUM REAL  ("is it real money-safe")
+  Capital        : $10,000   (small enough that a full 39% drawdown = ~$3903, a tolerable tuition cost)
+  Duration       : 12 months live (>= 12 monthly rebalances)
+  Hold at $10k, do NOT add, for the whole 12 months regardless of good results.
+  ADVANCE to Stage 2 only if ALL of:
+     - live trailing Sharpe >= 0.35   (backtate walk-forward Sharpe is 0.61;
+       0.35 is ~1 annual-Sharpe-stdev below the worst individual walk-forward year's
+       -1.45 floor -- i.e. "not outside what 27 years of history already showed")
+     - live 12-month return not worse than -19%  (the worst single year in 2000-2026)
+     - tracking: |live monthly return - backtest-replayed monthly return| average < 1.0 pp
+       (the live book should track a same-period paper replay closely; large divergence =
+       an execution or data problem, not alpha)
+  HALT (stop live, return to paper, diagnose) if ANY of:
+     - live drawdown-from-peak > 20%  (hard kill switch, already coded in live/risk.py at 15%
+       for new orders; 20% here is the "shut the whole thing down" line)
+     - 2 consecutive monthly monitor runs with negative trailing Sharpe AND CAGR
+       > 10 pp below SPY over the same span  (already the documented stop rule in live/monitor.py)
+     - operational failure as in Stage 0
+
+STAGE 2 -- SCALED  ("size it to matter")
+  Capital        : $50,000  (5x)
+  Entry          : move in 2 tranches -- $30k at Stage-2 start, +$20k after 6 more
+                   clean months (Sharpe still >= 0.35, no HALT trigger).
+  Duration       : 18 months live before any further scaling.
+  ADVANCE to Stage 3 only if:
+     - live trailing Sharpe across the FULL Stage 1+2 history (>= 30 months by now)
+       lands in [0.35, 0.85]  (the backtest walk-forward Sharpe 0.61 sits inside
+       this band; landing ABOVE 0.85 is also a flag -- it means live is behaving better
+       than 27 years of history, treat as luck not skill and do NOT let it justify
+       faster scaling)
+     - live cumulative return still ahead of a paper SPY-buy-and-hold of the same
+       cashflows, OR within 5 pp of it with a lower realised drawdown
+     - at least one genuine risk-off period has been traded live (SPY below its 200-SMA
+       for >= 1 rebalance) and the filter moved to IEF as designed -- if markets never
+       went risk-off during Stages 1-2, extend Stage 2 until one occurs, because the
+       filter IS the edge (§12/§12.1) and it must be seen working with real money once.
+
+STAGE 3 -- FULL ALLOCATION
+  Capital        : target book size (whatever the sleeve is meant to be, e.g. $150-250k),
+                   entered over 3 monthly tranches.
+  Ongoing rule   : re-check every quarter. If live trailing Sharpe drops below 0.35
+                   for 2 consecutive quarters, de-scale one full stage (e.g. $200k -> $50k)
+                   and re-observe for 6 months before re-advancing. If the HALT drawdown
+                   line (20%) is hit at any stage, exit to cash and restart at Stage 1.
+
+EXIT CONDITION (the whole ladder, not indefinite):
+  If, by 42 months of live trading (Stage 0 end -> Stage 3), the strategy has NOT
+  sustained a live Sharpe >= 0.35 and has NOT beaten a same-cashflow SPY buy-and-hold
+  on either return or risk-adjusted return, STOP. The §12.3 verdict (real, robust
+  mechanism, but not DSR-significant) means the honest prior is "small edge or none";
+  42 months with real money is enough to tell which, and a clean stop is the success
+  condition of THIS plan, not a failure of it.
