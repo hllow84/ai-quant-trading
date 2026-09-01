@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 download_btcusdt_m1_binance.py — pull real Binance spot 1-MINUTE OHLCV for
-BTC/USDT, 2018-01-01 -> now, to data/BTCUSDT_M1_2018_2025_binance.csv.
+BTC/USDT, from Binance's earliest 1m kline (2017-08-17) -> now, to
+data/BTCUSDT_M1_2017_2025_binance.csv.
 
 WHY THIS EXISTS
 ---------------
@@ -53,11 +54,13 @@ import pandas as pd
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
-OUT = DATA / "BTCUSDT_M1_2018_2025_binance.csv"
+OUT = DATA / "BTCUSDT_M1_2017_2025_binance.csv"
 
 SYMBOL_VISION = "BTCUSDT"
 SYMBOL_CCXT = "BTC/USDT"
-START = pd.Timestamp("2018-01-01", tz="UTC")
+# Earliest available: Binance BTC/USDT spot's first 1m kline is 2017-08-17. The
+# 2017-08 monthly archive file exists (partial month); nothing before it.
+START = pd.Timestamp("2017-08-01", tz="UTC")
 END = pd.Timestamp.now(tz="UTC")
 BAR = pd.Timedelta(minutes=1)
 FALLBACK_SPREAD_BPS = 0.0013     # STATE_OF_PLAY sec 13, BTCUSDT top-of-book, if live measure fails
@@ -228,7 +231,7 @@ def main() -> None:
             print(f"    before {ts}: {g}", flush=True)
     px = out["mid_close"]
     print(f"price range: ${px.min():,.2f} - ${px.max():,.2f}", flush=True)
-    assert 3000 < px.min() and px.max() < 250_000, "BTC price sanity check failed"
+    assert 2000 < px.min() and px.max() < 250_000, "BTC price sanity check failed"
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUT)

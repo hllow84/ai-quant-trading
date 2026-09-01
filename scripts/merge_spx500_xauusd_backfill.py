@@ -7,7 +7,7 @@ research/gold_data.py loaders work unchanged:
 
 Outputs:
     data/SPX500_M1_2013_2025_cfd_dukascopy.csv   (usa500idxusd, spread in points)
-    data/XAUUSD_M1_2013_2017_spot_dukascopy.csv  (xauusd, spread in $/oz)
+    data/XAUUSD_M1_2003_2017_spot_dukascopy.csv  (xauusd, spread in $/oz)
 
 Timezone: UTC (Dukascopy -utc 0). Spread = ask_close - bid_close.
 """
@@ -84,10 +84,20 @@ def merge(src, prefix, years, out_path, lo_exp, hi_exp, min_year_rows):
         problems.append(f"price {lo:.1f}..{hi:.1f} outside band {lo_exp}-{hi_exp}")
     if neg > len(m) * 0.001:
         problems.append(f"{neg} negative spreads (>0.1%)")
-    thin = [int(y) for y, n in per_year.items() if min_year_rows and n < min_year_rows
-            and int(y) not in (years[0],)]
-    if thin:
-        problems.append(f"thin years {thin} (< {min_year_rows} rows)")
+    # Hard gate only for 2013+ (the window the out-of-regime tests actually use
+    # and where full M1 coverage is guaranteed). Pre-2013 gold M1 can be genuinely
+    # thinner; report it, do not block on it. The first year is always exempt
+    # (2003 gold starts in May; 2013 SPX ask starts in Sept).
+    thin_hard = [int(y) for y, n in per_year.items()
+                 if min_year_rows and n < min_year_rows
+                 and int(y) >= 2013 and int(y) != years[0]]
+    thin_soft = [int(y) for y, n in per_year.items()
+                 if min_year_rows and n < min_year_rows
+                 and int(y) < 2013 and int(y) != years[0]]
+    if thin_soft:
+        print(f"NOTE: thin pre-2013 years {thin_soft} (< {min_year_rows} rows) -- advisory only")
+    if thin_hard:
+        problems.append(f"thin years {thin_hard} (< {min_year_rows} rows)")
     if problems:
         print("GATE FAILED: " + " | ".join(problems) + "  -- NOT writing " + os.path.basename(out_path))
         return False
@@ -101,9 +111,9 @@ def main():
     ok = True
     ok &= merge(
         os.path.join(REPO, "data", "raw", "xau_bf", "download"),
-        "xauusd", list(range(2013, 2018)),
-        os.path.join(REPO, "data", "XAUUSD_M1_2013_2017_spot_dukascopy.csv"),
-        lo_exp=1000, hi_exp=2100, min_year_rows=150_000)
+        "xauusd", list(range(2003, 2018)),
+        os.path.join(REPO, "data", "XAUUSD_M1_2003_2017_spot_dukascopy.csv"),
+        lo_exp=300, hi_exp=2100, min_year_rows=150_000)
     ok &= merge(
         os.path.join(REPO, "data", "raw", "spx_bf", "download"),
         "usa500idxusd", list(range(2013, 2026)),

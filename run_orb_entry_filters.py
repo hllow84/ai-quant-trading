@@ -144,7 +144,7 @@ def _inst_table():
                              pd.Timestamp("2016-01-01", tz="UTC"))}),
         "BTCUSDT": dict(
             kind="crypto", session=UTC_SESSION, cost_bps=CRYPTO_COST_BPS, slip_fn=None,
-            windows={"in": (d / "BTCUSDT_M1_2018_2025_binance.csv",
+            windows={"in": (d / "BTCUSDT_M1_2017_2025_binance.csv",
                             pd.Timestamp("2023-01-01", tz="UTC"))}),
     }
 

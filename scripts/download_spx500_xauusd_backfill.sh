@@ -50,9 +50,10 @@ pull_year() {
       touch "$DONE"
       return 0
     fi
-    # An empty file can be legitimate (SPX500 ask archive does not exist before
-    # ~2013-09). Accept a 0-row year as done if it is a known-empty early year.
-    if [ "$n" -le 1 ] && { [ "$Y" -lt 2013 ] || { [ "$Y" -eq 2013 ] && [ "$P" = "ask" ]; }; }; then
+    # A 0-row SPX500 year before the archive starts (~2013-09 for the ask side)
+    # is legitimate; accept it. XAUUSD has full coverage from 2003, so an empty
+    # XAUUSD year is a real failure and must keep retrying.
+    if [ "$n" -le 1 ] && [ "$I" = "usa500idxusd" ] && [ "$Y" -le 2013 ]; then
       echo "EMPTY ${FN}: accepting (pre-archive year)" | tee -a "$LOG"
       : > "$TARGET"
       touch "$DONE"
@@ -65,14 +66,18 @@ pull_year() {
   return 1
 }
 
-# ---- 1. XAUUSD M1 2013-2017 (gold M1 year ~250k-370k rows; >150k = complete) ----
-for Y in 2013 2014 2015 2016 2017; do
+# ---- 1. XAUUSD M1 2003-2017 (earliest available on Dukascopy = 2003-05-05).
+#         Gold M1 year ~250k-370k rows; early/partial years thinner, so accept
+#         >60k and let merge_spx500_xauusd_backfill.py apply the real per-year
+#         gate (hard for 2013+, advisory before). 2003 starts in May. ----
+for Y in 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017; do
   for P in bid ask; do
-    pull_year xauusd "$XAU_DL" xauusd "$Y" "$P" 150000
+    pull_year xauusd "$XAU_DL" xauusd "$Y" "$P" 60000
   done
 done
 
-# ---- 2. SPX500 M1 2013-2025 (index M1 year >> 1000 rows) ----
+# ---- 2. SPX500 M1 2013-2025 (earliest with a real ASK side ~2013-09; 2010/2012
+#         probed empty, same archive limit as US30). index M1 year >> 1000 rows ----
 for Y in 2013 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025; do
   for P in bid ask; do
     pull_year usa500idxusd "$SPX_DL" usa500idxusd "$Y" "$P" 1000
