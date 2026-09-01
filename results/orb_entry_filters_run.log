@@ -1,0 +1,330 @@
+
+[XAUUSD in] loading XAUUSD_M1_2018_2025_spot_dukascopy.csv ...
+  1,827,147 M1 bars 2018-01-01 -> 2025-12-31 | B&H SR +1.19 maxDD 20.4%
+  DMI(14) daily direction available on 99% of sessions (+DI>-DI on 58%)
+    ORIGINAL OR15 1R    n=1284 grPF=1.168 netPF=0.825 SR=-1.32 
+    RETEST   OR15 1R    n= 481 grPF=1.629 netPF=1.141 SR=+0.55 
+    DI       OR15 1R    n= 684 grPF=1.099 netPF=0.777 SR=-1.27 
+    ORIGINAL OR15 2R    n=1284 grPF=1.132 netPF=0.857 SR=-1.01 
+    RETEST   OR15 2R    n= 481 grPF=1.534 netPF=1.147 SR=+0.55 
+    DI       OR15 2R    n= 684 grPF=1.107 netPF=0.842 SR=-0.83 
+    ORIGINAL OR15 close n=1284 grPF=1.230 netPF=0.955 SR=-0.24 
+    RETEST   OR15 close n= 481 grPF=1.633 netPF=1.245 SR=+0.74 
+    DI       OR15 close n= 684 grPF=1.316 netPF=1.034 SR=+0.12 
+    ORIGINAL OR30 1R    n=1263 grPF=1.249 netPF=0.938 SR=-0.42 
+    RETEST   OR30 1R    n= 465 grPF=1.780 netPF=1.336 SR=+1.14 
+    DI       OR30 1R    n= 630 grPF=1.222 netPF=0.923 SR=-0.37 
+    ORIGINAL OR30 2R    n=1263 grPF=1.160 netPF=0.902 SR=-0.63 
+    RETEST   OR30 2R    n= 465 grPF=1.602 netPF=1.242 SR=+0.79 
+    DI       OR30 2R    n= 630 grPF=1.170 netPF=0.916 SR=-0.39 
+    ORIGINAL OR30 close n=1263 grPF=1.219 netPF=0.959 SR=-0.22 
+    RETEST   OR30 close n= 465 grPF=1.642 netPF=1.285 SR=+0.77 
+    DI       OR30 close n= 630 grPF=1.304 netPF=1.037 SR=+0.14 
+
+[NAS100 in] loading NAS100_M1_2018_2025_cfd_dukascopy.csv ...
+  2,211,511 M1 bars 2018-01-03 -> 2025-12-31 | B&H SR +0.84 maxDD 35.7%
+  DMI(14) daily direction available on 99% of sessions (+DI>-DI on 57%)
+    ORIGINAL OR15 1R    n=1616 grPF=1.129 netPF=0.953 SR=-0.33 
+    RETEST   OR15 1R    n= 672 grPF=1.345 netPF=1.143 SR=+0.60 
+    DI       OR15 1R    n= 806 grPF=1.153 netPF=0.973 SR=-0.13 
+    ORIGINAL OR15 2R    n=1616 grPF=1.164 netPF=1.014 SR=+0.09 
+    RETEST   OR15 2R    n= 672 grPF=1.343 netPF=1.173 SR=+0.67 
+    DI       OR15 2R    n= 806 grPF=1.134 netPF=0.986 SR=-0.06 
+    ORIGINAL OR15 close n=1616 grPF=1.164 netPF=1.019 SR=+0.11 
+    RETEST   OR15 close n= 672 grPF=1.360 netPF=1.196 SR=+0.66 
+    DI       OR15 close n= 806 grPF=1.205 netPF=1.056 SR=+0.23 
+    ORIGINAL OR30 1R    n=1609 grPF=1.164 netPF=1.014 SR=+0.09 
+    RETEST   OR30 1R    n= 685 grPF=1.391 netPF=1.219 SR=+0.85 
+    DI       OR30 1R    n= 820 grPF=1.171 netPF=1.021 SR=+0.10 
+    ORIGINAL OR30 2R    n=1609 grPF=1.174 netPF=1.039 SR=+0.23 
+    RETEST   OR30 2R    n= 685 grPF=1.380 netPF=1.226 SR=+0.81 
+    DI       OR30 2R    n= 820 grPF=1.184 netPF=1.048 SR=+0.21 
+    ORIGINAL OR30 close n=1609 grPF=1.172 netPF=1.039 SR=+0.22 
+    RETEST   OR30 close n= 685 grPF=1.330 netPF=1.182 SR=+0.63 
+    DI       OR30 close n= 820 grPF=1.190 netPF=1.056 SR=+0.23 
+
+[NAS100 out] loading NAS100_M1RTH_2013_2017_cfd_dukascopy.csv ...
+  443,449 M1 bars 2013-09-30 -> 2017-12-29 | B&H SR +1.21 maxDD 16.6%
+  DMI(14) daily direction available on 99% of sessions (+DI>-DI on 57%)
+    ORIGINAL OR15 1R    n= 974 grPF=0.891 netPF=0.607 SR=-3.71 
+    RETEST   OR15 1R    n= 392 grPF=1.080 netPF=0.751 SR=-1.34 
+    DI       OR15 1R    n= 474 grPF=0.951 netPF=0.643 SR=-2.26 
+    ORIGINAL OR15 2R    n= 974 grPF=1.022 netPF=0.750 SR=-2.05 
+    RETEST   OR15 2R    n= 392 grPF=1.152 netPF=0.860 SR=-0.68 
+    DI       OR15 2R    n= 474 grPF=0.999 netPF=0.731 SR=-1.56 
+    ORIGINAL OR15 close n= 974 grPF=1.064 netPF=0.798 SR=-1.37 
+    RETEST   OR15 close n= 392 grPF=1.296 netPF=0.991 SR=-0.03 
+    DI       OR15 close n= 474 grPF=1.010 netPF=0.752 SR=-1.25 
+    ORIGINAL OR30 1R    n= 970 grPF=0.918 netPF=0.666 SR=-2.90 
+    RETEST   OR30 1R    n= 377 grPF=1.130 netPF=0.837 SR=-0.79 
+    DI       OR30 1R    n= 479 grPF=0.951 netPF=0.690 SR=-1.86 
+    ORIGINAL OR30 2R    n= 970 grPF=0.965 netPF=0.730 SR=-2.13 
+    RETEST   OR30 2R    n= 377 grPF=1.154 netPF=0.892 SR=-0.48 
+    DI       OR30 2R    n= 479 grPF=0.951 netPF=0.717 SR=-1.59 
+    ORIGINAL OR30 close n= 970 grPF=0.985 netPF=0.753 SR=-1.70 
+    RETEST   OR30 close n= 377 grPF=1.212 netPF=0.948 SR=-0.18 
+    DI       OR30 close n= 479 grPF=0.916 netPF=0.695 SR=-1.65 
+
+[US30 in] loading US30_M1_2018_2025_cfd_dukascopy.csv ...
+  2,090,818 M1 bars 2018-01-02 -> 2025-12-31 | B&H SR +0.55 maxDD 37.0%
+  DMI(14) daily direction available on 99% of sessions (+DI>-DI on 56%)
+    ORIGINAL OR15 1R    n=1540 grPF=1.126 netPF=0.907 SR=-0.67 
+    RETEST   OR15 1R    n= 604 grPF=1.481 netPF=1.200 SR=+0.79 
+    DI       OR15 1R    n= 770 grPF=1.150 netPF=0.928 SR=-0.36 
+    ORIGINAL OR15 2R    n=1540 grPF=1.139 netPF=0.956 SR=-0.29 
+    RETEST   OR15 2R    n= 604 grPF=1.369 netPF=1.150 SR=+0.57 
+    DI       OR15 2R    n= 770 grPF=1.133 netPF=0.953 SR=-0.22 
+    ORIGINAL OR15 close n=1540 grPF=1.142 netPF=0.965 SR=-0.20 
+    RETEST   OR15 close n= 604 grPF=1.371 netPF=1.161 SR=+0.52 
+    DI       OR15 close n= 770 grPF=1.103 netPF=0.933 SR=-0.28 
+    ORIGINAL OR30 1R    n=1530 grPF=1.100 netPF=0.924 SR=-0.52 
+    RETEST   OR30 1R    n= 602 grPF=1.396 netPF=1.177 SR=+0.68 
+    DI       OR30 1R    n= 766 grPF=1.118 netPF=0.939 SR=-0.30 
+    ORIGINAL OR30 2R    n=1530 grPF=1.108 netPF=0.952 SR=-0.30 
+    RETEST   OR30 2R    n= 602 grPF=1.259 netPF=1.084 SR=+0.31 
+    DI       OR30 2R    n= 766 grPF=1.128 netPF=0.969 SR=-0.14 
+    ORIGINAL OR30 close n=1530 grPF=1.108 netPF=0.954 SR=-0.26 
+    RETEST   OR30 close n= 602 grPF=1.302 netPF=1.125 SR=+0.41 
+    DI       OR30 close n= 766 grPF=1.081 netPF=0.929 SR=-0.29 
+
+[US30 out] loading US30_M1RTH_2013_2017_cfd_dukascopy.csv ...
+  467,543 M1 bars 2013-09-30 -> 2017-12-29 | B&H SR +1.05 maxDD 14.5%
+  DMI(14) daily direction available on 99% of sessions (+DI>-DI on 54%)
+    ORIGINAL OR15 1R    n=1025 grPF=0.924 netPF=0.649 SR=-3.21 
+    RETEST   OR15 1R    n= 381 grPF=1.256 netPF=0.889 SR=-0.53 
+    DI       OR15 1R    n= 515 grPF=0.890 netPF=0.624 SR=-2.48 
+    ORIGINAL OR15 2R    n=1025 grPF=0.962 netPF=0.721 SR=-2.33 
+    RETEST   OR15 2R    n= 381 grPF=1.251 netPF=0.946 SR=-0.24 
+    DI       OR15 2R    n= 515 grPF=0.927 netPF=0.696 SR=-1.84 
+    ORIGINAL OR15 close n=1025 grPF=0.987 netPF=0.753 SR=-1.72 
+    RETEST   OR15 close n= 381 grPF=1.225 netPF=0.938 SR=-0.24 
+    DI       OR15 close n= 515 grPF=1.001 netPF=0.772 SR=-1.08 
+    ORIGINAL OR30 1R    n=1016 grPF=0.892 netPF=0.667 SR=-2.88 
+    RETEST   OR30 1R    n= 369 grPF=0.910 netPF=0.695 SR=-1.56 
+    DI       OR30 1R    n= 515 grPF=0.838 netPF=0.621 SR=-2.41 
+    ORIGINAL OR30 2R    n=1016 grPF=0.947 netPF=0.733 SR=-2.08 
+    RETEST   OR30 2R    n= 369 grPF=0.940 netPF=0.737 SR=-1.24 
+    DI       OR30 2R    n= 515 grPF=0.864 netPF=0.662 SR=-1.98 
+    ORIGINAL OR30 close n=1016 grPF=0.960 netPF=0.751 SR=-1.70 
+    RETEST   OR30 close n= 369 grPF=1.004 netPF=0.797 SR=-0.80 
+    DI       OR30 close n= 515 grPF=0.897 netPF=0.697 SR=-1.52 
+
+[BTCUSDT in] loading BTCUSDT_M1_2018_2025_binance.csv ...
+  4,549,089 M1 bars 2018-01-01 -> 2026-09-01 | B&H SR +0.53 maxDD 81.2%
+  DMI(14) daily direction available on 100% of sessions (+DI>-DI on 48%)
+    ORIGINAL OR15 1R    n=3148 grPF=1.031 netPF=0.216 SR=-9.31 
+    RETEST   OR15 1R    n=1237 grPF=1.380 netPF=0.287 SR=-4.29 
+    DI       OR15 1R    n=1625 grPF=1.092 netPF=0.232 SR=-5.89 
+    ORIGINAL OR15 2R    n=3148 grPF=0.997 netPF=0.360 SR=-7.50 
+    RETEST   OR15 2R    n=1237 grPF=1.207 netPF=0.442 SR=-3.54 
+    DI       OR15 2R    n=1625 grPF=1.076 netPF=0.388 SR=-4.75 
+    ORIGINAL OR15 close n=3148 grPF=1.107 netPF=0.566 SR=-2.44 
+    RETEST   OR15 close n=1237 grPF=1.358 netPF=0.702 SR=-0.89 
+    DI       OR15 close n=1625 grPF=1.297 netPF=0.662 SR=-1.16 
+    ORIGINAL OR30 1R    n=3149 grPF=1.057 netPF=0.353 SR=-6.98 
+    RETEST   OR30 1R    n=1286 grPF=1.285 netPF=0.425 SR=-3.51 
+    DI       OR30 1R    n=1619 grPF=1.143 netPF=0.390 SR=-4.34 
+    ORIGINAL OR30 2R    n=3149 grPF=1.012 netPF=0.486 SR=-5.44 
+    RETEST   OR30 2R    n=1286 grPF=1.105 netPF=0.526 SR=-3.03 
+    DI       OR30 2R    n=1619 grPF=1.109 netPF=0.540 SR=-3.26 
+    ORIGINAL OR30 close n=3149 grPF=1.066 netPF=0.623 SR=-2.29 
+    RETEST   OR30 close n=1286 grPF=1.046 netPF=0.602 SR=-1.74 
+    DI       OR30 close n=1619 grPF=1.215 netPF=0.713 SR=-1.11 
+
+======================================================================================================================================================
+  ORB ENTRY-FILTER TEST  --  filter 2 (RETEST) and filter 5 (DI), EACH SEPARATELY, vs the unfiltered baseline
+======================================================================================================================================================
+  RISK PARAMETERS (exact, from research/ftmo_engine.py):
+    - fixed fractional, 1.00% of account equity risked per trade (RISK_PER_TRADE = 0.01)
+    - stop = opposite side of the opening range; 1R = the OR width; UNCHANGED by either filter
+    - targets: 1R, 2R, hold-to-session-close (stop live); ONE position per instrument per day, no pyramiding
+  RETEST definition: after the first break, price must return to within 10% of the OR width of the broken
+    level, within the SAME session; if a bar CLOSES back through the level first the day is CANCELLED
+    (no immediate-entry fallback, no trade). Entry = limit fill at the broken OR level.
+  DI definition: Wilder 14-period DMI on the SESSION (daily) bars, shifted 1 session (causal). Long only
+    if +DI > -DI on the prior session, short only if -DI > +DI, else no trade.
+  SESSION: US instruments = 09:30-16:00 America/New_York (per-bar DST-correct). BTCUSDT = 00:00-23:59 UTC
+    (repo's existing crypto day boundary); 'session close' = the 23:59 UTC bar.
+  COSTS: XAUUSD legacy $/oz | NAS100/US30 spread+0.35bps+ET-anchored slip 1.00/0.15 | BTCUSDT 20bps taker+slip
+  NEW TRIALS THIS BATCH: 84  (72 filter cells + 12 first-time ORIGINAL cells for XAUUSD/BTCUSDT;
+    NAS100/US30 ORIGINAL cells reproduce section 10 and are NOT re-counted)
+  CUMULATIVE PROJECT TRIALS (DSR N): 946 + 84 = 1030
+  DSR structural pool [in] = 48 filter cells -> E[max SR] +3.293 (mu -0.606, sd 1.725)
+  DSR structural pool [out] = 24 filter cells -> E[max SR] +0.210 (mu -1.233, sd 0.729)
+  Gates: guard PASS + grossPF>1 + netPF>1 + SR>0 + DSR>0.95 + OOS holds + top-year<=60% + beats B&H
+  THIN = < 30 trades: PF / win rate NOT trustworthy, flagged inline, cannot be a SURVIVOR
+======================================================================================================================================================
+
+  --- IN-REGIME 2018-2025 ---
+  instrument window  OR target  variant     n   grPF  netPF     SR   DSR  maxDD  win%  costR% topYr%  OOS  B&H         flags
+  --------------------------------------------------------------------------------------------------------------------------------------------------
+    BTCUSDT   in  15     1R ORIGINAL  3148  1.031  0.216  -9.31  0.00 100.0% 39.5%   75.4%    n/a   no lose              
+    BTCUSDT   in  15     1R   RETEST  1237  1.380  0.287  -4.29  0.00  99.9% 45.3%   74.2%    n/a   no lose              
+    BTCUSDT   in  15     1R       DI  1625  1.092  0.232  -5.89  0.00 100.0% 40.9%   76.6%    n/a   no lose              
+  ..................................................................................................................................................
+    BTCUSDT   in  15     2R ORIGINAL  3148  0.997  0.360  -7.50  0.00 100.0% 31.5%   75.4%    n/a   no lose              
+    BTCUSDT   in  15     2R   RETEST  1237  1.207  0.442  -3.54  0.00 100.0% 36.2%   74.2%    n/a   no lose              
+    BTCUSDT   in  15     2R       DI  1625  1.076  0.388  -4.75  0.00 100.0% 32.8%   76.6%    n/a   no lose              
+  ..................................................................................................................................................
+    BTCUSDT   in  15  close ORIGINAL  3148  1.107  0.566  -2.44  0.00 100.0% 13.8%   75.4%    n/a   no lose              
+    BTCUSDT   in  15  close   RETEST  1237  1.358  0.702  -0.89  0.00  99.9% 15.8%   74.2%    n/a   no lose              
+    BTCUSDT   in  15  close       DI  1625  1.297  0.662  -1.16  0.00 100.0% 15.2%   76.6%    n/a   no lose              
+  ..................................................................................................................................................
+    BTCUSDT   in  30     1R ORIGINAL  3149  1.057  0.353  -6.98  0.00 100.0% 46.4%   52.1%    n/a   no lose              
+    BTCUSDT   in  30     1R   RETEST  1286  1.285  0.425  -3.51  0.00  99.5% 51.0%   53.0%    n/a   no lose              
+    BTCUSDT   in  30     1R       DI  1619  1.143  0.390  -4.34  0.00 100.0% 48.5%   51.7%    n/a   no lose              
+  ..................................................................................................................................................
+    BTCUSDT   in  30     2R ORIGINAL  3149  1.012  0.486  -5.44  0.00 100.0% 33.3%   52.1%    n/a   no lose              
+    BTCUSDT   in  30     2R   RETEST  1286  1.105  0.526  -3.03  0.00  99.8% 35.2%   53.0%    n/a   no lose              
+    BTCUSDT   in  30     2R       DI  1619  1.109  0.540  -3.26  0.00 100.0% 35.3%   51.7%    n/a   no lose              
+  ..................................................................................................................................................
+    BTCUSDT   in  30  close ORIGINAL  3149  1.066  0.623  -2.29  0.00 100.0% 18.4%   52.1%    n/a   no lose              
+    BTCUSDT   in  30  close   RETEST  1286  1.046  0.602  -1.74  0.00  99.9% 19.2%   53.0%    n/a   no lose              
+    BTCUSDT   in  30  close       DI  1619  1.215  0.713  -1.11  0.00  99.9% 19.9%   51.7%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100   in  15     1R ORIGINAL  1616  1.129  0.953  -0.33  0.00  48.2% 52.5%    7.9%    n/a   no lose              
+     NAS100   in  15     1R   RETEST   672  1.345  1.143  +0.60  0.00  11.3% 56.8%    7.7%    38%  yes lose              
+     NAS100   in  15     1R       DI   806  1.153  0.973  -0.13  0.00  29.5% 53.1%    7.9%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100   in  15     2R ORIGINAL  1616  1.164  1.014  +0.09  0.00  31.0% 41.5%    7.9%   154%  yes lose              
+     NAS100   in  15     2R   RETEST   672  1.343  1.173  +0.67  0.00  14.7% 44.9%    7.7%    31%  yes lose              
+     NAS100   in  15     2R       DI   806  1.134  0.986  -0.06  0.00  33.3% 41.4%    7.9%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100   in  15  close ORIGINAL  1616  1.164  1.019  +0.11  0.00  37.0% 38.7%    7.9%   180%   no lose              
+     NAS100   in  15  close   RETEST   672  1.360  1.196  +0.66  0.00  22.0% 42.0%    7.7%    33%  yes lose              
+     NAS100   in  15  close       DI   806  1.205  1.056  +0.23  0.00  25.5% 39.5%    7.9%    54%  yes lose              
+  ..................................................................................................................................................
+     NAS100   in  30     1R ORIGINAL  1609  1.164  1.014  +0.09  0.00  30.6% 52.8%    5.7%   193%   no lose              
+     NAS100   in  30     1R   RETEST   685  1.391  1.219  +0.85  0.00  12.2% 56.5%    5.5%    34%  yes BEAT              
+     NAS100   in  30     1R       DI   820  1.171  1.021  +0.10  0.00  28.2% 53.4%    5.7%   216%   no lose              
+  ..................................................................................................................................................
+     NAS100   in  30     2R ORIGINAL  1609  1.174  1.039  +0.23  0.00  33.5% 46.1%    5.7%    74%   no lose              
+     NAS100   in  30     2R   RETEST   685  1.380  1.226  +0.81  0.00  14.8% 49.5%    5.5%    43%  yes lose              
+     NAS100   in  30     2R       DI   820  1.184  1.048  +0.21  0.00  28.6% 47.2%    5.7%    89%   no lose              
+  ..................................................................................................................................................
+     NAS100   in  30  close ORIGINAL  1609  1.172  1.039  +0.22  0.00  40.4% 45.1%    5.7%    79%   no lose              
+     NAS100   in  30  close   RETEST   685  1.330  1.182  +0.63  0.00  18.4% 48.3%    5.5%    41%  yes lose              
+     NAS100   in  30  close       DI   820  1.190  1.056  +0.23  0.00  27.2% 46.5%    5.7%    92%   no lose              
+  ..................................................................................................................................................
+       US30   in  15     1R ORIGINAL  1540  1.126  0.907  -0.67  0.00  61.0% 52.0%    9.9%    n/a   no lose              
+       US30   in  15     1R   RETEST   604  1.481  1.200  +0.79  0.00  13.7% 57.6%    9.7%    44%  yes BEAT              
+       US30   in  15     1R       DI   770  1.150  0.928  -0.36  0.00  29.3% 52.3%    9.8%    n/a   no lose              
+  ..................................................................................................................................................
+       US30   in  15     2R ORIGINAL  1540  1.139  0.956  -0.29  0.00  56.6% 40.9%    9.9%    n/a   no lose              
+       US30   in  15     2R   RETEST   604  1.369  1.150  +0.57  0.00  16.8% 44.5%    9.7%    42%  yes BEAT              
+       US30   in  15     2R       DI   770  1.133  0.953  -0.22  0.00  39.9% 40.9%    9.8%    n/a   no lose              
+  ..................................................................................................................................................
+       US30   in  15  close ORIGINAL  1540  1.142  0.965  -0.20  0.00  56.4% 37.9%    9.9%    n/a   no lose              
+       US30   in  15  close   RETEST   604  1.371  1.161  +0.52  0.00  24.5% 41.1%    9.7%    32%  yes lose              
+       US30   in  15  close       DI   770  1.103  0.933  -0.28  0.00  49.1% 37.8%    9.8%    n/a   no lose              
+  ..................................................................................................................................................
+       US30   in  30     1R ORIGINAL  1530  1.100  0.924  -0.52  0.00  57.3% 51.4%    7.3%    n/a   no lose              
+       US30   in  30     1R   RETEST   602  1.396  1.177  +0.68  0.00  13.6% 57.0%    7.1%    39%  yes BEAT              
+       US30   in  30     1R       DI   766  1.118  0.939  -0.30  0.00  35.3% 51.7%    7.3%    n/a   no lose              
+  ..................................................................................................................................................
+       US30   in  30     2R ORIGINAL  1530  1.108  0.952  -0.30  0.00  53.1% 43.7%    7.3%    n/a   no lose              
+       US30   in  30     2R   RETEST   602  1.259  1.084  +0.31  0.00  18.8% 47.0%    7.1%    81%   no lose              
+       US30   in  30     2R       DI   766  1.128  0.969  -0.14  0.00  31.3% 44.3%    7.3%    n/a   no lose              
+  ..................................................................................................................................................
+       US30   in  30  close ORIGINAL  1530  1.108  0.954  -0.26  0.00  57.6% 42.7%    7.3%    n/a   no lose              
+       US30   in  30  close   RETEST   602  1.302  1.125  +0.41  0.00  20.8% 46.3%    7.1%    72%  yes lose              
+       US30   in  30  close       DI   766  1.081  0.929  -0.29  0.00  43.2% 43.0%    7.3%    n/a   no lose              
+  ..................................................................................................................................................
+     XAUUSD   in  15     1R ORIGINAL  1284  1.168  0.825  -1.32  0.00  70.0% 53.1%   16.2%    n/a   no lose              
+     XAUUSD   in  15     1R   RETEST   481  1.629  1.141  +0.55  0.00  18.8% 60.5%   16.5%    47%  yes lose              
+     XAUUSD   in  15     1R       DI   684  1.099  0.777  -1.27  0.00  58.4% 51.8%   16.3%    n/a   no lose              
+  ..................................................................................................................................................
+     XAUUSD   in  15     2R ORIGINAL  1284  1.132  0.857  -1.01  0.00  72.3% 40.1%   16.2%    n/a   no lose              
+     XAUUSD   in  15     2R   RETEST   481  1.534  1.147  +0.55  0.00  18.4% 46.8%   16.5%    62%  yes lose              
+     XAUUSD   in  15     2R       DI   684  1.107  0.842  -0.83  0.00  60.4% 39.8%   16.3%    n/a   no lose              
+  ..................................................................................................................................................
+     XAUUSD   in  15  close ORIGINAL  1284  1.230  0.955  -0.24  0.00  56.7% 36.1%   16.2%    n/a   no lose              
+     XAUUSD   in  15  close   RETEST   481  1.633  1.245  +0.74  0.00  14.8% 43.0%   16.5%    33%  yes lose              
+     XAUUSD   in  15  close       DI   684  1.316  1.034  +0.12  0.00  38.0% 36.1%   16.3%   276%  yes lose              
+  ..................................................................................................................................................
+     XAUUSD   in  30     1R ORIGINAL  1263  1.249  0.938  -0.42  0.00  40.7% 52.5%   11.8%    n/a   no lose              
+     XAUUSD   in  30     1R   RETEST   465  1.780  1.336  +1.14  0.00  10.0% 60.2%   11.7%    36%  yes lose              
+     XAUUSD   in  30     1R       DI   630  1.222  0.923  -0.37  0.00  35.1% 52.9%   11.8%    n/a   no lose              
+  ..................................................................................................................................................
+     XAUUSD   in  30     2R ORIGINAL  1263  1.160  0.902  -0.63  0.00  59.2% 43.2%   11.8%    n/a   no lose              
+     XAUUSD   in  30     2R   RETEST   465  1.602  1.242  +0.79  0.00  20.9% 50.5%   11.7%    46%  yes lose              
+     XAUUSD   in  30     2R       DI   630  1.170  0.916  -0.39  0.00  37.8% 44.4%   11.8%    n/a   no lose              
+  ..................................................................................................................................................
+     XAUUSD   in  30  close ORIGINAL  1263  1.219  0.959  -0.22  0.00  46.0% 42.0%   11.8%    n/a   no lose              
+     XAUUSD   in  30  close   RETEST   465  1.642  1.285  +0.77  0.00  21.4% 49.0%   11.7%    35%  yes lose              
+     XAUUSD   in  30  close       DI   630  1.304  1.037  +0.14  0.00  28.3% 43.3%   11.8%   125%  yes lose              
+  ..................................................................................................................................................
+
+  --- OUT-OF-REGIME 2013-2017 (NAS100/US30 only) ---
+  instrument window  OR target  variant     n   grPF  netPF     SR   DSR  maxDD  win%  costR% topYr%  OOS  B&H         flags
+  --------------------------------------------------------------------------------------------------------------------------------------------------
+     NAS100  out  15     1R ORIGINAL   974  0.891  0.607  -3.71  0.00  89.5% 45.9%   17.5%    n/a   no lose              
+     NAS100  out  15     1R   RETEST   392  1.080  0.751  -1.34  0.00  40.9% 51.0%   16.6%    n/a   no lose              
+     NAS100  out  15     1R       DI   474  0.951  0.643  -2.26  0.00  63.2% 47.7%   18.0%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100  out  15     2R ORIGINAL   974  1.022  0.750  -2.05  0.00  81.7% 37.4%   17.5%    n/a   no lose              
+     NAS100  out  15     2R   RETEST   392  1.152  0.860  -0.68  0.04  42.3% 40.1%   16.6%    n/a   no lose              
+     NAS100  out  15     2R       DI   474  0.999  0.731  -1.56  0.00  61.2% 36.9%   18.0%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100  out  15  close ORIGINAL   974  1.064  0.798  -1.37  0.00  80.6% 34.2%   17.5%    n/a   no lose              
+     NAS100  out  15  close   RETEST   392  1.296  0.991  -0.03  0.31  38.6% 37.5%   16.6%    n/a   no lose              
+     NAS100  out  15  close       DI   474  1.010  0.752  -1.25  0.00  62.6% 33.5%   18.0%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100  out  30     1R ORIGINAL   970  0.918  0.666  -2.90  0.00  80.3% 45.7%   12.9%    n/a   no lose              
+     NAS100  out  30     1R   RETEST   377  1.130  0.837  -0.79  0.02  33.3% 49.3%   11.9%    n/a   no lose              
+     NAS100  out  30     1R       DI   479  0.951  0.690  -1.86  0.00  54.1% 46.6%   13.1%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100  out  30     2R ORIGINAL   970  0.965  0.730  -2.13  0.00  79.0% 40.3%   12.9%    n/a   no lose              
+     NAS100  out  30     2R   RETEST   377  1.154  0.892  -0.48  0.09  35.2% 42.7%   11.9%    n/a   no lose              
+     NAS100  out  30     2R       DI   479  0.951  0.717  -1.59  0.00  57.0% 40.7%   13.1%    n/a   no lose              
+  ..................................................................................................................................................
+     NAS100  out  30  close ORIGINAL   970  0.985  0.753  -1.70  0.00  77.4% 39.1%   12.9%    n/a   no lose              
+     NAS100  out  30  close   RETEST   377  1.212  0.948  -0.18  0.22  33.6% 41.4%   11.9%    n/a   no lose              
+     NAS100  out  30  close       DI   479  0.916  0.695  -1.65  0.00  61.5% 39.0%   13.1%    n/a   no lose              
+  ..................................................................................................................................................
+       US30  out  15     1R ORIGINAL  1025  0.924  0.649  -3.21  0.00  87.9% 47.0%   16.2%    n/a   no lose              
+       US30  out  15     1R   RETEST   381  1.256  0.889  -0.53  0.06  29.4% 54.1%   16.0%    n/a   no lose              
+       US30  out  15     1R       DI   515  0.890  0.624  -2.48  0.00  68.5% 45.6%   16.3%    n/a   no lose              
+  ..................................................................................................................................................
+       US30  out  15     2R ORIGINAL  1025  0.962  0.721  -2.33  0.00  86.5% 37.9%   16.2%    n/a   no lose              
+       US30  out  15     2R   RETEST   381  1.251  0.946  -0.24  0.18  28.4% 43.0%   16.0%    n/a   no lose              
+       US30  out  15     2R       DI   515  0.927  0.696  -1.84  0.00  67.5% 36.1%   16.3%    n/a   no lose              
+  ..................................................................................................................................................
+       US30  out  15  close ORIGINAL  1025  0.987  0.753  -1.72  0.00  85.5% 34.6%   16.2%    n/a   no lose              
+       US30  out  15  close   RETEST   381  1.225  0.938  -0.24  0.18  36.3% 39.4%   16.0%    n/a   no lose              
+       US30  out  15  close       DI   515  1.001  0.772  -1.08  0.01  63.1% 32.0%   16.3%    n/a   no lose              
+  ..................................................................................................................................................
+       US30  out  30     1R ORIGINAL  1016  0.892  0.667  -2.88  0.00  82.4% 45.5%   11.9%    n/a   no lose              
+       US30  out  30     1R   RETEST   369  0.910  0.695  -1.56  0.00  44.2% 46.1%   11.1%    n/a   no lose              
+       US30  out  30     1R       DI   515  0.838  0.621  -2.41  0.00  64.6% 44.1%   12.4%    n/a   no lose              
+  ..................................................................................................................................................
+       US30  out  30     2R ORIGINAL  1016  0.947  0.733  -2.08  0.00  78.6% 40.1%   11.9%    n/a   no lose              
+       US30  out  30     2R   RETEST   369  0.940  0.737  -1.24  0.00  41.9% 41.2%   11.1%    n/a   no lose              
+       US30  out  30     2R       DI   515  0.864  0.662  -1.98  0.00  64.6% 38.3%   12.4%    n/a   no lose              
+  ..................................................................................................................................................
+       US30  out  30  close ORIGINAL  1016  0.960  0.751  -1.70  0.00  79.1% 38.5%   11.9%    n/a   no lose              
+       US30  out  30  close   RETEST   369  1.004  0.797  -0.80  0.03  43.6% 40.4%   11.1%    n/a   no lose              
+       US30  out  30  close       DI   515  0.897  0.697  -1.52  0.00  64.0% 36.5%   12.4%    n/a   no lose              
+  ..................................................................................................................................................
+
+======================================================================================================================================================
+  VERDICT
+======================================================================================================================================================
+  NO config clears every gate -- on EITHER filter, on ANY instrument, in ANY window.
+
+  RETEST: closest cell = XAUUSD in OR30 1R
+     SR +1.14 | grossPF 1.780 | netPF 1.336 | DSR 0.000 | cost 11.7% of 1R | top-year 36%
+     FAILS: DSR>0.95, beats B&H
+     vs baseline same cell: grossPF 1.249 netPF 0.938 SR -0.42 n=1263  ->  filter effect: netPF +0.397, SR +1.56, n -798
+
+  DI: closest cell = NAS100 in OR30 close
+     SR +0.23 | grossPF 1.190 | netPF 1.056 | DSR 0.000 | cost 5.7% of 1R | top-year 92%
+     FAILS: DSR>0.95, OOS holds, top-year<=60%, beats B&H
+     vs baseline same cell: grossPF 1.172 netPF 1.039 SR +0.22 n=1609  ->  filter effect: netPF +0.017, SR +0.01, n -789
+
+  Batch summary (traded cells only):
+    ORIGINAL: 36 cells | guard 36/36 | grossPF>1 25/36 | netPF>1 5/36 | SR>0 5/36 | DSR>0.95 0/36 | OOS 1/36 | not-conc 0/36 | beats-B&H 0/36 | THIN 0/36 | SURVIVORS 0/36
+      RETEST: 36 cells | guard 36/36 | grossPF>1 34/36 | netPF>1 18/36 | SR>0 18/36 | DSR>0.95 0/36 | OOS 17/36 | not-conc 15/36 | beats-B&H 4/36 | THIN 0/36 | SURVIVORS 0/36
+          DI: 36 cells | guard 36/36 | grossPF>1 26/36 | netPF>1 6/36 | SR>0 6/36 | DSR>0.95 0/36 | OOS 3/36 | not-conc 1/36 | beats-B&H 0/36 | THIN 0/36 | SURVIVORS 0/36
+
+  results -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_entry_filters.csv

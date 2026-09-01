@@ -136,7 +136,8 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=946):
+Trial composition (this is the cumulative DSR trial count, N=1030 — see the
+2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -164,7 +165,8 @@ Trial composition (this is the cumulative DSR trial count, N=946):
 | Positioning-extreme contrarian reversal (§18) | BTCUSDT, ETHUSDT | 8 | 0 survive (§18) — first non-price-based signal tested, clean kill |
 | Volatility risk premium harvest (§20) | SVXY (VIX vs SPY realized vol) | 2 | 0 survive (§20) — KILLED ON TAIL RISK: -83% single-day loss (2018 Volmageddon), regardless of headline Sharpe |
 | Protected VRP structures (§21) | SVXY + cash / VIX circuit breaker / VIXY hedge | 12 | 0 survive (§21) — only small fixed sizing (f=0.10) stays inside the account bar, and it shrinks CAGR to ~2% at SR +0.43 < SPY; breaker & hedge are blind to same-day gap events |
-| **Total** | | **946** | **0 survive** |
+| ORB entry filters — RETEST + DI, each separately, both windows (§10.5) | XAUUSD, NAS100, US30, BTCUSDT | 84 | 0 survive (§10.5) — RETEST fixes concentration/DD/OOS in regime but fails DSR, buy-and-hold and the 2013-17 out-of-regime gate; DI inert; BTCUSDT cost-doomed |
+| **Total** | | **1030** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -1160,6 +1162,111 @@ survive across both windows.**
 | `results/orb_trend_in_regime_scored.csv`, `orb_trend_out_regime_scored.csv` | filtered results |
 | `results/orb_trend_*_unfiltered_reference.csv` | same-run unfiltered recompute, for the side-by-side |
 | `results/orb_trend_run.log` | full run log incl. the removed-vs-kept trade table |
+
+### 10.5 TWO MORE ENTRY FILTERS — RETEST and +DI/-DI, tested 2026-09-01, both killed
+
+**Question:** the plain ORB kill (§10) and its two prior variants (§10.2 moderate
+stop, §10.4 trend filter) all died the same way — an in-regime edge that (a)
+inverts or vanishes out of regime and (b) is single-year concentrated. Do either
+of two *entry-selection* filters survive where those died? Tested **each filter
+SEPARATELY** (never combined), on **every instrument with M1 on disk**, always
+reported next to the unfiltered baseline in the same run.
+
+**Instruments & data.** M1 already on disk: **XAUUSD** (2018-2025), **NAS100 /
+US30** (2018-2025 + 2013-2017 M1RTH out-of-regime). **BTCUSDT M1 was pulled
+fresh** for this test (`scripts/download_btcusdt_m1_binance.py`, Binance's own
+`data.binance.vision` 1m archive, 2018-01-01 → 2026-09-01, 4.55M bars, 30
+historical exchange-outage gaps, modelled spread ~0.0013 bps per §13 — ETH
+skipped, "same as BTC for trend" per the brief). **No pre-2018 out-of-regime
+window exists for XAUUSD (no pre-2018 M1) or BTCUSDT (Binance starts 2017-08) —
+stated, not worked around.** Crypto session = the repo's existing 00:00-23:59
+UTC day (`run_sweep_crypto.py` boundary), *not* a re-invented "session".
+
+**Risk parameters (exact, from `research/ftmo_engine.py`, not inherited
+silently).** Fixed-fractional **1.00%** of equity per trade (`RISK_PER_TRADE =
+0.01`). Stop = opposite side of the OR; **1R = the OR width, UNCHANGED by either
+filter** (both filters only change trade *selection* / entry *timing*, so the
+comparison against the baseline is like-for-like). Targets 1R / 2R /
+hold-to-session-close. One position per instrument per day, no pyramiding. Costs
+per instrument = its existing sections' model (XAUUSD legacy $/oz; NAS100/US30
+the §10 spread + 0.35 bps + ET-anchored 1.00/0.15 bps slippage; BTCUSDT the §13
+20 bps taker + 1-2 bps slippage).
+
+**Filter 2 — RETEST (definition used, stated before the result).** After the
+first break of the day, price must return to **within 10% of the OR's own width**
+of the broken level (long: a later bar's low ≤ or_high + 0.10·range), **within
+the remainder of the same session**. If a bar **closes back through** the broken
+level first, the setup is **CANCELLED for the day — no immediate-entry fallback,
+no trade** (stated explicitly). Entry on a good retest = limit fill at the broken
+OR level.
+
+**Filter 5 — DIRECTIONAL MOVEMENT (definition used).** Standard **Wilder
+14-period DMI on the session (daily) bars, `.shift(1)`** so it is strictly
+causal. Long breaks only if +DI > −DI on the prior session, shorts only if
+−DI > +DI, else no trade. ("At the moment of breakout" read as the prevailing
+*daily* DMI state — a 14-minute intrabar DMI is noise and the breakout session's
+own bar would be look-ahead, exactly as §10.4 read its trend filter.)
+
+**Grid.** 4 instruments × (1-2 windows) × 2 OR × 3 targets × 3 variants
+(ORIGINAL / RETEST / DI). **New trials this batch: 84** (72 filter cells + 12
+first-time ORIGINAL cells for XAUUSD/BTCUSDT; the NAS100/US30 ORIGINAL cells
+reproduce §10 and are not re-counted). Look-ahead guard **PASS 108/108**.
+
+**Result — batch summary (traded cells; gates: guard + grossPF>1 + netPF>1 +
+SR>0 + DSR>0.95 + OOS holds + top-year ≤60% + beats B&H):**
+
+| variant | cells | grossPF>1 | netPF>1 | SR>0 | DSR>0.95 | OOS holds | not year-conc | beats B&H | **SURVIVORS** |
+|---|---|---|---|---|---|---|---|---|---|
+| ORIGINAL | 36 | 25 | 5 | 5 | 0 | 1 | 0 | 0 | **0** |
+| **RETEST** | 36 | **34** | **18** | **18** | **0** | **17** | **15** | **4** | **0** |
+| DI | 36 | 26 | 6 | 6 | 0 | 3 | 1 | 0 | **0** |
+
+**RETEST is the most interesting negative in the whole ORB block.** In regime it
+does what §10.2 and §10.4 could not: it roughly **halves-to-quarters max
+drawdown** (e.g. XAUUSD OR30 1R 41%→10%; US30 OR15 1R 61%→14%), **fixes the
+single-year concentration** (not-concentrated 0/36 → 15/36), **makes OOS hold**
+(1/36 → 17/36), and turns net PF positive in half the cells. And it still **does
+not survive**, on three independent gates:
+
+1. **DSR 0/36.** Best cell XAUUSD OR30 1R: gross PF 1.78, net PF 1.34, SR **+1.14**,
+   top-year 36%, DD 10% — DSR **0.000**. Recomputed against a *clean* structural
+   pool (in-regime RETEST+DI cells, BTCUSDT excluded as cost-doomed, n=36,
+   E[max SR] +1.378): DSR only **0.282**, every other RETEST cell < 0.10. The
+   Sharpe uplift (~+0.5 to +1.1) is inside the noise of testing this many cells.
+2. **Beats buy-and-hold only 4/36** — and all 4 are US30/NAS100 cells where the
+   index B&H Sharpe is low (+0.55). Against gold (B&H SR **+1.19**) the best
+   RETEST cell (+1.14) still loses.
+3. **Out of regime (2013-2017, NAS100/US30): 0/12 net-PF-positive**, every cell
+   SR-negative (netPF 0.70-0.99, best NAS100 OR15 close 0.991 / SR −0.03). The
+   in-regime improvement is a **2018-2025 phenomenon — the same signature that
+   killed §10, §10.2 and §10.4.**
+
+**DI is inert.** Removes ~50% of trades, moves mean net PF by **+0.02** and mean
+SR by **+0.01** vs baseline, clears no gate the baseline didn't. Fails DSR, OOS,
+concentration and B&H everywhere.
+
+**BTCUSDT is structurally dead on cost** on all three variants: cost_R **52-77%
+of 1R** (20 bps taker fee against a ~25-50 bps OR stop), net PF 0.2-0.7, SR −1 to
+−9, maxDD ~100%. Confirms §11 (tight-stop intraday) and §13 (crypto cost
+structure). No out-of-regime window exists to test further.
+
+**Verdict — plain kill.** Neither entry filter, on any instrument, in any
+window, clears every gate. RETEST comes closest (XAUUSD OR30 1R) and fails on
+DSR, on buy-and-hold, and — where it can be tested — out of regime. A *different*
+retest study (a stop wide enough not to be cost-dominated; retest tolerance and
+window as free-but-stated parameters; 2013-2017 tested first) remains logically
+possible and would carry its own trials — but the plain, pre-registered form
+here does not survive. **Cumulative trials: N=1030** (946 prior + 84).
+
+### Files (10.5)
+
+| file | what it is |
+|---|---|
+| `strategies/orb.py` | `wilder_dmi_direction()` + `orb(..., retest=, di_dir=, session_tz=, open_min=, close_min=, min_sess_bars=)` — additive; all defaults reproduce §10 byte-identically (verified: default call == explicit ET-session call, identical entry times) |
+| `run_orb_entry_filters.py` | the runner — 4 instruments, both windows, 3 variants/cell, all gates, DSR (structural + clean recompute), the comparison table |
+| `scripts/download_btcusdt_m1_binance.py` | the one-off BTCUSDT M1 pull (binance.vision archive + ccxt tail) |
+| `results/orb_entry_filters.csv`, `orb_entry_filters_scored.csv`, `orb_entry_filters_run.log` | the numeric evidence |
+| `data/BTCUSDT_M1_2018_2025_binance.csv` | 418 MB, gitignored; reproduce with the download script |
 
 ---
 
