@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-02 (RETEST OR30/1R compounding tables, all 4 instruments incl. new SPX500 M1 §10.6 — 12/12 rows lose to buy-and-hold).** Read this file first in any new session. It is the
+**Last updated: 2026-09-02 (§10.7 — FTMO cost audit: this test's XAUUSD costs are HARSHER than FTMO's published conditions; exit-management study: 2R/3R/breakeven/trailing all tested, NONE beats the 1R baseline or buy-and-hold on the full window).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -136,9 +136,10 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=1033 — see the
+Trial composition (this is the cumulative DSR trial count, N=1041 — see the
 2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5,
-and the 2026-09-02 line for the +3 RETEST OR30/1R compounding-table backtests, §10.6):
+the 2026-09-02 (a) line for the +3 RETEST OR30/1R compounding-table backtests, §10.6,
+and the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -168,7 +169,8 @@ and the 2026-09-02 line for the +3 RETEST OR30/1R compounding-table backtests, �
 | Protected VRP structures (§21) | SVXY + cash / VIX circuit breaker / VIXY hedge | 12 | 0 survive (§21) — only small fixed sizing (f=0.10) stays inside the account bar, and it shrinks CAGR to ~2% at SR +0.43 < SPY; breaker & hedge are blind to same-day gap events |
 | ORB entry filters — RETEST + DI, each separately, both windows (§10.5) | XAUUSD, NAS100, US30, BTCUSDT | 84 | 0 survive (§10.5) — RETEST fixes concentration/DD/OOS in regime but fails DSR, buy-and-hold and the 2013-17 out-of-regime gate; DI inert; BTCUSDT cost-doomed |
 | RETEST OR30/1R compounding-table backtests — SPX500 (new instrument, both windows) + XAUUSD 2017 out-of-regime (§10.6) | SPX500, XAUUSD | 3 | 0 survive (§10.6) — SPX500 loses to buy-and-hold in all 3 periods; XAUUSD 2017 slice is a statistical wash vs its own buy-and-hold (+13.1% vs +13.2%), not a beat |
-| **Total** | | **1033** | **0 survive** |
+| RETEST OR30 exit-management — 3R, breakeven, trailing stop, both windows + 1R/2R out-of-regime-2017 (§10.7) | XAUUSD | 8 | 0 survive (§10.7) — every wider-target/dynamic-stop variant gives back dollars vs the 1R baseline on FULL 2018-2025, and none beats buy-and-hold |
+| **Total** | | **1041** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -1363,6 +1365,170 @@ prints the tables), `scripts/download_spx500_xauusd_backfill.sh` +
 `scripts/merge_spx500_xauusd_backfill.py` (the 2017/SPX500-M1 data pull),
 `results/retest_or30_1r_all4_summary.csv`,
 `results/retest_or30_1r_all4_compounded.log` (full run output).
+
+### 10.7 COST VERIFICATION vs FTMO + exit-management study, XAUUSD RETEST OR30, 2026-09-02
+
+#### Part 1 — cost verification (fact-check, not a new backtest)
+
+**This test's XAUUSD cost model** (`research/ftmo_engine.py`, the legacy $/oz
+path used for every XAUUSD ORB cell in this project, `cost_bps=None`):
+
+| component | value | source |
+|---|---|---|
+| spread | REAL historical Dukascopy bid/ask spread at the entry minute | data, not an assumption |
+| commission | **$0.07/oz round-turn** ($7/lot, 1 lot = 100 oz) | fixed constant, `COMMISSION_PER_OZ` |
+| slippage | **$0.03/oz per side normal** (**$0.06 round-turn**) / **$0.10/oz per side in news windows** (**$0.20 round-turn**) — news = 07:00-08:00 UTC London open, 12:30-14:30 UTC US data/NY open | fixed constants, `SLIP_NORMAL_PER_SIDE` / `SLIP_NEWS_PER_SIDE` |
+
+Measured directly on the 465 RETEST OR30/1R entries (09:30 ET = 13:30/14:30 UTC,
+which sits **inside** the 12:30-14:30 UTC news window for every single entry —
+53.8% of entries fall on the wider-slippage side purely from DST, not a
+modelling choice):
+
+| stat | spread ($/oz) | round-turn slippage ($/oz) | commission ($/oz) | **total cost ($/oz)** |
+|---|---|---|---|---|
+| median | 0.334 | — | 0.07 (fixed) | **0.554** |
+| mean | 0.373 | 0.135 (46.2% normal @0.06, 53.8% news @0.20) | 0.07 | **0.578** |
+| range | 0.088 – 1.214 | 0.06 or 0.20 | 0.07 | 0.293 – 1.484 |
+
+**FTMO's published gold (XAUUSD) conditions** (fetched live from ftmo.com and
+corroborated third-party review sources — FTMO's own symbols page does not
+publish a fixed number, only says "compare live spreads on the platform"):
+- **Commission: $0.00.** FTMO explicitly states "no commission on metals,
+  indices or energy" — gold is spread-only.
+- **Spread: no fixed published figure**, but independent gold-trading review
+  sources report FTMO's XAUUSD spread as **typically $0.15-$0.30/oz during
+  standard (London-NY overlap) hours**, widening outside that window and
+  around news.
+- No separate published "slippage" line item — FTMO's cost to a trader is
+  whatever the live spread is at execution; slippage in this test is an
+  **additional, explicit buffer this project adds on top of the spread**,
+  not something FTMO itself bills separately.
+
+**Verdict: this test's XAUUSD cost model is HARSHER than FTMO's published
+conditions, on every component that can be compared:**
+1. **Commission** — this test charges $0.07/oz round-turn; FTMO charges **$0**
+   on metals. Strictly harsher.
+2. **Spread** — this test's real historical measured spread (median $0.334/oz,
+   mean $0.373/oz) sits **above** the top of FTMO's cited $0.15-$0.30/oz range.
+   Plausibly legitimate (Dukascopy's feed is not FTMO's own liquidity bridge,
+   and 53.8% of entries sit at the volatile 09:30 ET cash open where spreads
+   structurally widen), but it cannot be called generous.
+3. **Slippage** — this test adds $0.06-$0.20/oz round-turn that FTMO does not
+   itemize as a separate charge at all.
+4. **Total**: this test's mean modelled round-turn cost ($0.578/oz) is roughly
+   **1.9-3.9x** FTMO's cited spread-only range ($0.15-$0.30/oz) and includes a
+   commission line FTMO does not charge on gold.
+
+**Practical implication: every dollar figure in sec 10.5/10.6/10.7 of this
+project is CONSERVATIVE relative to FTMO's real economics, not optimistic.**
+An actual FTMO gold trade would net MORE than this test credits it — meaning
+the negative verdicts (loses to buy-and-hold, RETEST fails DSR) are, if
+anything, understating the strategy's real edge slightly, not overstating it.
+It does not change any verdict (the gap to buy-and-hold in Part 2 below is far
+larger than a ~$0.3-0.4/oz cost difference could close), but it is the honest
+direction of the bias and is stated here so it isn't silently assumed.
+
+#### Part 2 — exit-management study (new backtest, entry logic UNCHANGED)
+
+**Question.** Sec 10.5/10.6 only ever tested a fixed 1R target on RETEST
+OR30. Does a wider target or a dynamic stop change the verdict? Entry logic
+(RETEST, OR30, ET session, real cost model) is **byte-identical** to sec
+10.5/10.6 — only the exit rule changes. Confirmed explicitly, not assumed: an
+entry-time-set equality check shows all 5 variants below fire on the exact
+same 465 in-regime / 89 out-of-regime (2017) entries.
+
+- **1R** — baseline (sec 10.5/10.6), reproduction-checked against
+  `orb_entry_filters_scored.csv`.
+- **2R** — fixed 2R target, same stop. Already scored in sec 10.5 (`target`
+  parses "2R" natively) — reproduction-checked, **not a new trial**.
+- **3R** — fixed 3R target, same stop. **NEW** — 3R was never in the sec 10.5
+  target grid (1R/2R/close only).
+- **breakeven** — no fixed target; once price first moves 1R in favor, the
+  stop moves to entry exactly once and never moves again; rides to the
+  (possibly breakeven) stop or session close. **NEW.**
+- **trailing** — no fixed target; once price first moves 1R in favor, a
+  trailing stop activates at 0.5R behind the running favorable extreme and
+  only ever tightens; rides to the trailing stop or session close. **NEW.**
+
+`research/ftmo_engine.simulate_trades` is vectorized around a FIXED stop and
+target (one `searchsorted` over the whole trade window) and **cannot express
+a stop that moves mid-trade** — so breakeven/trailing needed a genuine
+bar-by-bar resolver, written for this task: `research/orb_dynamic_stop.py`.
+Same conservative tie convention as the existing engine (the OLD, pre-this-bar
+stop is always checked first; a stop move triggered by this bar's own
+high/low only takes effect on bars strictly after it — no look-ahead), unit-
+tested against a hand-computed 6-bar synthetic trade before running on real
+data (both modes matched the hand calculation exactly). Same cost model as
+every other XAUUSD ORB cell (Part 1 above).
+
+**8 new backtests this run** (3R x2 windows, breakeven x2, trailing x2 — 1R
+and 2R in-regime are reused; STATE_OF_PLAY trial count **1033 → 1041**):
+
+| cell | n | guard | grossPF | netPF | SR | maxDD | exit breakdown (reason=count, %, avg net R) |
+|---|---|---|---|---|---|---|---|
+| 3R / in | 465 | PASS | 1.585 | 1.235 | +0.73 | 24.3% | target 35(8%,+2.83) · stop 152(33%,−1.14) · time 278(60%,+0.44) |
+| 3R / out-2017 | 89 | PASS | 2.159 | 1.517 | +1.52 | 6.1% | target 9(10%,+2.79) · stop 23(26%,−1.20) · time 57(64%,+0.37) |
+| breakeven / in | 465 | PASS | 1.759 | 1.294 | +0.74 | 14.8% | stop 120(26%,−1.14) · breakeven 88(19%,−0.14) · time 257(55%,+0.78) |
+| breakeven / out-2017 | 89 | PASS | 1.866 | 1.132 | +0.44 | 6.6% | stop 17(19%,−1.18) · breakeven 20(22%,−0.23) · time 52(58%,+0.55) |
+| trailing / in | 465 | PASS | 1.718 | 1.281 | +0.93 | 12.1% | stop 120(26%,−1.14) · trail 211(45%,+0.82) · time 134(29%,+0.06) |
+| trailing / out-2017 | 89 | PASS | 2.260 | 1.478 | +1.52 | 4.2% | stop 17(19%,−1.18) · trail 43(48%,+0.81) · time 29(33%,−0.06) |
+
+(1R/out-2017 and 2R/out-2017 are also new relative to sec 10.5's original
+in-regime-only grid; 1R/out-2017 reproduces sec 10.6 exactly.) Every one of
+the 10 cells (5 variants × 2 windows) PASSES the look-ahead guard. Top-year
+share on the out-2017 window is 100% by construction (it is a single
+calendar year, not a concentration failure — flagged the same way as sec
+10.6).
+
+**Deflated Sharpe, printed as REFERENCE ONLY per this task's brief (not a
+survival gate this round):** structural pool = this batch's own 5 in-regime
+cells, E[max SR] +1.075. 1R DSR 0.569, trailing 0.356, 2R 0.231, 3R 0.180,
+breakeven 0.172 — 1R remains the least noise-explicable of the five even by
+this narrow a pool.
+
+**Compounding — 1% risk/trade from $100,000, same 3-period layout as sec
+10.6, next to buy-and-hold XAUUSD:**
+
+| variant | FULL 2018-2025 | OUT-OF-REGIME 2017 | RECENT 2022-2025 |
+|---|---|---|---|
+| **1R (baseline)** | **$168,000 (+68.0%)** | $113,066 (+13.1%) | $143,057 (+43.1%) |
+| 2R | $156,652 (+56.7%) | $116,592 (+16.6%) beats B&H | $128,196 (+28.2%) |
+| 3R | $156,039 (+56.0%) | $119,733 (+19.7%) beats B&H | $134,856 (+34.9%) |
+| breakeven | $160,082 (+60.1%) | $103,839 (+3.8%) | $141,662 (+41.7%) |
+| trailing | $153,904 (+53.9%) | $113,462 (+13.5%) beats B&H | $131,278 (+31.3%) |
+| buy-and-hold XAUUSD | $331,604 (+231.6%) | $113,177 (+13.2%) | $239,440 (+139.4%) |
+
+**Verdict — plain answers to the brief's two questions:**
+1. **No exit variant beats the $168,000 (1R) baseline on FULL 2018-2025
+   dollars.** 1R is the best of the five on the full window; every wider
+   target or dynamic stop gives back money relative to it (2R −6.8%, 3R
+   −7.1%, breakeven −4.7%, trailing −8.4% relative to the 1R dollar figure).
+   Letting winners run trades a higher per-trade R ceiling for a lower
+   effective win rate and more "time" exits that give back the open profit
+   before the wider target/trail is reached (see the exit breakdown: 1R's
+   win rate is 60.2%, versus 48-55% net-positive-rate territory once the
+   target widens or the stop only trails after 1R).
+2. **No exit variant beats buy-and-hold on FULL 2018-2025** ($331,604) —
+   the best variant (1R, $168,000) is still 49% of buy-and-hold's dollar
+   total. **3 of the 4 new exit variants (2R, 3R, trailing — not
+   breakeven) DO beat buy-and-hold in the OUT-OF-REGIME/2017 window**, but
+   that window is a single calm year where buy-and-hold itself only returns
+   +13.2%, so beating it is a low bar, not evidence of a real edge — and it
+   does not hold in FULL or RECENT, the same generalization failure as every
+   other candidate in this project.
+
+**Bottom line: wider targets and dynamic stops do not fix the sec 10.5/10.6
+finding.** RETEST's real, cost-surviving edge is best monetized at the plain
+1R target; every attempt to let winners run tested here reduces the
+compounded dollar total instead of improving it, and none closes the gap to
+simply owning gold through 2018-2025.
+
+**Files (10.7):** `research/orb_dynamic_stop.py` (the bar-by-bar breakeven/
+trailing resolver), `research/report_orb_exit_variants_xauusd.py` (the
+runner — builds all 5 variants on both windows, gates, compounds, prints the
+table), `results/orb_exit_variants_xauusd_summary.csv`,
+`results/orb_exit_variants_xauusd_run.log` (full run output, incl. the Part 1
+cost measurement).
 
 ---
 

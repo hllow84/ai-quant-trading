@@ -1,0 +1,68 @@
+==================================================================================================================================
+  PART 2 -- XAUUSD RETEST OR30 exit-management study (sec 10.7)
+==================================================================================================================================
+  IN  window: XAUUSD_M1_2018_2025_spot_dukascopy.csv  2018-01-01 -> 2025-12-31  (1,827,147 bars)
+  OUT window: XAUUSD_M1_2017_spot_dukascopy.csv  2017-01-02 -> 2017-12-29  (323,514 bars)
+    repro OK vs orb_entry_filters_scored.csv [1R/in]: 465 trades, net_R total 53.618466
+  [1R          in] n=465  guard=PASS   grossPF=1.780  netPF=1.336  SR=+1.14  maxDD=10.0%  topYr=36%  (reused/repro-checked)
+      exits: target=225(48%,avgR=+0.871) | stop=120(26%,avgR=-1.136) | time=120(26%,avgR=-0.050)
+  [1R         out] n= 89  guard=PASS   grossPF=2.243  netPF=1.463  SR=+1.58  maxDD=4.5%  topYr=100%  (NEW BACKTEST)
+      exits: target=44(49%,avgR=+0.807) | stop=17(19%,avgR=-1.181) | time=28(31%,avgR=-0.102)
+    repro OK vs orb_entry_filters_scored.csv [2R/in]: 465 trades, net_R total 47.760873
+  [2R          in] n=465  guard=PASS   grossPF=1.602  netPF=1.242  SR=+0.79  maxDD=20.9%  topYr=46%  (reused/repro-checked)
+      exits: target=85(18%,avgR=+1.849) | stop=147(32%,avgR=-1.142) | time=233(50%,avgR=+0.251)
+  [2R         out] n= 89  guard=PASS   grossPF=2.101  netPF=1.456  SR=+1.45  maxDD=6.1%  topYr=100%  (NEW BACKTEST)
+      exits: target=19(21%,avgR=+1.797) | stop=22(25%,avgR=-1.197) | time=48(54%,avgR=+0.169)
+  [3R          in] n=465  guard=PASS   grossPF=1.585  netPF=1.235  SR=+0.73  maxDD=24.3%  topYr=47%  (NEW BACKTEST)
+      exits: target=35(8%,avgR=+2.834) | stop=152(33%,avgR=-1.143) | time=278(60%,avgR=+0.440)
+  [3R         out] n= 89  guard=PASS   grossPF=2.159  netPF=1.517  SR=+1.52  maxDD=6.1%  topYr=100%  (NEW BACKTEST)
+      exits: target=9(10%,avgR=+2.789) | stop=23(26%,avgR=-1.200) | time=57(64%,avgR=+0.372)
+  [breakeven   in] n=465  guard=PASS   grossPF=1.759  netPF=1.294  SR=+0.74  maxDD=14.8%  topYr=42%  (NEW BACKTEST)
+      exits: stop=120(26%,avgR=-1.136) | breakeven=88(19%,avgR=-0.142) | time=257(55%,avgR=+0.776)
+  [breakeven  out] n= 89  guard=PASS   grossPF=1.866  netPF=1.132  SR=+0.44  maxDD=6.6%  topYr=100%  (NEW BACKTEST)
+      exits: stop=17(19%,avgR=-1.181) | breakeven=20(22%,avgR=-0.226) | time=52(58%,avgR=+0.553)
+  [trailing    in] n=465  guard=PASS   grossPF=1.718  netPF=1.281  SR=+0.93  maxDD=12.1%  topYr=36%  (NEW BACKTEST)
+      exits: stop=120(26%,avgR=-1.136) | trail=211(45%,avgR=+0.821) | time=134(29%,avgR=+0.060)
+  [trailing   out] n= 89  guard=PASS   grossPF=2.260  netPF=1.478  SR=+1.52  maxDD=4.2%  topYr=100%  (NEW BACKTEST)
+      exits: stop=17(19%,avgR=-1.181) | trail=43(48%,avgR=+0.807) | time=29(33%,avgR=-0.057)
+
+  entry-set equality across all 5 variants: IN 465 entries, OUT 89 entries -- CONFIRMED identical for every variant
+
+  NEW BACKTESTS this run: 8  (1R/out, 2R/out, 3R/in, 3R/out, breakeven/in, breakeven/out, trailing/in, trailing/out)
+  CUMULATIVE PROJECT TRIALS: 1033 + 8 = 1041
+
+  DSR REFERENCE ONLY (not a gate) -- structural pool = this batch's 5 in-regime cells, E[max SR] +1.075 (mu +0.865, sd 0.176):
+    1R         SR +1.14  DSR 0.569
+    2R         SR +0.79  DSR 0.231
+    3R         SR +0.73  DSR 0.180
+    breakeven  SR +0.74  DSR 0.172
+    trailing   SR +0.93  DSR 0.356
+
+================================================================================================================================
+  COMPOUNDING -- 1% risk/trade from $100,000, XAUUSD RETEST OR30, vs buy-and-hold XAUUSD
+================================================================================================================================
+  variant    period                      strategy end $  strategy %  trades    B&H end $     B&H %  beats B&H?
+  ----------------------------------------------------------------------------------------------------------------------------
+  1R         FULL                               168,000     +68.0%     465      331,604  +231.6%          no
+  1R         OUT-OF-REGIME                      113,066     +13.1%      89      113,177   +13.2%          no
+  1R         RECENT                             143,057     +43.1%     198      239,440  +139.4%          no
+  2R         FULL                               156,652     +56.7%     465      331,604  +231.6%          no
+  2R         OUT-OF-REGIME                      116,592     +16.6%      89      113,177   +13.2%         YES
+  2R         RECENT                             128,196     +28.2%     198      239,440  +139.4%          no
+  3R         FULL                               156,039     +56.0%     465      331,604  +231.6%          no
+  3R         OUT-OF-REGIME                      119,733     +19.7%      89      113,177   +13.2%         YES
+  3R         RECENT                             134,856     +34.9%     198      239,440  +139.4%          no
+  breakeven  FULL                               160,082     +60.1%     465      331,604  +231.6%          no
+  breakeven  OUT-OF-REGIME                      103,839      +3.8%      89      113,177   +13.2%          no
+  breakeven  RECENT                             141,662     +41.7%     198      239,440  +139.4%          no
+  trailing   FULL                               153,904     +53.9%     465      331,604  +231.6%          no
+  trailing   OUT-OF-REGIME                      113,462     +13.5%      89      113,177   +13.2%         YES
+  trailing   RECENT                             131,278     +31.3%     198      239,440  +139.4%          no
+================================================================================================================================
+
+  results -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_exit_variants_xauusd_summary.csv
+
+  VERDICT:
+  1R baseline, FULL 2018-2025: $168,000
+  Variants beating the 1R baseline on FULL 2018-2025 dollars: NONE
+  Variants beating buy-and-hold on FULL 2018-2025: NONE
