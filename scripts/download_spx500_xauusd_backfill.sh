@@ -1,20 +1,21 @@
 #!/usr/bin/env bash
-# Backfill the two data gaps that make ORB cells "not runnable" (STATE_OF_PLAY
-# sec 10.5 follow-up):
+# Backfill the ORB "not runnable" data gaps (STATE_OF_PLAY sec 10.5 follow-up),
+# scoped to 2017 onwards per the user's instruction ("do all instruments from
+# 2017 onwards only"):
 #
-#   1. SPX500 M1 - the repo only had SPX500 at H1, so the ORB opening range
-#      could not be built at all. Pull usa500idxusd M1 bid+ask 2013-2025.
-#   2. XAUUSD M1 2013-2017 - the repo's XAUUSD M1 starts 2018-01, so gold had
-#      no pre-2018 out-of-regime window. Pull xauusd M1 bid+ask 2013-2017.
+#   1. SPX500 M1 2017-2025 - the repo held SPX500 at H1 only, so the ORB opening
+#      range could not be built at all. Pull usa500idxusd M1 bid+ask.
+#   2. XAUUSD M1 2017       - the repo's XAUUSD M1 starts 2018-01; this adds the
+#      one pre-2018 year so gold has a 2017 out-of-regime slice.
 #
-# BTCUSDT has NO fix: Binance history starts 2017-08, so there is no pre-2018
-# crypto regime at any resolution. Not attempted here.
+# NAS100/US30 already have 2017 (data/*_M1RTH_2013_2017_*.csv) + 2018-2025
+# (data/*_M1_2018_2025_*.csv), so no pull is needed for them.
+# BTCUSDT already covers 2017-08-17 onwards (download_btcusdt_m1_binance.py).
 #
-# Method = the repo's proven Dukascopy path (scripts/download_indices.sh /
-# download_xauusd.sh): plain `npx dukascopy-node` CLI, ONE process (Dukascopy
-# rate-limits across processes), BID and ASK pulled separately then merged to a
-# real spread by scripts/merge_spx500_xauusd_backfill.py. Timezone UTC (-utc 0).
-# Resumable: a (job).done marker skips a completed (instrument,year,side).
+# Method = the repo's proven Dukascopy path: plain `npx dukascopy-node` CLI, ONE
+# process, BID and ASK separately then merged to a real spread by
+# scripts/merge_spx500_xauusd_backfill.py. Timezone UTC (-utc 0). Resumable: a
+# (job).done marker skips a completed (instrument,year,side).
 set -u
 
 REPO="C:/Claude Code/AI Quant Trading/crypto-factor-lab"
@@ -50,15 +51,6 @@ pull_year() {
       touch "$DONE"
       return 0
     fi
-    # A 0-row SPX500 year before the archive starts (~2013-09 for the ask side)
-    # is legitimate; accept it. XAUUSD has full coverage from 2003, so an empty
-    # XAUUSD year is a real failure and must keep retrying.
-    if [ "$n" -le 1 ] && [ "$I" = "usa500idxusd" ] && [ "$Y" -le 2013 ]; then
-      echo "EMPTY ${FN}: accepting (pre-archive year)" | tee -a "$LOG"
-      : > "$TARGET"
-      touch "$DONE"
-      return 0
-    fi
     echo "RETRY ${FN} (attempt ${attempt}: ${n} rows)" | tee -a "$LOG"
     sleep 12
   done
@@ -66,19 +58,13 @@ pull_year() {
   return 1
 }
 
-# ---- 1. XAUUSD M1 2003-2017 (earliest available on Dukascopy = 2003-05-05).
-#         Gold M1 year ~250k-370k rows; early/partial years thinner, so accept
-#         >60k and let merge_spx500_xauusd_backfill.py apply the real per-year
-#         gate (hard for 2013+, advisory before). 2003 starts in May. ----
-for Y in 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017; do
-  for P in bid ask; do
-    pull_year xauusd "$XAU_DL" xauusd "$Y" "$P" 60000
-  done
+# ---- 1. XAUUSD M1 2017 (gold M1 full year ~250k-370k rows; >150k = complete) ----
+for P in bid ask; do
+  pull_year xauusd "$XAU_DL" xauusd 2017 "$P" 150000
 done
 
-# ---- 2. SPX500 M1 2013-2025 (earliest with a real ASK side ~2013-09; 2010/2012
-#         probed empty, same archive limit as US30). index M1 year >> 1000 rows ----
-for Y in 2013 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025; do
+# ---- 2. SPX500 M1 2017-2025 (index M1 year >> 1000 rows) ----
+for Y in 2017 2018 2019 2020 2021 2022 2023 2024 2025; do
   for P in bid ask; do
     pull_year usa500idxusd "$SPX_DL" usa500idxusd "$Y" "$P" 1000
   done

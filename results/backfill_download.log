@@ -1,0 +1,482 @@
+=== backfill download started Tue, Sep  1, 2026 10:20:39 PM ===
+--- xauusd-m1-bid-2017 attempt 1 Tue, Sep  1, 2026 10:20:39 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Gold vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2017, 12:00 AM
+To date:        Jan 1, 2018, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\xau_bf\download\xauusd-m1-bid-2017.csv (17.62 MB)
+
+Download time: 4m 26s
+
+OK xauusd-m1-bid-2017: 327535 lines
+--- xauusd-m1-ask-2017 attempt 1 Tue, Sep  1, 2026 10:25:07 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Gold vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2017, 12:00 AM
+To date:        Jan 1, 2018, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\xau_bf\download\xauusd-m1-ask-2017.csv (18.61 MB)
+
+Download time: 4m 16s
+
+OK xauusd-m1-ask-2017: 346010 lines
+--- usa500idxusd-m1-bid-2017 attempt 1 Tue, Sep  1, 2026 10:29:25 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2017, 12:00 AM
+To date:        Jan 1, 2018, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2017.csv (9.61 MB)
+
+Download time: 4m 19s
+
+OK usa500idxusd-m1-bid-2017: 186112 lines
+--- usa500idxusd-m1-ask-2017 attempt 1 Tue, Sep  1, 2026 10:33:45 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2017, 12:00 AM
+To date:        Jan 1, 2018, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2017.csv (9.06 MB)
+
+Download time: 4m 23s
+
+OK usa500idxusd-m1-ask-2017: 176693 lines
+--- usa500idxusd-m1-bid-2018 attempt 1 Tue, Sep  1, 2026 10:38:10 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2018, 12:00 AM
+To date:        Jan 1, 2019, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2018.csv (13.91 MB)
+
+Download time: 4m 11s
+
+OK usa500idxusd-m1-bid-2018: 270895 lines
+--- usa500idxusd-m1-ask-2018 attempt 1 Tue, Sep  1, 2026 10:42:24 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2018, 12:00 AM
+To date:        Jan 1, 2019, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2018.csv (13.78 MB)
+
+Download time: 4m 23s
+
+OK usa500idxusd-m1-ask-2018: 268391 lines
+--- usa500idxusd-m1-bid-2019 attempt 1 Tue, Sep  1, 2026 10:46:48 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2019, 12:00 AM
+To date:        Jan 1, 2020, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2019.csv (15.52 MB)
+
+Download time: 4m 15s
+
+OK usa500idxusd-m1-bid-2019: 303107 lines
+--- usa500idxusd-m1-ask-2019 attempt 1 Tue, Sep  1, 2026 10:51:05 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2019, 12:00 AM
+To date:        Jan 1, 2020, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2019.csv (15.26 MB)
+
+Download time: 4m 18s
+
+OK usa500idxusd-m1-ask-2019: 300722 lines
+--- usa500idxusd-m1-bid-2020 attempt 1 Tue, Sep  1, 2026 10:55:25 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2020, 12:00 AM
+To date:        Jan 1, 2021, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2020.csv (17.54 MB)
+
+Download time: 4m 16s
+
+OK usa500idxusd-m1-bid-2020: 332631 lines
+--- usa500idxusd-m1-ask-2020 attempt 1 Tue, Sep  1, 2026 10:59:43 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2020, 12:00 AM
+To date:        Jan 1, 2021, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2020.csv (17.41 MB)
+
+Download time: 4m 23s
+
+OK usa500idxusd-m1-ask-2020: 331260 lines
+--- usa500idxusd-m1-bid-2021 attempt 1 Tue, Sep  1, 2026 11:04:09 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2021, 12:00 AM
+To date:        Jan 1, 2022, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2021.csv (17.58 MB)
+
+Download time: 4m 21s
+
+OK usa500idxusd-m1-bid-2021: 325218 lines
+--- usa500idxusd-m1-ask-2021 attempt 1 Tue, Sep  1, 2026 11:08:32 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2021, 12:00 AM
+To date:        Jan 1, 2022, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2021.csv (16.93 MB)
+
+Download time: 4m 25s
+
+OK usa500idxusd-m1-ask-2021: 313847 lines
+--- usa500idxusd-m1-bid-2022 attempt 1 Tue, Sep  1, 2026 11:12:59 PM ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2022, 12:00 AM
+To date:        Jan 1, 2023, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+=== backfill download started Wed Sep  2 21:28:28 SEAST 2026 ===
+SKIP xauusd-m1-bid-2017 (.done, 327535 lines)
+SKIP xauusd-m1-ask-2017 (.done, 346010 lines)
+SKIP usa500idxusd-m1-bid-2017 (.done, 186112 lines)
+SKIP usa500idxusd-m1-ask-2017 (.done, 176693 lines)
+SKIP usa500idxusd-m1-bid-2018 (.done, 270895 lines)
+SKIP usa500idxusd-m1-ask-2018 (.done, 268391 lines)
+SKIP usa500idxusd-m1-bid-2019 (.done, 303107 lines)
+SKIP usa500idxusd-m1-ask-2019 (.done, 300722 lines)
+SKIP usa500idxusd-m1-bid-2020 (.done, 332631 lines)
+SKIP usa500idxusd-m1-ask-2020 (.done, 331260 lines)
+SKIP usa500idxusd-m1-bid-2021 (.done, 325218 lines)
+SKIP usa500idxusd-m1-ask-2021 (.done, 313847 lines)
+--- usa500idxusd-m1-bid-2022 attempt 1 Wed Sep  2 21:28:29 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2022, 12:00 AM
+To date:        Jan 1, 2023, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2022.csv (18.46 MB)
+
+Download time: 4m 7s
+
+OK usa500idxusd-m1-bid-2022: 341683 lines
+--- usa500idxusd-m1-ask-2022 attempt 1 Wed Sep  2 21:32:38 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2022, 12:00 AM
+To date:        Jan 1, 2023, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2022.csv (18.46 MB)
+
+Download time: 4m 7s
+
+OK usa500idxusd-m1-ask-2022: 341683 lines
+--- usa500idxusd-m1-bid-2023 attempt 1 Wed Sep  2 21:36:47 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2023, 12:00 AM
+To date:        Jan 1, 2024, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2023.csv (17.58 MB)
+
+Download time: 4m 8s
+
+OK usa500idxusd-m1-bid-2023: 332237 lines
+--- usa500idxusd-m1-ask-2023 attempt 1 Wed Sep  2 21:41:06 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2023, 12:00 AM
+To date:        Jan 1, 2024, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2023.csv (17.58 MB)
+
+Download time: 4m 6s
+
+OK usa500idxusd-m1-ask-2023: 332237 lines
+--- usa500idxusd-m1-bid-2024 attempt 1 Wed Sep  2 21:45:14 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2024, 12:00 AM
+To date:        Jan 1, 2025, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2024.csv (17.77 MB)
+
+Download time: 4m 6s
+
+OK usa500idxusd-m1-bid-2024: 335017 lines
+--- usa500idxusd-m1-ask-2024 attempt 1 Wed Sep  2 21:49:22 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2024, 12:00 AM
+To date:        Jan 1, 2025, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2024.csv (17.79 MB)
+
+Download time: 4m 6s
+
+OK usa500idxusd-m1-ask-2024: 335017 lines
+--- usa500idxusd-m1-bid-2025 attempt 1 Wed Sep  2 21:53:30 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2025, 12:00 AM
+To date:        Jan 1, 2026, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-bid-2025.csv (18.18 MB)
+
+Download time: 4m 6s
+
+OK usa500idxusd-m1-bid-2025: 339145 lines
+--- usa500idxusd-m1-ask-2025 attempt 1 Wed Sep  2 21:57:38 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     US 500 Index
+Timeframe:      m1
+From date:      Jan 1, 2025, 12:00 AM
+To date:        Jan 1, 2026, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\spx_bf\download\usa500idxusd-m1-ask-2025.csv (18.22 MB)
+
+Download time: 4m 6s
+
+OK usa500idxusd-m1-ask-2025: 339145 lines
+=== backfill download finished Wed Sep  2 22:01:46 SEAST 2026 ===
+ALL_DONE
+--- running merge ---
+
+======================================================================
+xauusd -> XAUUSD_M1_2017_spot_dukascopy.csv
+======================================================================
+BID:
+  loaded  xauusd-m1-bid-2017.csv: 327,534 rows
+ASK:
+  loaded  xauusd-m1-ask-2017.csv: 346,009 rows
+
+=== SANITY ===
+rows            : 323,514
+date range      : 2017-01-02 23:00:00+00:00  ->  2017-12-29 21:58:00+00:00
+bid_close range : 1,146.33 .. 1,357.09
+spread min/med/max: 0.0010 / 0.2410 / 2.9520  (1.912 bps)
+negative spreads: 0 (0.000%)
+rows per year   : {2017: 323514}
+WROTE C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\XAUUSD_M1_2017_spot_dukascopy.csv  (41 MB)
+
+======================================================================
+usa500idxusd -> SPX500_M1_2017_2025_cfd_dukascopy.csv
+======================================================================
+BID:
+  loaded  usa500idxusd-m1-bid-2017.csv: 186,111 rows
+  loaded  usa500idxusd-m1-bid-2018.csv: 270,894 rows
+  loaded  usa500idxusd-m1-bid-2019.csv: 303,106 rows
+  loaded  usa500idxusd-m1-bid-2020.csv: 332,630 rows
+  loaded  usa500idxusd-m1-bid-2021.csv: 325,217 rows
+  loaded  usa500idxusd-m1-bid-2022.csv: 341,682 rows
+  loaded  usa500idxusd-m1-bid-2023.csv: 332,236 rows
+  loaded  usa500idxusd-m1-bid-2024.csv: 335,016 rows
+  loaded  usa500idxusd-m1-bid-2025.csv: 339,144 rows
+ASK:
+  loaded  usa500idxusd-m1-ask-2017.csv: 176,692 rows
+  loaded  usa500idxusd-m1-ask-2018.csv: 268,390 rows
+  loaded  usa500idxusd-m1-ask-2019.csv: 300,721 rows
+  loaded  usa500idxusd-m1-ask-2020.csv: 331,259 rows
+  loaded  usa500idxusd-m1-ask-2021.csv: 313,846 rows
+  loaded  usa500idxusd-m1-ask-2022.csv: 341,682 rows
+  loaded  usa500idxusd-m1-ask-2023.csv: 332,236 rows
+  loaded  usa500idxusd-m1-ask-2024.csv: 335,016 rows
+  loaded  usa500idxusd-m1-ask-2025.csv: 339,144 rows
+
+=== SANITY ===
+rows            : 2,712,351
+date range      : 2017-01-03 07:00:00+00:00  ->  2025-12-31 21:13:00+00:00
+bid_close range : 2,184.25 .. 6,943.84
+spread min/med/max: 0.0010 / 0.5260 / 5.0250  (1.310 bps)
+negative spreads: 0 (0.000%)
+rows per year   : {2017: 173138, 2018: 261722, 2019: 294795, 2020: 328593, 2021: 306025, 2022: 341682, 2023: 332236, 2024: 335016, 2025: 339144}
+WROTE C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\SPX500_M1_2017_2025_cfd_dukascopy.csv  (339 MB)
+MERGE_DONE (0)

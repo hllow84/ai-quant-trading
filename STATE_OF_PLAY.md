@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-08-30 (momentum rotation SECOND audit §12.3 — 6 more checks, no new bugs, filter and cost robustness both PASS).** Read this file first in any new session. It is the
+**Last updated: 2026-09-02 (RETEST OR30/1R compounding tables, all 4 instruments incl. new SPX500 M1 §10.6 — 12/12 rows lose to buy-and-hold).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -136,8 +136,9 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=1030 — see the
-2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5):
+Trial composition (this is the cumulative DSR trial count, N=1033 — see the
+2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5,
+and the 2026-09-02 line for the +3 RETEST OR30/1R compounding-table backtests, §10.6):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -166,7 +167,8 @@ Trial composition (this is the cumulative DSR trial count, N=1030 — see the
 | Volatility risk premium harvest (§20) | SVXY (VIX vs SPY realized vol) | 2 | 0 survive (§20) — KILLED ON TAIL RISK: -83% single-day loss (2018 Volmageddon), regardless of headline Sharpe |
 | Protected VRP structures (§21) | SVXY + cash / VIX circuit breaker / VIXY hedge | 12 | 0 survive (§21) — only small fixed sizing (f=0.10) stays inside the account bar, and it shrinks CAGR to ~2% at SR +0.43 < SPY; breaker & hedge are blind to same-day gap events |
 | ORB entry filters — RETEST + DI, each separately, both windows (§10.5) | XAUUSD, NAS100, US30, BTCUSDT | 84 | 0 survive (§10.5) — RETEST fixes concentration/DD/OOS in regime but fails DSR, buy-and-hold and the 2013-17 out-of-regime gate; DI inert; BTCUSDT cost-doomed |
-| **Total** | | **1030** | **0 survive** |
+| RETEST OR30/1R compounding-table backtests — SPX500 (new instrument, both windows) + XAUUSD 2017 out-of-regime (§10.6) | SPX500, XAUUSD | 3 | 0 survive (§10.6) — SPX500 loses to buy-and-hold in all 3 periods; XAUUSD 2017 slice is a statistical wash vs its own buy-and-hold (+13.1% vs +13.2%), not a beat |
+| **Total** | | **1033** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -500,6 +502,8 @@ nothing.
 | `GER40_H1_…csv`, `UK100_H1_…csv`, `JP225_H1_…csv`, `SPX500_H1_…csv` | ~6 MB ea | H1 bid/ask CFD, downloaded directly | `scripts/download_basket.sh` → `scripts/merge_basket.py` |
 
 | `{NAS100,US30,SPX500,UK100,JP225}_H1_2013_2017_cfd_dukascopy.csv` | ~2 MB ea | **Pre-2018 out-of-regime window**, H1 bid/ask CFD. GER40 impossible (no ask before 2015) | `scripts/download_pre2018.mjs` (resumable per instrument/side/year) |
+| `SPX500_M1_2017_2025_cfd_dukascopy.csv` | 339 MB | S&P 500 M1 CFD, 2017-01 → 2025-12 — added 2026-09-02, closes the "SPX500 is H1-only" gap noted in §10 | `scripts/download_spx500_xauusd_backfill.sh` → `scripts/merge_spx500_xauusd_backfill.py` |
+| `XAUUSD_M1_2017_spot_dukascopy.csv` | 41 MB | Gold M1 SPOT, 2017 only — added 2026-09-02, extends XAUUSD M1 back one year for a 2017 out-of-regime slice | same as above |
 
 All 2018-2025 files: UTC, real bid+ask OHLC plus a real `spread` column,
 2018-01 → 2025-12. The `2013_2017` files are the same schema, spanning
@@ -1267,6 +1271,98 @@ here does not survive. **Cumulative trials: N=1030** (946 prior + 84).
 | `scripts/download_btcusdt_m1_binance.py` | the one-off BTCUSDT M1 pull (binance.vision archive + ccxt tail) |
 | `results/orb_entry_filters.csv`, `orb_entry_filters_scored.csv`, `orb_entry_filters_run.log` | the numeric evidence |
 | `data/BTCUSDT_M1_2018_2025_binance.csv` | 418 MB, gitignored; reproduce with the download script |
+
+### 10.6 RETEST OR30/1R compounding tables — SPX500 finally testable, all 4 instruments, 2026-09-02
+
+**Why this batch exists.** §10.5's RETEST result was the closest thing to a
+lead ORB ever produced (XAUUSD OR30/1R: gross PF 1.78, net PF 1.34, SR +1.14),
+but the "does it actually make money" question had only ever been answered in
+Sharpe/PF units. This task compounds it in dollars — 1% risk/trade from
+$100,000 — on **all four** liquid instruments the repo can reach, laid out on
+the **same three periods** for every one: **FULL** 2018-01-01..2025-12-31,
+**OUT-OF-REGIME** 2017-01-01..2017-12-31, **RECENT** 2022-01-01..2025-12-31 —
+each next to buy-and-hold over the identical range, from the same M1 mid data
+the strategy trades on.
+
+**OUT-OF-REGIME is ONE bull year, not a real regime test — stated plainly.**
+Every other out-of-regime test in this project (§6, §9.3, §10.5) used
+2013-2017, a 4-5 year window with real dispersion (a low-vol grind, no crash).
+2017 alone is a single, unusually calm, straight-up year for every one of
+these four instruments (SPX500 B&H +18.8%, NAS100 +30.2%, US30 +24.3%, gold
++13.2%) — it cannot show whether an edge survives a *different* regime, only
+whether it survives *one more good year*. It is used here only because it is
+the deepest window all four instruments share (XAUUSD and SPX500 had **no**
+M1 before 2017 on disk prior to this session); NAS100/US30 already have the
+real 2013-2017 test in §10.5 and it is not superseded by this section.
+
+**Two data gaps closed this session**, both backfilled via Dukascopy
+(`scripts/download_spx500_xauusd_backfill.sh`, bid+ask pulled separately,
+merged to a real spread by `scripts/merge_spx500_xauusd_backfill.py`, UTC):
+- `data/SPX500_M1_2017_2025_cfd_dukascopy.csv` — SPX500 had **only H1** on
+  disk before this session (§10 stated the strategy was "NOT runnable" on it
+  for exactly this reason). 2.71M M1 bars, 2017-01-03..2025-12-31, bid_close
+  2,184.25..6,943.84, spread 1.31 bps median, 0 negative spreads.
+- `data/XAUUSD_M1_2017_spot_dukascopy.csv` — the repo's XAUUSD M1 started
+  2018-01; this adds the missing 2017 year. 323,514 bars, bid_close
+  1,146.33..1,357.09, spread 1.91 bps median, 0 negative spreads.
+
+**3 genuinely NEW backtests this run** (§1 trial count 1030 → **1033**), each
+one fully-specified cell (instrument × window × OR30 × target=1R ×
+variant=RETEST), scored with the same honesty gates as every other cell —
+look-ahead guard, gross/net PF, Sharpe, max drawdown:
+
+| cell | n trades | guard | gross PF | net PF | SR | maxDD | cost_R |
+|---|---|---|---|---|---|---|---|
+| SPX500 FULL (2018-2025) | 747 | PASS | 1.383 | 1.109 | +0.44 | 18.8% | 9.7% |
+| SPX500 OUT-OF-REGIME (2017) | 88 | PASS | 1.519 | 0.945 | −0.26 | 13.2% | 20.7% |
+| XAUUSD OUT-OF-REGIME (2017) | 89 | PASS | 2.243 | 1.463 | +1.58 | 4.5% | 16.9% |
+
+All other rows in the table below are **reslices by exit/entry date** of an
+already-scored §10.5 trade log (XAUUSD/NAS100/US30 FULL and RECENT are
+subsets of the existing "in" window; NAS100/US30 OUT-OF-REGIME is the
+2017-only slice of the existing 2013-2017 "out" window; SPX500 RECENT is a
+slice of the new SPX500 FULL trade log above) — no new trial. XAUUSD/NAS100/
+US30 FULL-window trade counts and net_R totals were reproduction-checked
+against `results/orb_entry_filters_scored.csv` (exact match, 4/4) before any
+compounding ran.
+
+**Compounding results — 1% risk/trade from $100,000, strategy vs buy-and-hold:**
+
+| instrument | period | strategy end $ | strategy % | B&H end $ | B&H % | strategy beats B&H? |
+|---|---|---|---|---|---|---|
+| XAUUSD | FULL 2018-2025 | 168,000 | +68.0% | 331,604 | +231.6% | **no** |
+| XAUUSD | OUT-OF-REGIME 2017 | 113,066 | +13.1% | 113,177 | +13.2% | **no** (statistical wash) |
+| XAUUSD | RECENT 2022-2025 | 143,057 | +43.1% | 239,440 | +139.4% | **no** |
+| NAS100 | FULL 2018-2025 | 169,323 | +69.3% | 387,510 | +287.5% | **no** |
+| NAS100 | OUT-OF-REGIME 2017 | 94,521 | −5.5% | 130,201 | +30.2% | **no** |
+| NAS100 | RECENT 2022-2025 | 151,198 | +51.2% | 154,094 | +54.1% | **no** (close) |
+| US30 | FULL 2018-2025 | 146,738 | +46.7% | 194,005 | +94.0% | **no** |
+| US30 | OUT-OF-REGIME 2017 | 94,799 | −5.2% | 124,286 | +24.3% | **no** |
+| US30 | RECENT 2022-2025 | 106,558 | +6.6% | 132,040 | +32.0% | **no** |
+| **SPX500** | **FULL 2018-2025** | **135,770** | **+35.8%** | **255,640** | **+155.6%** | **no** |
+| **SPX500** | **OUT-OF-REGIME 2017** | **97,516** | **−2.5%** | **118,831** | **+18.8%** | **no** |
+| **SPX500** | **RECENT 2022-2025** | **114,600** | **+14.6%** | **143,260** | **+43.3%** | **no** |
+
+**Verdict — 12/12 rows, the strategy loses to buy-and-hold on absolute
+compounded dollars.** This is consistent with, not a contradiction of, §10.5's
+Sharpe/PF-based finding: RETEST's edge is real (positive gross PF in 10 of 12
+cells here, and the honesty-gated SR/PF numbers above are respectable) but it
+is a **lower-volatility, lower-return path than simply owning the index or
+gold through 2018-2025** — the same shape as every other candidate in this
+project that "beats B&H on Sharpe" while losing to it on CAGR. **SPX500 is now
+tested for the first time in this project and changes nothing**: it loses to
+its own buy-and-hold in all three periods, same as the other three
+instruments, extending §10.5's finding to a fourth, previously-untestable
+index rather than contradicting it. The XAUUSD 2017 slice is the one row
+close to parity (+13.1% vs +13.2% — an actual dead heat) but on **89 trades in
+one calm year**, and is explicitly flagged above as not a regime test.
+
+**Files (10.6):** `research/report_retest_or30_1r_all4_compounded.py` (the
+runner — builds/reproduction-checks all 4 instruments' trade logs, compounds,
+prints the tables), `scripts/download_spx500_xauusd_backfill.sh` +
+`scripts/merge_spx500_xauusd_backfill.py` (the 2017/SPX500-M1 data pull),
+`results/retest_or30_1r_all4_summary.csv`,
+`results/retest_or30_1r_all4_compounded.log` (full run output).
 
 ---
 

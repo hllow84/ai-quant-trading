@@ -1,13 +1,14 @@
 """Merge the backfill Dukascopy pulls (scripts/download_spx500_xauusd_backfill.sh)
-into clean bid/ask+spread datasets, same schema as the existing repo files so
+into clean bid/ask+spread datasets, same schema as the existing repo M1 files so
 research/gold_data.py loaders work unchanged:
 
     timestamp, datetime_utc, bid_open, bid_high, bid_low, bid_close,
     ask_open, ask_high, ask_low, ask_close, spread, volume
 
+Scope: 2017 onwards (per the user's instruction).
 Outputs:
-    data/SPX500_M1_2013_2025_cfd_dukascopy.csv   (usa500idxusd, spread in points)
-    data/XAUUSD_M1_2003_2017_spot_dukascopy.csv  (xauusd, spread in $/oz)
+    data/SPX500_M1_2017_2025_cfd_dukascopy.csv   (usa500idxusd, spread in points)
+    data/XAUUSD_M1_2017_spot_dukascopy.csv       (xauusd, spread in $/oz)
 
 Timezone: UTC (Dukascopy -utc 0). Spread = ask_close - bid_close.
 """
@@ -26,11 +27,8 @@ def _load_side(src, prefix, years, price):
     frames = []
     for y in years:
         f = os.path.join(src, f"{prefix}-m1-{price}-{y}.csv")
-        if not os.path.exists(f):
-            print(f"  MISSING {os.path.basename(f)}")
-            continue
-        if os.path.getsize(f) == 0:
-            print(f"  EMPTY   {os.path.basename(f)} (pre-archive year)")
+        if not os.path.exists(f) or os.path.getsize(f) == 0:
+            print(f"  MISSING/EMPTY {os.path.basename(f)}")
             continue
         df = pd.read_csv(f)
         if df.empty:
@@ -84,20 +82,10 @@ def merge(src, prefix, years, out_path, lo_exp, hi_exp, min_year_rows):
         problems.append(f"price {lo:.1f}..{hi:.1f} outside band {lo_exp}-{hi_exp}")
     if neg > len(m) * 0.001:
         problems.append(f"{neg} negative spreads (>0.1%)")
-    # Hard gate only for 2013+ (the window the out-of-regime tests actually use
-    # and where full M1 coverage is guaranteed). Pre-2013 gold M1 can be genuinely
-    # thinner; report it, do not block on it. The first year is always exempt
-    # (2003 gold starts in May; 2013 SPX ask starts in Sept).
-    thin_hard = [int(y) for y, n in per_year.items()
-                 if min_year_rows and n < min_year_rows
-                 and int(y) >= 2013 and int(y) != years[0]]
-    thin_soft = [int(y) for y, n in per_year.items()
-                 if min_year_rows and n < min_year_rows
-                 and int(y) < 2013 and int(y) != years[0]]
-    if thin_soft:
-        print(f"NOTE: thin pre-2013 years {thin_soft} (< {min_year_rows} rows) -- advisory only")
-    if thin_hard:
-        problems.append(f"thin years {thin_hard} (< {min_year_rows} rows)")
+    thin = [int(y) for y, n in per_year.items()
+            if min_year_rows and n < min_year_rows and int(y) != years[0]]
+    if thin:
+        problems.append(f"thin years {thin} (< {min_year_rows} rows)")
     if problems:
         print("GATE FAILED: " + " | ".join(problems) + "  -- NOT writing " + os.path.basename(out_path))
         return False
@@ -111,13 +99,13 @@ def main():
     ok = True
     ok &= merge(
         os.path.join(REPO, "data", "raw", "xau_bf", "download"),
-        "xauusd", list(range(2003, 2018)),
-        os.path.join(REPO, "data", "XAUUSD_M1_2003_2017_spot_dukascopy.csv"),
-        lo_exp=300, hi_exp=2100, min_year_rows=150_000)
+        "xauusd", [2017],
+        os.path.join(REPO, "data", "XAUUSD_M1_2017_spot_dukascopy.csv"),
+        lo_exp=1000, hi_exp=1500, min_year_rows=150_000)
     ok &= merge(
         os.path.join(REPO, "data", "raw", "spx_bf", "download"),
-        "usa500idxusd", list(range(2013, 2026)),
-        os.path.join(REPO, "data", "SPX500_M1_2013_2025_cfd_dukascopy.csv"),
+        "usa500idxusd", list(range(2017, 2026)),
+        os.path.join(REPO, "data", "SPX500_M1_2017_2025_cfd_dukascopy.csv"),
         lo_exp=1000, hi_exp=8000, min_year_rows=55_000)
     sys.exit(0 if ok else 1)
 
