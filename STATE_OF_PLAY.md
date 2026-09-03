@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-03 (§18.1 — ML on crypto positioning data: shallow LightGBM on 21 funding/OI + price-control features, BTC/ETH, 4h/24h forward-return prediction. Sealed-test IC ≈ 0 (mean −0.005, 3/4 negative), strategy net Sharpe −2.6 after real costs, beats buy-and-hold 0/4. The model DOES lean on positioning features (66% gain) but they carry no out-of-sample predictive value; ablation: positioning-only, price-only, both all ≈ 0 IC. Clean kill — closes the ML-on-positioning thread. Same day: §12.6 momentum rebalance-frequency sweep, §10.8 EURUSD RETEST kill.).** Read this file first in any new session. It is the
+**Last updated: 2026-09-03 (§24 — long short-dated CALL OPTIONS on a trend signal, a defined-risk structure. Black-Scholes-approximated premiums, SPY/QQQ on near-real IV (^VIX/^VXN), AAPL/MSFT/GOOGL on a trailing-RV proxy (flagged optimistic). 20 cells (5 inst × 2 DTE × 2 moneyness). 0/20 beat the underlying buy-and-hold on total return OR Sharpe; SPY/QQQ returned −87%…+42% while the indices did +677%/+1326%. Time decay is the dominant loss channel — 44% of options expire worthless, option wrapper costs 20–74% of return per trade vs delta-matched stock. Clean kill. Same day: §18.1 ML-on-positioning, §12.6 rebalance-frequency, §10.8 EURUSD RETEST.).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -136,13 +136,14 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=1053 — see the
+Trial composition (this is the cumulative DSR trial count, N=1073 — see the
 2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5,
 the 2026-09-02 (a) line for the +3 RETEST OR30/1R compounding-table backtests, §10.6,
 the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7,
 the 2026-09-03 (a) line for the +2 EURUSD RETEST OR30/1R generalization cells, §10.8,
 the 2026-09-03 (b) line for the +6 momentum-rotation rebalance-frequency cells, §12.6,
-and the 2026-09-03 (c) line for the +4 ML-on-positioning-data cells, §18.1):
+the 2026-09-03 (c) line for the +4 ML-on-positioning-data cells, §18.1,
+and the 2026-09-03 (d) line for the +20 long-call-option cells, §24):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -176,7 +177,8 @@ and the 2026-09-03 (c) line for the +4 ML-on-positioning-data cells, §18.1):
 | RETEST OR30/1R generalization to FOREX — EURUSD, both windows (§10.8) | EURUSD | 2 | 0 survive (§10.8) — first FX pair; the only RETEST cell with net PF < 1 in BOTH windows (0.879 in / 0.967 out), net Sharpe negative both, 1% compounding −37.9% over 2018-2025. Gross breakout edge generalizes to FX (gross PF 1.39/1.48); it cannot pay its costs on a currency pair |
 | Momentum-rotation rebalance-frequency sweep — weekly/bi-weekly/quarterly new, monthly/bi-monthly reused (§12.6) | 17-ETF universe, SPY benchmark | 6 | 0 survive (§12.6) — DSR reference-only this batch; quarterly maximises full-period compounded return (+1010% vs SPY +772%, only cadence to beat SPY on raw return), monthly wins the 2000-09 stress window (+138%); higher frequency strictly worse everywhere. Does not revive §12 — quarterly DSR 0.526 vs 0.95 bar, same pre-2009 crash-hedge artefact as §12.5 |
 | ML on crypto positioning data — shallow LightGBM, funding/OI + price-control features (§18.1) | BTCUSDT, ETHUSDT | 4 | 0 survive (§18.1) — DSR reference-only; sealed-test IC ≈ 0 (mean −0.005, 3/4 negative), strategy net Sharpe −2.6 after real costs, beats B&H 0/4. Model leans on positioning features (66% gain) but they carry no OOS predictive value; ablation positioning-only/price-only/both all ≈ 0 IC. Closes the ML-on-positioning thread |
-| **Total** | | **1053** | **0 survive** |
+| Long short-dated call options on a trend signal — defined-risk structure, BS-approximated premiums (§24) | SPY, QQQ, AAPL, MSFT, GOOGL | 20 | 0 survive (§24) — DSR reference-only; 5 inst × 2 DTE × 2 moneyness, 2012-2026. 0/20 beat the underlying buy-and-hold on total return or Sharpe (SPY/QQQ −87%…+42% vs index +677%/+1326%). Time decay dominates: 44% of options expire worthless, wrapper costs 20-74% of return/trade vs delta-matched stock. SPY/QQQ on near-real IV (^VIX/^VXN); single names on optimistic RV proxy, still lose |
+| **Total** | | **1073** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -4500,3 +4502,132 @@ Files: `report_winrate_over_50.py`,
 `results/winrate_over_50_period_strategies.csv`,
 `results/winrate_over_50_momentum_recent.csv`. Reproduce:
 `python report_winrate_over_50.py`. **No trials added — N = 946.**
+
+---
+
+## 24. LONG SHORT-DATED CALL OPTIONS ON A TREND SIGNAL — a defined-risk structure, tested 2026-09-03, killed
+
+### Why this run exists — genuinely different structure, not another pattern search
+
+Everything in §1–§23 tests some variant of "predict direction, size with a
+stop." This tests a **structurally different bet**: buy a short-dated call,
+**max loss = premium paid** (no stop mechanics), and **time decay is the
+central risk**. The question is whether the capped downside plus convexity
+pays for the theta bleed, historically, on a simple bullish trigger.
+
+### DATA — STATED PLAINLY: these are Black-Scholes approximations, not real chains
+
+**Free historical option-chain data for SPY/QQQ/AAPL/MSFT/GOOGL going back
+years does not exist** (yfinance serves only the current chain; CBOE
+DataShop / OptionMetrics / ORATS are paid). Option prices here are
+**Black-Scholes**, priced per trade from yfinance daily adjusted close plus
+an implied-vol input:
+
+| instrument | IV source | trust |
+|---|---|---|
+| SPY | **^VIX** (CBOE 30-day S&P 500 implied-vol index) | **near-real** — small basis (term structure, SPY-vs-SPX) |
+| QQQ | **^VXN** (CBOE 30-day Nasdaq-100 implied-vol index) | **near-real** |
+| AAPL, MSFT, GOOGL | **trailing 21-day realised vol times 1.15** | **approximation, optimistically biased** — CBOE's single-name vol indices (VXAPL/VXAZN) were discontinued ~2020, no free replacement. Trailing RV is backward-looking: it **underprices** options going *into* volatile periods, which **flatters a long-call strategy**. |
+
+Other stated simplifications: r = 2% constant; q = 0 (auto-adjusted prices
+already remove dividend drops — slightly over-values calls on SPY/MSFT); VIX/
+VXN used flat for both 14- and 35-day tenors (two-sided term-structure
+error, small). **Trust summary: SPY/QQQ results rest on near-real market IV;
+AAPL/MSFT/GOOGL numbers are an optimistic upper bound and any *positive*
+result there would need real-chain confirmation.**
+
+### Strategy — every choice a priori, nothing swept
+
+Signal on close[t]: **close > 50-day SMA AND close > close[t-20]** (trend +
+1-month momentum). Buy at close[t+1] (S, IV, r all as of the purchase day —
+look-ahead guard asserts entry strictly after the signal day, **PASS 20/20**).
+One call, **K = ATM or 2% OTM** (both tested), **14 or 35 calendar DTE**
+(both tested; expiry = last trading day on/before the Friday on/after
+entry+DTE). **Hold to expiry** (primary; a +100% profit-take variant is a
+diagnostic). Re-enter on expiry if the signal is still on. Costs: premium
+times (1 + half-spread + 0.5% commission), half-spread **2% of premium for
+SPY/QQQ, 4% for single names** (options spreads are wider than stock —
+stated). Held to expiry => settles at intrinsic, no exit spread. Size:
+**premium at risk = 2% of capital per trade, compounded** from $100k,
+2012–2026 (~14 years; weekly expiries broadly available from ~2012).
+
+**Grid: 5 instruments x 2 DTE x 2 moneyness = 20 a priori cells.**
+
+### Result — primary (hold to expiry)
+
+| cell | trades | win% | expired worthless | total return | Sharpe | vs underlying B&H |
+|---|---|---|---|---|---|---|
+| SPY 14 ATM | 210 | 43% | 33% | **−28%** | −0.24 | vs **+677%** |
+| SPY 14 OTM | 210 | 18% | 69% | **−87%** | −1.16 | vs +677% |
+| SPY 35 ATM | 113 | 46% | 29% | **+3%** | +0.04 | vs +677% |
+| SPY 35 OTM | 113 | 32% | 53% | **−39%** | −0.40 | vs +677% |
+| QQQ (4 cells) | 108–201 | 27–50% | 31–63% | **−59% … +42%** | −0.48 … +0.31 | vs **+1326%** |
+| AAPL (4 cells) | 105–193 | 35–50% | 40–54% | **+201% … +495%** | +0.49 … +0.60 | vs **+2499%** |
+| MSFT (4 cells) | 106–195 | 27–42% | 35–60% | **+58% … +100%** | +0.19 … +0.38 | vs **+2365%** |
+| GOOGL (4 cells) | 107–195 | 32–40% | 36–54% | **+103% … +236%** | +0.35 … +0.42 | vs **+2000%** |
+
+**16/20 cells post a positive total return, but 0/20 beat the underlying
+buy-and-hold — on total return OR on Sharpe.** SPY and QQQ (near-real IV)
+range from −87% to +42% while the index itself compounded +677% / +1326%.
+The single-name cells look large in isolation (+200% to +495%) but are
+**8x–50x worse than just holding the stock**, are on the optimistically-biased
+RV-proxy IV, and are concentrated (AAPL 14/OTM: 2017 alone = +0.77 of +2.15
+total; **2022 is negative in every one of the 20 cells**).
+
+### Time decay — quantified explicitly (the task's central question)
+
+- **44% of all options expired worthless on average** — a total (100%) loss,
+  pure decay, no directional offset. OTM cells: 46–69% worthless; ATM: 29–43%.
+- **`option return − delta-matched-stock return`, per trade** (the cleanest
+  isolation of the wrapper's cost): **SPY −27% to −74%, QQQ −21% to −53%**
+  per trade. On the instruments with trustworthy IV, using the option instead
+  of a delta-equivalent stock position destroyed 20–74% of the return on
+  every trade — that gap *is* the theta cost, and it is the entire difference
+  between the strategy and the index it is built on.
+- Theta drag as a share of premium outlaid: SPY/QQQ ATM ~1–13%, OTM ~17–50%.
+  35-DTE is consistently less bad than 14-DTE (less relative theta), as theory
+  predicts. (The single names show near-zero aggregate theta drag only because
+  a few explosive RV-underpriced years paid the long gamma — the
+  optimistic-bias artefact, not a real edge.)
+
+### Out-of-regime (expiries before 2020 calm bull vs 2020+ COVID / 2022 bear / 2023-25)
+
+The pattern holds in both regimes: SPY/QQQ average per-trade return is
+negative-to-flat before and after 2020 (SPY 14 ATM −1% -> −14%); the single
+names are positive in both halves but on the same optimistic IV proxy. **No
+regime in 14 years where the SPY/QQQ structure works.**
+
+### Honesty gates
+
+Look-ahead guard **PASS 20/20**. Realistic option bid/ask charged (2%/4%
+half-spread + commission, stated). DSR **reference only** (pool = the 20
+cells; E[max SR] +0.98, best cell AAPL 35 ATM SR +0.60 -> **DSR 0.008** vs a
+0.95 bar). Concentration reported above. +100% profit-take diagnostic does
+not rescue it (SPY still −26% / −89%; QQQ still far below B&H).
+
+### Verdict
+
+**KILL, 0/20 beat buy-and-hold.** The defined-risk long-call structure does
+not pay off historically once BS-approximated premium, realistic option
+bid/ask, and time decay are charged. **Time decay is the dominant loss
+channel** — 44% of options expire worthless, and on SPY/QQQ (real IV) the
+option wrapper costs 20–74% of return per trade versus a delta-matched stock
+position. The capped downside does not compensate: you pay a spread, bleed
+theta continuously, and capture only delta·dS of the upside, so across a
+14-year bull market the structure returned −87%…+42% (SPY/QQQ) where the
+underlyings returned +677%…+1326%. **The data limitation cuts *toward* the
+kill, not against it**: SPY/QQQ rest on near-real IV and lose decisively;
+AAPL/MSFT/GOOGL rest on a trailing-RV proxy that *flatters* long calls and
+still lose to their stocks by an order of magnitude. Structurally different
+from everything else in the project, same answer.
+
+Files: `research/long_call_trend.py`. Data: yfinance daily
+(SPY/QQQ/AAPL/MSFT/GOOGL + ^VIX/^VXN), pulled at runtime, none saved.
+Results: `results/long_call_trend.csv`, `results/long_call_trend_run.log`.
+Reproduce: `python research/long_call_trend.py`.
+
+**Cumulative trials: N=1073** (1053 prior + 20 — 5 instruments x 2 DTE x 2
+moneyness. The +100% profit-take variant and the 2020 OOS sub-split are
+diagnostics of those same 20 cells, not separate configs — same treatment
+as §12.3 audit 8. DSR was reference-only this batch per the standing
+instruction.)
