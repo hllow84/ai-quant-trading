@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-02 (§10.7 — FTMO cost audit: this test's XAUUSD costs are HARSHER than FTMO's published conditions; exit-management study: 2R/3R/breakeven/trailing all tested, NONE beats the 1R baseline or buy-and-hold on the full window).** Read this file first in any new session. It is the
+**Last updated: 2026-09-03 (§10.8 — RETEST OR30/1R generalization test: EURUSD, first FX pair, both windows. Clean kill — the only RETEST cell with net PF < 1 in BOTH windows (0.879 in / 0.967 out); 1% compounding bleeds −37.9% over 2018-2025. The gross breakout edge generalizes to FX; it still cannot pay its costs.).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -136,10 +136,11 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=1041 — see the
+Trial composition (this is the cumulative DSR trial count, N=1043 — see the
 2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5,
 the 2026-09-02 (a) line for the +3 RETEST OR30/1R compounding-table backtests, §10.6,
-and the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7):
+the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7,
+and the 2026-09-03 line for the +2 EURUSD RETEST OR30/1R generalization cells, §10.8):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -170,7 +171,8 @@ and the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7):
 | ORB entry filters — RETEST + DI, each separately, both windows (§10.5) | XAUUSD, NAS100, US30, BTCUSDT | 84 | 0 survive (§10.5) — RETEST fixes concentration/DD/OOS in regime but fails DSR, buy-and-hold and the 2013-17 out-of-regime gate; DI inert; BTCUSDT cost-doomed |
 | RETEST OR30/1R compounding-table backtests — SPX500 (new instrument, both windows) + XAUUSD 2017 out-of-regime (§10.6) | SPX500, XAUUSD | 3 | 0 survive (§10.6) — SPX500 loses to buy-and-hold in all 3 periods; XAUUSD 2017 slice is a statistical wash vs its own buy-and-hold (+13.1% vs +13.2%), not a beat |
 | RETEST OR30 exit-management — 3R, breakeven, trailing stop, both windows + 1R/2R out-of-regime-2017 (§10.7) | XAUUSD | 8 | 0 survive (§10.7) — every wider-target/dynamic-stop variant gives back dollars vs the 1R baseline on FULL 2018-2025, and none beats buy-and-hold |
-| **Total** | | **1041** | **0 survive** |
+| RETEST OR30/1R generalization to FOREX — EURUSD, both windows (§10.8) | EURUSD | 2 | 0 survive (§10.8) — first FX pair; the only RETEST cell with net PF < 1 in BOTH windows (0.879 in / 0.967 out), net Sharpe negative both, 1% compounding −37.9% over 2018-2025. Gross breakout edge generalizes to FX (gross PF 1.39/1.48); it cannot pay its costs on a currency pair |
+| **Total** | | **1043** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -1529,6 +1531,88 @@ runner — builds all 5 variants on both windows, gates, compounds, prints the
 table), `results/orb_exit_variants_xauusd_summary.csv`,
 `results/orb_exit_variants_xauusd_run.log` (full run output, incl. the Part 1
 cost measurement).
+
+### 10.8 RETEST OR30/1R generalizes to FOREX — EURUSD, first non-metal/non-index pair, tested 2026-09-03, killed
+
+**Why this batch exists.** RETEST OR30/1R (§10.5) is the closest thing ORB
+ever produced to a lead, but every cell to date has been an equity index or
+gold. This test asks the plain generalization question: does the **same rule
+set** — RETEST, OR30, target 1R, stop = OR width, **09:30 ET session anchor
+unchanged** — hold up on a currency pair? EURUSD M1 was pulled fresh this
+session via Dukascopy (`scripts/download_eurusd_backfill.sh` →
+`scripts/merge_eurusd_backfill.py`, bid+ask separately, real spread column),
+covering the SAME two windows as every other ORB instrument: **2013-2017
+out-of-regime** and **2018-2025 in-regime**. EURUSD is Dukascopy's flagship
+pair with continuous depth, so — unlike XAUUSD/SPX500 in §10.6 — it gets a
+full **5-year** out-of-regime window, not a single calm year.
+
+**The 09:30 ET anchor is deliberately kept, not EURUSD-tuned.** EURUSD's own
+conventional session opens are London (08:00 GMT) or Tokyo — not the US cash
+equity open. 09:30 ET is kept anyway so this measures whether *this exact
+strategy generalizes*, not whether a EURUSD-specific breakout window can be
+found (that is a different, untested hypothesis with its own trial cost).
+
+**Data (both files passed the merge script's sanity gate — it refuses to
+write on failure):**
+- `data/EURUSD_M1_2013_2017_spot_dukascopy.csv` — 1,837,284 bars, bid_close
+  1.03435..1.39904, spread 0.30 pips / 0.261 bps median, **0** negative
+  spreads, 358k-374k rows/year.
+- `data/EURUSD_M1_2018_2025_spot_dukascopy.csv` — 2,922,985 bars, bid_close
+  0.95382..1.25541, spread 0.30 pips / 0.268 bps median, 152 negative
+  spreads (**0.005%**, well inside the 0.1% tolerance), 353k-373k rows/year.
+
+**Costs.** Real measured spread from the data (median 0.30 pips ≈ 0.27 bps
+both windows) + **0.30 bps commission** — grounded in FTMO's published $3
+per 100k-unit round lot on forex (~0.27-0.29 bps at EURUSD's 1.05-1.10 level;
+rounded UP, a slightly harsh reading) — + slippage kept UNCHANGED from the
+index convention (1.00 bps/side 09:30-10:30 ET, 0.15 bps/side after),
+deliberately not tightened for EURUSD's deeper liquidity.
+
+**2 NEW backtests this run** (§1 trial count **1041 → 1043**), same honesty
+gates as every other cell:
+
+| cell | n | guard | grossPF | netPF | SR | maxDD | posYrs | exit breakdown (reason=count, %, avg net R) |
+|---|---|---|---|---|---|---|---|---|
+| EURUSD in-regime 2018-2025 | 802 | PASS | 1.390 | **0.879** | **−0.55** | 41.7% | 3/8 | target 389 (49%, +0.779) · stop 276 (34%, −1.211) · time 137 (17%, −0.096) |
+| EURUSD out-of-regime 2013-2017 | 496 | PASS | 1.479 | **0.967** | **−0.14** | 21.0% | 1/5 | target 248 (50%, +0.792) · stop 162 (33%, −1.193) · time 86 (17%, −0.120) |
+
+**Compounding — 1% risk/trade from $100,000, vs buy-and-hold EURUSD (M1 mid),
+same 3-period layout as §10.6/§10.7:**
+
+| period | strategy end $ | strategy % | B&H end $ | B&H % | strategy beats B&H? |
+|---|---|---|---|---|---|
+| FULL 2018-2025 | 62,053 | **−37.9%** | 97,794 | −2.2% | **no** |
+| OUT-OF-REGIME 2013-2017 | 91,213 | −8.8% | 90,954 | −9.0% | nominally yes — **both lose ~9%**, a dead heat in a EUR downtrend, not a beat |
+| RECENT 2022-2025 | 76,768 | −23.2% | 103,275 | +3.3% | **no** |
+
+**Verdict — clean kill, and the WEAKEST RETEST cell in the project.** EURUSD
+is the **only** instrument where RETEST OR30/1R posts **net PF < 1 in BOTH
+windows** (0.879 in, 0.967 out) — the gross edge is real and consistent with
+the index/gold cells (gross PF 1.39 / 1.48, and a foreign 09:30 ET anchor
+still finds it, which is mildly notable) but it does **not come close to
+paying its transaction costs** on a currency pair: net Sharpe is negative in
+both windows, and 1% compounding bleeds the account **−37.9%** over
+2018-2025 while simply holding EURUSD is roughly flat (−2.2%). The
+out-of-regime "beat" is an artefact — strategy −8.8% vs B&H −9.0%, both
+deeply negative across a multi-year EUR decline; being 0.2pp less bad is not
+evidence of edge. RECENT confirms: −23.2% vs B&H +3.3%. Single-year
+concentration is undefined here (total net R is negative, so the top-year
+share ratio has no meaning) but only 3/8 and 1/5 years are positive.
+
+**What this adds to §10.** ORB's RETEST filter produces a small, genuine,
+regime-robust GROSS breakout edge on liquid instruments — now confirmed on a
+fourth asset class (FX) after equity indices and gold — but it is a
+**lower-return, cost-fragile path** everywhere it has been tested, and on
+EURUSD the costs alone sink it below water before any comparison to
+buy-and-hold is needed. No change to the §10 kill; the generalization test
+extends it rather than reopening it.
+
+**Files (10.8):** `research/report_retest_or30_1r_eurusd.py` (the runner),
+`scripts/download_eurusd_backfill.sh` + `scripts/merge_eurusd_backfill.py`
+(the 26-pull Dukascopy backfill + merge),
+`results/retest_or30_1r_eurusd_summary.csv`,
+`results/retest_or30_1r_eurusd_run.log` (full run output),
+`results/eurusd_backfill_download.log` (download + merge sanity output).
 
 ---
 

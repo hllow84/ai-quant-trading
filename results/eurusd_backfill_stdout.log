@@ -1,0 +1,32 @@
+=== EURUSD backfill download started Thu Sep  3 16:09:35 SEAST 2026 ===
+SKIP eurusd-m1-bid-2013 (.done, 364254 lines)
+SKIP eurusd-m1-ask-2013 (.done, 366708 lines)
+SKIP eurusd-m1-bid-2014 (.done, 371537 lines)
+SKIP eurusd-m1-ask-2014 (.done, 365818 lines)
+SKIP eurusd-m1-bid-2015 (.done, 372945 lines)
+SKIP eurusd-m1-ask-2015 (.done, 372945 lines)
+SKIP eurusd-m1-bid-2016 (.done, 373995 lines)
+OK eurusd-m1-ask-2016: 373995 lines
+OK eurusd-m1-bid-2017: 370229 lines
+OK eurusd-m1-ask-2017: 368967 lines
+OK eurusd-m1-bid-2018: 373089 lines
+OK eurusd-m1-ask-2018: 372125 lines
+OK eurusd-m1-bid-2019: 370374 lines
+OK eurusd-m1-ask-2019: 368817 lines
+OK eurusd-m1-bid-2020: 373475 lines
+RETRY eurusd-m1-ask-2020 (attempt 1: 47526 rows)
+OK eurusd-m1-ask-2020: 367556 lines
+OK eurusd-m1-bid-2021: 370686 lines
+OK eurusd-m1-ask-2021: 367840 lines
+OK eurusd-m1-bid-2022: 372880 lines
+OK eurusd-m1-ask-2022: 372880 lines
+OK eurusd-m1-bid-2023: 371126 lines
+OK eurusd-m1-ask-2023: 368283 lines
+OK eurusd-m1-bid-2024: 365638 lines
+OK eurusd-m1-ask-2024: 352759 lines
+OK eurusd-m1-bid-2025: 372069 lines
+OK eurusd-m1-ask-2025: 355969 lines
+=== EURUSD backfill download finished Thu Sep  3 17:30:58 SEAST 2026 ===
+ALL_DONE
+--- running merge ---
+MERGE_DONE (0)

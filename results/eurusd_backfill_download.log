@@ -1,0 +1,618 @@
+=== EURUSD backfill download started Wed Sep  2 23:00:35 SEAST 2026 ===
+--- eurusd-m1-bid-2013 attempt 1 Wed Sep  2 23:00:35 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2013, 12:00 AM
+To date:        Jan 1, 2014, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2013.csv (19.19 MB)
+
+Download time: 4m 11s
+
+OK eurusd-m1-bid-2013: 364254 lines
+--- eurusd-m1-ask-2013 attempt 1 Wed Sep  2 23:04:48 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2013, 12:00 AM
+To date:        Jan 1, 2014, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2013.csv (19.32 MB)
+
+Download time: 4m 21s
+
+OK eurusd-m1-ask-2013: 366708 lines
+--- eurusd-m1-bid-2014 attempt 1 Wed Sep  2 23:09:10 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2014, 12:00 AM
+To date:        Jan 1, 2015, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2014.csv (19.55 MB)
+
+Download time: 4m 9s
+
+OK eurusd-m1-bid-2014: 371537 lines
+--- eurusd-m1-ask-2014 attempt 1 Wed Sep  2 23:13:21 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2014, 12:00 AM
+To date:        Jan 1, 2015, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2014.csv (19.24 MB)
+
+Download time: 4m 13s
+
+OK eurusd-m1-ask-2014: 365818 lines
+--- eurusd-m1-bid-2015 attempt 1 Wed Sep  2 23:17:36 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2015, 12:00 AM
+To date:        Jan 1, 2016, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2015.csv (19.68 MB)
+
+Download time: 4m 7s
+
+OK eurusd-m1-bid-2015: 372945 lines
+--- eurusd-m1-ask-2015 attempt 1 Wed Sep  2 23:21:45 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2015, 12:00 AM
+To date:        Jan 1, 2016, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2015.csv (19.68 MB)
+
+Download time: 4m 9s
+
+OK eurusd-m1-ask-2015: 372945 lines
+--- eurusd-m1-bid-2016 attempt 1 Wed Sep  2 23:25:56 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2016, 12:00 AM
+To date:        Jan 1, 2017, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2016.csv (19.84 MB)
+
+Download time: 4m 9s
+
+OK eurusd-m1-bid-2016: 373995 lines
+--- eurusd-m1-ask-2016 attempt 1 Wed Sep  2 23:30:07 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2016, 12:00 AM
+To date:        Jan 1, 2017, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+=== EURUSD backfill download started Thu Sep  3 16:09:35 SEAST 2026 ===
+SKIP eurusd-m1-bid-2013 (.done, 364254 lines)
+SKIP eurusd-m1-ask-2013 (.done, 366708 lines)
+SKIP eurusd-m1-bid-2014 (.done, 371537 lines)
+SKIP eurusd-m1-ask-2014 (.done, 365818 lines)
+SKIP eurusd-m1-bid-2015 (.done, 372945 lines)
+SKIP eurusd-m1-ask-2015 (.done, 372945 lines)
+SKIP eurusd-m1-bid-2016 (.done, 373995 lines)
+--- eurusd-m1-ask-2016 attempt 1 Thu Sep  3 16:09:35 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2016, 12:00 AM
+To date:        Jan 1, 2017, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2016.csv (19.84 MB)
+
+Download time: 4m 6s
+
+OK eurusd-m1-ask-2016: 373995 lines
+--- eurusd-m1-bid-2017 attempt 1 Thu Sep  3 16:13:52 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2017, 12:00 AM
+To date:        Jan 1, 2018, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2017.csv (19.58 MB)
+
+Download time: 4m 11s
+
+OK eurusd-m1-bid-2017: 370229 lines
+--- eurusd-m1-ask-2017 attempt 1 Thu Sep  3 16:18:05 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2017, 12:00 AM
+To date:        Jan 1, 2018, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2017.csv (19.51 MB)
+
+Download time: 4m 13s
+
+OK eurusd-m1-ask-2017: 368967 lines
+--- eurusd-m1-bid-2018 attempt 1 Thu Sep  3 16:22:20 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2018, 12:00 AM
+To date:        Jan 1, 2019, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2018.csv (19.76 MB)
+
+Download time: 4m 13s
+
+OK eurusd-m1-bid-2018: 373089 lines
+--- eurusd-m1-ask-2018 attempt 1 Thu Sep  3 16:26:35 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2018, 12:00 AM
+To date:        Jan 1, 2019, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2018.csv (19.71 MB)
+
+Download time: 4m 9s
+
+OK eurusd-m1-ask-2018: 372125 lines
+--- eurusd-m1-bid-2019 attempt 1 Thu Sep  3 16:30:45 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2019, 12:00 AM
+To date:        Jan 1, 2020, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2019.csv (19.59 MB)
+
+Download time: 4m 15s
+
+OK eurusd-m1-bid-2019: 370374 lines
+--- eurusd-m1-ask-2019 attempt 1 Thu Sep  3 16:35:01 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2019, 12:00 AM
+To date:        Jan 1, 2020, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2019.csv (19.5 MB)
+
+Download time: 4m 13s
+
+OK eurusd-m1-ask-2019: 368817 lines
+--- eurusd-m1-bid-2020 attempt 1 Thu Sep  3 16:39:16 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2020, 12:00 AM
+To date:        Jan 1, 2021, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2020.csv (19.76 MB)
+
+Download time: 4m 6s
+
+OK eurusd-m1-bid-2020: 373475 lines
+--- eurusd-m1-ask-2020 attempt 1 Thu Sep  3 16:43:24 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2020, 12:00 AM
+To date:        Jan 1, 2021, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+RETRY eurusd-m1-ask-2020 (attempt 1: 47526 rows)
+--- eurusd-m1-ask-2020 attempt 2 Thu Sep  3 16:44:41 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2020, 12:00 AM
+To date:        Jan 1, 2021, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2020.csv (19.44 MB)
+
+Download time: 4m 15s
+
+OK eurusd-m1-ask-2020: 367556 lines
+--- eurusd-m1-bid-2021 attempt 1 Thu Sep  3 16:48:58 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2021, 12:00 AM
+To date:        Jan 1, 2022, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2021.csv (19.41 MB)
+
+Download time: 4m 8s
+
+OK eurusd-m1-bid-2021: 370686 lines
+--- eurusd-m1-ask-2021 attempt 1 Thu Sep  3 16:53:08 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2021, 12:00 AM
+To date:        Jan 1, 2022, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2021.csv (19.26 MB)
+
+Download time: 4m 13s
+
+OK eurusd-m1-ask-2021: 367840 lines
+--- eurusd-m1-bid-2022 attempt 1 Thu Sep  3 16:57:23 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2022, 12:00 AM
+To date:        Jan 1, 2023, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2022.csv (19.71 MB)
+
+Download time: 4m 6s
+
+OK eurusd-m1-bid-2022: 372880 lines
+--- eurusd-m1-ask-2022 attempt 1 Thu Sep  3 17:01:30 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2022, 12:00 AM
+To date:        Jan 1, 2023, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2022.csv (19.7 MB)
+
+Download time: 4m 7s
+
+OK eurusd-m1-ask-2022: 372880 lines
+--- eurusd-m1-bid-2023 attempt 1 Thu Sep  3 17:05:39 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2023, 12:00 AM
+To date:        Jan 1, 2024, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2023.csv (19.64 MB)
+
+Download time: 4m 6s
+
+OK eurusd-m1-bid-2023: 371126 lines
+--- eurusd-m1-ask-2023 attempt 1 Thu Sep  3 17:09:46 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2023, 12:00 AM
+To date:        Jan 1, 2024, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2023.csv (19.48 MB)
+
+Download time: 4m 11s
+
+OK eurusd-m1-ask-2023: 368283 lines
+--- eurusd-m1-bid-2024 attempt 1 Thu Sep  3 17:13:59 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2024, 12:00 AM
+To date:        Jan 1, 2025, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2024.csv (19.29 MB)
+
+Download time: 4m 6s
+
+OK eurusd-m1-bid-2024: 365638 lines
+--- eurusd-m1-ask-2024 attempt 1 Thu Sep  3 17:18:08 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2024, 12:00 AM
+To date:        Jan 1, 2025, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2024.csv (18.59 MB)
+
+Download time: 4m 15s
+
+OK eurusd-m1-ask-2024: 352759 lines
+--- eurusd-m1-bid-2025 attempt 1 Thu Sep  3 17:22:25 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2025, 12:00 AM
+To date:        Jan 1, 2026, 12:00 AM
+Price type:     bid
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-bid-2025.csv (19.56 MB)
+
+Download time: 4m 6s
+
+OK eurusd-m1-bid-2025: 372069 lines
+--- eurusd-m1-ask-2025 attempt 1 Thu Sep  3 17:26:33 SEAST 2026 ---
+----------------------------------------------------
+Downloading historical price data for:
+----------------------------------------------------
+Instrument:     Euro vs US Dollar
+Timeframe:      m1
+From date:      Jan 1, 2025, 12:00 AM
+To date:        Jan 1, 2026, 12:00 AM
+Price type:     ask
+Volumes:        true
+UTC Offset:     0
+Include flats:  false
+Format:         csv
+----------------------------------------------------
+----------------------------------------------------
+√ File saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\raw\eurusd_bf\download\eurusd-m1-ask-2025.csv (18.71 MB)
+
+Download time: 4m 24s
+
+OK eurusd-m1-ask-2025: 355969 lines
+=== EURUSD backfill download finished Thu Sep  3 17:30:58 SEAST 2026 ===
+ALL_DONE
+--- running merge ---
+
+======================================================================
+eurusd 2013-2017 -> EURUSD_M1_2013_2017_spot_dukascopy.csv
+======================================================================
+BID:
+  loaded  eurusd-m1-bid-2013.csv: 364,253 rows
+  loaded  eurusd-m1-bid-2014.csv: 371,536 rows
+  loaded  eurusd-m1-bid-2015.csv: 372,944 rows
+  loaded  eurusd-m1-bid-2016.csv: 373,994 rows
+  loaded  eurusd-m1-bid-2017.csv: 370,228 rows
+ASK:
+  loaded  eurusd-m1-ask-2013.csv: 366,707 rows
+  loaded  eurusd-m1-ask-2014.csv: 365,817 rows
+  loaded  eurusd-m1-ask-2015.csv: 372,944 rows
+  loaded  eurusd-m1-ask-2016.csv: 373,994 rows
+  loaded  eurusd-m1-ask-2017.csv: 368,966 rows
+
+=== SANITY ===
+rows            : 1,837,284
+date range      : 2013-01-01 22:00:00+00:00  ->  2017-12-29 21:59:00+00:00
+bid_close range : 1.03435 .. 1.39904
+spread min/med/max: 0.000000 / 0.000030 / 0.002860  (0.30 pips / 0.261 bps)
+negative spreads: 0 (0.000%)
+rows per year   : {2013: 358441, 2014: 365817, 2015: 372944, 2016: 373994, 2017: 366088}
+WROTE C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\EURUSD_M1_2013_2017_spot_dukascopy.csv  (224 MB)
+
+======================================================================
+eurusd 2018-2025 -> EURUSD_M1_2018_2025_spot_dukascopy.csv
+======================================================================
+BID:
+  loaded  eurusd-m1-bid-2018.csv: 373,088 rows
+  loaded  eurusd-m1-bid-2019.csv: 370,373 rows
+  loaded  eurusd-m1-bid-2020.csv: 373,474 rows
+  loaded  eurusd-m1-bid-2021.csv: 370,685 rows
+  loaded  eurusd-m1-bid-2022.csv: 372,879 rows
+  loaded  eurusd-m1-bid-2023.csv: 371,125 rows
+  loaded  eurusd-m1-bid-2024.csv: 365,637 rows
+  loaded  eurusd-m1-bid-2025.csv: 372,068 rows
+ASK:
+  loaded  eurusd-m1-ask-2018.csv: 372,124 rows
+  loaded  eurusd-m1-ask-2019.csv: 368,816 rows
+  loaded  eurusd-m1-ask-2020.csv: 367,555 rows
+  loaded  eurusd-m1-ask-2021.csv: 367,839 rows
+  loaded  eurusd-m1-ask-2022.csv: 372,879 rows
+  loaded  eurusd-m1-ask-2023.csv: 368,282 rows
+  loaded  eurusd-m1-ask-2024.csv: 352,758 rows
+  loaded  eurusd-m1-ask-2025.csv: 355,968 rows
+
+=== SANITY ===
+rows            : 2,922,985
+date range      : 2018-01-01 22:00:00+00:00  ->  2025-12-30 23:59:00+00:00
+bid_close range : 0.95382 .. 1.25541
+spread min/med/max: -0.000010 / 0.000030 / 0.003310  (0.30 pips / 0.268 bps)
+negative spreads: 152 (0.005%)
+rows per year   : {2018: 371768, 2019: 365936, 2020: 367555, 2021: 367839, 2022: 372879, 2023: 368282, 2024: 352758, 2025: 355968}
+WROTE C:\Claude Code\AI Quant Trading\crypto-factor-lab\data\EURUSD_M1_2018_2025_spot_dukascopy.csv  (356 MB)
+MERGE_DONE (0)

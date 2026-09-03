@@ -1,0 +1,56 @@
+==================================================================================================================================
+  RETEST OR30/1R -- EURUSD (first forex pair tested with this strategy)
+==================================================================================================================================
+  IN  window: EURUSD_M1_2018_2025_spot_dukascopy.csv  2018-01-01 -> 2025-12-30  (2,922,985 bars)
+  OUT window: EURUSD_M1_2013_2017_spot_dukascopy.csv  2013-01-01 -> 2017-12-29  (1,837,284 bars)
+  [IN] measured spread: median 0.00003 (0.30 pips, 0.268 bps) | commission 0.3 bps | slippage 0.15/1.0 bps normal/opening-hour (unchanged index convention)
+  [OUT] measured spread: median 0.00003 (0.30 pips, 0.261 bps) | commission 0.3 bps | slippage 0.15/1.0 bps normal/opening-hour (unchanged index convention)
+
+  [IN  2018-2025] n=802 guard=PASS grossPF=1.390 netPF=0.879 SR=-0.55 maxDD=41.7% topYr=nan% posYrs=3/8
+      exits: target=389 (49%, avg net R=+0.779) | stop=276 (34%, avg net R=-1.211) | time=137 (17%, avg net R=-0.096)
+  [OUT 2013-2017] n=496 guard=PASS grossPF=1.479 netPF=0.967 SR=-0.14 maxDD=21.0% topYr=nan% posYrs=1/5
+      exits: target=248 (50%, avg net R=+0.792) | stop=162 (33%, avg net R=-1.193) | time=86 (17%, avg net R=-0.120)
+
+  NEW BACKTESTS this run: 2 (EURUSD in-regime, EURUSD out-of-regime 2013-2017)
+  CUMULATIVE PROJECT TRIALS: 1041 + 2 = 1043
+
+  DSR REFERENCE ONLY (not a gate; single-cell pool, uninformative by construction, printed for completeness): E[max SR] -0.547, EURUSD-in DSR 0.500
+
+==========================================================================================================================
+  RETEST OR30/1R, EURUSD -- 1% risk/trade compounded from $100,000, vs buy-and-hold
+==========================================================================================================================
+  period                     approach                           starting         ending   return %  trades
+  ----------------------------------------------------------------------------------------------------------------------
+  FULL 2018-01-01..2025-12-31 strategy (RETEST EURUSD OR30/1R)    100,000         62,053    -37.9%     802
+                             -> trades 2018-01-03..2025-12-26
+  FULL 2018-01-01..2025-12-31 buy & hold EURUSD (M1 mid)          100,000         97,794     -2.2%        
+                             -> 1.20107 (2018-01-01) -> 1.17457 (2025-12-30)
+  OUT-OF-REGIME 2013-01-01..2017-12-31 strategy (RETEST EURUSD OR30/1R)    100,000         91,213     -8.8%     496
+                             -> trades 2013-01-08..2017-12-29
+  OUT-OF-REGIME 2013-01-01..2017-12-31 buy & hold EURUSD (M1 mid)          100,000         90,954     -9.0%        
+                             -> 1.31968 (2013-01-01) -> 1.20030 (2017-12-29)
+  RECENT 2022-01-01..2025-12-31 strategy (RETEST EURUSD OR30/1R)    100,000         76,768    -23.2%     407
+                             -> trades 2022-01-03..2025-12-26
+  RECENT 2022-01-01..2025-12-31 buy & hold EURUSD (M1 mid)          100,000        103,275     +3.3%        
+                             -> 1.13733 (2022-01-02) -> 1.17457 (2025-12-30)
+==========================================================================================================================
+
+  results -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\retest_or30_1r_eurusd_summary.csv
+
+
+##########################################################################################################################
+  EURUSD in the SAME table format as sec 10.6 (XAUUSD/NAS100/US30/SPX500), for direct comparison
+##########################################################################################################################
+  instrument period                     approach       starting        ending   return %  trades
+  ------------------------------------------------------------------------------------------------
+  EURUSD   FULL 2018-01-01..2025-12-31 strategy        100,000        62,053    -37.9%     802
+  EURUSD   FULL 2018-01-01..2025-12-31 buy & hold      100,000        97,794     -2.2%        
+  EURUSD   OUT-OF-REGIME 2013-01-01..2017-12-31 strategy        100,000        91,213     -8.8%     496
+  EURUSD   OUT-OF-REGIME 2013-01-01..2017-12-31 buy & hold      100,000        90,954     -9.0%        
+  EURUSD   RECENT 2022-01-01..2025-12-31 strategy        100,000        76,768    -23.2%     407
+  EURUSD   RECENT 2022-01-01..2025-12-31 buy & hold      100,000       103,275     +3.3%        
+
+  VERDICT:
+  FULL 2018-2025:  strategy $62,053 (-37.9%) vs buy-and-hold $97,794 (-2.2%)  -> LOSES TO buy-and-hold
+  OUT-OF-REGIME 2013-2017:  strategy $91,213 (-8.8%) vs buy-and-hold $90,954 (-9.0%)  -> BEATS buy-and-hold
+  Net PF in/out: 0.879 / 0.967   Net Sharpe in/out: -0.55 / -0.14
