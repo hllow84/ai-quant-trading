@@ -2800,6 +2800,17 @@ verified — plus `week_end_signal_dates()`/`signal_dates()` helpers),
 `results/momentum_rotation_frequency_run.log`. Reproduce:
 `python research/momentum_rotation_frequency.py`.
 
+**Tooling follow-up (2026-09-03, not a trial):** `scripts/monthly_signal_check.py`
+(the manual, broker-free "what should I hold" monitor) gained a
+`--freq {monthly,quarterly}` flag so it can be run on either cadence. The
+signal math is untouched — `--freq` only moves the "is today the day to
+check" gate (`is_last_trading_day_of_period()`: last trading day of the month,
+or last trading day of a Mar/Jun/Sep/Dec quarter), which is the live
+equivalent of `rebalance_step` in the backtest. Each cadence logs to its own
+file (`scripts/logs/{monthly,quarterly}_picks.csv`). `live/signals.py::generate_signal()`
+now forwards `signal_freq`/`rebalance_step` to `build_weights()` (defaults
+unchanged, `live/rebalance.py` unaffected).
+
 **Cumulative trials: N=1049** (1043 prior + 3 genuinely new frequencies
 [weekly, bi-weekly, quarterly] × 2 windows = 6). Monthly is already counted
 in §12's 8-cell batch; bi-monthly was run as a one-shot robustness check in

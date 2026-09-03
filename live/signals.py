@@ -24,7 +24,9 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
-from live.config import MARKET_FILTER, N_MONTHS, SIGNAL_LOOKBACK_DAYS, SMA_WINDOW, TOP_K
+from live.config import (
+    MARKET_FILTER, N_MONTHS, REBALANCE_STEP, SIGNAL_LOOKBACK_DAYS, SMA_WINDOW, TOP_K,
+)
 from live.risk import validate_weights
 from research.momentum_rotation import BENCHMARK, UNIVERSE, build_weights, month_end_signal_dates
 
@@ -71,7 +73,11 @@ def _append_future_placeholder(adjclose: pd.DataFrame) -> tuple[pd.DataFrame, pd
     return ext, placeholder
 
 
-def generate_signal(as_of: pd.Timestamp | None = None) -> dict:
+def generate_signal(
+    as_of: pd.Timestamp | None = None,
+    signal_freq: str = "M",
+    rebalance_step: int = REBALANCE_STEP,
+) -> dict:
     """
     Returns a dict:
       target_weights : pd.Series indexed by UNIVERSE ticker, sums to ~1.0
@@ -85,6 +91,18 @@ def generate_signal(as_of: pd.Timestamp | None = None) -> dict:
                          before treating this as a real rebalance signal.
       risk_off        : bool -- True if the market filter parked in IEF
       adjclose_tail   : last 5 rows of the pulled panel, for the order log
+
+    `signal_freq` / `rebalance_step` are forwarded verbatim to
+    research.momentum_rotation.build_weights() (the params added for
+    STATE_OF_PLAY sec 12.6's rebalance-frequency sweep). Defaults ("M", 1)
+    reproduce the sec 12/12.1-12.4 monthly behaviour byte-identically. NOTE
+    for callers wanting a QUARTERLY cadence: leave these at the monthly
+    defaults and instead gate the *run* on calendar quarter-ends -- sec 12.6
+    established the ranking + SMA-filter computation is identical at every
+    cadence, and `rebalance_step > 1` applied to this ~760-day live panel
+    would decimate from an arbitrary window-start phase, not calendar
+    quarters. The cadence belongs in the caller's date gate, exactly as
+    `rebalance_step` expresses it over full history in the backtest.
     """
     adjclose = pull_price_panel()
     last_real_date = pd.Timestamp(adjclose.index[-1])
@@ -106,6 +124,8 @@ def generate_signal(as_of: pd.Timestamp | None = None) -> dict:
         top_k=TOP_K,
         market_filter=MARKET_FILTER,
         sma_window=SMA_WINDOW,
+        signal_freq=signal_freq,
+        rebalance_step=rebalance_step,
     )
 
     if weights_at_exec.empty or weights_at_exec.index[-1] != placeholder:
