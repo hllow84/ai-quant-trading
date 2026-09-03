@@ -1,0 +1,176 @@
+====================================================================================================================================
+  POSITIONING-DATA ML TEST -- can a shallow GBM find signal in funding/OI that section 18's threshold rule missed?
+  cost/round-turn: 20bps taker + 2bps slip = 22bps, + funding paid per 8h stamp held.  ann.factor 365.
+====================================================================================================================================
+
+[BTCUSDT / 4h]  rows=51,041  window 2020-11-02..2026-08-30  | train 30,620  val 7,652  SEALED test 12,761 (2025-03-17..2026-08-30)
+  feature causality: funding=PASS oi=PASS
+  [both] test IC +0.0058 | net Sharpe -6.19 (1099 trades) vs B&H +0.10
+         GAIN importance share:  positioning  61.2%   price_ctrl  38.8%
+         top 6: funding_x_oi_signed=13%, ctrl_hilo_24h=9%, ctrl_vol_24h=8%, oi_pctl=7%, ctrl_dist_ma168=7%, oi_accel=6%
+
+[BTCUSDT / 24h]  rows=51,021  window 2020-11-02..2026-08-30  | train 30,588  val 7,629  SEALED test 12,756 (2025-03-16..2026-08-30)
+  feature causality: funding=PASS oi=PASS
+  [both] test IC -0.0121 | net Sharpe -0.53 (68 trades) vs B&H +0.13
+         GAIN importance share:  positioning  79.8%   price_ctrl  20.2%
+         top 6: funding_dev_90d=24%, funding_rate=20%, funding_extremity=19%, funding_x_oi_signed=13%, ctrl_dist_ma168=9%, ctrl_vol_24h=6%
+
+[ETHUSDT / 4h]  rows=49,174  window 2021-01-19..2026-08-30  | train 29,500  val 7,372  SEALED test 12,294 (2025-04-05..2026-08-30)
+  feature causality: funding=PASS oi=PASS
+  [both] test IC -0.0061 | net Sharpe -4.24 (1113 trades) vs B&H +0.67
+         GAIN importance share:  positioning  55.9%   price_ctrl  44.1%
+         top 6: funding_dev_90d=9%, funding_extremity=9%, ctrl_vol_24h=8%, ctrl_hilo_24h=8%, ctrl_dist_ma168=8%, ctrl_ret_1h=8%
+
+[ETHUSDT / 24h]  rows=49,154  window 2021-01-19..2026-08-30  | train 29,468  val 7,349  SEALED test 12,289 (2025-04-05..2026-08-30)
+  feature causality: funding=PASS oi=PASS
+  [both] test IC -0.0087 | net Sharpe +0.52 (343 trades) vs B&H +0.66
+         GAIN importance share:  positioning  66.0%   price_ctrl  34.0%
+         top 6: funding_dev_90d=15%, ctrl_vol_24h=10%, funding_pctl=10%, oi_pctl=8%, oi_roc_7d=8%, ctrl_dist_ma168=8%
+
+
+####################################################################################################################################
+  RESULTS -- SEALED TEST (final 25%, strict out-of-sample)
+####################################################################################################################################
+      inst    H   test IC  trades   net SR  net PF   maxDD   net ret  top-yr |  B&H SR   B&H ret  beats B&H?
+  --------------------------------------------------------------------------------------------------------------------------------
+   BTCUSDT   4h   +0.0058    1099    -6.19   0.505   91.2%   -233.3%     n/a |   +0.10     -6.5%       loses
+   BTCUSDT  24h   -0.0121      68    -0.53   0.815   25.0%     -9.7%     n/a |   +0.13     -5.0%       loses
+   ETHUSDT   4h   -0.0061    1113    -4.24   0.635   94.4%   -269.2%     n/a |   +0.67    +37.9%       loses
+   ETHUSDT  24h   -0.0087     343    +0.52   1.101   59.0%    +40.4%    202% |   +0.66    +36.5%       loses
+
+####################################################################################################################################
+  ABLATION -- positioning-only vs price-ctrl-only vs both (sealed test).  THE decisive honesty check.
+####################################################################################################################################
+      inst    H   feature set   test IC   net SR  net PF  trades   net ret
+  --------------------------------------------------------------------------------------------------------------------------------
+   BTCUSDT   4h   positioning   +0.0104    -5.13   0.539    1010   -191.3%
+   BTCUSDT   4h    price_ctrl   -0.0171    -4.33   0.565     669   -137.5%
+   BTCUSDT   4h          both   +0.0058    -6.19   0.505    1099   -233.3%
+  --------------------------------------------------------------------------------------------------------------------------------
+   BTCUSDT  24h   positioning   -0.0119    -0.86   0.837     261    -37.0%
+   BTCUSDT  24h    price_ctrl   -0.0330    -1.19   0.727     145    -41.7%
+   BTCUSDT  24h          both   -0.0121    -0.53   0.815      68     -9.7%
+  --------------------------------------------------------------------------------------------------------------------------------
+   ETHUSDT   4h   positioning   -0.0249    -3.60   0.658     955   -195.4%
+   ETHUSDT   4h    price_ctrl   -0.0142    -3.93   0.597     778   -206.6%
+   ETHUSDT   4h          both   -0.0061    -4.24   0.635    1113   -269.2%
+  --------------------------------------------------------------------------------------------------------------------------------
+   ETHUSDT  24h   positioning   -0.0077    -0.35   0.937     353    -29.1%
+   ETHUSDT  24h    price_ctrl   +0.0441    -0.28   0.942     221    -19.7%
+   ETHUSDT  24h          both   -0.0087    +0.52   1.101     343    +40.4%
+  --------------------------------------------------------------------------------------------------------------------------------
+
+####################################################################################################################################
+  FEATURE IMPORTANCE -- gain share, positioning vs price control (both-feature model)
+####################################################################################################################################
+
+  BTCUSDT / 4h:   positioning  61.2%   |   price_ctrl  38.8%
+      1. funding_x_oi_signed    positioning  13.4%  ########
+      2. ctrl_hilo_24h          price_ctrl    9.0%  #####
+      3. ctrl_vol_24h           price_ctrl    7.7%  ####
+      4. oi_pctl                positioning   7.4%  ####
+      5. ctrl_dist_ma168        price_ctrl    7.0%  ####
+      6. oi_accel               positioning   6.5%  ###
+      7. ctrl_ret_7d            price_ctrl    6.3%  ###
+      8. funding_roc_24h        positioning   5.4%  ###
+
+  BTCUSDT / 24h:   positioning  79.8%   |   price_ctrl  20.2%
+      1. funding_dev_90d        positioning  23.6%  ##############
+      2. funding_rate           positioning  20.0%  ###########
+      3. funding_extremity      positioning  18.6%  ###########
+      4. funding_x_oi_signed    positioning  13.3%  ########
+      5. ctrl_dist_ma168        price_ctrl    8.9%  #####
+      6. ctrl_vol_24h           price_ctrl    6.2%  ###
+      7. oi_accel               positioning   4.3%  ##
+      8. ctrl_ret_24h           price_ctrl    3.7%  ##
+
+  ETHUSDT / 4h:   positioning  55.9%   |   price_ctrl  44.1%
+      1. funding_dev_90d        positioning   8.9%  #####
+      2. funding_extremity      positioning   8.7%  #####
+      3. ctrl_vol_24h           price_ctrl    8.2%  ####
+      4. ctrl_hilo_24h          price_ctrl    8.1%  ####
+      5. ctrl_dist_ma168        price_ctrl    8.1%  ####
+      6. ctrl_ret_1h            price_ctrl    7.8%  ####
+      7. funding_roc_8h         positioning   6.6%  ###
+      8. oi_accel               positioning   6.1%  ###
+
+  ETHUSDT / 24h:   positioning  66.0%   |   price_ctrl  34.0%
+      1. funding_dev_90d        positioning  15.2%  #########
+      2. ctrl_vol_24h           price_ctrl   10.3%  ######
+      3. funding_pctl           positioning   9.7%  #####
+      4. oi_pctl                positioning   8.4%  #####
+      5. oi_roc_7d              positioning   8.2%  ####
+      6. ctrl_dist_ma168        price_ctrl    8.1%  ####
+      7. funding_x_oi           positioning   6.3%  ###
+      8. ctrl_ret_24h           price_ctrl    6.0%  ###
+
+####################################################################################################################################
+  PERMUTATION IMPORTANCE on the sealed test (mean IC drop when a feature is shuffled)
+####################################################################################################################################
+  positioning share of total positive IC-drop: 56.0%   price_ctrl share: 44.0%
+     funding_x_oi_signed    positioning mean IC drop +0.0082
+     ctrl_dist_ma168        price_ctrl  mean IC drop +0.0060
+     oi_accel               positioning mean IC drop +0.0036
+     funding_dev_90d        positioning mean IC drop +0.0022
+     ctrl_ret_7d            price_ctrl  mean IC drop +0.0017
+     ctrl_ret_1h            price_ctrl  mean IC drop +0.0017
+     ctrl_ret_24h           price_ctrl  mean IC drop +0.0015
+     ctrl_vol_24h           price_ctrl  mean IC drop +0.0015
+     oi_roc_24h             positioning mean IC drop +0.0014
+     oi_roc_7d              positioning mean IC drop +0.0005
+
+####################################################################################################################################
+  WALK-FORWARD (expanding window, both features) -- per-fold sealed test IC and strategy net Sharpe
+####################################################################################################################################
+      inst    H fold               test window  train n  test n   test IC   net SR  trades
+   BTCUSDT   4h    1    2023-03-03..2024-01-16   17,346   7,656   +0.0229    -4.55     840
+   BTCUSDT   4h    2    2024-01-16..2024-11-30   23,853   7,656   +0.0024    -4.12     668
+   BTCUSDT   4h    3    2024-11-30..2025-10-15   30,361   7,656   -0.0142    -7.36     827
+   BTCUSDT   4h    4    2025-10-15..2026-08-30   36,869   7,657   +0.0354    -1.73     195
+   BTCUSDT  24h    1    2023-03-03..2024-01-16   17,302   7,653   +0.0440    +0.24       4
+   BTCUSDT  24h    2    2024-01-16..2024-11-30   23,807   7,653   +0.0342    +1.87     165
+   BTCUSDT  24h    3    2024-11-30..2025-10-15   30,312   7,653   -0.0058    -0.04      56
+   BTCUSDT  24h    4    2025-10-15..2026-08-30   36,817   7,654   -0.0127    +0.18      56
+   ETHUSDT   4h    1    2023-04-19..2024-02-20   16,711   7,376   -0.0054    -2.99     226
+   ETHUSDT   4h    2    2024-02-20..2024-12-24   22,980   7,376   +0.0049    -5.39     832
+   ETHUSDT   4h    3    2024-12-24..2025-10-27   29,250   7,376   +0.0045    -4.04     817
+   ETHUSDT   4h    4    2025-10-27..2026-08-30   35,520   7,377   -0.0262    -1.06     122
+   ETHUSDT  24h    1    2023-04-19..2024-02-20   16,667   7,373   +0.0004    -0.60     130
+   ETHUSDT  24h    2    2024-02-20..2024-12-23   22,934   7,373   +0.0196    -0.32     121
+   ETHUSDT  24h    3    2024-12-23..2025-10-26   29,201   7,373   -0.0003    -0.94     192
+   ETHUSDT  24h    4    2025-10-26..2026-08-30   35,468   7,374   +0.0267    -1.49      90
+
+  mean fold test IC +0.0082  (62% of folds IC>0)  |  mean fold net Sharpe -2.02
+
+####################################################################################################################################
+  DEFLATED SHARPE -- REFERENCE ONLY (not a survival gate). Pool = the 4 a priori 'both' cells.
+####################################################################################################################################
+  pool Sharpes [-6.191, -0.527, -4.241, 0.524]  ->  E[max SR] +0.699  (mu -2.609, sd 3.143)
+     BTCUSDT 4h: net Sharpe -6.19  DSR 0.000
+     BTCUSDT 24h: net Sharpe -0.53  DSR 0.298
+     ETHUSDT 4h: net Sharpe -4.24  DSR 0.000
+     ETHUSDT 24h: net Sharpe +0.52  DSR 0.433
+
+####################################################################################################################################
+  PER-YEAR CONCENTRATION -- sealed-test strategy net return by calendar year (both features)
+####################################################################################################################################
+  BTCUSDT 4h: 2025:-133.9%  2026:-99.3%   total -233.3%   top-year share n/a (total<=0)
+  BTCUSDT 24h: 2025:-2.5%  2026:-7.2%   total -9.7%   top-year share n/a (total<=0)
+  ETHUSDT 4h: 2025:-162.2%  2026:-107.0%   total -269.2%   top-year share n/a (total<=0)
+  ETHUSDT 24h: 2025:+81.6%  2026:-41.1%   total +40.4%   top-year share 202%
+
+====================================================================================================================================
+  VERDICT
+====================================================================================================================================
+  mean sealed-test IC (both features): -0.0053   mean strategy net Sharpe: -2.61   beats B&H: 0/4
+  mean GAIN importance:   positioning 65.7%   |   price control 34.3%
+  ablation mean test IC:  positioning-only -0.0085   price-ctrl-only -0.0051   both -0.0053
+
+  -> NO EXPLOITABLE SIGNAL FROM EITHER FEATURE GROUP (IC ~ 0, strategy does not beat B&H after costs).
+     The shallow GBM finds nothing in the positioning data that section 18's threshold rule missed.
+     KILL -- closes the ML-on-positioning thread.
+
+  NEW TRIALS THIS RUN: 4 (BTC/ETH x 4h/24h, 'both features').  CUMULATIVE: 1049 + 4 = 1053
+  (positioning-only / price-ctrl-only ablations and walk-forward folds are diagnostics of those 4 cells,
+   not separate configs -- same treatment as STATE_OF_PLAY sec 12.3 audit 8 perturbations.)
+  saved -> results/positioning_ml_{primary,ablation,importance,perm_importance,walkforward}.csv

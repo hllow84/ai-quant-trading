@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-03 (§12.6 — momentum-rotation rebalance-frequency sweep: weekly/bi-weekly/monthly/bi-monthly/quarterly, N=12/K=5, mechanism unchanged. Highest actual compounded return is QUARTERLY full-period (+1010% vs SPY +772%, the only cadence to beat SPY on raw return) and MONTHLY in the 2000-2009 stress window (+138%); higher frequency = strictly worse everywhere. Does not revive §12 — quarterly DSR 0.526 vs 0.95 bar, same crash-hedge artefact. Earlier same day: §10.8 EURUSD RETEST OR30/1R generalization, clean kill.).** Read this file first in any new session. It is the
+**Last updated: 2026-09-03 (§18.1 — ML on crypto positioning data: shallow LightGBM on 21 funding/OI + price-control features, BTC/ETH, 4h/24h forward-return prediction. Sealed-test IC ≈ 0 (mean −0.005, 3/4 negative), strategy net Sharpe −2.6 after real costs, beats buy-and-hold 0/4. The model DOES lean on positioning features (66% gain) but they carry no out-of-sample predictive value; ablation: positioning-only, price-only, both all ≈ 0 IC. Clean kill — closes the ML-on-positioning thread. Same day: §12.6 momentum rebalance-frequency sweep, §10.8 EURUSD RETEST kill.).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -136,12 +136,13 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=1049 — see the
+Trial composition (this is the cumulative DSR trial count, N=1053 — see the
 2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5,
 the 2026-09-02 (a) line for the +3 RETEST OR30/1R compounding-table backtests, §10.6,
 the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7,
 the 2026-09-03 (a) line for the +2 EURUSD RETEST OR30/1R generalization cells, §10.8,
-and the 2026-09-03 (b) line for the +6 momentum-rotation rebalance-frequency cells, §12.6):
+the 2026-09-03 (b) line for the +6 momentum-rotation rebalance-frequency cells, §12.6,
+and the 2026-09-03 (c) line for the +4 ML-on-positioning-data cells, §18.1):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -174,7 +175,8 @@ and the 2026-09-03 (b) line for the +6 momentum-rotation rebalance-frequency cel
 | RETEST OR30 exit-management — 3R, breakeven, trailing stop, both windows + 1R/2R out-of-regime-2017 (§10.7) | XAUUSD | 8 | 0 survive (§10.7) — every wider-target/dynamic-stop variant gives back dollars vs the 1R baseline on FULL 2018-2025, and none beats buy-and-hold |
 | RETEST OR30/1R generalization to FOREX — EURUSD, both windows (§10.8) | EURUSD | 2 | 0 survive (§10.8) — first FX pair; the only RETEST cell with net PF < 1 in BOTH windows (0.879 in / 0.967 out), net Sharpe negative both, 1% compounding −37.9% over 2018-2025. Gross breakout edge generalizes to FX (gross PF 1.39/1.48); it cannot pay its costs on a currency pair |
 | Momentum-rotation rebalance-frequency sweep — weekly/bi-weekly/quarterly new, monthly/bi-monthly reused (§12.6) | 17-ETF universe, SPY benchmark | 6 | 0 survive (§12.6) — DSR reference-only this batch; quarterly maximises full-period compounded return (+1010% vs SPY +772%, only cadence to beat SPY on raw return), monthly wins the 2000-09 stress window (+138%); higher frequency strictly worse everywhere. Does not revive §12 — quarterly DSR 0.526 vs 0.95 bar, same pre-2009 crash-hedge artefact as §12.5 |
-| **Total** | | **1049** | **0 survive** |
+| ML on crypto positioning data — shallow LightGBM, funding/OI + price-control features (§18.1) | BTCUSDT, ETHUSDT | 4 | 0 survive (§18.1) — DSR reference-only; sealed-test IC ≈ 0 (mean −0.005, 3/4 negative), strategy net Sharpe −2.6 after real costs, beats B&H 0/4. Model leans on positioning features (66% gain) but they carry no OOS predictive value; ablation positioning-only/price-only/both all ≈ 0 IC. Closes the ML-on-positioning thread |
+| **Total** | | **1053** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -3731,6 +3733,116 @@ Results: `results/positioning_reversal.csv`,
 `python scripts/download_crypto_funding_oi.py && python run_positioning_reversal.py`.
 
 **Cumulative trials: N=932** (924 prior + 8 positioning-reversal cells).
+
+---
+
+## 18.1 ML ON THE SAME POSITIONING DATA — can a shallow gradient-boosted model find what the threshold rule missed? Tested 2026-09-03, killed
+
+### Why this run exists, and why it is not a re-test of §18
+
+§18 killed a **simple contrarian threshold** on funding/OI extremes (gross PF
+~1.00). This asks a genuinely different question: does the **same underlying
+positioning data** contain a more complex, non-obvious pattern that a
+**machine-learning model** can extract where a hand-specified rule could not?
+The decisive output is **feature importance** — if price-derived control
+features dominate, the model found nothing new in positioning and is just
+re-discovering price shape (empty across 1000+ prior trials); if positioning
+features genuinely drive the predictions and the result survives costs, that
+would be the first finding of its kind in the project.
+
+### Setup — deliberately shallow, same data, same causal machinery as §18
+
+- **Data:** the §18 pull reused verbatim — Binance funding (8h), Bybit OI
+  (1h), cross-venue split stated. Usable windows BTC 2020-11-02→2026-08-30
+  (~51k hourly bars), ETH 2021-01-19→2026-08-30 (~49k).
+- **Features (21):** positioning (14) — funding level / 90-day causal
+  percentile / 8h & 24h rate-of-change / 90-day deviation, OI 90-day
+  percentile / 1h,24h,7d ROC / acceleration, funding×OI interactions,
+  positioning-skew, funding-extremity; **price-derived controls (7),
+  explicitly prefixed `ctrl_`** — trailing 1h/24h/7d return, 24h realised
+  vol, RSI-14, distance-to-168h-MA, 24h hi-lo range. Positioning features
+  aligned + lagged with §18's own `align_feature` (merge_asof backward + 1
+  extra H1 bar); **every** feature shifted one further bar (prediction at *t*
+  uses only ≤ *t−1*). `verify_feature_causality` funding + OI **PASS 4/4**.
+- **Label:** forward simple return, **H = 4h and 24h** (both tested).
+- **Model:** LightGBM regressor, `num_leaves=15, max_depth=4, lr=0.03,
+  min_child_samples=200, reg_lambda=5, reg_alpha=1`, ≤400 trees
+  early-stopped. Point is testing whether the data carries signal, not model
+  capacity.
+- **Validation:** strict time-order 60/15/25 train / early-stop val / **sealed
+  test**, H-bar purge at every boundary; 4-fold expanding walk-forward;
+  real costs on the strategy conversion (**22 bps taker+slip round-turn +
+  funding paid on every 8h stamp held**); DSR reference-only (pool = the 4
+  a priori cells); per-year concentration; sealed final 25% is itself a
+  strict out-of-regime block.
+- **Ablation (the honest test):** every (instrument, horizon) trained THREE
+  ways — positioning-only, price-control-only, both — and compared.
+
+### Result — sealed test (final 25%, 2025-03 → 2026-08)
+
+| inst | H | test IC | trades | net Sharpe | net PF | maxDD | net ret | vs B&H |
+|---|---|---|---|---|---|---|---|---|
+| BTCUSDT | 4h | +0.0058 | 1099 | **−6.19** | 0.505 | 91% | −233% | loses (B&H +0.10) |
+| BTCUSDT | 24h | −0.0121 | 68 | −0.53 | 0.815 | 25% | −10% | loses (B&H +0.13) |
+| ETHUSDT | 4h | −0.0061 | 1113 | **−4.24** | 0.635 | 94% | −269% | loses (B&H +0.67) |
+| ETHUSDT | 24h | −0.0087 | 343 | +0.52 | 1.101 | 59% | +40% | **loses on Sharpe** (B&H +0.66); top-year share **202%** — one year > 100% of total, a broken-concentration artefact |
+
+**Mean sealed-test IC −0.0053 (3 of 4 negative). Mean strategy net Sharpe
+−2.61. Beats buy-and-hold 0/4.** The 4h cells are destroyed by cost (1000+
+trades × 22 bps + funding against a ~0-IC signal); the 24h cells trade less
+and simply have no predictive edge (IC −0.012, −0.009). Walk-forward (4
+expanding folds per cell, 2023-03 → 2026-08): mean fold IC **+0.0082** (62% of
+folds IC > 0 — a coin flip), mean fold net Sharpe **−2.02**. DSR reference:
+pool Sharpes [−6.19, −0.53, −4.24, +0.52], best cell DSR **0.433** (ETH 24h)
+vs a 0.95 bar — and the same "uniformly-bad pool makes DSR uninformative"
+caveat §18 flagged applies.
+
+### Feature importance — the critical output, stated plainly
+
+**The model DID lean on positioning features, not price:** mean GAIN
+importance **positioning 65.7% / price-control 34.3%** (BTC-24h 80/20,
+ETH-24h 66/34); permutation importance on the sealed test **56% / 44%**. Top
+features are consistently `funding_dev_90d`, `funding_rate`,
+`funding_extremity`, `funding_x_oi_signed`, `oi_pctl`.
+
+**But this does not rescue anything — it makes the negative cleaner.** The
+GBM splitting more often on positioning features means only that those
+features helped it fit the *training* set; on the sealed test those splits
+carry **no predictive value** (IC ≈ 0, negative on 3/4). The ablation is
+decisive: mean sealed-test IC is **positioning-only −0.0085, price-only
+−0.0051, both −0.0053** — all three ≈ zero, and positioning-only is the
+*worst* of the three. There is no feature subset, horizon, or instrument
+where positioning data produces a positive out-of-sample IC on average.
+
+### Verdict — KILL, and it closes the thread
+
+This is **not** the "model defaults to price patterns" outcome (price
+features did not dominate). It is the more complete negative: **a shallow
+GBM extracts no exploitable signal from EITHER feature group.** It
+preferentially uses positioning features and still predicts nothing
+out-of-sample; the price controls it also has access to add nothing —
+consistent with the 1000+ prior price-pattern trials. §18's simple threshold
+and this ML model reach the **same conclusion by different routes**: the
+crypto positioning data this project can reach (Binance funding + Bybit OI,
+BTC/ETH, 2020-2026) does not contain a funding/OI-based edge — simple or
+complex — that survives real costs and beats buy-and-hold. The one
+nominally-positive cell (ETH 24h, +0.52 Sharpe) loses to ETH B&H on
+risk-adjusted return and is a single-year concentration artefact. **The
+ML-on-positioning research thread is closed.**
+
+Files: `research/positioning_ml.py`. Data: reuses
+`data/{BTCUSDT,ETHUSDT}_{funding_binance,oi_bybit}.csv` + the H1 panels.
+Results: `results/positioning_ml_{primary,ablation,importance,perm_importance,walkforward}.csv`,
+`positioning_ml_run.log`. Reproduce: `python research/positioning_ml.py`.
+
+**Cumulative trials: N=1053** (1049 prior + 4 — BTC/ETH × 4h/24h "both
+features". Positioning-only / price-control-only ablations and walk-forward
+folds are diagnostics of those same 4 cells, not separate configs — same
+treatment as §12.3 audit 8's perturbations. DSR was reference-only this
+batch per the standing instruction, so these 4 cells enter the count but
+not any survival-gate pool.)
+
+---
 
 ## 19. CROSS-ASSET LEAD-LAG — a third information category, tested 2026-08-31, clean statistical negative
 
