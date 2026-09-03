@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-03 (§24 — long short-dated CALL OPTIONS on a trend signal, a defined-risk structure. Black-Scholes-approximated premiums, SPY/QQQ on near-real IV (^VIX/^VXN), AAPL/MSFT/GOOGL on a trailing-RV proxy (flagged optimistic). 20 cells (5 inst × 2 DTE × 2 moneyness). 0/20 beat the underlying buy-and-hold on total return OR Sharpe; SPY/QQQ returned −87%…+42% while the indices did +677%/+1326%. Time decay is the dominant loss channel — 44% of options expire worthless, option wrapper costs 20–74% of return per trade vs delta-matched stock. Clean kill. Same day: §18.1 ML-on-positioning, §12.6 rebalance-frequency, §10.8 EURUSD RETEST.).** Read this file first in any new session. It is the
+**Last updated: 2026-09-03 (§25 — POST-EARNINGS-ANNOUNCEMENT DRIFT, event-driven, yfinance earnings-surprise data (63 large-caps, 4,735 events, 2006-2026). The gross drift is unambiguously real — +1.2% over 20d / +3.4% over 60d, 58-65% event win rate, OOS *stronger* than IS, not year-concentrated, clears net PF / Sharpe / OOS / concentration gates — but 0/12 cells beat equal-weight buy-and-hold of the universe (best CAGR +12.8% vs B&H +15.8%). KILL, same terminal reason as §12/§14: a real edge that still loses to owning the beta. Data caveats (estimate PIT integrity, survivorship) both flatter the result, so the kill is solid. Same day: §24 long calls, §18.1 ML-on-positioning, §12.6 rebalance-frequency, §10.8 EURUSD RETEST.).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -136,14 +136,15 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=1073 — see the
+Trial composition (this is the cumulative DSR trial count, N=1085 — see the
 2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5,
 the 2026-09-02 (a) line for the +3 RETEST OR30/1R compounding-table backtests, §10.6,
 the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7,
 the 2026-09-03 (a) line for the +2 EURUSD RETEST OR30/1R generalization cells, §10.8,
 the 2026-09-03 (b) line for the +6 momentum-rotation rebalance-frequency cells, §12.6,
 the 2026-09-03 (c) line for the +4 ML-on-positioning-data cells, §18.1,
-and the 2026-09-03 (d) line for the +20 long-call-option cells, §24):
+the 2026-09-03 (d) line for the +20 long-call-option cells, §24,
+and the 2026-09-03 (e) line for the +12 post-earnings-drift cells, §25):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -178,7 +179,8 @@ and the 2026-09-03 (d) line for the +20 long-call-option cells, §24):
 | Momentum-rotation rebalance-frequency sweep — weekly/bi-weekly/quarterly new, monthly/bi-monthly reused (§12.6) | 17-ETF universe, SPY benchmark | 6 | 0 survive (§12.6) — DSR reference-only this batch; quarterly maximises full-period compounded return (+1010% vs SPY +772%, only cadence to beat SPY on raw return), monthly wins the 2000-09 stress window (+138%); higher frequency strictly worse everywhere. Does not revive §12 — quarterly DSR 0.526 vs 0.95 bar, same pre-2009 crash-hedge artefact as §12.5 |
 | ML on crypto positioning data — shallow LightGBM, funding/OI + price-control features (§18.1) | BTCUSDT, ETHUSDT | 4 | 0 survive (§18.1) — DSR reference-only; sealed-test IC ≈ 0 (mean −0.005, 3/4 negative), strategy net Sharpe −2.6 after real costs, beats B&H 0/4. Model leans on positioning features (66% gain) but they carry no OOS predictive value; ablation positioning-only/price-only/both all ≈ 0 IC. Closes the ML-on-positioning thread |
 | Long short-dated call options on a trend signal — defined-risk structure, BS-approximated premiums (§24) | SPY, QQQ, AAPL, MSFT, GOOGL | 20 | 0 survive (§24) — DSR reference-only; 5 inst × 2 DTE × 2 moneyness, 2012-2026. 0/20 beat the underlying buy-and-hold on total return or Sharpe (SPY/QQQ −87%…+42% vs index +677%/+1326%). Time decay dominates: 44% of options expire worthless, wrapper costs 20-74% of return/trade vs delta-matched stock. SPY/QQQ on near-real IV (^VIX/^VXN); single names on optimistic RV proxy, still lose |
-| **Total** | | **1073** | **0 survive** |
+| Post-earnings-announcement drift — SUE on yfinance surprise data, 63 large-caps, 20/60-day holds (§25) | 63 US large-caps (4,735 events, 2006-2026) | 12 | 0 survive (§25) — DSR reference-only; 3 SUE thresholds × 2 horizons × [long/short, long-only]. Gross drift is REAL (+1.2%/20d, +3.4%/60d, 58-65% win, OOS stronger than IS, not concentrated, clears net PF/Sharpe/OOS/conc gates) but 0/12 beat equal-weight B&H of the universe (best CAGR +12.8% vs +15.8%). Same terminal reason as §12/§14: real edge, loses to owning the beta. Data caveats (estimate PIT integrity, survivorship) flatter it → kill is solid |
+| **Total** | | **1085** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -4630,4 +4632,142 @@ Reproduce: `python research/long_call_trend.py`.
 moneyness. The +100% profit-take variant and the 2020 OOS sub-split are
 diagnostics of those same 20 cells, not separate configs — same treatment
 as §12.3 audit 8. DSR was reference-only this batch per the standing
+instruction.)
+
+---
+
+## 25. POST-EARNINGS-ANNOUNCEMENT DRIFT (PEAD) — event-driven, tested 2026-09-03, killed (real edge, still loses to buy-and-hold)
+
+### Why this run exists
+
+The Ball & Brown (1968) / Bernard & Thomas (1989) anomaly: stocks that beat
+(miss) consensus EPS drift up (down) for weeks afterward. **Event-driven,
+news-triggered** — mechanistically unlike every price-pattern,
+portfolio-rotation, positioning and options structure in §1–§24. Genuinely
+untested here.
+
+### Data quality — reported first, per the brief
+
+**Source: yfinance `Ticker.get_earnings_dates(limit=100)`** — per name, the
+last ~100 quarterly events with **EPS Estimate, Reported EPS, Surprise(%)**,
+indexed by a **timezone-aware announcement timestamp** (date + time ET), not
+the fiscal-quarter end.
+
+| metric | value |
+|---|---|
+| raw earnings events, 63-name large-cap universe, 2006-01→2026-08 | 5,139 |
+| ... with both EPS Estimate and Reported EPS present | 5,085 (**98.9%**) |
+| ... with a computable causal SUE + price coverage (events actually used) | **4,735** |
+| distinct names contributing | 63 |
+| announcements before market open (06:00–08:59 ET) | 64% (rest after-close 16:00, ~1% during-hours) |
+
+**Coverage is strong** — 99% field completeness, ~20 years deep, and the
+timestamp genuinely encodes before-open vs after-close (probed: ~3,900
+events cluster hard at 06:00–08:00 and 16:00 ET). **This is a usable test,
+not a data-quality dead end.**
+
+**Trust limitations, stated, not worked around:**
+1. **Point-in-time integrity of the ESTIMATE is unverifiable with free data.**
+   "EPS Estimate" is Yahoo's *current* record of consensus, not a
+   confirmed pre-announcement snapshot. A restated estimate biases surprises
+   toward looking *more* predictive than they were in real time → **a kill
+   is robust; a positive result would need paid I/B/E/S PIT data to trust.**
+2. **Reported EPS may be restated** (adjusted-vs-GAAP reclassification). Same
+   caveat, smaller.
+3. **Survivorship** — the universe is 63 names large-cap and solvent *today*;
+   2006-era blow-ups (Lehman, Bear, AIG, WaMu, GM…) and acquisitions are
+   absent. Inflates the long-beat leg's realised drift. Not corrected (no
+   free historical index membership).
+
+Both caveats **cut toward leniency** — they flatter the strategy — so the
+kill below is despite an optimistic setup.
+
+### Look-ahead handling — verified explicitly
+
+Entry = the **close of the first trading day whose open is strictly after the
+announcement timestamp**: after-close announce on day D → enter D+1 close;
+before-open announce on D → enter D close (news out at 07:00, entered at
+16:00). This **skips the announcement jump entirely** and captures only the
+drift — the conservative PEAD convention. SUE's rolling std uses trailing
+surprises only, shifted one quarter. **Guard: every entry's close instant is
+strictly after its announcement wall-clock time — PASS 4,735/4,735, min gap
+8.0 h** (the before-open same-day entries, 07:00 announce → 16:00 close).
+
+### Strategy — all a priori
+
+SUE = (Reported − Estimate) / trailing-8-quarter std of the dollar surprise
+(causal). **|SUE| threshold 1.0 / 1.5 / 2.0** (three levels). SUE > +thr →
+long; SUE < −thr → short. **Shorts modelled** (S&P-100 borrow is general
+collateral; 2.0%/yr carry = 0.5% borrow + ~1.5% blended dividend owed,
+pro-rated daily); a **long-only** variant also run. **Hold 20 and 60 trading
+days** (both standard PEAD windows), no stop, no profit-take.
+Daily-rebalanced equal-weight portfolio, gross scaled to 1.0. Costs: **10 bps
+round-turn** per position (3 spread + 1 commission + 1 slippage per side) +
+short carry. **Grid: 3 thresholds × 2 horizons × {long/short, long-only} =
+12 cells.**
+
+### Result — full window 2006–2026 (equal-weight B&H of the 63 names: Sharpe +0.85, CAGR +15.8%, maxDD 48%)
+
+| cell | events (L/S) | mean event drift | event win% | net Sharpe | net PF | CAGR | maxDD | top-yr | beats B&H? |
+|---|---|---|---|---|---|---|---|---|---|
+| L/S SUE>1.0 20d | 2044/251 | +1.15% | 58% | +0.57 | 1.12 | +9.8% | 39% | 17% | no |
+| L/S SUE>1.0 60d | 2044/251 | +2.94% | 61% | +0.86 | 1.17 | +11.6% | 32% | 11% | no |
+| L/S SUE>1.5 60d **(best)** | 1438/161 | +3.37% | 62% | **+0.91** | 1.18 | +12.8% | 29% | 11% | no |
+| L/S SUE>2.0 60d | 984/114 | +3.36% | 61% | +0.76 | 1.16 | +11.9% | 34% | 13% | no |
+| L-only SUE>1.0 60d | 2044/0 | +3.63% | 64% | +0.80 | 1.17 | +14.4% | 46% | 11% | no |
+| L-only SUE>1.5 60d | 1438/0 | +3.98% | 65% | +0.81 | 1.17 | +14.8% | 42% | 11% | no |
+| *(other 6 cells)* | — | +1.2–4.0% | 58–65% | +0.42–0.73 | 1.09–1.16 | +7.5–13.8% | 39–50% | 13–29% | no |
+
+**The gross drift is unambiguously real:** +1.2–1.4% over 20 days, +2.9–4.0%
+over 60 days, 58–65% event win rate, monotone-ish in horizon, consistent
+across all three SUE thresholds AND the raw-Surprise(%) diagnostic (5/10/20%
+thresholds: +1.0–1.8% / 20d, +2.9–3.3% / 60d). PEAD shows up in this data.
+
+**But every one of the 12 cells loses to simply owning the 63-name universe
+equal-weighted.** Best cell (L/S SUE>1.5 60d): net Sharpe +0.91 vs B&H +0.85
+— a hair higher on Sharpe — but **CAGR +12.8% vs B&H +15.8%**, so it fails
+the "beats B&H on Sharpe AND CAGR" gate. Long-only cells get to ~14–15% CAGR
+but at Sharpe 0.73–0.81, below B&H's 0.85. **0/12 beat buy-and-hold.**
+
+### Honesty gates
+
+| gate | result |
+|---|---|
+| look-ahead guard | **PASS 12/12** (4,735/4,735 events, min gap 8.0 h) |
+| net PF > 1 | 12/12 |
+| net Sharpe > 0 | 12/12 |
+| **beats equal-weight B&H (Sharpe AND CAGR)** | **0/12** |
+| OOS holds (IS 2006–15 / OOS 2016–26, both PF>1 & SR>0) | **12/12** — genuinely robust: OOS Sharpe (0.51–1.14) *higher* than IS (0.26–0.70) for every cell |
+| 2008–2009 sub-window | L/S cells −7% to +1% CAGR (SR −0.34 to +0.16); long-only cells **positive** (+2% to +15% CAGR, SR +0.14 to +0.54) vs B&H +2.1% |
+| not year-concentrated (top year ≤ 60%) | 12/12 (top-year 11–29%) |
+| DSR (reference only, pool = 12 cells) | best 0.440 (L/S SUE>1.5 60d), E[max SR] +0.94 — **vs 0.95 bar** |
+| **SURVIVORS** | **0/12** |
+
+### Verdict
+
+**KILL — but the most methodologically-clean real anomaly the project has
+found.** PEAD is the first candidate whose gross signal is (a) unambiguously
+positive, (b) *stronger* out-of-sample than in-sample, (c) not
+year-concentrated, and (d) clears net PF, Sharpe, OOS and concentration
+gates simultaneously. What kills it is the same terminal reason as §12
+(momentum rotation) and §14 (individual stocks): **a real edge that still
+loses to buying and holding the underlying universe** through a 2006–2026
+large-cap bull market. A ~3.4% gross drift over 60 days, diluted across a
+daily-rebalanced equal-weight book and netted of a 10 bps round-trip, just
+does not compound faster than +15.8%/yr of beta. DSR (reference) also cannot
+clear 0.95 against its own flat 12-cell pool.
+
+The data caveats (unverifiable estimate PIT integrity + survivorship) both
+*flatter* this result, so the kill is not a data artefact. A paid-PIT-data
+re-test would only lower these numbers.
+
+**Files:** `research/post_earnings_drift.py`. Data: `data/pead_earnings.csv`,
+`data/pead_prices.csv` (yfinance, cached). Results:
+`results/post_earnings_drift.csv`, `post_earnings_drift_scored.csv`,
+`post_earnings_drift_run.log`. Reproduce: `python research/post_earnings_drift.py`.
+
+**Cumulative trials: N=1085** (1073 prior + 12 — 3 SUE thresholds × 2
+horizons × [long/short, long-only]. The raw-Surprise(%) variant and the
+2016 OOS / 2008-09 GFC sub-splits are diagnostics of those 12 cells, not
+separate configs. DSR was reference-only this batch per the standing
 instruction.)
