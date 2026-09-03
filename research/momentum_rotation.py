@@ -52,6 +52,30 @@ def month_end_signal_dates(daily_index: pd.DatetimeIndex) -> pd.DatetimeIndex:
     return s.groupby([daily_index.year, daily_index.month]).max().sort_values().values
 
 
+def week_end_signal_dates(daily_index: pd.DatetimeIndex) -> pd.DatetimeIndex:
+    """Last trading day actually present in the data for each ISO calendar week.
+
+    The weekly analogue of month_end_signal_dates -- used by build_weights()
+    when signal_freq="W" (the weekly / bi-weekly rebalance-frequency test,
+    STATE_OF_PLAY sec 12.6). Nothing else about the mechanism changes: the
+    trailing N-MONTH return lookback and the causal 200-day SMA market filter
+    are unchanged; only the cadence at which a new decision is made differs.
+    """
+    iso = daily_index.isocalendar()
+    s = pd.Series(daily_index, index=daily_index)
+    return s.groupby([iso["year"].values, iso["week"].values]).max().sort_values().values
+
+
+def signal_dates(daily_index: pd.DatetimeIndex, freq: str = "M") -> pd.DatetimeIndex:
+    """Dispatch to the month-end or week-end signal-date generator. freq in
+    {"M", "W"}; default "M" reproduces every existing call site byte-for-byte."""
+    if freq == "M":
+        return month_end_signal_dates(daily_index)
+    if freq == "W":
+        return week_end_signal_dates(daily_index)
+    raise ValueError(f"signal_freq must be 'M' or 'W', got {freq!r}")
+
+
 def next_trading_day(daily_index: pd.DatetimeIndex, date) -> pd.Timestamp | None:
     pos = daily_index.searchsorted(date, side="right")
     if pos >= len(daily_index):
@@ -69,6 +93,7 @@ def build_weights(
     rebalance_step: int = 1,
     benchmark: str = BENCHMARK,
     defensive: str = DEFENSIVE,
+    signal_freq: str = "M",
 ) -> tuple[pd.DataFrame, pd.Series]:
     """
     Returns (weights_at_exec, turnover_at_exec):
@@ -81,10 +106,17 @@ def build_weights(
     test) -- `defensive` (default DEFENSIVE="IEF") must be a member of
     whatever list is passed. `sma_window` overrides the 200-day market-filter
     SMA length (audit 8 perturbation test -- 150/250 alternatives).
-    `rebalance_step` keeps only every Nth month-end signal date (audit 8
-    perturbation test -- step=2 gives a bi-monthly rebalance); the N-month
-    trailing-return lookback is unchanged, only the frequency at which a new
-    decision is made. `benchmark` (default BENCHMARK="SPY") overrides which
+    `rebalance_step` keeps only every Nth signal date (audit 8 perturbation
+    test -- step=2 gives a bi-monthly rebalance); the N-month trailing-return
+    lookback is unchanged, only the frequency at which a new decision is made.
+    `signal_freq` ("M" default = month-end signal dates, byte-identical to
+    every existing call site; "W" = ISO-week-end signal dates) selects the
+    base cadence before `rebalance_step` decimates it -- so ("W", step 1) is
+    weekly, ("W", step 2) bi-weekly, ("M", step 1) monthly, ("M", step 2)
+    bi-monthly, ("M", step 3) quarterly (STATE_OF_PLAY sec 12.6 frequency
+    test). The trailing N-MONTH ranking lookback and the causal `sma_window`-day
+    SMA market filter are IDENTICAL across every frequency; only the decision
+    cadence and the resulting turnover (hence cost) change. `benchmark` (default BENCHMARK="SPY") overrides which
     ticker's causal 200-day SMA drives the risk-on/risk-off market filter --
     added for the cross-universe generalisation test (crypto and country-ETF
     universes have no reason to filter on SPY's regime); both `benchmark` and
@@ -94,7 +126,7 @@ def build_weights(
     """
     uni = universe if universe is not None else UNIVERSE
     daily_index = adjclose.index
-    sig_dates = month_end_signal_dates(daily_index)
+    sig_dates = signal_dates(daily_index, signal_freq)
     if rebalance_step > 1:
         sig_dates = sig_dates[::rebalance_step]
 

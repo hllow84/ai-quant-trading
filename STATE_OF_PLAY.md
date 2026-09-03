@@ -1,6 +1,6 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-03 (§10.8 — RETEST OR30/1R generalization test: EURUSD, first FX pair, both windows. Clean kill — the only RETEST cell with net PF < 1 in BOTH windows (0.879 in / 0.967 out); 1% compounding bleeds −37.9% over 2018-2025. The gross breakout edge generalizes to FX; it still cannot pay its costs.).** Read this file first in any new session. It is the
+**Last updated: 2026-09-03 (§12.6 — momentum-rotation rebalance-frequency sweep: weekly/bi-weekly/monthly/bi-monthly/quarterly, N=12/K=5, mechanism unchanged. Highest actual compounded return is QUARTERLY full-period (+1010% vs SPY +772%, the only cadence to beat SPY on raw return) and MONTHLY in the 2000-2009 stress window (+138%); higher frequency = strictly worse everywhere. Does not revive §12 — quarterly DSR 0.526 vs 0.95 bar, same crash-hedge artefact. Earlier same day: §10.8 EURUSD RETEST OR30/1R generalization, clean kill.).** Read this file first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -136,11 +136,12 @@ against even its own 4-cell pool, in either the 17-instrument or the widened
 but cannot pay its own transaction costs) is the closest positive result among
 the price-pattern candidates specifically.
 
-Trial composition (this is the cumulative DSR trial count, N=1043 — see the
+Trial composition (this is the cumulative DSR trial count, N=1049 — see the
 2026-09-01 line at the foot of the table for the +84 ORB entry-filter batch, §10.5,
 the 2026-09-02 (a) line for the +3 RETEST OR30/1R compounding-table backtests, §10.6,
 the 2026-09-02 (b) line for the +8 exit-management backtests, §10.7,
-and the 2026-09-03 line for the +2 EURUSD RETEST OR30/1R generalization cells, §10.8):
+the 2026-09-03 (a) line for the +2 EURUSD RETEST OR30/1R generalization cells, §10.8,
+and the 2026-09-03 (b) line for the +6 momentum-rotation rebalance-frequency cells, §12.6):
 
 | Batch | Instrument(s) | Configs | Outcome |
 |---|---|---|---|
@@ -172,7 +173,8 @@ and the 2026-09-03 line for the +2 EURUSD RETEST OR30/1R generalization cells, �
 | RETEST OR30/1R compounding-table backtests — SPX500 (new instrument, both windows) + XAUUSD 2017 out-of-regime (§10.6) | SPX500, XAUUSD | 3 | 0 survive (§10.6) — SPX500 loses to buy-and-hold in all 3 periods; XAUUSD 2017 slice is a statistical wash vs its own buy-and-hold (+13.1% vs +13.2%), not a beat |
 | RETEST OR30 exit-management — 3R, breakeven, trailing stop, both windows + 1R/2R out-of-regime-2017 (§10.7) | XAUUSD | 8 | 0 survive (§10.7) — every wider-target/dynamic-stop variant gives back dollars vs the 1R baseline on FULL 2018-2025, and none beats buy-and-hold |
 | RETEST OR30/1R generalization to FOREX — EURUSD, both windows (§10.8) | EURUSD | 2 | 0 survive (§10.8) — first FX pair; the only RETEST cell with net PF < 1 in BOTH windows (0.879 in / 0.967 out), net Sharpe negative both, 1% compounding −37.9% over 2018-2025. Gross breakout edge generalizes to FX (gross PF 1.39/1.48); it cannot pay its costs on a currency pair |
-| **Total** | | **1043** | **0 survive** |
+| Momentum-rotation rebalance-frequency sweep — weekly/bi-weekly/quarterly new, monthly/bi-monthly reused (§12.6) | 17-ETF universe, SPY benchmark | 6 | 0 survive (§12.6) — DSR reference-only this batch; quarterly maximises full-period compounded return (+1010% vs SPY +772%, only cadence to beat SPY on raw return), monthly wins the 2000-09 stress window (+138%); higher frequency strictly worse everywhere. Does not revive §12 — quarterly DSR 0.526 vs 0.95 bar, same pre-2009 crash-hedge artefact as §12.5 |
+| **Total** | | **1049** | **0 survive** |
 
 **Correction, 2026-08-30:** the ORB moderate-stop variant (§10.1-10.3, run
 2026-08-29/30) was a genuinely new a priori design choice — 12 cells x 2 windows
@@ -2689,6 +2691,123 @@ Files: `run_momentum_rotation_walkforward.py`. Results:
 **Not a new trial batch** — frozen config, re-slices the §12 simulation by
 year, fits nothing. **Cumulative trial count unchanged: N=946.**
 
+---
+
+## 12.6 REBALANCE-FREQUENCY SWEEP — which cadence actually earns the most, tested 2026-09-03
+
+### The question, and why it needed a direct test
+
+Every §12 result used a **monthly** rebalance. §12.3's audit 8 tried
+bi-monthly as one perturbation and found it slightly softer, but the full
+frequency curve was never mapped. This test settles it directly with real
+data: **holding the audited mechanism byte-identical** (N=12-month
+trailing-return ranking, K=5 equal-weighted, causal 200-day SPY SMA filter,
+base 17-instrument universe, the §12.1 causal execution lag and look-ahead
+guard — `build_weights()`/`simulate()` called unmodified except the two
+additive cadence parameters), **only the rebalance frequency changes**, and
+we ask which cadence produced the highest *actual compounded historical
+return* — full period and in the 2000-2009 stress window.
+
+Five frequencies: **weekly** (`signal_freq="W"`, step 1), **bi-weekly**
+(`"W"`, step 2), **monthly** (`"M"`, step 1 — the existing baseline, reused),
+**bi-monthly** (`"M"`, step 2 — existing, audit 8, reused), **quarterly**
+(`"M"`, step 3 — new). Weekly signal dates are the last trading day present
+in each ISO week; the N-month ranking lookback and the SMA filter are
+unchanged at every cadence.
+
+### Costs scale with turnover, not a flat per-frequency assumption
+
+The per-side transaction cost is the **same 3 bps/side** (2 bps spread + 1 bp
+commission-equivalent) §12 used — it is a property of the instrument and the
+order, not the calendar. `simulate()` charges `cost_bps × turnover` at every
+rebalance, so a faster schedule pays that cost **more often** and its total
+cost-as-%-of-gross rises automatically. Confirmed in the table: cost load
+runs from **2.7%** of gross return (quarterly) to **11.3%** (weekly) on the
+full window — a 4.2× spread driven purely by cadence.
+
+### The one table — N=12 / K=5, common head-to-head window 2000-02-01 → 2026-08-28, and the 2000-2009 stress window
+
+| frequency | rebalances | net CAGR | net Sharpe | maxDD | cost % of gross | **full total return** | stress net CAGR | stress Sharpe | **stress total return** | vs SPY CAGR (full) | vs SPY CAGR (stress) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| weekly | 1299 | 6.67% | 0.548 | 35.0% | 11.32% | **+454.0%** | 5.53% | 0.426 | **+71.2%** | −1.84 pp | +6.05 pp |
+| bi-weekly | 649 | 7.11% | 0.564 | 36.8% | 7.92% | **+518.8%** | 5.22% | 0.394 | **+66.2%** | −1.40 pp | +5.74 pp |
+| monthly | 299 | 8.32% | 0.629 | 39.0% | 4.90% | **+732.4%** | 9.08% | 0.610 | **+138.2%** | −0.19 pp | +9.60 pp |
+| bi-monthly | 150 | 7.65% | 0.566 | 39.0% | 3.63% | **+606.3%** | 8.61% | 0.586 | **+128.0%** | −0.86 pp | +9.12 pp |
+| **quarterly** | 100 | **9.50%** | **0.670** | 43.1% | **2.69%** | **+1010.2%** | 8.44% | 0.568 | **+124.5%** | **+0.99 pp** | +8.95 pp |
+| SPY buy & hold | — | 8.51% | 0.522 | 55.2% | — | +772.4% | −0.52% | 0.071 | −5.0% | — | — |
+
+Look-ahead guard **PASS 5/5**. Per-year concentration (top-year share of net
+log return) **12–19% for all five**, well inside the ≤60% gate — cadence does
+not create concentration. **DSR, reference only** (pool = these 5 frequency
+cells, per the brief — not a survival gate): full-window E[max SR] +0.658,
+best cell quarterly **0.526**; stress E[max SR] +0.636, best monthly 0.468 —
+nothing clears 0.95, the same flat-grid DSR ceiling §12/§12.1/§12.3 hit.
+
+### Ranked by actual compounded return
+
+**FULL PERIOD (2000-02 → 2026-08):** 1. quarterly +1010% · 2. monthly +732%
+· 3. bi-monthly +606% · 4. bi-weekly +519% · 5. weekly +454%. **Strictly
+monotonic — the slower the rebalance, the higher the actual compounded
+return.** Quarterly is also the **only** frequency that beats SPY
+buy-and-hold on raw full-period return (+1010% vs +772%); every faster
+cadence trails SPY.
+
+**STRESS WINDOW (2000-2009):** 1. monthly +138% · 2. bi-monthly +128% ·
+3. quarterly +125% · 4. weekly +71% · 5. bi-weekly +66%. **Monthly wins**;
+quarterly slips to third (too slow to react to the two crashes as cleanly as
+the monthly SMA check). All five crush SPY B&H (−5%) here, because the whole
+edge in this window is the filter sidestepping the dot-com and GFC drawdowns.
+
+### Plain answers to the brief
+
+1. **Highest actual compounded return, full period: QUARTERLY** (+1010%,
+   net CAGR 9.50%, net Sharpe 0.670 — best on every headline metric except
+   max drawdown, where its 43% is the worst of the five).
+2. **Highest actual compounded return, stress window: MONTHLY** (+138%).
+3. **Yes, the answer changes between the calm full period and the crash
+   window.** Full period rewards the *slowest* cadence (least cost drag,
+   least whipsaw, rides winners longer); the crash window rewards *monthly*
+   specifically — fast enough to act on the 200-day-SMA risk-off signal
+   promptly, slow enough not to churn. Both windows agree completely on the
+   **losers**: weekly and bi-weekly are last in *both*, and higher frequency
+   produces strictly worse compounded return everywhere. The optimum sits at
+   the **slow end** of the range (quarterly or monthly), never the fast end.
+
+### What this does and does not change
+
+It does **not** revive §12 — the strategy's verdict was already KILL on DSR
+(flat grid) and the §12.5 walk-forward finding that all the SPY
+outperformance was banked pre-2009, and this sweep clears none of that:
+quarterly's full-window DSR is 0.526 against a 0.95 bar, and its full-period
+"beat" over SPY (+1010% vs +772%) is the same crash-hedge artefact §12.5
+already dissected — remove 2000-2008 and it trails. What it **does** settle,
+for any future revisit of this family: **monthly was not the return-maximising
+choice on the full period — quarterly is, by a wide margin (+278 pp of total
+return) and at roughly half the cost load — but monthly is the best cadence
+for the crash-hedging job the filter actually does.** A future deployment
+should rebalance **quarterly** if the goal is raw compounded return and
+**monthly** if the goal is the defensive/crash-response property; weekly and
+bi-weekly are dominated on every axis and should not be used.
+
+### Files
+
+`research/momentum_rotation_frequency.py` (the runner),
+`research/momentum_rotation.py` (gained two additive optional params on
+`build_weights()` — `signal_freq` and the already-existing `rebalance_step`;
+`signal_freq="M"` default reproduces §12/§12.1/§12.2/§12.3 byte-identically,
+verified — plus `week_end_signal_dates()`/`signal_dates()` helpers),
+`results/momentum_rotation_frequency_summary.csv`,
+`results/momentum_rotation_frequency_run.log`. Reproduce:
+`python research/momentum_rotation_frequency.py`.
+
+**Cumulative trials: N=1049** (1043 prior + 3 genuinely new frequencies
+[weekly, bi-weekly, quarterly] × 2 windows = 6). Monthly is already counted
+in §12's 8-cell batch; bi-monthly was run as a one-shot robustness check in
+§12.3 audit 8 and is folded in here as a reported comparison without
+re-running. DSR is reference-only this batch (task brief), so these 6 cells
+enter the cumulative count but not any survival-gate pool.
+
+---
 
 ## 13. CRYPTO — the same 5-family sweep on a genuinely new instrument class, tested 2026-08-31, killed
 

@@ -1,0 +1,71 @@
+========================================================================================================================
+  REBALANCE-FREQUENCY SWEEP  --  momentum rotation, N=12 / K=5 / 200d SMA filter / base 17-instrument universe
+  cost model: 3.0 bps/side (SAME every frequency) applied to ACTUAL turnover at each rebalance -> total cost scales with cadence
+  panel: 1993-01-29 -> 2026-08-28  (8,453 daily rows)
+========================================================================================================================
+  weekly      [NEW                     ] rebalances=1299  first_exec=1999-12-06  guard=PASS  mean_turnover/rebal=0.257  total_turnover=334.2
+  bi-weekly   [NEW                     ] rebalances= 649  first_exec=1999-12-13  guard=PASS  mean_turnover/rebal=0.361  total_turnover=234.2
+  monthly     [reused (sec 12 baseline)] rebalances= 299  first_exec=2000-01-03  guard=PASS  mean_turnover/rebal=0.498  total_turnover=149.0
+  bi-monthly  [reused (audit 8)        ] rebalances= 150  first_exec=2000-02-01  guard=PASS  mean_turnover/rebal=0.708  total_turnover=106.2
+  quarterly   [NEW                     ] rebalances= 100  first_exec=2000-02-01  guard=PASS  mean_turnover/rebal=0.830  total_turnover=83.0
+
+  COMMON head-to-head window starts 2000-02-01 (= latest first_exec across the 5 frequencies)
+
+  DSR REFERENCE ONLY [COMMON full]  pool=5 freqs  E[max SR]=+0.658 (mu +0.596, sd 0.052)  -> DSR weekly=0.285, bi-weekly=0.314, monthly=0.442, bi-monthly=0.318, quarterly=0.526
+  DSR REFERENCE ONLY [STRESS]  pool=5 freqs  E[max SR]=+0.636 (mu +0.517, sd 0.099)  -> DSR weekly=0.254, bi-weekly=0.223, monthly=0.468, bi-monthly=0.438, quarterly=0.416
+
+
+########################################################################################################################
+  FREQUENCY x (net CAGR, net Sharpe, maxDD, cost % of gross, out-of-regime, vs buy-and-hold SPY)
+  COMMON head-to-head window: 2000-02-01 -> 2026-08-28   |   STRESS: 2000-01-01 -> 2009-12-31
+########################################################################################################################
+  frequency     reb  netCAGR   netSR   maxDD  cost%gr    totRet% |  strCAGR   strSR   strTot%  strMDD |  vsSPY(f)  vsSPY(s)
+  ----------------------------------------------------------------------------------------------------------------------
+  weekly       1299    6.67%   0.548   35.0%   11.32%     454.0% |    5.53%   0.426     71.2%   35.4% |    -1.84    +6.05
+  bi-weekly     649    7.11%   0.564   36.8%    7.92%     518.8% |    5.22%   0.394     66.2%   37.9% |    -1.40    +5.74
+  monthly       299    8.32%   0.629   39.0%    4.90%     732.4% |    9.08%   0.610    138.2%   39.0% |    -0.19    +9.60
+  bi-monthly    150    7.65%   0.566   39.0%    3.63%     606.3% |    8.61%   0.586    128.0%   39.0% |    -0.86    +9.12
+  quarterly     100    9.50%   0.670   43.1%    2.69%    1010.2% |    8.44%   0.568    124.5%   43.1% |    +0.99    +8.95
+  ----------------------------------------------------------------------------------------------------------------------
+  SPY B&H              8.51%   0.522   55.2%      --     772.4% |   -0.52%   0.071     -5.0%   55.2% |
+
+  Per-frequency OWN live window (each freq vs SPY over its own identical dates):
+  frequency           from  netCAGR  SPY CAGR   vs pp   netSR  SPY SR    totRet%   SPY tot%  beats?
+  weekly        1999-12-06    6.64%     8.45%  -1.81   0.542   0.516     456.2%     771.0%   False
+  bi-weekly     1999-12-13    7.09%     8.49%  -1.40   0.559   0.517     520.2%     776.5%   False
+  monthly       2000-01-03    8.07%     8.52%  -0.46   0.608   0.513     687.6%     780.6%   False
+  bi-monthly    2000-02-01    7.65%     8.51%  -0.86   0.566   0.522     606.3%     772.4%   False
+  quarterly     2000-02-01    9.50%     8.51%  +0.99   0.670   0.522    1010.2%     772.4%    True
+
+
+========================================================================================================================
+  RANKING BY ACTUAL COMPOUNDED HISTORICAL RETURN
+========================================================================================================================
+
+  FULL PERIOD (common window 2000-02-01 -> 2026-08-28), ranked by total compounded NET return:
+   1. quarterly       1010.2%   (net CAGR 9.50%, net SR 0.670, maxDD 43.1%, cost 2.69% of gross)
+   2. monthly          732.4%   (net CAGR 8.32%, net SR 0.629, maxDD 39.0%, cost 4.90% of gross)
+   3. bi-monthly       606.3%   (net CAGR 7.65%, net SR 0.566, maxDD 39.0%, cost 3.63% of gross)
+   4. bi-weekly        518.8%   (net CAGR 7.11%, net SR 0.564, maxDD 36.8%, cost 7.92% of gross)
+   5. weekly           454.0%   (net CAGR 6.67%, net SR 0.548, maxDD 35.0%, cost 11.32% of gross)
+      SPY buy-and-hold over the same window: 772.4% (CAGR 8.51%, SR 0.522)
+
+  STRESS WINDOW (2000-01-01 -> 2009-12-31), ranked by total compounded NET return:
+   1. monthly          138.2%   (net CAGR 9.08%, net SR 0.610, maxDD 39.0%, cost 1.83% of gross)
+   2. bi-monthly       128.0%   (net CAGR 8.61%, net SR 0.586, maxDD 39.0%, cost 1.38% of gross)
+   3. quarterly        124.5%   (net CAGR 8.44%, net SR 0.568, maxDD 43.1%, cost 1.17% of gross)
+   4. weekly            71.2%   (net CAGR 5.53%, net SR 0.426, maxDD 35.4%, cost 7.48% of gross)
+   5. bi-weekly         66.2%   (net CAGR 5.22%, net SR 0.394, maxDD 37.9%, cost 5.65% of gross)
+      SPY buy-and-hold over the same window: -5.0% (CAGR -0.52%, SR 0.071)
+
+========================================================================================================================
+  PLAIN ANSWER
+========================================================================================================================
+  Highest actual compounded return, FULL PERIOD  : QUARTERLY
+  Highest actual compounded return, STRESS WINDOW: MONTHLY
+  Does the answer change between the calm full period and the 2000-2009 crash window? YES
+
+  NEW trials this run: 3 frequencies (weekly, bi-weekly, quarterly) x 2 windows = 6
+  CUMULATIVE PROJECT TRIALS: 1043 + 6 = 1049
+
+  saved -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\momentum_rotation_frequency_summary.csv
