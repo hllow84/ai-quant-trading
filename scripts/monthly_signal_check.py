@@ -57,6 +57,30 @@ LOG_FILE_BY_FREQ = {
 PERIOD_WORD = {"monthly": "month", "quarterly": "quarter"}
 
 
+def print_status_banner(period: str, is_real_rebalance_date: bool, today: dt.date) -> None:
+    """
+    Impossible-to-miss banner, printed BEFORE anything else, saying whether
+    this run is a LIVE actionable signal (today is the real rebalance date)
+    or a mid-period PREVIEW (what the signal would say if calculated today,
+    subject to change by the real rebalance date).
+    """
+    bar_live = "=" * 72
+    bar_prev = "!" * 72
+    if is_real_rebalance_date:
+        print(bar_live)
+        print(f"  LIVE SIGNAL  --  today ({today}) IS the real {period}-end rebalance date.")
+        print("  Act on this.")
+        print(bar_live)
+    else:
+        print(bar_prev)
+        print(f"  PREVIEW ONLY  --  today ({today}) is NOT {period}-end.")
+        print(f"  This is what the signal WOULD say if calculated today; it may change")
+        print(f"  by the real rebalance date (the last trading day of the {period}).")
+        print(f"  DO NOT place trades based on this unless today IS {period}-end.")
+        print(bar_prev)
+    print()
+
+
 def is_last_trading_day_of_period(freq: str, as_of: dt.date | None = None) -> bool:
     """
     True iff `as_of` (default: today) is the last NYSE trading day of the
@@ -120,18 +144,28 @@ def main() -> int:
     freq = args.freq
     period = PERIOD_WORD[freq]
     log_file = LOG_FILE_BY_FREQ[freq]
+    today = dt.date.today()
+    is_real_rebalance_date = is_last_trading_day_of_period(freq)
+
+    # Without --force, a mid-period run does nothing (unchanged behaviour).
+    if not args.force and not is_real_rebalance_date:
+        print("=" * 72)
+        print(f"{freq.upper()} MOMENTUM ROTATION SIGNAL CHECK -- INFORMATIONAL ONLY")
+        print("=" * 72)
+        print(f"\nToday is not the last NYSE trading day of the {period}. No signal "
+              f"check needed yet -- run this again on the last trading day of the "
+              f"{period}, or pass --force to preview anyway.")
+        return 0
+
+    # BANNER FIRST -- before any other output -- so a LIVE signal can never be
+    # confused with a mid-period PREVIEW.
+    print_status_banner(period, is_real_rebalance_date, today)
 
     print("=" * 72)
     print(f"{freq.upper()} MOMENTUM ROTATION SIGNAL CHECK -- INFORMATIONAL ONLY")
     print("This script places NO orders and connects to NO broker. You place")
     print("trades yourself, manually, in whatever brokerage account you use.")
     print("=" * 72)
-
-    if not args.force and not is_last_trading_day_of_period(freq):
-        print(f"\nToday is not the last NYSE trading day of the {period}. No signal "
-              f"check needed yet -- run this again on the last trading day of the "
-              f"{period}, or pass --force to preview anyway.")
-        return 0
 
     # generate_signal() is cadence-invariant (sec 12.6): the ranking + SMA
     # filter is identical at every frequency, so both cadences call it with the
@@ -177,20 +211,34 @@ def main() -> int:
           f"holding exactly these, rebalance to them (manually, in your own "
           f"brokerage account). <<<")
 
-    if not args.no_log:
-        if last is not None and last["date"] == str(signal_date):
-            print(f"\nAlready logged for {signal_date} in {log_file.name} -- not "
-                  f"duplicating the entry (re-run detected).")
-        else:
-            log_picks(log_file, {
-                "date": str(signal_date),
-                "risk_off": risk_off,
-                "tickers": ",".join(tickers),
-                "signal_source": f"momentum_rotation N=12 K=5 SMA=200 {freq}",
-            })
-            print(f"\nLogged to {log_file.relative_to(REPO)}")
+    # Repeat the LIVE/PREVIEW status at the bottom too -- after a long signal
+    # printout the top banner has scrolled off, and the pause shows this.
+    if is_real_rebalance_date:
+        print(f"\n[{'=' * 20}]  LIVE SIGNAL -- today ({today}) is the real {period}-end "
+              f"rebalance date. Act on this.  [{'=' * 20}]")
     else:
+        print(f"\n[{'!' * 20}]  PREVIEW ONLY -- today ({today}) is NOT {period}-end. "
+              f"Do NOT trade on this unless today IS {period}-end.  [{'!' * 20}]")
+
+    if args.no_log:
         print("\n--no-log: not written to the picks log.")
+    elif not is_real_rebalance_date:
+        # A mid-period PREVIEW must never enter the picks log -- that file is
+        # the record of ACTUAL rebalance-date signals, used for the
+        # period-over-period comparison above. Previews would corrupt it.
+        print(f"\nPREVIEW run -- NOT written to {log_file.name} (only real "
+              f"{period}-end runs are logged).")
+    elif last is not None and last["date"] == str(signal_date):
+        print(f"\nAlready logged for {signal_date} in {log_file.name} -- not "
+              f"duplicating the entry (re-run detected).")
+    else:
+        log_picks(log_file, {
+            "date": str(signal_date),
+            "risk_off": risk_off,
+            "tickers": ",".join(tickers),
+            "signal_source": f"momentum_rotation N=12 K=5 SMA=200 {freq}",
+        })
+        print(f"\nLogged to {log_file.relative_to(REPO)}")
 
     return 0
 
