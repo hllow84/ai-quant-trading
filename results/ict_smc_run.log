@@ -1,0 +1,114 @@
+======================================================================================================================
+  ICT SMC FULL MODEL (v2, audited) -- XAUUSD / EURUSD / SPX500 / BTCUSDT, M1, real spread
+  Headline: pure compounded dollar return vs buy-and-hold. Sharpe/DSR reported separately below.
+======================================================================================================================
+
+[XAUUSD] loading XAUUSD_M1_2018_2025_spot_dukascopy.csv ...
+[XAUUSD] 1,827,147 bars, 2018-01-01 23:00:00+00:00 -> 2025-12-31 21:58:00+00:00
+[XAUUSD] computing ICT SMC state machine (this is the slow O(n) pass) ...
+[XAUUSD] 15,773 raw (pre-no_pos) signals over the whole file (6,757 more rejected at signal time for stop < 20 ticks)
+  [XAUUSD in-regime 2018-2025] resolving trades (no_pos-gated) ...
+    [XAUUSD in-regime 2018-2025] 2196 trades in window (21 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[XAUUSD] loading XAUUSD_M1_2017_spot_dukascopy.csv ...
+[XAUUSD] 323,514 bars, 2017-01-02 23:00:00+00:00 -> 2017-12-29 21:58:00+00:00
+[XAUUSD] computing ICT SMC state machine (this is the slow O(n) pass) ...
+[XAUUSD] 2,413 raw (pre-no_pos) signals over the whole file (1,731 more rejected at signal time for stop < 20 ticks)
+  [XAUUSD out-of-regime 2017 (1yr, not a full regime test)] resolving trades (no_pos-gated) ...
+    [XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 355 trades in window (4 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[EURUSD] loading EURUSD_M1_2018_2025_spot_dukascopy.csv ...
+[EURUSD] 2,922,985 bars, 2018-01-01 22:00:00+00:00 -> 2025-12-30 23:59:00+00:00
+[EURUSD] computing ICT SMC state machine (this is the slow O(n) pass) ...
+[EURUSD] 14,559 raw (pre-no_pos) signals over the whole file (13,091 more rejected at signal time for stop < 20 ticks)
+  [EURUSD in-regime 2018-2025] resolving trades (no_pos-gated) ...
+    [EURUSD in-regime 2018-2025] 1764 trades in window (20 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[EURUSD] loading EURUSD_M1_2013_2017_spot_dukascopy.csv ...
+[EURUSD] 1,837,284 bars, 2013-01-01 22:00:00+00:00 -> 2017-12-29 21:59:00+00:00
+[EURUSD] computing ICT SMC state machine (this is the slow O(n) pass) ...
+[EURUSD] 11,037 raw (pre-no_pos) signals over the whole file (8,628 more rejected at signal time for stop < 20 ticks)
+  [EURUSD out-of-regime 2013-2017 (full 5yr)] resolving trades (no_pos-gated) ...
+    [EURUSD out-of-regime 2013-2017 (full 5yr)] 1174 trades in window (7 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[SPX500] loading SPX500_M1_2017_2025_cfd_dukascopy.csv ...
+[SPX500] 2,712,351 bars, 2017-01-03 07:00:00+00:00 -> 2025-12-31 21:13:00+00:00
+[SPX500] computing ICT SMC state machine (this is the slow O(n) pass) ...
+[SPX500] 28,618 raw (pre-no_pos) signals over the whole file (20,469 more rejected at signal time for stop < 20 ticks)
+  [SPX500 in-regime 2018-2025] resolving trades (no_pos-gated) ...
+    [SPX500 in-regime 2018-2025] 3469 trades in window (151 rejected for a fill-gap-eroded stop < 20 ticks)
+  [SPX500 out-of-regime 2017 (1yr, not a full regime test)] resolving trades (no_pos-gated) ...
+    [SPX500 out-of-regime 2017 (1yr, not a full regime test)] 311 trades in window (151 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[BTCUSDT] loading BTCUSDT_M1_2017_2025_binance.csv ...
+[BTCUSDT] 4,725,367 bars, 2017-08-17 04:00:00+00:00 -> 2026-09-01 14:49:00+00:00
+[BTCUSDT] computing ICT SMC state machine (this is the slow O(n) pass) ...
+[BTCUSDT] 44,644 raw (pre-no_pos) signals over the whole file (7,046 more rejected at signal time for stop < 20 ticks)
+  [BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] resolving trades (no_pos-gated) ...
+    [BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 5381 trades in window (65 rejected for a fill-gap-eroded stop < 20 ticks)
+
+######################################################################################################################
+  HEADLINE -- PURE COMPOUNDED DOLLAR RETURN, ICT SMC vs BUY-AND-HOLD ($100,000 start, 1% risk/trade)
+######################################################################################################################
+  cell                                                        strategy end $   strat %     B&H end $    B&H %  beat B&H?
+  --------------------------------------------------------------------------------------------------------------------
+  XAUUSD in-regime 2018-2025                                 $          165    -99.8% $    331,604  +231.6%         no
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test)    $       24,173    -75.8% $    113,177   +13.2%         no
+  EURUSD in-regime 2018-2025                                 $        6,159    -93.8% $     97,794    -2.2%         no
+  EURUSD out-of-regime 2013-2017 (full 5yr)                  $       18,603    -81.4% $     90,954    -9.0%         no
+  SPX500 in-regime 2018-2025                                 $           14   -100.0% $    255,640  +155.6%         no
+  SPX500 out-of-regime 2017 (1yr, not a full regime test)    $       54,304    -45.7% $    118,831   +18.8%         no
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring) $            0   -100.0% $    639,397  +539.4%         no
+
+  RUIN DIAGNOSTIC (why several cells end near $0): fixed-fractional 1%-of-CURRENT-capital
+  compounding over thousands of trades decays MULTIPLICATIVELY, not linearly, once net PF < 1.
+  Trade # at which equity first fell to <= 1% of the $100,000 start (None = never in this window):
+    XAUUSD in-regime 2018-2025                                 trade #1487 of 2196
+    XAUUSD out-of-regime 2017 (1yr, not a full regime test)    never (did not reach 1% of start)
+    EURUSD in-regime 2018-2025                                 never (did not reach 1% of start)
+    EURUSD out-of-regime 2013-2017 (full 5yr)                  never (did not reach 1% of start)
+    SPX500 in-regime 2018-2025                                 trade #1786 of 3469
+    SPX500 out-of-regime 2017 (1yr, not a full regime test)    never (did not reach 1% of start)
+    BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring) trade #321 of 5381
+
+######################################################################################################################
+  TRADE COUNTS / WIN RATES
+######################################################################################################################
+  cell                                                        trades   win%  grossPF   netPF  topYr
+  XAUUSD in-regime 2018-2025                                    2196    34%    1.031   0.674    n/a
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test)        355    33%    0.992   0.582    n/a
+  EURUSD in-regime 2018-2025                                    1764    34%    1.020   0.808    n/a
+  EURUSD out-of-regime 2013-2017 (full 5yr)                     1174    34%    1.016   0.825    n/a
+  SPX500 in-regime 2018-2025                                    3469    34%    1.013   0.704    n/a
+  SPX500 out-of-regime 2017 (1yr, not a full regime test)        311    41%    1.365   0.781    n/a
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)    5381    25%    1.037   0.173    n/a
+
+######################################################################################################################
+  PLAIN VERDICT PER INSTRUMENT (in-regime window; real dollars)
+######################################################################################################################
+  XAUUSD: ICT SMC did NOT beat simply holding XAUUSD ($165 vs $331,604).
+  EURUSD: ICT SMC did NOT beat simply holding EURUSD ($6,159 vs $97,794).
+  SPX500: ICT SMC did NOT beat simply holding SPX500 ($14 vs $255,640).
+  BTCUSDT: ICT SMC did NOT beat simply holding BTCUSDT ($0 vs $639,397).
+
+======================================================================================================================
+  SECONDARY -- STATISTICAL REFERENCE (Sharpe, DSR, guard, concentration). Not the headline.
+======================================================================================================================
+  DSR reference pool: N=7 a priori cells, E[max SR] +1.371
+  cell                                                        Sharpe    DSR   maxDD   guard
+  XAUUSD in-regime 2018-2025                                   -3.09  0.000   99.8%    PASS
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test)      -4.29  0.000   78.5%    PASS
+  EURUSD in-regime 2018-2025                                   -1.64  0.000   94.8%    PASS
+  EURUSD out-of-regime 2013-2017 (full 5yr)                    -1.49  0.000   83.9%    PASS
+  SPX500 in-regime 2018-2025                                   -2.74  0.000  100.0%    PASS
+  SPX500 out-of-regime 2017 (1yr, not a full regime test)      -1.94  0.000   54.0%    PASS
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)  -12.31  0.000  100.0%    PASS
+
+  Look-ahead guard: PASS on every cell (spot-checked first 200 trades/cell: entry_mid must equal the NEXT bar's open after the signal bar).
+
+  Cells clearing net PF>1 AND Sharpe>0 AND beats-B&H AND not-year-concentrated: 0/7
+
+  NEW TRIALS: 7 (XAUUSD x2, EURUSD x2, SPX500 x2, BTCUSDT x1).
+  Cumulative project trials after this batch: 1098 (1091 prior + 7).
+  saved -> results/ict_smc.csv, results/ict_smc_trades.csv, results/ict_smc_run.log
+======================================================================================================================

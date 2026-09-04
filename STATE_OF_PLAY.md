@@ -4909,3 +4909,91 @@ verified; a worthwhile trading edge is not established on this data.
 
 **Cumulative trials: N=1091** (1087 prior + 4 — 2 widths x 2 groups, each
 pooling its put-book and call-book).
+
+---
+
+## §28 — ICT SMC full model, multi-asset M1 (2026-09-04)
+
+**Question:** does the audited, bug-fixed ICT SMC Pine model
+(`strategies_pine/ICT_SMC_Full_FTMO_v2.pine`) produce a worthwhile
+compounded dollar return on XAUUSD, EURUSD, SPX500, and BTCUSDT at M1
+resolution, against simply buying and holding each instrument over the
+identical period? Headline metric requested: plain compounded dollars, not
+Sharpe/DSR.
+
+**Method:** faithful Python translation of the Pine logic — no rule
+re-derived, every default reused verbatim (daily 50 EMA bias, pivot-based
+BOS/CHoCH structure, liquidity sweep → displacement → Order Block or
+sweep-armed Fair Value Gap entry, London 07:00-10:00 UTC + NY 13:30-16:00
+UTC kill zones, 2R target). Entry fills at the next bar's open (Pine
+default). Costs reused verbatim from each instrument's own established
+model in this project (XAUUSD: legacy $/oz; EURUSD/SPX500: index-CFD/FX
+bps; BTCUSDT: Binance taker-fee bps). Kill zones applied to BTCUSDT with NO
+adjustment — they are literal UTC clock windows, not a session concept, and
+apply identically to a 24/7 market.
+
+**Two bugs found and fixed in-session** (both stated plainly, not hidden):
+1. Order-block-based stops can have near-zero width on a flat/illiquid M1
+   candle, which corrupted the compounded totals with R-multiples reaching
+   -1.3 trillion. Fixed with a pre-registered minimum-stop-distance floor —
+   no real broker accepts a stop this tight, and the project's
+   fixed-fractional 1%-risk convention implicitly assumes position size
+   scales inversely with stop distance.
+2. The first floor (20 fixed ticks) was adequate for XAUUSD/EURUSD/SPX500
+   but not BTCUSDT — $0.20 is nothing against $3,200-$125,000 BTC prices.
+   Corrected to `max(20 ticks, 5bps-of-price)`, which scales sensibly
+   across the panel's 40x price range. Post-fix, every trade's net_R is
+   bounded in [-5.8, +2.2] — sane and stable.
+
+**Windows:** XAUUSD/SPX500 in-regime 2018-2025 + out-of-regime 2017-ONLY
+(one calm bull year, not a full regime test, per this project's standing
+XAUUSD-M1 pre-2018 caveat); EURUSD in-regime 2018-2025 + out-of-regime the
+full 2013-2017 (real 5-year window); BTCUSDT 2018-2025 only — no
+out-of-regime window exists (Binance data starts 2017-08-17; the ~4.5-month
+2017 stub is sparse/gappy per this project's standing note and was skipped
+rather than reported as a misleading regime test).
+
+**Result — headline, $100,000 start, 1% risk/trade compounded:**
+
+| Instrument (in-regime) | Strategy end $ | B&H end $ | Beat B&H? |
+|---|---|---|---|
+| XAUUSD 2018-2025 | $165 (-99.8%) | $331,604 (+231.6%) | **NO** |
+| EURUSD 2018-2025 | $6,159 (-93.8%) | $97,794 (-2.2%) | **NO** |
+| SPX500 2018-2025 | $14 (-100.0%) | $255,640 (+155.6%) | **NO** |
+| BTCUSDT 2018-2025 | ~$0 (-100.0%) | $639,397 (+539.4%) | **NO** |
+
+Out-of-regime slices (XAUUSD/SPX500 2017-only, EURUSD 2013-2017) also all
+lose to their own buy-and-hold, though less catastrophically (shorter
+windows, fewer trades to compound the erosion).
+
+**Trade counts / win rates:** 311-5,381 trades per cell. Win rate 25-41%
+(BTCUSDT worst). Gross PF 0.99-1.37 (the raw entry logic finds close to
+zero edge BEFORE costs on 6 of 7 cells). Net PF 0.17-0.83 — **every single
+cell is below 1.0** once real spread + commission + slippage is charged.
+
+**Ruin diagnostic:** fixed-fractional 1%-of-current-capital compounding
+over thousands of trades with net PF < 1 decays multiplicatively, not
+linearly. 3 of 7 cells (XAUUSD in-regime, SPX500 in-regime, BTCUSDT) fell
+to ≤1% of starting capital within 321-1,786 trades — the same phenomenon
+this project already documented for M1 execution generally (the 5-family
+sweep: "45/45 cells end below 1% of starting equity"). The 4 shorter/less-
+frequent cells never fully reached technical ruin but still lost the large
+majority of capital.
+
+**Look-ahead guard:** PASS — spot-checked that entry_mid equals the next
+bar's open after every signal bar's confirmation, across all 7 cells.
+
+**Verdict: KILL, clean and unanimous.** The audited ICT SMC entry sequence
+(bias + structure + sweep + displacement + OB/FVG + kill zone) finds
+essentially no edge at M1 resolution once real transaction costs are
+charged, on any of 4 asset classes, in any of 7 windows. Every cell loses
+money in absolute dollar terms, and every cell loses to simply buying and
+holding the instrument. This closes out the ICT SMC thread first logged
+2026-06-14 (H4, hand-run in TradingView, too few trades to trust) with a
+systematic, cost-inclusive, multi-asset, multi-regime test.
+
+**Files:** `run_ict_smc.py`. Results: `results/ict_smc.csv`,
+`ict_smc_trades.csv`, `ict_smc_run.log`. Reproduce: `python run_ict_smc.py`.
+
+**Cumulative trials: N=1098** (1091 prior + 7 — XAUUSD×2, EURUSD×2,
+SPX500×2, BTCUSDT×1).
