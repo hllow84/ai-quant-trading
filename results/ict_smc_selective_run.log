@@ -1,0 +1,145 @@
+==========================================================================================================================
+  ICT-SMC SELECTIVE v1  --  section 28 engine + 4 pre-registered discretionary filters
+  (1) significant-swing sweep  (2) daily 50/200 EMA stack  (3) 1 trade / 7d + 2.0x displacement floor
+  (4) level significance: prior-day H/L | >=3 defended touches | round number
+  Headline: pure compounded dollar return vs buy-and-hold, DIRECTLY comparable to section 28.
+==========================================================================================================================
+
+[XAUUSD] loading XAUUSD_M1_2018_2025_spot_dukascopy.csv ...
+[XAUUSD] 1,827,147 bars, 2018-01-01 23:00:00+00:00 -> 2025-12-31 21:58:00+00:00
+[XAUUSD] computing SELECTIVE v1 state machine (slow O(n) pass) ...
+[XAUUSD] sweeps seen L/S 83,505/83,762 ; pass quality+significance L/S 31,449/36,099 (rej: quality 99,712, level-sig 7)
+[XAUUSD] entry rejections -- htf-stack 1,750, conviction<2.0x 2,827, min-stop 1,190
+[XAUUSD] raw signals 2,712 -> after 1-per-7d cap 149 (whole file, pre-no_pos)
+  [XAUUSD in-regime 2018-2025] resolving trades (no_pos-gated, section-28 run_one_window) ...
+    [XAUUSD in-regime 2018-2025] 149 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[XAUUSD] loading XAUUSD_M1_2017_spot_dukascopy.csv ...
+[XAUUSD] 323,514 bars, 2017-01-02 23:00:00+00:00 -> 2017-12-29 21:58:00+00:00
+[XAUUSD] computing SELECTIVE v1 state machine (slow O(n) pass) ...
+[XAUUSD] sweeps seen L/S 15,013/15,593 ; pass quality+significance L/S 6,604/7,450 (rej: quality 16,551, level-sig 1)
+[XAUUSD] entry rejections -- htf-stack 93, conviction<2.0x 532, min-stop 362
+[XAUUSD] raw signals 693 -> after 1-per-7d cap 29 (whole file, pre-no_pos)
+  [XAUUSD out-of-regime 2017 (1yr, not a full regime test)] resolving trades (no_pos-gated, section-28 run_one_window) ...
+    [XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 29 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[EURUSD] loading EURUSD_M1_2018_2025_spot_dukascopy.csv ...
+[EURUSD] 2,922,985 bars, 2018-01-01 22:00:00+00:00 -> 2025-12-30 23:59:00+00:00
+[EURUSD] computing SELECTIVE v1 state machine (slow O(n) pass) ...
+[EURUSD] sweeps seen L/S 118,661/120,769 ; pass quality+significance L/S 76,356/77,602 (rej: quality 85,472, level-sig 0)
+[EURUSD] entry rejections -- htf-stack 5,827, conviction<2.0x 4,236, min-stop 2,831
+[EURUSD] raw signals 3,391 -> after 1-per-7d cap 122 (whole file, pre-no_pos)
+  [EURUSD in-regime 2018-2025] resolving trades (no_pos-gated, section-28 run_one_window) ...
+    [EURUSD in-regime 2018-2025] 120 trades in window (2 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[EURUSD] loading EURUSD_M1_2013_2017_spot_dukascopy.csv ...
+[EURUSD] 1,837,284 bars, 2013-01-01 22:00:00+00:00 -> 2017-12-29 21:59:00+00:00
+[EURUSD] computing SELECTIVE v1 state machine (slow O(n) pass) ...
+[EURUSD] sweeps seen L/S 72,808/72,903 ; pass quality+significance L/S 43,745/43,119 (rej: quality 58,845, level-sig 2)
+[EURUSD] entry rejections -- htf-stack 3,512, conviction<2.0x 2,971, min-stop 2,200
+[EURUSD] raw signals 2,245 -> after 1-per-7d cap 75 (whole file, pre-no_pos)
+  [EURUSD out-of-regime 2013-2017 (full 5yr)] resolving trades (no_pos-gated, section-28 run_one_window) ...
+    [EURUSD out-of-regime 2013-2017 (full 5yr)] 74 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[SPX500] loading SPX500_M1_2017_2025_cfd_dukascopy.csv ...
+[SPX500] 2,712,351 bars, 2017-01-03 07:00:00+00:00 -> 2025-12-31 21:13:00+00:00
+[SPX500] computing SELECTIVE v1 state machine (slow O(n) pass) ...
+[SPX500] sweeps seen L/S 118,944/123,743 ; pass quality+significance L/S 42,743/59,666 (rej: quality 140,266, level-sig 12)
+[SPX500] entry rejections -- htf-stack 2,087, conviction<2.0x 8,252, min-stop 5,369
+[SPX500] raw signals 7,098 -> after 1-per-7d cap 277 (whole file, pre-no_pos)
+  [SPX500 in-regime 2018-2025] resolving trades (no_pos-gated, section-28 run_one_window) ...
+    [SPX500 in-regime 2018-2025] 230 trades in window (11 rejected for a fill-gap-eroded stop < 20 ticks)
+  [SPX500 out-of-regime 2017 (1yr, not a full regime test)] resolving trades (no_pos-gated, section-28 run_one_window) ...
+    [SPX500 out-of-regime 2017 (1yr, not a full regime test)] 36 trades in window (11 rejected for a fill-gap-eroded stop < 20 ticks)
+
+[BTCUSDT] loading BTCUSDT_M1_2017_2025_binance.csv ...
+[BTCUSDT] 4,725,367 bars, 2017-08-17 04:00:00+00:00 -> 2026-09-01 14:49:00+00:00
+[BTCUSDT] computing SELECTIVE v1 state machine (slow O(n) pass) ...
+[BTCUSDT] sweeps seen L/S 193,262/190,014 ; pass quality+significance L/S 19,415/23,566 (rej: quality 339,517, level-sig 778)
+[BTCUSDT] entry rejections -- htf-stack 1,789, conviction<2.0x 2,116, min-stop 706
+[BTCUSDT] raw signals 3,248 -> after 1-per-7d cap 138 (whole file, pre-no_pos)
+  [BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] resolving trades (no_pos-gated, section-28 run_one_window) ...
+    [BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 126 trades in window (1 rejected for a fill-gap-eroded stop < 20 ticks)
+
+##########################################################################################################################
+  HEADLINE -- COMPOUNDED $ RETURN ($100,000 start, 1% risk/trade) :  SELECTIVE v1  vs  section 28  vs  B&H
+##########################################################################################################################
+  cell                                                  SELECTIVE v1 $    sel %       sec28 $         B&H $ sel beat B&H?
+  ----------------------------------------------------------------------------------------------------------------------
+  XAUUSD in-regime 2018-2025                           $       50,790   -49.2% $        165 $    331,604            no
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test) $       95,941    -4.1% $     24,173 $    113,177            no
+  EURUSD in-regime 2018-2025                           $       77,196   -22.8% $      6,159 $     97,794            no
+  EURUSD out-of-regime 2013-2017 (full 5yr)            $      103,977    +4.0% $     18,603 $     90,954           YES
+  SPX500 in-regime 2018-2025                           $       83,296   -16.7% $         14 $    255,640            no
+  SPX500 out-of-regime 2017 (1yr, not a full regime test) $       88,636   -11.4% $     54,304 $    118,831            no
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring) $       14,307   -85.7% $          0 $    639,397            no
+
+##########################################################################################################################
+  TRADE COUNT REDUCTION -- how much did selectivity cut volume?  (in-window resolved trades)
+##########################################################################################################################
+  cell                                                   sec28 n  SELECTIVE n   reduction
+  XAUUSD in-regime 2018-2025                               2,196          149      -93.2%
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test)       355           29      -91.8%
+  EURUSD in-regime 2018-2025                               1,764          120      -93.2%
+  EURUSD out-of-regime 2013-2017 (full 5yr)                1,174           74      -93.7%
+  SPX500 in-regime 2018-2025                               3,469          230      -93.4%
+  SPX500 out-of-regime 2017 (1yr, not a full regime test)       311           36      -88.4%
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)     5,381          126      -97.7%
+  ----------------------------------------------------------------------------------------------------------------------
+  TOTAL (7 cells)                                         14,650          764      -94.8%
+
+##########################################################################################################################
+  ACCOUNT-RUIN DIAGNOSTIC (section-29 brief: does any cell still grind toward zero, and at what trade #?)
+##########################################################################################################################
+  Trade # at which equity first fell to <= 1% of the $100,000 start (None = never in this window):
+    XAUUSD in-regime 2018-2025                           never (did not reach 1% of start)
+    XAUUSD out-of-regime 2017 (1yr, not a full regime test) never (did not reach 1% of start)
+    EURUSD in-regime 2018-2025                           never (did not reach 1% of start)
+    EURUSD out-of-regime 2013-2017 (full 5yr)            never (did not reach 1% of start)
+    SPX500 in-regime 2018-2025                           never (did not reach 1% of start)
+    SPX500 out-of-regime 2017 (1yr, not a full regime test) never (did not reach 1% of start)
+    BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring) never (did not reach 1% of start)
+
+  Any cell still ruining under SELECTIVE v1: NO
+
+##########################################################################################################################
+  TRADE STATS
+##########################################################################################################################
+  cell                                                  trades   win%  grossPF   netPF  topYr
+  XAUUSD in-regime 2018-2025                               149    28%    0.784   0.520    n/a
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test)      29    41%    1.407   0.838    n/a
+  EURUSD in-regime 2018-2025                               120    32%    0.968   0.746    n/a
+  EURUSD out-of-regime 2013-2017 (full 5yr)                 74    41%    1.361   1.093   112%
+  SPX500 in-regime 2018-2025                               230    40%    1.350   0.909    n/a
+  SPX500 out-of-regime 2017 (1yr, not a full regime test)      36    36%    1.117   0.641    n/a
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)     126    23%    0.960   0.149    n/a
+
+##########################################################################################################################
+  PLAIN VERDICT PER INSTRUMENT (in-regime window; real dollars)
+##########################################################################################################################
+  XAUUSD: SELECTIVE v1 did NOT beat holding XAUUSD ($50,790 vs $331,604; section 28 was $165).
+  EURUSD: SELECTIVE v1 did NOT beat holding EURUSD ($77,196 vs $97,794; section 28 was $6,159).
+  SPX500: SELECTIVE v1 did NOT beat holding SPX500 ($83,296 vs $255,640; section 28 was $14).
+  BTCUSDT: SELECTIVE v1 did NOT beat holding BTCUSDT ($14,307 vs $639,397; section 28 was $0).
+
+==========================================================================================================================
+  SECONDARY -- STATISTICAL REFERENCE (Sharpe, DSR, guard, concentration). Not the headline.
+==========================================================================================================================
+  DSR reference pool: N=7 a priori cells, E[max SR] +2.969
+  cell                                                   Sharpe     DSR    maxDD   guard
+  XAUUSD in-regime 2018-2025                              -5.17   0.000    51.3%    PASS
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test)    -1.36   0.074     9.4%    PASS
+  EURUSD in-regime 2018-2025                              -2.23   0.000    30.5%    PASS
+  EURUSD out-of-regime 2013-2017 (full 5yr)               +0.68   0.106    13.1%    PASS
+  SPX500 in-regime 2018-2025                              -0.74   0.000    23.8%    PASS
+  SPX500 out-of-regime 2017 (1yr, not a full regime test)    -3.48   0.011    15.2%    PASS
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)   -13.81   0.000    86.2%    PASS
+
+  Look-ahead guard: PASS on every cell (spot-checked first 200 trades/cell: entry_mid == the NEXT bar's open after the signal bar).
+
+  Cells clearing net PF>1 AND Sharpe>0 AND beats-B&H AND not-year-concentrated: 0/7
+
+  NEW TRIALS: 7 (the section-28 cell set, re-run under SELECTIVE v1).
+  Cumulative project trials after this batch: 1105 (1098 prior + 7).
+  saved -> results/ict_smc_selective.csv, results/ict_smc_selective_trades.csv, results/ict_smc_selective_run.log
+==========================================================================================================================

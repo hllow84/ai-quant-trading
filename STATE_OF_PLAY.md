@@ -4997,3 +4997,113 @@ systematic, cost-inclusive, multi-asset, multi-regime test.
 
 **Cumulative trials: N=1098** (1091 prior + 7 — XAUUSD×2, EURUSD×2,
 SPX500×2, BTCUSDT×1).
+
+---
+
+## §29 — ICT SMC SELECTIVE v1: four discretionary filters on the §28 engine (2026-09-04)
+
+**Question:** §28 killed the audited ICT SMC model with a total-account
+collapse (3 of 7 cells ground to ≤1% of starting capital). Was that a
+strawman — firing on every valid signal — rather than what a disciplined
+discretionary ICT trader would actually take? Add four real, pre-registered
+quality/selectivity filters (each tied to a named gap in §28), apply all
+four together as ONE new variant, and re-run the identical 7 cells. Does
+real selectivity turn this into a merely-losing strategy, a breakeven one,
+or something that works?
+
+**Method:** `run_ict_smc_selective.py` imports the §28 engine wholesale —
+the per-bar state machine mechanics, the cost model, the
+`max(20 ticks, 5 bps of price)` min-stop floor and its fill-gap re-check,
+next-bar-open fills, the sequential `no_pos` gate, the $100k/1% compounding
+convention, the ruin diagnostic, the look-ahead guard. **Only signal
+acceptance is narrowed.** Every threshold below was stated in the script
+docstring before the run and not tuned afterward.
+
+1. **Sweep quality** — the swept level must sit within **10 bps** of the
+   extreme of the last **240 M1 bars** (4h; ≫ the 11-bar pivot window),
+   i.e. a real session extreme, not a shallow wick through a minor pivot.
+2. **Real HTF context** — on top of the daily-50-EMA bias, require a full
+   daily MA stack: `close` on the correct side of the **daily 200 EMA**
+   *and* `EMA50` on the correct side of `EMA200` (a daily golden/death-cross
+   regime, not one line).
+3. **Selectivity cap** — **max 1 entry per rolling 7 days per instrument**,
+   plus an absolute conviction floor: the displacement candle body must be
+   **≥ 2.0×** the 20-bar average (base model needs only 1.5×). A true ex-post
+   "largest displacement of the week" pick is not look-ahead-free, so the
+   causal proxy is: conviction floor removes the weak setups, the cap keeps
+   the first survivor.
+4. **Level significance** — the swept level must pass ≥1 of: within **15 bps**
+   of the prior calendar day's high/low; touched (±10 bps) on **≥3 distinct
+   prior bars** in the last **480 bars** (8h); or within **10 bps** of a
+   round number (step: XAUUSD 10 / EURUSD 0.0050 / SPX500 25 / BTCUSDT 1000).
+
+An ablation isolating which filter matters most is deliberately deferred to
+a follow-up (§29.x); this run tests the combined realistic version first.
+
+**Trade-count reduction — the headline mechanical effect:** −94.8% overall
+(14,650 §28 trades → 764). Per cell −88% to −98%. The dominant cut is the
+1-per-7-days cap (e.g. XAUUSD raw signals 2,712 → 149); sweep-quality
+rejects ~60-75% of sweeps before that; the HTF stack and conviction floor
+each reject a few thousand more; **level-significance rejects almost
+nothing** (0-778 across all cells) — a swing that already *is* the 4-hour
+extreme is nearly always near a prior-day level or round number, so filter 4
+is largely redundant given filter 1. Worth noting for the ablation.
+
+**Result — headline, $100,000 start, 1% risk/trade compounded, directly
+comparable to §28:**
+
+| Instrument (in-regime) | §28 end $ | SELECTIVE v1 end $ | B&H end $ | Beat B&H? |
+|---|---|---|---|---|
+| XAUUSD 2018-2025 | $165 (-99.8%) | **$50,790 (-49.2%)** | $331,604 | NO |
+| EURUSD 2018-2025 | $6,159 (-93.8%) | **$77,196 (-22.8%)** | $97,794 | NO |
+| SPX500 2018-2025 | $14 (-100.0%) | **$83,296 (-16.7%)** | $255,640 | NO |
+| BTCUSDT 2018-2025 | ~$0 (-100.0%) | **$14,307 (-85.7%)** | $639,397 | NO |
+
+Out-of-regime slices: XAUUSD 2017 $95,941 (-4.1%) vs B&H $113,177 — NO;
+SPX500 2017 $88,636 (-11.4%) vs B&H $118,831 — NO; EURUSD 2013-2017
+$103,977 (+4.0%) vs B&H $90,954 — **the lone "beat B&H" of 7 cells**, but
+B&H itself was down 9% that window, and +5.2R of the +4.7R total P&L comes
+from **2013 alone** (2015-16 negative; top-year concentration 112%, DSR
+0.106). Not a real win.
+
+**Account-ruin diagnostic — the one unambiguous improvement:** **ELIMINATED.**
+No cell reaches ≤1% of starting capital (§28: 3/7 ruined at trades
+#321-1,786). Trading ~20× less means even a net-PF-below-1 cell only
+compounds 120-230 times instead of thousands, so the multiplicative decay
+to zero never runs its course. Verdict on the §28 question "does any cell
+still grind toward zero": **no.**
+
+**But it is still a losing strategy, not breakeven and not working:**
+- **Net PF < 1 on 6 of 7 cells** (0.15-0.91; only EURUSD 2013-2017 at 1.09).
+  Real costs still exceed the thin gross edge.
+- **Gross PF got *worse* on some cells** — XAUUSD in-regime 1.03 → 0.78,
+  BTCUSDT 1.04 → 0.96, EURUSD in-regime 1.02 → 0.97. The four filters did
+  **not** isolate a higher-edge subset; on several instruments they selected
+  a *worse* one. The dollar improvement is almost entirely the mechanical
+  ruin-avoidance effect of trading 95% less, **not** recovered alpha.
+- **Sharpe still negative on 6/7** (SPX500 in-regime improves to -0.74 from
+  -2.74; BTCUSDT still catastrophic at -13.8).
+- **Per-year:** XAUUSD in-regime negative every one of 8 years; BTCUSDT
+  negative every year (worse 2023-25); SPX500 negative in 5 of 8.
+- **DSR ≤ 0.106 on every cell** (bar 0.95). **Survivors 0/7.**
+- Look-ahead guard PASS 7/7.
+
+**Verdict: KILL — but now a fair one.** Disciplined, selective, quality-
+filtered ICT trading is **not** account-destroying — §28's collapse to zero
+was substantially an artefact of over-trading a tiny negative edge with
+fixed-fractional sizing. Remove 95% of the trades and the account merely
+bleeds instead of imploding. But across 4 asset classes and 7 windows the
+selective version still loses money in 6/7 cells, still loses to buy-and-hold
+in 7/7, still has net PF < 1 in 6/7, and its dollar gains over §28 are
+mechanical (fewer compounding steps), not a found edge — the underlying
+entry logic's gross edge is at or below breakeven and did not improve under
+selection. A per-filter ablation (§29.x) could confirm which filter, if any,
+carries signal, but the combined realistic model does not clear any honesty
+gate.
+
+**Files:** `run_ict_smc_selective.py`. Results:
+`results/ict_smc_selective.csv`, `ict_smc_selective_trades.csv`,
+`ict_smc_selective_run.log`. Reproduce: `python run_ict_smc_selective.py`.
+
+**Cumulative trials: N=1105** (1098 prior + 7 — the §28 cell set re-run
+under SELECTIVE v1).
