@@ -5196,3 +5196,113 @@ appear. This closes the ICT SMC thread completely.
 
 **Cumulative trials: N=1133** (1105 prior + 28 — 4 individual filters × 7
 cells; baseline and ALL-FOUR are references, not new trials).
+
+---
+
+## §30 — On-chain signal test: BTC active-address surge (2026-09-04)
+
+**Question:** does on-chain flow data predict returns where price patterns
+and positioning data didn't — the first genuinely new information category
+tested since the crypto factor studies (§13/§15-18)?
+
+**STEP 1 — data honesty, live-tested this session, reported first per the
+brief.** The brief's leading candidates — exchange inflow/outflow, exchange
+reserves, whale/large-holder balance changes — are **not available from any
+free, no-signup API**, checked live:
+- **Glassnode**: free tier is dashboard-only; the Light API needs the
+  Advanced plan (~$49/mo), capped at 50 calls/day.
+- **CryptoQuant**: free tier "severely limited," no documented free API;
+  the Data API needs the Professional plan (~$99/mo) even for 24h
+  resolution — the cheapest paid tier does not include it.
+- **Coin Metrics Community API**: documented as free/no-key, but every
+  endpoint tried this session (`asset-metrics` with `AdrActCnt` alone,
+  `catalog-all/assets`) returned **HTTP 401 "requires authorization"** —
+  free access now needs a registered API key this autonomous session
+  cannot obtain (signup/email/captcha).
+- **Etherscan** (checked as an ETH active-address equivalent): returns
+  "Missing/Invalid API Key" with no key, on both API versions.
+- **blockchain.info Charts API**: the one source that worked — no key, no
+  auth, no rate limit hit, `n-unique-addresses` returned 6,417 daily rows,
+  **2009-01-03 → 2026-09-03**, full and unsampled.
+
+**Honest conclusion, stated before any backtest:** the metrics with the
+clearest "smart-money" trading narrative (exchange flow, whale balances)
+are paywalled everywhere free-tier-checked — the same thin-free-surface
+pattern already documented for PIT earnings data (§25). What gets tested
+is **BTC daily unique active addresses** — a network-activity / adoption
+metric, genuinely distinct from price/positioning/options, but **weaker
+and different from the exchange-flow signal the brief led with**, BTC-only
+(no free ETH source found), and that gap is reported before the result.
+
+**STEP 2 — strategy, pre-registered before running:** causal 90-day
+rolling z-score of daily active addresses (baseline excludes the current
+day); signal = z > **+1.5** (a large surge); **long-only** (mainstream
+on-chain reading: address-growth surges as adoption/demand, a priori, no
+short leg, no post-hoc direction flip); position modelled as entering at
+the signal day's UTC close (the moment the print is knowable — equivalent
+to next-day open to within an immaterial gap on a 24/7 market); held
+**H = 5 and H = 20 calendar days** (both tested); `no_pos` gate (one
+position at a time); real BTCUSDT spread + the project's own
+`CRYPTO_COST_BPS` (20 bps commission, 1.0 bps/side slippage) reused
+verbatim from `run_ict_smc.py`; $100,000 start, fully-invested-or-cash.
+
+**Result — headline, full 2018-2025 window:**
+
+| Hold | Trades | Net Sharpe | Net PF | maxDD | Top-year | Ending $ | vs B&H |
+|---|---|---|---|---|---|---|---|
+| H=5 | 150 | −0.30 | 0.953 | 68.8% | n/a | $55,629 (−44.4%) | loses |
+| H=20 | 72 | +0.65 | 1.110 | 65.6% | 70% | $220,762 (+120.8%) | loses |
+| **Buy-and-hold BTC** | — | — | — | — | — | **$576,995 (+477.0%)** | — |
+
+**Event-level (the honest positive finding):** mean signed drift entry→exit
+is **positive on both holds** (+0.50% H=5, +3.27% H=20), win rate **58%
+both** — a small but real gross directional edge, gross Sharpe +0.74 (H=5)
+and +0.86 (H=20). This is a genuinely different outcome from every prior
+positioning/ML test in this project (§18 contrarian reversal, §18.1 ML on
+positioning both found ≈0 edge) — the on-chain signal shows real
+information content.
+
+**Why it still loses:** H=5's small gross edge does not clear real crypto
+transaction costs (net PF 0.953, net Sharpe negative) — the same
+cost-vs-edge failure mode as §13/§11. H=20's net edge is real (PF 1.110,
+Sharpe +0.65) but the strategy is only invested **~45% of the days**
+(72 trades × 20 days ≈ 1,440 of 3,165), so it cannot capture BTC's own
++477% run — **the same terminal reason as §25 PEAD: a real edge that loses
+to simply owning the underlying's beta.** H=20 also fails the concentration
+gate (top year = 70-102% of total P&L across cells).
+
+**Regime sub-split** (2018-2021 bull-heavy vs 2022-2025 mixed — NOT a true
+out-of-regime test; no free pre-2018 real-spread BTCUSDT data exists,
+same constraint already stated for BTCUSDT in §28): H=5 is unstable
+(+0.48 Sharpe in 2018-21, **−1.46** in 2022-25); H=20 is the more robust
+cell, positive in BOTH sub-periods (+0.76, +0.52) — the one cell with any
+claim to robustness, though still losing to B&H in both.
+
+**DSR (reference only, not a gate, N=2 pool):** H=5 0.145, H=20 0.596 —
+neither clears 0.95. Look-ahead guard PASS on every cell (verified: entry
+never precedes the signal day's close; the z-score is NaN, and excluded,
+until 90 full trailing days of address history exist).
+
+**Verdict: KILL, but a genuinely informative one.** Unlike most prior
+non-price signals in this project, the on-chain active-address surge shows
+a **real, positive, non-zero gross edge** (58% win rate both holds,
+positive mean drift, gross Sharpe > 0) — on-chain data DOES carry some
+signal that price/positioning data didn't show. It still loses to
+buy-and-hold because (a) H=5's edge is too small to survive real costs and
+(b) H=20's edge is real but the strategy sits in cash too often to compete
+with a genuine bull market — the same terminal pattern as §25 PEAD, not
+the "edge ≈ 0" pattern of §18/§18.1. **The bigger caveat is STEP 1, not
+STEP 2**: this tests active addresses, not the exchange-flow / whale-
+balance metric the brief named as the leading hypothesis, because that
+data is not free anywhere checked. A genuine test of exchange flow would
+require a paid subscription (Glassnode Advanced ~$49/mo or CryptoQuant
+Professional ~$99/mo) — flagged as an open, costed next step, not run here.
+
+**Files:** `scripts/download_btc_active_addresses.py`,
+`run_onchain_signal.py`. Results: `results/onchain_signal.csv`,
+`onchain_signal_run.log`. Data:
+`data/BTC_active_addresses_blockchaininfo.csv` (free, re-downloadable, not
+gitignored — 6,417 rows, ~200 KB). Reproduce:
+`python scripts/download_btc_active_addresses.py && python run_onchain_signal.py`.
+
+**Cumulative trials: N=1135** (1133 prior + 2 — H=5, H=20).

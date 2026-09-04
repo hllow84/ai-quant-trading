@@ -1,0 +1,58 @@
+====================================================================================================================
+  ON-CHAIN SIGNAL TEST (section 30) -- BTC active-address surge, long-only, daily bars
+  STEP 1 (data honesty) is in the script docstring -- read it before trusting STEP 2's numbers.
+====================================================================================================================
+
+[data] active-address history: 2009-01-03 -> 2026-09-03 (6,417 days)
+[data] BTCUSDT real-spread daily price: 2018-01-01 -> 2026-08-31 (3,165 days)
+[signal] z-score computable on 3,165/3,165 price days (90-day trailing window needs history to fill first); 246 raw days with z > 1.5
+
+  Look-ahead guard: PASS on every cell (entry never precedes the signal day's close; z-score NaN -- and excluded -- until 90 full trailing days of address history exist).
+
+####################################################################################################################
+  HEADLINE -- full 2018-2025 window, $100,000 start, fully-invested-or-cash allocator
+####################################################################################################################
+  hold    trades  net Sharpe  gross Sharpe  net PF   maxDD  topYr         end $   total %
+  H=5        150       -0.30         +0.74   0.953   68.8%    n/a $     55,629    -44.4%
+  H=20        72       +0.65         +0.86   1.110   65.6%    70% $    220,762   +120.8%
+
+  Buy-and-hold BTC over the identical window: $576,995 (+477.0%), CAGR +22.4%
+
+####################################################################################################################
+  REGIME SUB-SPLIT -- 2018-2021 (bull-heavy) vs 2022-2025 (mixed, incl. 2022 bear)
+  NOT a true out-of-regime test: no free pre-2018 REAL-SPREAD BTCUSDT data exists (Binance starts
+  2017-08-17), the same constraint already stated for BTCUSDT in section 28. Best available substitute.
+####################################################################################################################
+  H=5    2018-2021    n= 80  net Sharpe  +0.48  net PF  1.079  maxDD  39.5%  topYr  162%  end $   109,500  vs B&H $   344,216
+  H=5    2022-2025    n= 70  net Sharpe  -1.46  net PF  0.783  maxDD  57.4%  topYr   n/a  end $    50,803  vs B&H $   163,609
+  H=20   2018-2021    n= 37  net Sharpe  +0.76  net PF  1.127  maxDD  65.6%  topYr  102%  end $   171,903  vs B&H $   344,216
+  H=20   2022-2025    n= 35  net Sharpe  +0.52  net PF  1.085  maxDD  55.1%  topYr  102%  end $   128,422  vs B&H $   163,609
+
+####################################################################################################################
+  EVENT-LEVEL STATS (full window) -- mean signed drift entry->exit, win rate
+####################################################################################################################
+  H=5    n=150  mean event drift  +0.50%  win rate  58.0%
+  H=20   n= 72  mean event drift  +3.27%  win rate  58.3%
+
+====================================================================================================================
+  SECONDARY -- DSR reference only (NOT a gate, per the brief)
+====================================================================================================================
+  DSR reference pool: N=2 a priori cells (H=5, H=20), E[max SR] +0.528
+  H=5    net Sharpe -0.30  DSR 0.145  (bar 0.95, reference only)
+  H=20   net Sharpe +0.65  DSR 0.596  (bar 0.95, reference only)
+
+####################################################################################################################
+  PLAIN VERDICT
+####################################################################################################################
+  DATA QUALITY: the metric under test is BTC active addresses, NOT exchange flow / whale balance
+  (those are paywalled everywhere free-tier-checked this session) -- read as a genuinely distinct
+  but WEAKER on-chain category than the brief's leading example. Stated first, per the brief.
+  H=5: net PF 0.953 (<=1), net Sharpe -0.30, loses to buy-and-hold ($55,629 vs $576,995) -- fails at least one gate.
+  H=20: net PF 1.110 (>1), net Sharpe +0.65, loses to buy-and-hold ($220,762 vs $576,995) -- fails at least one gate.
+
+  NO SURVIVORS among the 2 cells tested.
+
+  NEW TRIALS: 2 (H=5, H=20).
+  Cumulative project trials after this batch: 1135 (1133 prior + 2).
+  saved -> results/onchain_signal.csv, results/onchain_signal_run.log
+====================================================================================================================

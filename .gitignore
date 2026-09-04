@@ -20,6 +20,11 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 # data they rest on.
 !results/*.csv
 
+# ...and the free BTC on-chain active-address series (section 30): tiny
+# (~200 KB), free, no-key, one-command reproducible, and unlike the price
+# CSVs it is not derived from a licensed/paid data vendor.
+!data/BTC_active_addresses_blockchaininfo.csv
+
 # Live trading secrets and runtime state -- NEVER commit API keys or local state.
 .env
 live/.env
