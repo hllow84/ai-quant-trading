@@ -1,0 +1,73 @@
+====================================================================================================================
+  DOES THE ULTIMATE INVESTOR IV-RANK FILTER MAKE DELTA-10 SHORT OPTIONS MORE CONSISTENT?
+  Real causal VIX + SPY (same series as scripts/test_vol_risk_premium.py / run_vol_risk_premium.py).
+  This is a FILTER-LOGIC validation, NOT a full profitability verdict (that is sec 20, already KILLED).
+====================================================================================================================
+
+  Data: 1993-01-29 -> 2026-06-16  (8,402 trading days)
+  IV-rank warm-up: first eligible date for EITHER group = 1994-01-26 (needs 252 trading days of trailing VIX)
+  Filtered (top-tercile IV rank) days: 2,796 / 8,151 eligible days (34.3%)
+
+####################################################################################################################
+  *** TAIL RISK -- READ THIS FIRST *** (pooled put+call book per group, real subsequent SPY/VIX path)
+####################################################################################################################
+
+  FILTERED (IV rank top-tercile)
+    worst single day:   -69.5%  on 2020-03-16 00:00:00
+    worst single month: -91.0%  on 2008-10
+    worst single TRADE (return on premium collected): -4034%  (put worst -4034%, call worst -126%)
+    trades losing >100% of premium collected: 12/362
+    KILL ON TAIL RISK (bar: day<-30% or month<-50%): YES
+
+  UNFILTERED (control, no IV condition)
+    worst single day:   -74.9%  on 2008-10-15 00:00:00
+    worst single month: -93.3%  on 2008-10
+    worst single TRADE (return on premium collected): -12675%  (put worst -12675%, call worst -225%)
+    trades losing >100% of premium collected: 15/616
+    KILL ON TAIL RISK (bar: day<-30% or month<-50%): YES
+
+####################################################################################################################
+  CONSISTENCY -- win rate, variance of outcomes, standard risk metrics
+####################################################################################################################
+  group                                        n   win%  wrthls%  meanRet%  sdRet%  Sharpe     PF   maxDD   top%
+  FILTERED (IV rank top-tercile)             362    97%      96%    +69.3%  248.0%   +0.38   1.22   97.0%    23%
+                                             put: n= 181 win  94%   call: n= 181 win  99%
+  UNFILTERED (control, no IV condition)      616    97%      97%    +60.0%  535.4%   +0.53   1.25   98.0%    18%
+                                             put: n= 308 win  95%   call: n= 308 win  99%
+
+  DSR REFERENCE ONLY (2-cell pool, not a survival gate): E[max SR] +0.513 over N=2
+    FILTERED (IV rank top-tercile)           Sharpe +0.38 -> DSR 0.287 (n_obs=4760)
+    UNFILTERED (control, no IV condition)    Sharpe +0.53 -> DSR 0.545 (n_obs=8141)
+
+####################################################################################################################
+  PER-YEAR CONCENTRATION
+####################################################################################################################
+  FILTERED (IV rank top-tercile): top-year share of total log-return = 23%
+  UNFILTERED (control, no IV condition): top-year share of total log-return = 18%
+
+####################################################################################################################
+  LOOK-AHEAD GUARD
+####################################################################################################################
+  FILTERED-group entries re-derived from raw VIX (never trusting the precomputed series): 362 checked, using only data through each entry's PRIOR trading day (one full day of delay, same shift(1) convention as sec 20).
+  UNFILTERED-group entries: 616 (no IV condition to violate by construction).
+  PASS -- every FILTERED entry's eligibility independently re-verified from raw VIX using only information available strictly before that entry was opened.
+
+====================================================================================================================
+  VERDICT
+====================================================================================================================
+  win rate:      filtered 97%  vs  unfiltered 97%  -> filter does NOT improve win rate
+  outcome sd:    filtered 248.0%  vs  unfiltered 535.4%  -> filter REDUCES variance of outcomes
+  worst day:     filtered -69.5%  vs  unfiltered -74.9%
+  worst month:   filtered -91.0%  vs  unfiltered -93.3%  -> filter REDUCES tail risk on this specific metric
+  BOTH groups breach the sec-20 catastrophic single-day/-month bar. The IV filter does NOT remove the
+  underlying naked-short-option tail risk -- it can only change how OFTEN you are exposed to it.
+
+  PLAIN ANSWER: does the IV/VIX filter meaningfully improve consistency vs no filter? NO / MIXED
+  This is a filter-logic validation only -- it says nothing about whether either group is profitable
+  enough to trade once compared to buy-and-hold (that comparison is out of scope here; see sec 20 for
+  the full-strategy verdict on naked short vol, which was KILL regardless of any filter).
+
+  NEW TRIALS: 2 (filtered cell, unfiltered cell; each pools its put-book + call-book).
+  Cumulative project trials after this batch: 1087 (1085 prior + 2).
+  saved -> results/delta10_iv_filter.csv, results/delta10_iv_filter_trades.csv, results/delta10_iv_filter_run.log
+====================================================================================================================

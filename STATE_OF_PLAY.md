@@ -4771,3 +4771,69 @@ horizons × [long/short, long-only]. The raw-Surprise(%) variant and the
 2016 OOS / 2008-09 GFC sub-splits are diagnostics of those 12 cells, not
 separate configs. DSR was reference-only this batch per the standing
 instruction.)
+
+---
+
+## §26 — Delta-10 IV-rank filter validation (2026-09-04)
+
+**Question asked (narrower than a strategy pitch):** Ultimate Investor's
+live credit-spread scanner (`C:\Claude Code\Ultimate Investor\backend\app\
+services\options_scanner.py`) only surfaces delta-10 short legs, 30-45 DTE,
+and additionally reports IV Rank as a live filter cue. Sec 20 already
+KILLED naked short vol on tail risk regardless of any filter. This section
+asks a narrower, still-useful question: does entering delta-10 short
+options ONLY when IV rank is in its own top tercile ("the Ultimate Investor
+filter") make the OUTCOME more consistent than entering with no IV
+condition at all — separate from whether either is profitable enough to
+trade.
+
+**Method:** real causal VIX+SPY (same series as sec 20), Black-Scholes with
+real VIX as the wing's IV (flat-vol limitation stated, same class as §24),
+strike solved analytically for exact |delta|=0.10, 37 DTE (midpoint of
+Ultimate Investor's own 30-45 DTE window), marked to market DAILY using the
+REAL subsequent VIX/SPY path (not frozen at entry) so tail events reprice
+exactly as a real short seller would see them. Two books (put, call), one
+position at a time each. FILTERED group requires IV rank (252d causal
+rolling percentile) ≥ top tercile at entry, decided one day ahead
+(shift(1), sec-20 convention); UNFILTERED control shares the identical
+252-day history floor and differs ONLY in the IV condition.
+
+**Result:**
+
+| | FILTERED (IV top tercile) | UNFILTERED (control) |
+|---|---|---|
+| trades (put+call pooled) | 362 | 616 |
+| win rate | 96.7% | 97.2% |
+| % expired worthless | 96.4% | 97.1% |
+| std-dev of per-trade return-on-premium | 248.0% | 535.4% |
+| worst single day | **-69.5%** (2020-03-16) | **-74.9%** (2008-10-15) |
+| worst single month | **-91.0%** (2008-10) | **-93.3%** (2008-10) |
+| worst single trade (ret on premium) | -4034% | -12675% |
+| trades losing >100% of premium | 12/362 | 15/616 |
+| net Sharpe (ref, return-on-margin) | +0.38 | +0.53 |
+| DSR (reference only, 2-cell pool) | 0.287 | 0.545 |
+| kill on sec-20 catastrophic bar (day<-30%/month<-50%) | **YES** | **YES** |
+
+**Verdict on the filter itself:** the IV-rank filter roughly HALVES the
+variance of per-trade outcomes and trims the worst-day/-month magnitude by
+a modest amount (~5pp), but this is driven almost entirely by trading only
+~34% as often (2,796 of 8,151 eligible days) rather than by avoiding worse
+conditional outcomes — win rate and Sharpe are NOT improved. Critically,
+**both groups still breach the exact same catastrophic tail-risk bar sec 20
+already found**, on the same two real historical events (2008 GFC, 2020
+COVID) — the filter does not remove the naked-short-option tail, it only
+changes how often you are exposed to it. Plain answer: the filter does real
+but limited work on smoothness; it is not a tail-risk kill switch, and a
+trader relying on "IV is elevated" as a safety signal would still have been
+caught in both crashes on this data. This does not reopen sec 20 — that
+verdict (KILL on tail risk, regardless of headline Sharpe) stands as the
+authoritative call on the underlying strategy; this section only answers
+whether ITS live filter is doing real work, and the answer is "partially,
+on smoothness, not on the tail."
+
+**Files:** `research/delta10_iv_filter.py`. Results:
+`results/delta10_iv_filter.csv`, `delta10_iv_filter_trades.csv`,
+`delta10_iv_filter_run.log`. Reproduce: `python -m research.delta10_iv_filter`.
+
+**Cumulative trials: N=1087** (1085 prior + 2 — filtered cell, unfiltered
+cell, each pooling its put-book and call-book).
