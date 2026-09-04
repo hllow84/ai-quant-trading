@@ -1,0 +1,154 @@
+==========================================================================================================================
+  DEFINED-RISK CREDIT SPREAD (delta-10 short + protective long leg) -- follow-up to sec 26 (naked)
+  Same real causal VIX/SPY, same BS pricing, same IV-rank filter -- ONLY the added long leg is new.
+==========================================================================================================================
+
+  Data: 1993-01-29 -> 2026-06-16  (8,402 trading days)
+  B&H SPY over this window: total return +3004%, Sharpe +0.65, maxDD 55.2%
+
+##########################################################################################################################
+  WIDTH SANITY -- actual average $ width by decade (width = % of spot AT ENTRY, not a fixed $ figure)
+##########################################################################################################################
+  1pct: 1990s=$0.49  2000s=$0.81  2010s=$1.68  2020s=$4.63
+  2pct: 1990s=$0.99  2000s=$1.61  2010s=$3.35  2020s=$9.27
+
+##########################################################################################################################
+  REJECTED CANDIDATE SPREADS (net credit <= 0, or credit >= width -- same guard as Ultimate Investor's scanner)
+##########################################################################################################################
+  1pct width | FILTERED (IV rank top-tercile)             rejected     0  vs accepted   362
+  1pct width | UNFILTERED (control, no IV condition)      rejected     0  vs accepted   616
+  2pct width | FILTERED (IV rank top-tercile)             rejected     0  vs accepted   362
+  2pct width | UNFILTERED (control, no IV condition)      rejected     0  vs accepted   616
+
+##########################################################################################################################
+  *** MAX-LOSS CAP VERIFICATION -- read this first ***
+##########################################################################################################################
+
+  1pct width | FILTERED (IV rank top-tercile)
+    max loss EVER breached (assertion + explicit re-check): NO -- confirmed bounded on every trade
+    avg realized loss on losing trades: $-139.98   avg computed max_loss: $-164.66
+    % of losing trades that hit (within 1% of) their full max_loss: 75%
+    worst single day: -2.0% (return on the $100,000 reference account, 2% risked per new position)  on 2020-03-05 00:00:00
+    worst single month: -1.9%  on 2011-09
+    KILL ON TAIL RISK (bar: day<-30% or month<-50%): no -- bounded structure holds under the same bar sec 20/26 used
+
+  1pct width | UNFILTERED (control, no IV condition)
+    max loss EVER breached (assertion + explicit re-check): NO -- confirmed bounded on every trade
+    avg realized loss on losing trades: $-151.95   avg computed max_loss: $-181.92
+    % of losing trades that hit (within 1% of) their full max_loss: 59%
+    worst single day: -1.8% (return on the $100,000 reference account, 2% risked per new position)  on 2018-12-14 00:00:00
+    worst single month: -2.0%  on 2007-11
+    KILL ON TAIL RISK (bar: day<-30% or month<-50%): no -- bounded structure holds under the same bar sec 20/26 used
+
+  2pct width | FILTERED (IV rank top-tercile)
+    max loss EVER breached (assertion + explicit re-check): NO -- confirmed bounded on every trade
+    avg realized loss on losing trades: $-225.93   avg computed max_loss: $-331.93
+    % of losing trades that hit (within 1% of) their full max_loss: 42%
+    worst single day: -1.6% (return on the $100,000 reference account, 2% risked per new position)  on 2020-03-05 00:00:00
+    worst single month: -1.7%  on 2002-07
+    KILL ON TAIL RISK (bar: day<-30% or month<-50%): no -- bounded structure holds under the same bar sec 20/26 used
+
+  2pct width | UNFILTERED (control, no IV condition)
+    max loss EVER breached (assertion + explicit re-check): NO -- confirmed bounded on every trade
+    avg realized loss on losing trades: $-236.68   avg computed max_loss: $-367.16
+    % of losing trades that hit (within 1% of) their full max_loss: 41%
+    worst single day: -1.5% (return on the $100,000 reference account, 2% risked per new position)  on 2012-06-01 00:00:00
+    worst single month: -1.6%  on 2008-10
+    KILL ON TAIL RISK (bar: day<-30% or month<-50%): no -- bounded structure holds under the same bar sec 20/26 used
+
+##########################################################################################################################
+  2008 GFC + 2020 COVID -- explicit trade-level outcomes (were they bounded, known losses?)
+##########################################################################################################################
+
+  1pct | FILTERED (IV rank top-tercile)
+    2008 GFC (Aug-Dec): 4 trades, 1 losers, total P&L $-67, worst single trade P&L $-81 (max_loss was $-81 -- MATCHES cap, opt=put, entry 2008-09-10, exit 2008-10-17)
+    2020 COVID (mid-Jan-mid-May): 4 trades, 1 losers, total P&L $-218, worst single trade P&L $-274 (max_loss was $-274 -- MATCHES cap, opt=put, entry 2020-01-28, exit 2020-03-05)
+
+  1pct | UNFILTERED (control, no IV condition)
+    2008 GFC (Aug-Dec): 8 trades, 1 losers, total P&L $-40, worst single trade P&L $-80 (max_loss was $-80 -- MATCHES cap, opt=put, entry 2008-09-25, exit 2008-10-31)
+    2020 COVID (mid-Jan-mid-May): 6 trades, 1 losers, total P&L $-196, worst single trade P&L $-283 (max_loss was $-283 -- MATCHES cap, opt=put, entry 2020-02-13, exit 2020-03-20)
+
+  2pct | FILTERED (IV rank top-tercile)
+    2008 GFC (Aug-Dec): 4 trades, 1 losers, total P&L $-131, worst single trade P&L $-163 (max_loss was $-163 -- MATCHES cap, opt=put, entry 2008-09-10, exit 2008-10-17)
+    2020 COVID (mid-Jan-mid-May): 4 trades, 1 losers, total P&L $-316, worst single trade P&L $-434 (max_loss was $-553 -- inside cap, opt=put, entry 2020-01-28, exit 2020-03-05)
+
+  2pct | UNFILTERED (control, no IV condition)
+    2008 GFC (Aug-Dec): 8 trades, 1 losers, total P&L $-75, worst single trade P&L $-159 (max_loss was $-159 -- MATCHES cap, opt=put, entry 2008-09-25, exit 2008-10-31)
+    2020 COVID (mid-Jan-mid-May): 6 trades, 1 losers, total P&L $-401, worst single trade P&L $-573 (max_loss was $-573 -- MATCHES cap, opt=put, entry 2020-02-13, exit 2020-03-20)
+
+##########################################################################################################################
+  TRANSACTION COSTS -- both legs charged (confirm ~2x the cost EVENTS of sec 26's single leg)
+##########################################################################################################################
+  1pct width | FILTERED (IV rank top-tercile)             total cost $891  =  16% of GROSS (pre-cost) credit collected
+  1pct width | UNFILTERED (control, no IV condition)      total cost $1,311  =  14% of GROSS (pre-cost) credit collected
+  2pct width | FILTERED (IV rank top-tercile)             total cost $787  =  8% of GROSS (pre-cost) credit collected
+  2pct width | UNFILTERED (control, no IV condition)      total cost $1,147  =  7% of GROSS (pre-cost) credit collected
+
+##########################################################################################################################
+  CONSISTENCY -- win rate, avg win/loss, Sharpe, total return
+##########################################################################################################################
+  cell                                                        n   win%    avgWin    avgLoss  Sharpe     PF   maxDD    totRet   top%
+  1pct width | FILTERED (IV rank top-tercile)               362    97% $     13 $    -140   +0.57   1.22    3.7%      +38%     9%
+  1pct width | UNFILTERED (control, no IV condition)        616    97% $     13 $    -152   +1.04   1.30    6.5%      +94%     5%
+  2pct width | FILTERED (IV rank top-tercile)               362    97% $     25 $    -226   +0.65   1.26    3.7%      +41%     7%
+  2pct width | UNFILTERED (control, no IV condition)        616    97% $     24 $    -237   +1.15   1.35    5.1%      +92%     5%
+
+  DSR REFERENCE ONLY (4-cell pool, not a survival gate): E[max SR] +1.151 over N=4
+    1pct width | FILTERED (IV rank top-tercile)             Sharpe +0.57 -> DSR 0.007 (n_obs=4766)
+    1pct width | UNFILTERED (control, no IV condition)      Sharpe +1.04 -> DSR 0.272 (n_obs=8142)
+    2pct width | FILTERED (IV rank top-tercile)             Sharpe +0.65 -> DSR 0.016 (n_obs=4765)
+    2pct width | UNFILTERED (control, no IV condition)      Sharpe +1.15 -> DSR 0.490 (n_obs=8142)
+
+##########################################################################################################################
+  PER-YEAR CONCENTRATION
+##########################################################################################################################
+  1pct width | FILTERED (IV rank top-tercile): top-year share of total log-return = 9%
+  1pct width | UNFILTERED (control, no IV condition): top-year share of total log-return = 5%
+  2pct width | FILTERED (IV rank top-tercile): top-year share of total log-return = 7%
+  2pct width | UNFILTERED (control, no IV condition): top-year share of total log-return = 5%
+
+##########################################################################################################################
+  vs BUY-AND-HOLD SPY (same full window)
+##########################################################################################################################
+  B&H SPY: total return +3004%, Sharpe +0.65, maxDD 55.2%
+    1pct width | FILTERED (IV rank top-tercile)             total      +38% (loses to SPY)  Sharpe  +0.57 (loses to SPY)
+    1pct width | UNFILTERED (control, no IV condition)      total      +94% (loses to SPY)  Sharpe  +1.04 (BEATS SPY)
+    2pct width | FILTERED (IV rank top-tercile)             total      +41% (loses to SPY)  Sharpe  +0.65 (BEATS SPY)
+    2pct width | UNFILTERED (control, no IV condition)      total      +92% (loses to SPY)  Sharpe  +1.15 (BEATS SPY)
+
+##########################################################################################################################
+  LOOK-AHEAD GUARD (same independent re-derivation as sec 26)
+##########################################################################################################################
+  FILTERED-group entries re-derived from raw VIX: 724 checked.
+  UNFILTERED-group entries: 1232 (no IV condition to violate by construction).
+  PASS -- every FILTERED entry's eligibility independently re-verified from raw VIX using only information available strictly before that entry was opened.
+
+==========================================================================================================================
+  VERDICT
+==========================================================================================================================
+  cells: 4   beats SPY on total return: 0/4   beats SPY on Sharpe: 3/4
+  max-loss cap breached anywhere: NEVER (confirmed across all cells and trades, including 2008/2020)
+  catastrophic single-day/-month bar breached anywhere: NO -- the defined-risk structure never breaches the sec-20/26 bar
+
+  filter effect on the CAPPED structure: mean Sharpe filtered +0.61 vs unfiltered +1.09; mean total return filtered +40% vs unfiltered +93%
+  Consistent with sec 26: the IV-rank filter is not adding value here either -- UNFILTERED has the
+  higher Sharpe, higher DSR, and higher total return in every one of these 4 cells.
+
+  NOTE ON THE 0/4 TOTAL-RETURN RESULT: total return and Sharpe disagree (0/4 vs 3/4) because this study intentionally sizes each new position at a conservative 2% of capital -- the strategy runs at 6% max drawdown vs SPY's 55%, i.e. it is nowhere near fully risking the account SPY B&H risks. Sharpe is size-invariant and is therefore the fairer apples-to-apples comparison; raw total return at matched sizing is not, and is reported for completeness, not as the deciding number.
+
+  PLAIN ANSWER: is the capped credit-spread version a good, consistent, worthwhile return once the
+  reduced premium (from buying protection) is accounted for?
+  -> MIXED, NOT A CLEAN YES. 3/4 cells beat SPY on Sharpe and the tail risk is
+     genuinely bounded (confirmed above, including through 2008/2020) -- capping the loss did its job.
+     BUT: 0/4 cells beat SPY on raw total return at the stated conservative sizing, and the
+     BEST cell's DSR (reference only) is 0.490, well short of this project's own 0.95
+     significance bar for every cell -- so the Sharpe edge shown here is NOT distinguishable from
+     noise by this project's usual standard, even though it is nominally positive vs SPY.
+     Bottom line: the structure behaves exactly as designed (bounded, no catastrophe) but this
+     window does not provide statistically convincing evidence that it is worth trading over simply
+     holding SPY -- a plausible small edge, not a demonstrated one.
+
+  NEW TRIALS: 4 (2 widths x 2 groups, each pooling put-book + call-book).
+  Cumulative project trials after this batch: 1091 (1087 prior + 4).
+  saved -> results/credit_spread_iv_filter.csv, results/credit_spread_iv_filter_trades.csv, results/credit_spread_iv_filter_run.log
+==========================================================================================================================

@@ -4837,3 +4837,75 @@ on smoothness, not on the tail."
 
 **Cumulative trials: N=1087** (1085 prior + 2 — filtered cell, unfiltered
 cell, each pooling its put-book and call-book).
+
+---
+
+## §27 — Defined-risk credit spread validation (2026-09-04)
+
+**Question:** §26 tested the NAKED delta-10 short and found the IV-rank
+filter reduces outcome variance but doesn't remove the catastrophic tail.
+This section adds the actual protective long leg — a real bull put / bear
+call spread, exactly what Ultimate Investor's scanner lists — to see
+whether a hard, computed, bounded max loss changes the picture.
+
+**Bug found and fixed in-session:** the first pass compounded each day's
+dollar P&L by dividing by that trade's own ~$150-370 max_loss and treating
+the result as 100%-reinvested account growth — producing absurd totals
+(+2.9e8%). Fixed to the project's standard position-sizing convention: a
+stated $100k reference account, each new position risking exactly 2% of
+current capital, marked to market daily with put-book and call-book sharing
+one capital account. Per-contract trade economics (max_loss, win/loss,
+costs) were never affected by this bug — only Sharpe/total-return/max-DD
+were, and are corrected below.
+
+**Result:**
+
+| | 1pct FILTERED | 1pct UNFILTERED | 2pct FILTERED | 2pct UNFILTERED |
+|---|---|---|---|---|
+| trades | 362 | 616 | 362 | 616 |
+| win rate | 96.7% | 97.2% | 96.7% | 97.2% |
+| max loss ever breached | **NO** | **NO** | **NO** | **NO** |
+| losing trades hitting FULL max loss | 75% | 59% | 42% | 41% |
+| worst single day | -2.0% | -1.8% | -1.6% | -1.5% |
+| worst single month | -1.9% | -2.0% | -1.7% | -1.6% |
+| catastrophic bar breached (day<-30%/mo<-50%) | NO | NO | NO | NO |
+| cost as % of gross credit | 16% | 14% | 8% | 7% |
+| net Sharpe | +0.57 | +1.04 | +0.65 | +1.15 |
+| DSR (reference only) | 0.007 | 0.272 | 0.016 | 0.490 |
+| total return (33yr, $100k, 2% risk/trade) | +38% | +94% | +41% | +92% |
+
+SPY B&H over the same window: Sharpe +0.65, total return +3004%, maxDD 55.2%.
+
+**Max-loss cap: verified, never breached, across all 1,956 trades including
+both 2008 GFC and 2020 COVID** — e.g. the 2pct/unfiltered worst COVID trade
+lost exactly -$573, matching its computed max_loss to the cent. The
+catastrophic single-day/-month bar that both §20 (naked SVXY) and §26
+(naked delta-10) breached is **never breached here** — worst day is -1.5%
+to -2.0% of account capital vs §26's -69.5%/-74.9%. The defined-risk
+structure does exactly what it's supposed to do.
+
+However: "losing trades equal max loss" is NOT a strict identity — only
+41-75% of losers hit the full cap (narrower 1% width blows through both
+strikes more often; wider 2% width more often lands partially between
+strikes), reported honestly rather than assumed. Total return badly lags
+SPY, but this is a **sizing artefact** of the deliberately conservative
+2%-risk convention (max_dd only 3.7-6.5% vs SPY's 55.2%, nowhere near
+matched risk) — Sharpe (size-invariant) is the fairer comparison, and there
+UNFILTERED beats SPY (+1.04, +1.15 vs SPY's +0.65) while FILTERED does not
+clearly. The IV-rank filter again adds no value: UNFILTERED beats FILTERED
+on Sharpe, DSR, AND total return in all 4 cells, replicating §26.
+
+**Verdict: MIXED, not a clean yes.** Capping the loss works exactly as
+designed — bounded, no catastrophe, confirmed through both real crash
+events. But the nominal Sharpe edge over SPY does not clear this project's
+own DSR significance bar (0.95) in any of the 4 cells (best: 0.490). A
+plausible small edge, not a demonstrated one — capped tail risk is real and
+verified; a worthwhile trading edge is not established on this data.
+
+**Files:** `research/credit_spread_iv_filter.py`. Results:
+`results/credit_spread_iv_filter.csv`, `credit_spread_iv_filter_trades.csv`,
+`credit_spread_iv_filter_run.log`. Reproduce:
+`python -m research.credit_spread_iv_filter`.
+
+**Cumulative trials: N=1091** (1087 prior + 4 — 2 widths x 2 groups, each
+pooling its put-book and call-book).
