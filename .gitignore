@@ -30,3 +30,8 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 live/.env
 live/state/
 
+# Order-book capture output (section 30 follow-up infra) -- large, continuously
+# growing, and per-deployment; never the collected data itself, only the code
+# and docs that produce it. See docs/orderbook_capture_vps_deployment.md.
+data/orderbook_capture/
+

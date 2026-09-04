@@ -5306,3 +5306,65 @@ gitignored — 6,417 rows, ~200 KB). Reproduce:
 `python scripts/download_btc_active_addresses.py && python run_onchain_signal.py`.
 
 **Cumulative trials: N=1135** (1133 prior + 2 — H=5, H=20).
+
+---
+
+## §30 follow-up — order-book capture infrastructure (prep only, NOT a trial, 2026-09-04)
+
+Per the task brief, once §30 produced a genuine result this project moved
+straight to preparing the **next** genuinely new data category —
+order-book microstructure — rather than stopping. **Nothing is deployed
+and no data has been collected.** This is infrastructure only, built and
+smoke-tested so it is ready the moment always-on hosting exists.
+
+**Why capture-forward, not backtest:** no free (or, as far as checked, paid)
+vendor sells historical L2 order-book data for crypto at a price this
+project would pay. The only way to ever get it is to capture it forward
+from today on an always-on host — a laptop/session-based environment can't
+do this (this project's own standing rule: background processes die when
+the terminal session ends).
+
+**Pre-registered metric definitions (stated now, before any book history
+exists, so a future backtest cannot tune them after seeing a result):**
+1. **Depth-N order book imbalance**, N=10 and N=20:
+   `OBI_N = (Σbid_qty[1..N] − Σask_qty[1..N]) / (Σbid_qty[1..N] + Σask_qty[1..N])`.
+2. **Notional-band OBI**: same formula, using cumulative qty within ±25 bps
+   of mid (robust to tick-size/level-count gaming).
+3. **Trade-flow imbalance (TFI)**: aggressor-side buy/sell volume imbalance
+   over a trailing 60-second window (Binance `aggTrade`'s `m` flag).
+4. **Storage**: raw depth snapshots (~100ms cadence) and trade prints kept
+   verbatim (gzip JSONL, day-rotated); aggregated to **1-second** feature
+   bars for actual future backtest use — chosen because it can be honestly
+   rolled up further to this project's existing minimum tested bar (M1)
+   without look-ahead, without claiming sub-100ms execution realism.
+5. **Hypothesised direction** (long bias when OBI/TFI > 0, short when < 0 —
+   standard microstructure reading, e.g. Cont/Kukanov/Stoikov 2014):
+   pre-registered; no entry threshold is fixed yet — that requires the
+   first real batch's empirical distribution, decided BEFORE any P&L look
+   on a second, later batch (an explicit time-split, not a tuned threshold).
+
+**Capture script:** `scripts/orderbook_capture.py` — asyncio websocket
+client on Binance's free, no-API-key public streams (`depth20@100ms` +
+`aggTrade`), auto-reconnect with backoff, day-rotated gzip raw storage +
+1-second feature CSV. **Smoke-tested live this session** (not merely
+written): connected to the real Binance stream, ~2,200 msg/min for
+BTCUSDT, produced correct feature rows (OBI/TFI in the expected [-1,1]
+range) and correctly-formatted raw JSONL. **One real bug found and fixed
+during the smoke test**: a hard-killed process (simulating power loss /
+OOM-kill on a VPS) left the day's gzip raw file with a truncated final
+member (`EOFError` on read) — fixed by rotating the raw gzip file into a
+new, independently-decompressible member roughly every 60 seconds
+(`Writer.rotate_raw`), verified on a second hard-kill test: the file then
+read back cleanly (4,014 lines, no error) despite the same hard kill.
+
+**Deployment:** `docs/orderbook_capture_vps_deployment.md` — full walkthrough
+for a $5/month VPS (DigitalOcean/Vultr/Linode/Hetzner, smallest Ubuntu
+tier): provisioning, firewall, systemd service (auto-restart, graceful
+SIGTERM shutdown), disk-budget projection (~500-750 MB/month for two
+symbols, well inside a $5 tier's disk), an offload/rotation plan for when
+that budget is actually observed, and an explicit "what not to do" section
+(no trading credentials on this box — public market data only; always stop
+it gracefully; don't backtest on partial data).
+
+**Status: ready to deploy, not deployed.** No cumulative-trial count change
+— this is infrastructure, not a backtest.
