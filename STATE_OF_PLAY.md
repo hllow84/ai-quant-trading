@@ -5107,3 +5107,92 @@ gate.
 
 **Cumulative trials: N=1105** (1098 prior + 7 — the §28 cell set re-run
 under SELECTIVE v1).
+
+---
+
+## §29.x — ICT SMC filter ablation: which of the four §29 filters carries signal alone? (2026-09-04)
+
+**Question:** §29 deferred the ablation. Test each of the four filters
+**individually** on top of the unfiltered §28 engine (not combined), and ask
+whether any single one improves the **raw before-cost gross profit factor** —
+the number that matters, since §29 found gross PF got *worse* on several
+cells when all four were combined.
+
+**Method:** `run_ict_smc_ablation.py` — the §29 stateful loop re-parameterised
+with four on/off flags. Every gate expression is byte-identical to
+`run_ict_smc_selective`; only `if <flag>` wrappers are added. **With all four
+flags off the loop reproduces `run_ict_smc.run_state_machine` exactly —
+asserted at run time: baseline trade count and gross PF match
+`results/ict_smc.csv` on all 7 cells to 4 dp.** 6 variants (baseline, F1, F2,
+F3, F4, ALL-FOUR) × the same 7 cells. Look-ahead guard PASS 42/42.
+
+| Filter | What it gates |
+|---|---|
+| F1 sweep quality | swept level within 10 bps of the last 240-bar (4h) extreme |
+| F2 HTF context | daily 50 EMA bias **plus** daily 200 EMA stack alignment |
+| F3 selectivity cap | 1 entry / rolling 7 days **plus** 2.0× displacement conviction floor |
+| F4 level significance | swept level near prior-day H/L, ≥3 touches, or round number |
+
+**Result — mean gross PF across the 4 in-regime instrument cells
+(XAUUSD/EURUSD/SPX500 2018-25 + BTCUSDT 2018-25), baseline = 1.0252:**
+
+| Variant | mean gross PF | Δ vs baseline | # instruments gross PF > baseline | mean net PF | mean Sharpe | # beat B&H |
+|---|---|---|---|---|---|---|
+| **F1 sweep-quality only** | 1.0312 | **+0.0060** | **2 / 4** | 0.578 | −5.20 | 0/4 |
+| F4 level-significance only | 1.0256 | +0.0004 | 1 / 4 | 0.590 | −4.95 | 0/4 |
+| *baseline (§28)* | 1.0252 | — | 0 / 4 | 0.590 | −4.95 | 0/4 |
+| F2 HTF-context only | 1.0231 | −0.0021 | 1 / 4 | 0.592 | −4.86 | 0/4 |
+| ALL FOUR (§29) | 1.0153 | −0.0099 | 1 / 4 | 0.581 | −5.49 | 0/4 |
+| F3 selectivity-cap only | 0.9631 | −0.0621 | 1 / 4 | 0.525 | −5.93 | 0/4 |
+
+Per-instrument gross PF (in-regime):
+
+| | baseline | F1 | F2 | F3 | F4 | ALL4 |
+|---|---|---|---|---|---|---|
+| XAUUSD | 1.031 | **0.984** | 1.022 | 0.920 | 1.031 | 0.784 |
+| EURUSD | 1.020 | 1.016 | 1.010 | 0.908 | 1.020 | 0.968 |
+| SPX500 | 1.013 | 1.036 | 1.028 | 0.960 | 1.013 | 1.350 |
+| BTCUSDT | 1.037 | 1.088 | 1.033 | 1.064 | 1.038 | 0.960 |
+
+**Does any single filter improve the raw before-cost edge? No.**
+
+- **F1 (sweep quality)** has the only positive mean Δ, but it is **+0.006 gross
+  PF** — trivially small — and it is **inconsistent**: it lifts SPX500 (+0.023)
+  and BTCUSDT (+0.051) while *hurting* XAUUSD (−0.047) and EURUSD (−0.004).
+  A +0.006 mean produced by 2 of 4 instruments after halving the sample is
+  noise from a smaller draw, not a recovered edge.
+- **F4 (level significance)** is effectively a **no-op applied alone** —
+  identical gross PF to baseline on 3 of 4 instruments (rejects 24 of 12,810
+  signals total). It only does work in §29 because F1 first restricts the
+  candidate set. On its own it carries nothing.
+- **F2 (HTF context)** makes the mean gross edge slightly *worse* (−0.002).
+- **F3 (selectivity cap)** makes it substantially *worse* (−0.062 gross PF) —
+  the 1-per-7-days + conviction floor keeps a subset with a *lower* raw
+  win/loss ratio, not a higher one.
+- **Net PF stays below 1 and mean Sharpe stays −4.9 to −5.9 for every
+  variant.** Zero cells beat buy-and-hold under any single filter.
+
+**Ruin diagnostic across variants:** F1, F2 and F4 applied alone do **not**
+prevent the account-ruin seen in §28 — XAUUSD, SPX500 and BTCUSDT in-regime
+still grind to ≤1% of start (trades #361-1,678). Only F3 (and ALL-FOUR)
+avoid ruin, and purely by cutting trade volume ~15-40× — the same mechanical
+effect §29 identified, attributable entirely to the weekly cap, not to any
+edge in the other three filters.
+
+**Verdict — the complete, honest answer:** **No single filter carries a real
+isolated edge, and neither does the combination.** The one filter with a
+positive mean gross-PF delta (F1, +0.006) is within noise and inconsistent
+across instruments; two of the four make the raw edge measurably worse; one
+is a no-op alone. The ICT SMC entry logic itself has no before-cost edge
+that any of these four quality/selectivity filters — individually or
+together — can recover. §29's dollar improvement over §28 was mechanical
+(fewer compounding steps from the weekly cap), confirmed here from the other
+direction: strip the filters back to one at a time and the raw edge does not
+appear. This closes the ICT SMC thread completely.
+
+**Files:** `run_ict_smc_ablation.py`. Results:
+`results/ict_smc_ablation.csv`, `ict_smc_ablation_run.log`. Reproduce:
+`python run_ict_smc_ablation.py`.
+
+**Cumulative trials: N=1133** (1105 prior + 28 — 4 individual filters × 7
+cells; baseline and ALL-FOUR are references, not new trials).

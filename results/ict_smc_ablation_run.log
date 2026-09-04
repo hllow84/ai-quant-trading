@@ -1,0 +1,247 @@
+================================================================================================================================
+  ICT SMC -- SECTION 29.x FILTER ABLATION: each of the 4 section-29 filters applied ALONE on the sec-28 engine
+  Headline column = GROSS PF (before costs). Section 29 found gross PF got WORSE when all four were combined.
+================================================================================================================================
+
+################################################################################################################################
+  VARIANT: baseline (sec 28, unfiltered)   (q=False htf=False conv=False lvl=False cap=False)
+################################################################################################################################
+[XAUUSD] loading XAUUSD_M1_2018_2025_spot_dukascopy.csv ...
+[XAUUSD] 1,827,147 bars, 2018-01-01 23:00:00+00:00 -> 2025-12-31 21:58:00+00:00
+[XAUUSD/baseline] raw signals 15,773  (rej: quality 0, level-sig 0, htf 0, conviction 0)
+    [baseline:XAUUSD in-regime 2018-2025] 2196 trades in window (21 rejected for a fill-gap-eroded stop < 20 ticks)
+[XAUUSD] loading XAUUSD_M1_2017_spot_dukascopy.csv ...
+[XAUUSD] 323,514 bars, 2017-01-02 23:00:00+00:00 -> 2017-12-29 21:58:00+00:00
+[XAUUSD/baseline] raw signals 2,413  (rej: quality 0, level-sig 0, htf 0, conviction 0)
+    [baseline:XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 355 trades in window (4 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD] loading EURUSD_M1_2018_2025_spot_dukascopy.csv ...
+[EURUSD] 2,922,985 bars, 2018-01-01 22:00:00+00:00 -> 2025-12-30 23:59:00+00:00
+[EURUSD/baseline] raw signals 14,559  (rej: quality 0, level-sig 0, htf 0, conviction 0)
+    [baseline:EURUSD in-regime 2018-2025] 1764 trades in window (20 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD] loading EURUSD_M1_2013_2017_spot_dukascopy.csv ...
+[EURUSD] 1,837,284 bars, 2013-01-01 22:00:00+00:00 -> 2017-12-29 21:59:00+00:00
+[EURUSD/baseline] raw signals 11,037  (rej: quality 0, level-sig 0, htf 0, conviction 0)
+    [baseline:EURUSD out-of-regime 2013-2017 (full 5yr)] 1174 trades in window (7 rejected for a fill-gap-eroded stop < 20 ticks)
+[SPX500] loading SPX500_M1_2017_2025_cfd_dukascopy.csv ...
+[SPX500] 2,712,351 bars, 2017-01-03 07:00:00+00:00 -> 2025-12-31 21:13:00+00:00
+[SPX500/baseline] raw signals 28,618  (rej: quality 0, level-sig 0, htf 0, conviction 0)
+    [baseline:SPX500 in-regime 2018-2025] 3469 trades in window (151 rejected for a fill-gap-eroded stop < 20 ticks)
+    [baseline:SPX500 out-of-regime 2017 (1yr, not a full regime test)] 311 trades in window (151 rejected for a fill-gap-eroded stop < 20 ticks)
+[BTCUSDT] loading BTCUSDT_M1_2017_2025_binance.csv ...
+[BTCUSDT] 4,725,367 bars, 2017-08-17 04:00:00+00:00 -> 2026-09-01 14:49:00+00:00
+[BTCUSDT/baseline] raw signals 44,644  (rej: quality 0, level-sig 0, htf 0, conviction 0)
+    [baseline:BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 5381 trades in window (65 rejected for a fill-gap-eroded stop < 20 ticks)
+
+################################################################################################################################
+  VARIANT: F1 sweep-quality ONLY   (q=True htf=False conv=False lvl=False cap=False)
+################################################################################################################################
+[XAUUSD/F1] raw signals 5,697  (rej: quality 99,712, level-sig 0, htf 0, conviction 0)
+    [F1:XAUUSD in-regime 2018-2025] 913 trades in window (10 rejected for a fill-gap-eroded stop < 20 ticks)
+[XAUUSD/F1] raw signals 1,030  (rej: quality 16,551, level-sig 0, htf 0, conviction 0)
+    [F1:XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 171 trades in window (2 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F1] raw signals 8,330  (rej: quality 85,472, level-sig 0, htf 0, conviction 0)
+    [F1:EURUSD in-regime 2018-2025] 1240 trades in window (14 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F1] raw signals 5,908  (rej: quality 58,845, level-sig 0, htf 0, conviction 0)
+    [F1:EURUSD out-of-regime 2013-2017 (full 5yr)] 805 trades in window (5 rejected for a fill-gap-eroded stop < 20 ticks)
+[SPX500/F1] raw signals 13,044  (rej: quality 140,266, level-sig 0, htf 0, conviction 0)
+    [F1:SPX500 in-regime 2018-2025] 1807 trades in window (99 rejected for a fill-gap-eroded stop < 20 ticks)
+    [F1:SPX500 out-of-regime 2017 (1yr, not a full regime test)] 205 trades in window (99 rejected for a fill-gap-eroded stop < 20 ticks)
+[BTCUSDT/F1] raw signals 6,650  (rej: quality 339,517, level-sig 0, htf 0, conviction 0)
+    [F1:BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 921 trades in window (2 rejected for a fill-gap-eroded stop < 20 ticks)
+
+################################################################################################################################
+  VARIANT: F2 HTF-context ONLY   (q=False htf=True conv=False lvl=False cap=False)
+################################################################################################################################
+[XAUUSD/F2] raw signals 13,354  (rej: quality 0, level-sig 0, htf 3,897, conviction 0)
+    [F2:XAUUSD in-regime 2018-2025] 1867 trades in window (16 rejected for a fill-gap-eroded stop < 20 ticks)
+[XAUUSD/F2] raw signals 2,387  (rej: quality 0, level-sig 0, htf 202, conviction 0)
+    [F2:XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 347 trades in window (4 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F2] raw signals 9,693  (rej: quality 0, level-sig 0, htf 9,612, conviction 0)
+    [F2:EURUSD in-regime 2018-2025] 1195 trades in window (16 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F2] raw signals 6,141  (rej: quality 0, level-sig 0, htf 7,318, conviction 0)
+    [F2:EURUSD out-of-regime 2013-2017 (full 5yr)] 694 trades in window (3 rejected for a fill-gap-eroded stop < 20 ticks)
+[SPX500/F2] raw signals 24,665  (rej: quality 0, level-sig 0, htf 5,618, conviction 0)
+    [F2:SPX500 in-regime 2018-2025] 2868 trades in window (132 rejected for a fill-gap-eroded stop < 20 ticks)
+    [F2:SPX500 out-of-regime 2017 (1yr, not a full regime test)] 312 trades in window (132 rejected for a fill-gap-eroded stop < 20 ticks)
+[BTCUSDT/F2] raw signals 34,637  (rej: quality 0, level-sig 0, htf 11,978, conviction 0)
+    [F2:BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 4266 trades in window (40 rejected for a fill-gap-eroded stop < 20 ticks)
+
+################################################################################################################################
+  VARIANT: F3 selectivity-cap ONLY   (q=False htf=False conv=True lvl=False cap=True)
+################################################################################################################################
+[XAUUSD/F3] raw 9,466 -> after 1-per-7d cap 248  (rej: quality 0, level-sig 0, htf 0, conviction 9,362)
+    [F3:XAUUSD in-regime 2018-2025] 247 trades in window (1 rejected for a fill-gap-eroded stop < 20 ticks)
+[XAUUSD/F3] raw 1,461 -> after 1-per-7d cap 35  (rej: quality 0, level-sig 0, htf 0, conviction 1,719)
+    [F3:XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 35 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F3] raw 9,075 -> after 1-per-7d cap 227  (rej: quality 0, level-sig 0, htf 0, conviction 11,206)
+    [F3:EURUSD in-regime 2018-2025] 224 trades in window (3 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F3] raw 6,799 -> after 1-per-7d cap 148  (rej: quality 0, level-sig 0, htf 0, conviction 8,148)
+    [F3:EURUSD out-of-regime 2013-2017 (full 5yr)] 140 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+[SPX500/F3] raw 17,726 -> after 1-per-7d cap 380  (rej: quality 0, level-sig 0, htf 0, conviction 19,551)
+    [F3:SPX500 in-regime 2018-2025] 319 trades in window (14 rejected for a fill-gap-eroded stop < 20 ticks)
+    [F3:SPX500 out-of-regime 2017 (1yr, not a full regime test)] 44 trades in window (14 rejected for a fill-gap-eroded stop < 20 ticks)
+[BTCUSDT/F3] raw 28,396 -> after 1-per-7d cap 365  (rej: quality 0, level-sig 0, htf 0, conviction 18,974)
+    [F3:BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 314 trades in window (10 rejected for a fill-gap-eroded stop < 20 ticks)
+
+################################################################################################################################
+  VARIANT: F4 level-significance ONLY   (q=False htf=False conv=False lvl=True cap=False)
+################################################################################################################################
+[XAUUSD/F4] raw signals 15,773  (rej: quality 0, level-sig 9, htf 0, conviction 0)
+    [F4:XAUUSD in-regime 2018-2025] 2196 trades in window (21 rejected for a fill-gap-eroded stop < 20 ticks)
+[XAUUSD/F4] raw signals 2,413  (rej: quality 0, level-sig 1, htf 0, conviction 0)
+    [F4:XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 355 trades in window (4 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F4] raw signals 14,559  (rej: quality 0, level-sig 0, htf 0, conviction 0)
+    [F4:EURUSD in-regime 2018-2025] 1764 trades in window (20 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/F4] raw signals 11,037  (rej: quality 0, level-sig 2, htf 0, conviction 0)
+    [F4:EURUSD out-of-regime 2013-2017 (full 5yr)] 1174 trades in window (7 rejected for a fill-gap-eroded stop < 20 ticks)
+[SPX500/F4] raw signals 28,618  (rej: quality 0, level-sig 23, htf 0, conviction 0)
+    [F4:SPX500 in-regime 2018-2025] 3469 trades in window (151 rejected for a fill-gap-eroded stop < 20 ticks)
+    [F4:SPX500 out-of-regime 2017 (1yr, not a full regime test)] 311 trades in window (151 rejected for a fill-gap-eroded stop < 20 ticks)
+[BTCUSDT/F4] raw signals 44,364  (rej: quality 0, level-sig 2,639, htf 0, conviction 0)
+    [F4:BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 5357 trades in window (65 rejected for a fill-gap-eroded stop < 20 ticks)
+
+################################################################################################################################
+  VARIANT: ALL FOUR (sec 29, reference)   (q=True htf=True conv=True lvl=True cap=True)
+################################################################################################################################
+[XAUUSD/ALL4] raw 2,712 -> after 1-per-7d cap 149  (rej: quality 99,712, level-sig 7, htf 1,750, conviction 2,827)
+    [ALL4:XAUUSD in-regime 2018-2025] 149 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+[XAUUSD/ALL4] raw 693 -> after 1-per-7d cap 29  (rej: quality 16,551, level-sig 1, htf 93, conviction 532)
+    [ALL4:XAUUSD out-of-regime 2017 (1yr, not a full regime test)] 29 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/ALL4] raw 3,391 -> after 1-per-7d cap 122  (rej: quality 85,472, level-sig 0, htf 5,827, conviction 4,236)
+    [ALL4:EURUSD in-regime 2018-2025] 120 trades in window (2 rejected for a fill-gap-eroded stop < 20 ticks)
+[EURUSD/ALL4] raw 2,245 -> after 1-per-7d cap 75  (rej: quality 58,845, level-sig 2, htf 3,512, conviction 2,971)
+    [ALL4:EURUSD out-of-regime 2013-2017 (full 5yr)] 74 trades in window (0 rejected for a fill-gap-eroded stop < 20 ticks)
+[SPX500/ALL4] raw 7,098 -> after 1-per-7d cap 277  (rej: quality 140,266, level-sig 12, htf 2,087, conviction 8,252)
+    [ALL4:SPX500 in-regime 2018-2025] 230 trades in window (11 rejected for a fill-gap-eroded stop < 20 ticks)
+    [ALL4:SPX500 out-of-regime 2017 (1yr, not a full regime test)] 36 trades in window (11 rejected for a fill-gap-eroded stop < 20 ticks)
+[BTCUSDT/ALL4] raw 3,248 -> after 1-per-7d cap 138  (rej: quality 339,517, level-sig 778, htf 1,789, conviction 2,116)
+    [ALL4:BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)] 126 trades in window (1 rejected for a fill-gap-eroded stop < 20 ticks)
+
+================================================================================================================================
+  BASELINE REPRODUCTION CHECK -- all-flags-off must equal section 28 (results/ict_smc.csv) exactly
+================================================================================================================================
+  cell                                                      n (this)  n (sec28)  grossPF (this)  grossPF (sec28)   match
+  XAUUSD in-regime 2018-2025                                   2,196      2,196          1.0314           1.0314      OK
+  XAUUSD out-of-regime 2017 (1yr, not a full regime test)        355        355          0.9919           0.9919      OK
+  EURUSD in-regime 2018-2025                                   1,764      1,764          1.0199           1.0199      OK
+  EURUSD out-of-regime 2013-2017 (full 5yr)                    1,174      1,174          1.0160           1.0160      OK
+  SPX500 in-regime 2018-2025                                   3,469      3,469          1.0128           1.0128      OK
+  SPX500 out-of-regime 2017 (1yr, not a full regime test)        311        311          1.3654           1.3654      OK
+  BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)     5,381      5,381          1.0366           1.0366      OK
+
+  Baseline reproduces section 28 exactly on every cell: YES
+
+################################################################################################################################
+  FULL GRID -- gross PF / net PF / Sharpe / trades / ending$ vs B&H, per variant per cell
+################################################################################################################################
+
+  --- XAUUSD in-regime 2018-2025 ---
+    variant                           trades  grossPF   netPF   Sharpe         end $         B&H $  beat B&H
+    baseline (sec 28, unfiltered)      2,196    1.031   0.674    -3.09 $        165 $    331,604        no
+    F1 sweep-quality ONLY                913    0.984   0.639    -3.53 $      5,028 $    331,604        no
+    F2 HTF-context ONLY                1,867    1.022   0.676    -3.06 $        453 $    331,604        no
+    F3 selectivity-cap ONLY              247    0.920   0.586    -4.21 $     38,452 $    331,604        no
+    F4 level-significance ONLY         2,196    1.031   0.674    -3.09 $        165 $    331,604        no
+    ALL FOUR (sec 29, reference)         149    0.784   0.520    -5.17 $     50,790 $    331,604        no
+
+  --- XAUUSD out-of-regime 2017 (1yr, not a full regime test) ---
+    variant                           trades  grossPF   netPF   Sharpe         end $         B&H $  beat B&H
+    baseline (sec 28, unfiltered)        355    0.992   0.582    -4.29 $     24,173 $    113,177        no
+    F1 sweep-quality ONLY                171    0.914   0.529    -5.07 $     45,156 $    113,177        no
+    F2 HTF-context ONLY                  347    0.987   0.580    -4.32 $     24,744 $    113,177        no
+    F3 selectivity-cap ONLY               35    1.317   0.811    -1.63 $     94,309 $    113,177        no
+    F4 level-significance ONLY           355    0.992   0.582    -4.29 $     24,173 $    113,177        no
+    ALL FOUR (sec 29, reference)          29    1.407   0.838    -1.36 $     95,941 $    113,177        no
+
+  --- EURUSD in-regime 2018-2025 ---
+    variant                           trades  grossPF   netPF   Sharpe         end $         B&H $  beat B&H
+    baseline (sec 28, unfiltered)      1,764    1.020   0.808    -1.64 $      6,159 $     97,794        no
+    F1 sweep-quality ONLY              1,240    1.016   0.809    -1.63 $     14,299 $     97,794        no
+    F2 HTF-context ONLY                1,195    1.010   0.798    -1.74 $     13,679 $     97,794        no
+    F3 selectivity-cap ONLY              224    0.908   0.726    -2.47 $     59,913 $     97,794        no
+    F4 level-significance ONLY         1,764    1.020   0.808    -1.64 $      6,159 $     97,794        no
+    ALL FOUR (sec 29, reference)         120    0.968   0.746    -2.23 $     77,196 $     97,794        no
+
+  --- EURUSD out-of-regime 2013-2017 (full 5yr) ---
+    variant                           trades  grossPF   netPF   Sharpe         end $         B&H $  beat B&H
+    baseline (sec 28, unfiltered)      1,174    1.016   0.825    -1.49 $     18,603 $     90,954        no
+    F1 sweep-quality ONLY                805    0.985   0.803    -1.69 $     27,300 $     90,954        no
+    F2 HTF-context ONLY                  694    1.008   0.809    -1.63 $     33,675 $     90,954        no
+    F3 selectivity-cap ONLY              140    1.109   0.898    -0.82 $     88,666 $     90,954        no
+    F4 level-significance ONLY         1,174    1.016   0.825    -1.49 $     18,603 $     90,954        no
+    ALL FOUR (sec 29, reference)          74    1.361   1.093    +0.68 $    103,977 $     90,954       YES
+
+  --- SPX500 in-regime 2018-2025 ---
+    variant                           trades  grossPF   netPF   Sharpe         end $         B&H $  beat B&H
+    baseline (sec 28, unfiltered)      3,469    1.013   0.704    -2.74 $         14 $    255,640        no
+    F1 sweep-quality ONLY              1,807    1.036   0.713    -2.64 $      1,154 $    255,640        no
+    F2 HTF-context ONLY                2,868    1.028   0.713    -2.65 $         83 $    255,640        no
+    F3 selectivity-cap ONLY              319    0.960   0.650    -3.37 $     37,428 $    255,640        no
+    F4 level-significance ONLY         3,469    1.013   0.704    -2.74 $         14 $    255,640        no
+    ALL FOUR (sec 29, reference)         230    1.350   0.909    -0.74 $     83,296 $    255,640        no
+
+  --- SPX500 out-of-regime 2017 (1yr, not a full regime test) ---
+    variant                           trades  grossPF   netPF   Sharpe         end $         B&H $  beat B&H
+    baseline (sec 28, unfiltered)        311    1.365   0.781    -1.94 $     54,304 $    118,831        no
+    F1 sweep-quality ONLY                205    1.593   0.900    -0.82 $     83,070 $    118,831        no
+    F2 HTF-context ONLY                  312    1.358   0.776    -1.99 $     53,390 $    118,831        no
+    F3 selectivity-cap ONLY               44    1.553   0.862    -1.15 $     94,740 $    118,831        no
+    F4 level-significance ONLY           311    1.365   0.781    -1.94 $     54,304 $    118,831        no
+    ALL FOUR (sec 29, reference)          36    1.117   0.641    -3.48 $     88,636 $    118,831        no
+
+  --- BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring) ---
+    variant                           trades  grossPF   netPF   Sharpe         end $         B&H $  beat B&H
+    baseline (sec 28, unfiltered)      5,381    1.037   0.173   -12.31 $          0 $    639,397        no
+    F1 sweep-quality ONLY                921    1.088   0.151   -13.00 $          0 $    639,397        no
+    F2 HTF-context ONLY                4,266    1.033   0.183   -12.01 $          0 $    639,397        no
+    F3 selectivity-cap ONLY              314    1.064   0.139   -13.66 $        645 $    639,397        no
+    F4 level-significance ONLY         5,357    1.038   0.173   -12.31 $          0 $    639,397        no
+    ALL FOUR (sec 29, reference)         126    0.960   0.149   -13.81 $     14,307 $    639,397        no
+
+################################################################################################################################
+  HEADLINE -- does any SINGLE filter improve the RAW BEFORE-COST edge (gross PF)?
+  Mean over the 4 in-regime cells (XAUUSD/EURUSD/SPX500/BTCUSDT 2018-2025). Ranked by gross-PF delta vs baseline.
+################################################################################################################################
+  variant                           mean grossPF   d vs base  #inst grossPF>base  mean netPF  mean Sharpe  #beat B&H   trades
+  F1 sweep-quality ONLY                   1.0312     +0.0060                   2/4      0.5779        -5.20        0/4    4,881  <- new
+  F4 level-significance ONLY              1.0256     +0.0004                   1/4      0.5897        -4.95        0/4   12,786  <- new
+  baseline (sec 28, unfiltered)           1.0252     +0.0000                   0/4      0.5897        -4.95        0/4   12,810
+  F2 HTF-context ONLY                     1.0231     -0.0021                   1/4      0.5924        -4.86        0/4   10,196  <- new
+  ALL FOUR (sec 29, reference)            1.0153     -0.0099                   1/4      0.5811        -5.49        0/4      625
+  F3 selectivity-cap ONLY                 0.9631     -0.0621                   1/4      0.5252        -5.93        0/4    1,104  <- new
+
+  baseline mean gross PF = 1.0252  |  mean net PF = 0.5897  |  mean Sharpe = -4.95
+
+  Same ranking over ALL 7 cells (in + out of regime):
+    ALL FOUR (sec 29, reference)     mean grossPF 1.1352   d vs base +0.0675   #cells grossPF>base 3/7
+    F3 selectivity-cap ONLY          mean grossPF 1.1188   d vs base +0.0510   #cells grossPF>base 4/7
+    F1 sweep-quality ONLY            mean grossPF 1.0882   d vs base +0.0204   #cells grossPF>base 3/7
+    F4 level-significance ONLY       mean grossPF 1.0680   d vs base +0.0002   #cells grossPF>base 1/7
+    baseline (sec 28, unfiltered)    mean grossPF 1.0677   d vs base +0.0000   #cells grossPF>base 0/7
+    F2 HTF-context ONLY              mean grossPF 1.0636   d vs base -0.0041   #cells grossPF>base 1/7
+
+################################################################################################################################
+  PLAIN VERDICT
+################################################################################################################################
+  F1 sweep-quality ONLY: mean gross PF +0.0060 vs baseline but higher on only 2/4 instruments -- not a consistent isolated improvement.
+  F4 level-significance ONLY: mean gross PF +0.0004 vs baseline but higher on only 1/4 instruments -- not a consistent isolated improvement.
+  --> No single filter shows a CONSISTENT isolated gross-edge improvement (a positive mean driven by 1-2 instruments is not a finding).
+
+################################################################################################################################
+  ACCOUNT-RUIN across variants (trade # at which equity first <= 1% of $100k start; '-' = never)
+################################################################################################################################
+  cell                                      baseline        F1        F2        F3        F4      ALL4
+  XAUUSD in-regime 2018-2025                   #1487         -     #1558         -     #1487         -
+  XAUUSD out-of-regime 2017 (1yr, not a            -         -         -         -         -         -
+  EURUSD in-regime 2018-2025                       -         -         -         -         -         -
+  EURUSD out-of-regime 2013-2017 (full 5           -         -         -         -         -         -
+  SPX500 in-regime 2018-2025                   #1786         -     #1678         -     #1786         -
+  SPX500 out-of-regime 2017 (1yr, not a            -         -         -         -         -         -
+  BTCUSDT in-regime 2018-2025 (no out-of        #321      #361      #367      #300      #321         -
+
+  Look-ahead guard: PASS on every variant x cell (42 checks, first 200 trades each: entry_mid == next bar open).
+
+  NEW TRIALS: 28 (4 individual filters x 7 cells; baseline and ALL-FOUR are references).
+  Cumulative project trials after this batch: 1133 (1105 prior + 28).
+  saved -> results/ict_smc_ablation.csv, results/ict_smc_ablation_run.log
+================================================================================================================================
