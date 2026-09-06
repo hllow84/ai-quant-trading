@@ -5368,3 +5368,135 @@ it gracefully; don't backtest on partial data).
 
 **Status: ready to deploy, not deployed.** No cumulative-trial count change
 — this is infrastructure, not a backtest.
+
+---
+
+## §30.1 — On-chain active-address signal: bounded pre-registered extension (2026-09-06)
+
+**Follows §30 directly. Data, cost model and engine reused byte-for-byte**
+via `import run_onchain_signal as s30` — `s30.load_addr()` /
+`s30.load_btc_daily()` (free blockchain.info `n-unique-addresses` +
+real-spread BTCUSDT daily from the Binance H1 file), `s30.CRYPTO_COST_BPS`
+(20 bps commission + 1.0 bps/side slippage + real per-day closing-hour
+spread, split half-open/half-close), `s30.build_signal` (causal trailing
+z-score, current day excluded), `s30.run_cell` (no_pos sequential gate).
+Long cells call `s30.run_cell` unmodified; short cells use a byte-copy with
+**three marked sign flips**; Part 3 uses a new daily-filter engine.
+
+**The §30 STEP 1 data caveat still governs everything below:** the metric
+is BTC unique active addresses — a network-usage/adoption proxy — **not**
+the exchange-flow / whale-balance / exchange-reserve data the original
+brief named as its leading hypothesis. That data is paywalled on every free
+tier checked live in §30 (Glassnode, CryptoQuant, Coin Metrics, Etherscan).
+This section is a wide search of the one free series, not a test of the
+brief's actual hypothesis.
+
+**Pre-registration (all rules fixed before the run — `run_onchain_signal_ext.py` docstring):**
+
+- **Part 1 — lookback/threshold grid (level surge):** window {30, 60, 90*,
+  180} d × z-threshold {1.0, 1.5*, 2.0} SD × direction {long-on-surge*,
+  short-on-surge / fade} × hold {5, 20} d = **48 cells**. (* = §30 value.)
+  Trigger is identical for both directions (an *upward* address surge,
+  z > threshold); only the position sign differs.
+- **Part 2 — acceleration variant:** signal = 2nd difference of the trailing
+  rolling average, z-scored against its own trailing distribution.
+  Exact causal calc: `RA_t = A.shift(1).rolling(W).mean()` (day t excluded);
+  `ACCEL_t = RA_t − 2·RA_{t−1} + RA_{t−2}`;
+  `ACCELZ_t = (ACCEL_t − mean_{t−W..t−1} ACCEL) / std_{t−W..t−1} ACCEL`.
+  Strictly causal — uses A only through day t−1. Same 48-cell grid = **48 cells**.
+- **Part 3 — regime filter on default buy-and-hold:** hold 100% BTC every
+  day; **exit to cash on day t+1 iff the §30 level z-score on day t is
+  ≤ UNHEALTHY_THR** (network activity contracted vs its trailing
+  distribution); position lagged one day; never short. Grid: window {90,
+  180} × UNHEALTHY_THR {−0.5, −1.0, −1.5} SD = **6 cells**. One BTCUSDT
+  transaction charged per switch (half the §30 round-turn cost each).
+- **Total new cells / trials this batch: 48 + 48 + 6 = 102.**
+
+**Honesty gates:** look-ahead guard **PASS on all 102** (baselines exclude
+the current day by construction; Part 3 position is `z.shift(1)`; guard
+returned true on every evaluated cell). Real BTCUSDT costs (§30 model).
+Per-year concentration (bar 0.60). Regime sub-split 2018-2021 vs 2022-2025
+— **same caveat as §30/§28: NOT a true out-of-regime test**, no free
+pre-2018 real-spread BTCUSDT data exists (Binance starts 2017-08).
+vs buy-and-hold BTC over the identical window ($100k → **$576,995**,
++477.0%, CAGR +22.4%, daily-return Sharpe **+0.638**, maxDD 81%).
+
+**Deflated-Sharpe pool, stated explicitly (the brief's requirement):**
+- PRIOR cumulative project trials (through §30): **1135**.
+- NEW trials this batch: **102**.
+- **NEW CUMULATIVE TOTAL: 1237.**
+- Batch net-Sharpe distribution: mean −0.600, sd 1.171, range [−4.87, +2.20].
+- E[max Sharpe] under the null: batch structural pool N=102 → **+2.372**;
+  **full-cumulative pool N=1237 → +3.283** (the primary bar — the grid is
+  large, so the bar rises accordingly). DSR reported per cell against both.
+
+**RESULT — RANKED BY NET SHARPE (full window; complete 102-row table in
+`results/onchain_ext.csv`, console log `results/onchain_ext_run.log`):**
+
+| # | part / variant | win | thr | dir | H | n | net SR | gross SR | net PF | maxDD | topYr | end $ | vs B&H | subA / subB | DSR (N=1237) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 2 accel | 90 | +2.0 | long | 5 | 48 | **+2.20** | +3.55 | 1.421 | 26.3% | 68% | $172,975 | **loses** | +5.30 / −1.12 | 0.204 |
+| 2 | 2 accel | 180 | +1.5 | long | 5 | 111 | +1.16 | +2.22 | 1.192 | 42.9% | 89% | $186,061 | loses | +1.26 / +1.05 | 0.009 |
+| 3 | 1 level | 180 | +2.0 | long | 20 | 40 | +1.08 | +1.26 | 1.187 | 51.8% | 76% | $294,205 | loses | +1.22 / +0.85 | 0.001 |
+| 4 | 1 level | 180 | +1.5 | long | 20 | 64 | +1.07 | +1.27 | 1.190 | 58.5% | 58% | $489,625 | loses | +1.11 / +1.06 | 0.000 |
+| 5 | 1 level | 90 | +2.0 | long | 20 | 46 | +0.87 | +1.06 | 1.148 | 70.3% | 59% | $237,225 | loses | +0.95 / +0.77 | 0.000 |
+| … | 13 long cells beat B&H's +0.638 net Sharpe at lower DD; **none** beats it in dollars | | | | | | | | | | | | | | |
+| 30–45 | **Part 3** regime-filter-on-B&H (all 6) | 90/180 | −0.5…−1.5 | — | — | 403–865 sw | +0.19 … −0.20 | +0.48…+0.60 | ≤1.03 | 83–95% | — | **$14k–$57k** | **all lose** | mixed | 0.000 |
+| 50–102 | **all short / fade cells** | | | short | | | −0.46 … **−4.87** | mostly negative | <1 | 82–99.9% | — | wiped | all lose | negative | 0.000 |
+
+**Buy-and-hold BTC:** full $576,995 · sub 2018-2021 $344,216 · sub 2022-2025 $163,609.
+
+**FINDINGS:**
+
+1. **0 / 102 cells beat buy-and-hold BTC in compounded dollars.** 13 long
+   cells beat B&H on *risk-adjusted* return (net Sharpe > 0.638) at far
+   lower drawdown — the best (Part 2 accel/W90/thr+2.0/H5) posts net Sharpe
+   +2.20, gross +3.55, PF 1.42, maxDD 26.3% vs B&H's 81% — **but every one
+   loses in dollars because it is invested only a fraction of the time.**
+   Exact §30 / §25-PEAD terminal pattern: a real small gross directional
+   edge that cannot out-compound simply owning the beta through a genuine
+   bull run.
+2. **DSR: 0 / 102 clear 0.95** against the true N=1237 pool (E[max SR]
+   +3.283). Top cell scores **0.204**; #2 onward ≤ 0.009. Even against the
+   lenient batch-only pool (N=102) the best is 0.447. Nothing survives.
+3. **The acceleration variant is not an improvement.** Its best cell tops
+   the table only via a single-regime spike: subA (2018-2021) net Sharpe
+   **+5.30** vs subB (2022-2025) **−1.12** — a sign flip; the whole result
+   is one bull phase. Across the grid the acceleration cells interleave
+   with the level cells, no systematic edge.
+4. **Contrarian / short-on-surge / fade: clean anti-finding.** Ranks 50–102
+   are almost entirely short cells; gross Sharpe is *negative* on most —
+   fading an address surge is just being short BTC in a bull market. No
+   contrarian edge in either the level or the acceleration signal.
+5. **Part 3 (regime filter on B&H) does NOT fix §30's "sits in cash too
+   much" failure — it replaces it with churn.** The naive daily filter
+   flips 403–865 times over the window; even the variant that stays in BTC
+   **91%** of days returns **−6.3% CAGR** ($56,998) vs B&H's +22.4%. Gross
+   (cost-free) Sharpe of every Part-3 cell is ~0.48–0.60, **below B&H's
+   0.638**, so the unhealthy-exit timing is *mildly anti-predictive* even
+   before switch costs bury it. Hysteresis/persistence is an obvious
+   un-tested refinement, but the gross-Sharpe deficit says the exit timing
+   has no edge to rescue.
+6. **Regime instability is the rule:** 37 / 102 cells flip net-Sharpe sign
+   between 2018-2021 and 2022-2025. The few positive-Sharpe cells are
+   overwhelmingly 2018-2021 phenomena.
+
+**VERDICT — KILL, and the search is closed on this series.** A wide,
+pre-registered, look-ahead-clean search — 102 cells across level surge, its
+acceleration, both directions, four lookbacks, three thresholds, two hold
+periods, and a regime-filter-on-buy-and-hold — of the one genuinely free
+BTC on-chain series **came up empty**: nothing beats owning BTC in dollars,
+nothing clears the DSR bar for the true trial count. Consistent with §30's
+own conclusion. Real evidence that the free blockchain.info active-address
+series carries no tradeable edge over buy-and-hold, **not** a reason to keep
+parameter-hunting the same series. A genuine test of the brief's actual
+hypothesis (exchange flow / whale balance / exchange reserves) still
+requires a paid subscription (Glassnode Advanced ~$49/mo or CryptoQuant
+Professional ~$99/mo) — flagged in §30 as a costed next step, still not taken.
+
+**Files:** `run_onchain_signal_ext.py`. Results:
+`results/onchain_ext.csv` (ranked evaluated cells),
+`results/onchain_ext_all_cells.csv` (raw), `results/onchain_ext_run.log`.
+Reproduce: `py -3.14 run_onchain_signal_ext.py`.
+
+**Cumulative trials: N=1237** (1135 prior + 102).
