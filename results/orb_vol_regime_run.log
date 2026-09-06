@@ -1,0 +1,212 @@
+================================================================================================================================================================
+  ORB VOLATILITY-REGIME FILTER on RETEST OR30/1R  (§10.9)  --  FX + indices, both windows where available
+================================================================================================================================================================
+
+[XAUUSD in] 1,827,147 M1 bars 2018-01-01->2025-12-31 | B&H SR +1.19 maxDD 20.4% | ratio finite on 92% of sessions | base RETEST cands=465
+    baseline (no filter)     n= 465 grPF=  1.78 netPF=  1.34 SR= +1.14 costR%= 11.74 topYr%= 35.85 repro=OK
+    elevated > 1.2           n= 110 grPF=  1.56 netPF=  1.24 SR= +0.44 costR%=  9.52 topYr%= 76.51
+    elevated > 1.5           n=  49 grPF=  1.17 netPF=  0.96 SR= -0.06 costR%=  8.27 topYr%=  n/a
+    elevated > 2.0           n=   7 grPF=  0.74 netPF=  0.57 SR= -2.38 costR%= 11.40 topYr%=  n/a
+    suppressed < 0.8         n=  41 grPF=  2.03 netPF=  1.54 SR= +0.56 costR%= 12.35 topYr%= 71.98
+    suppressed < 0.6         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+
+[XAUUSD out] 323,514 M1 bars 2017-01-02->2017-12-29 | B&H SR +1.19 maxDD 7.8% | ratio finite on 56% of sessions | base RETEST cands=89 | OOS-STUB: 2017-only, ONE bull year -- NOT a real regime test
+    baseline (no filter)     n=  89 grPF=  2.24 netPF=  1.46 SR= +1.58 costR%= 16.94 topYr%=100.00 repro=no-ref
+    elevated > 1.2           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    elevated > 1.5           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    elevated > 2.0           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    suppressed < 0.8         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    suppressed < 0.6         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+
+[EURUSD in] 2,922,985 M1 bars 2018-01-01->2025-12-30 | B&H SR -0.00 maxDD 23.3% | ratio finite on 95% of sessions | base RETEST cands=802
+    baseline (no filter)     n= 802 grPF=  1.39 netPF=  0.88 SR= -0.55 costR%= 20.02 topYr%=  n/a repro=no-ref
+    elevated > 1.2           n=  66 grPF=  1.20 netPF=  0.86 SR= -0.24 costR%= 15.32 topYr%=  n/a
+    elevated > 1.5           n=  12 grPF=  1.18 netPF=  0.86 SR= -0.09 costR%= 12.29 topYr%=  n/a
+    elevated > 2.0           n=   7 grPF=  0.31 netPF=  0.24 SR= -5.62 costR%= 10.96 topYr%=  n/a
+    suppressed < 0.8         n=  71 grPF=  1.77 netPF=  0.98 SR= -0.03 costR%= 24.33 topYr%=  n/a
+    suppressed < 0.6         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+
+[EURUSD out] 1,837,284 M1 bars 2013-01-01->2017-12-29 | B&H SR -0.16 maxDD 25.4% | ratio finite on 92% of sessions | base RETEST cands=496
+    baseline (no filter)     n= 496 grPF=  1.48 netPF=  0.97 SR= -0.14 costR%= 18.57 topYr%=  n/a repro=no-ref
+    elevated > 1.2           n=  54 grPF=  1.16 netPF=  0.80 SR= -0.40 costR%= 15.61 topYr%=  n/a
+    elevated > 1.5           n=  14 grPF=  2.60 netPF=  1.67 SR= +3.02 costR%= 20.45 topYr%=100.00
+    elevated > 2.0           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    suppressed < 0.8         n=  33 grPF=  2.40 netPF=  1.22 SR= +0.24 costR%= 26.60 topYr%= 92.70
+    suppressed < 0.6         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+
+[NAS100 in] 2,211,511 M1 bars 2018-01-03->2025-12-31 | B&H SR +0.84 maxDD 35.7% | ratio finite on 94% of sessions | base RETEST cands=685
+    baseline (no filter)     n= 685 grPF=  1.39 netPF=  1.22 SR= +0.85 costR%=  5.47 topYr%= 34.38 repro=OK
+    elevated > 1.2           n= 148 grPF=  1.12 netPF=  1.02 SR= +0.04 costR%=  4.13 topYr%=571.58
+    elevated > 1.5           n=  41 grPF=  1.32 netPF=  1.21 SR= +0.23 costR%=  3.85 topYr%= 84.25
+    elevated > 2.0           n=  10 grPF=  1.65 netPF=  1.52 SR= +0.25 costR%=  3.46 topYr%= 89.13
+    suppressed < 0.8         n= 108 grPF=  1.74 netPF=  1.46 SR= +0.69 costR%=  7.10 topYr%= 66.02
+    suppressed < 0.6         n=   8 grPF=  0.48 netPF=  0.41 SR= -0.42 costR%=  5.54 topYr%=  n/a
+
+[NAS100 out] 443,449 M1 bars 2013-09-30->2017-12-29 | B&H SR +1.21 maxDD 16.6% | ratio finite on 90% of sessions | base RETEST cands=377
+    baseline (no filter)     n= 377 grPF=  1.13 netPF=  0.84 SR= -0.79 costR%= 11.94 topYr%=  n/a repro=OK
+    elevated > 1.2           n=  83 grPF=  1.17 netPF=  0.91 SR= -0.20 costR%=  9.52 topYr%=  n/a
+    elevated > 1.5           n=  19 grPF=  0.73 netPF=  0.60 SR= -0.60 costR%=  9.58 topYr%=  n/a
+    elevated > 2.0           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    suppressed < 0.8         n=  64 grPF=  0.85 netPF=  0.59 SR= -1.06 costR%= 15.03 topYr%=  n/a
+    suppressed < 0.6         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+
+[US30 in] 2,090,818 M1 bars 2018-01-02->2025-12-31 | B&H SR +0.55 maxDD 37.0% | ratio finite on 94% of sessions | base RETEST cands=602
+    baseline (no filter)     n= 602 grPF=  1.40 netPF=  1.18 SR= +0.68 costR%=  7.14 topYr%= 39.21 repro=OK
+    elevated > 1.2           n=  99 grPF=  0.77 netPF=  0.69 SR= -0.68 costR%=  4.95 topYr%=  n/a
+    elevated > 1.5           n=  49 grPF=  1.24 netPF=  1.13 SR= +0.17 costR%=  4.50 topYr%=156.22
+    elevated > 2.0           n=  17 grPF=  1.43 netPF=  1.32 SR= +0.23 costR%=  3.91 topYr%= 83.13
+    suppressed < 0.8         n= 142 grPF=  1.49 netPF=  1.21 SR= +0.40 costR%=  8.70 topYr%= 54.17
+    suppressed < 0.6         n=  17 grPF=  0.71 netPF=  0.57 SR= -0.41 costR%=  9.56 topYr%=  n/a
+
+[US30 out] 467,543 M1 bars 2013-09-30->2017-12-29 | B&H SR +1.05 maxDD 14.5% | ratio finite on 90% of sessions | base RETEST cands=369
+    baseline (no filter)     n= 369 grPF=  0.91 netPF=  0.70 SR= -1.56 costR%= 11.13 topYr%=  n/a repro=OK
+    elevated > 1.2           n=  52 grPF=  0.78 netPF=  0.67 SR= -0.69 costR%=  6.77 topYr%=  n/a
+    elevated > 1.5           n=  10 grPF=  0.45 netPF=  0.39 SR= -0.74 costR%=  6.74 topYr%=  n/a
+    elevated > 2.0           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    suppressed < 0.8         n=  73 grPF=  0.92 netPF=  0.68 SR= -0.81 costR%= 12.34 topYr%=  n/a
+    suppressed < 0.6         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+
+[SPX500 in] 2,539,213 M1 bars 2018-01-02->2025-12-31 | B&H SR +0.64 maxDD 35.0% | ratio finite on 95% of sessions | base RETEST cands=747
+    baseline (no filter)     n= 747 grPF=  1.38 netPF=  1.11 SR= +0.44 costR%=  9.73 topYr%= 62.12 repro=no-ref
+    elevated > 1.2           n= 174 grPF=  1.18 netPF=  1.01 SR= +0.02 costR%=  6.80 topYr%=1155.86
+    elevated > 1.5           n=  70 grPF=  1.13 netPF=  1.00 SR= +0.00 costR%=  5.48 topYr%=8515.08
+    elevated > 2.0           n=  14 grPF=  0.75 netPF=  0.70 SR= -0.27 costR%=  3.43 topYr%=  n/a
+    suppressed < 0.8         n= 160 grPF=  1.29 netPF=  0.98 SR= -0.04 costR%= 12.26 topYr%=  n/a
+    suppressed < 0.6         n=  28 grPF=  1.09 netPF=  0.82 SR= -0.17 costR%= 12.46 topYr%=  n/a
+
+[SPX500 out] 173,138 M1 bars 2017-01-03->2017-12-29 | B&H SR +2.83 maxDD 2.7% | ratio finite on 56% of sessions | base RETEST cands=88 | OOS-STUB: 2017-only, ONE bull year -- NOT a real regime test
+    baseline (no filter)     n=  88 grPF=  1.52 netPF=  0.95 SR= -0.26 costR%= 20.71 topYr%=  n/a repro=no-ref
+    elevated > 1.2           n=   2 grPF=  2.54 netPF=  1.52 SR= +1.50 costR%= 17.80 topYr%=100.00
+    elevated > 1.5           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    elevated > 2.0           n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+    suppressed < 0.8         n=   5 grPF=  2.25 netPF=  1.11 SR= +0.54 costR%= 28.90 topYr%=100.00
+    suppressed < 0.6         n=   0 grPF=  n/a netPF=  n/a SR=  n/a costR%=  n/a topYr%=  n/a
+
+################################################################################################################################################################
+  TRIAL COUNT & DSR POOL
+################################################################################################################################################################
+  PRIOR cumulative (through §30.1) : 1237
+  NEW filter cells this batch      : 50   (5 instruments x 2 windows x 5 thresholds; 10 baseline cells reproduce §10.5/10.6/10.8, not re-counted)
+  NEW CUMULATIVE TOTAL             : 1287
+  batch filter-cell Sharpe dist    : mean -0.193, sd 1.272, n 34
+  E[max SR] batch pool  N=34      : +2.510
+  E[max SR] cumulative  N=1287    : +4.039   <-- primary DSR bar
+
+################################################################################################################################################################
+  ALL CELLS RANKED BY NET SHARPE
+################################################################################################################################################################
+     inst  win             filter     n   grPF  netPF      SR  DSRbat  DSRcum   maxDD  costR%  topYr%   B&H  OOSreg  SURV
+  -----------------------------------------------------------------------------------------------------------------------
+   EURUSD  out     elevated > 1.5    14   2.60   1.67  +3.02   0.55   0.39   2.32  20.45     100  BEAT       -      
+   XAUUSD  out baseline (no filte    89   2.24   1.46  +1.58   0.18   0.01   4.53  16.94     100  BEAT       -      
+   SPX500  out     elevated > 1.2     2   2.54   1.52  +1.50   0.43   0.32   0.48  17.80     100  lose       -      
+   XAUUSD   in baseline (no filte   465   1.78   1.34  +1.14   0.00   0.00   9.96  11.74      36  lose       -      
+   NAS100   in baseline (no filte   685   1.39   1.22  +0.85   0.00   0.00  12.16   5.47      34  BEAT       -      
+   NAS100   in   suppressed < 0.8   108   1.74   1.46  +0.69   0.00   0.00   6.86   7.10      66  lose    FAIL      
+     US30   in baseline (no filte   602   1.40   1.18  +0.68   0.00   0.00  13.65   7.14      39  BEAT       -      
+   XAUUSD   in   suppressed < 0.8    41   2.03   1.54  +0.56   0.00   0.00   2.46  12.35      72  lose       -      
+   SPX500  out   suppressed < 0.8     5   2.25   1.11  +0.54   0.36   0.26   1.97  28.90     100  lose       -      
+   XAUUSD   in     elevated > 1.2   110   1.56   1.24  +0.44   0.00   0.00   7.67   9.52      77  lose       -      
+   SPX500   in baseline (no filte   747   1.38   1.11  +0.44   0.00   0.00  18.75   9.73      62  lose       -      
+     US30   in   suppressed < 0.8   142   1.49   1.21  +0.40   0.00   0.00   6.38   8.70      54  lose    FAIL      
+   NAS100   in     elevated > 2.0    10   1.65   1.52  +0.25   0.00   0.00   1.16   3.46      89  lose    FAIL      
+   EURUSD  out   suppressed < 0.8    33   2.40   1.22  +0.24   0.00   0.00   2.88  26.60      93  BEAT       -      
+   NAS100   in     elevated > 1.5    41   1.32   1.21  +0.23   0.00   0.00   3.05   3.85      84  lose    FAIL      
+     US30   in     elevated > 2.0    17   1.43   1.32  +0.23   0.00   0.00   2.33   3.91      83  lose    FAIL      
+     US30   in     elevated > 1.5    49   1.24   1.13  +0.17   0.00   0.00   5.15   4.50     156  lose    FAIL      
+   NAS100   in     elevated > 1.2   148   1.12   1.02  +0.04   0.00   0.00  14.94   4.13     572  lose    FAIL      
+   SPX500   in     elevated > 1.2   174   1.18   1.01  +0.02   0.00   0.00  18.97   6.80    1156  lose       -      
+   SPX500   in     elevated > 1.5    70   1.13   1.00  +0.00   0.00   0.00  15.25   5.48    8515  lose       -      
+   EURUSD   in   suppressed < 0.8    71   1.77   0.98  -0.03   0.00   0.00   6.95  24.33     n/a  lose    hold      
+   SPX500   in   suppressed < 0.8   160   1.29   0.98  -0.04   0.00   0.00  13.30  12.26     n/a  lose       -      
+   XAUUSD   in     elevated > 1.5    49   1.17   0.96  -0.06   0.00   0.00   4.73   8.27     n/a  lose       -      
+   EURUSD   in     elevated > 1.5    12   1.18   0.86  -0.09   0.00   0.00   3.70  12.29     n/a  lose    FAIL      
+   EURUSD  out baseline (no filte   496   1.48   0.97  -0.14   0.00   0.00  21.01  18.57     n/a  BEAT       -      
+   SPX500   in   suppressed < 0.6    28   1.09   0.82  -0.17   0.00   0.00   4.75  12.46     n/a  lose       -      
+   NAS100  out     elevated > 1.2    83   1.17   0.91  -0.20   0.00   0.00  13.15   9.52     n/a  lose       -      
+   EURUSD   in     elevated > 1.2    66   1.20   0.86  -0.24   0.00   0.00  11.86  15.32     n/a  lose    FAIL      
+   SPX500  out baseline (no filte    88   1.52   0.95  -0.26   0.00   0.00  13.22  20.71     n/a  lose       -      
+   SPX500   in     elevated > 2.0    14   0.75   0.70  -0.27   0.00   0.00   4.30   3.43     n/a  lose       -      
+   EURUSD  out     elevated > 1.2    54   1.16   0.80  -0.40   0.00   0.00  10.83  15.61     n/a  lose       -      
+     US30   in   suppressed < 0.6    17   0.71   0.57  -0.41   0.00   0.00   3.86   9.56     n/a  lose    FAIL      
+   NAS100   in   suppressed < 0.6     8   0.48   0.41  -0.42   0.00   0.00   2.62   5.54     n/a  lose    FAIL      
+   EURUSD   in baseline (no filte   802   1.39   0.88  -0.55   0.00   0.00  41.67  20.02     n/a  lose       -      
+   NAS100  out     elevated > 1.5    19   0.73   0.60  -0.60   0.00   0.00   4.38   9.58     n/a  lose       -      
+     US30   in     elevated > 1.2    99   0.77   0.69  -0.68   0.00   0.00  22.34   4.95     n/a  lose    FAIL      
+     US30  out     elevated > 1.2    52   0.78   0.67  -0.69   0.00   0.00  10.75   6.77     n/a  lose       -      
+     US30  out     elevated > 1.5    10   0.45   0.39  -0.74   0.00   0.00   4.40   6.74     n/a  lose       -      
+   NAS100  out baseline (no filte   377   1.13   0.84  -0.79   0.00   0.00  33.30  11.94     n/a  lose       -      
+     US30  out   suppressed < 0.8    73   0.92   0.68  -0.81   0.00   0.00  15.26  12.34     n/a  lose       -      
+   NAS100  out   suppressed < 0.8    64   0.85   0.59  -1.06   0.00   0.00  12.98  15.03     n/a  lose       -      
+     US30  out baseline (no filte   369   0.91   0.70  -1.56   0.00   0.00  44.23  11.13     n/a  lose       -      
+   XAUUSD   in     elevated > 2.0     7   0.74   0.57  -2.38   0.07   0.03   3.46  11.40     n/a  lose       -      
+   EURUSD   in     elevated > 2.0     7   0.31   0.24  -5.62   0.01   0.00   3.70  10.96     n/a  lose    FAIL      
+
+################################################################################################################################################################
+  FILTER EFFECT vs the SAME instrument/window BASELINE  (does the vol filter help at all?)
+################################################################################################################################################################
+  EURUSD in: baseline netPF 0.879 SR -0.55 n=802
+      suppressed < 0.8     n=  71  netPF   0.98 (+0.100)  SR  -0.03 (+0.52)  costR%  24.33
+      elevated > 1.2       n=  66  netPF   0.86 (-0.023)  SR  -0.24 (+0.31)  costR%  15.32
+      elevated > 1.5       n=  12  netPF   0.86 (-0.018)  SR  -0.09 (+0.45)  costR%  12.29
+      elevated > 2.0       n=   7  netPF   0.24 (-0.634)  SR  -5.62 (-5.07)  costR%  10.96
+  EURUSD out: baseline netPF 0.967 SR -0.14 n=496
+      suppressed < 0.8     n=  33  netPF   1.22 (+0.255)  SR  +0.24 (+0.39)  costR%  26.60
+      elevated > 1.2       n=  54  netPF   0.80 (-0.163)  SR  -0.40 (-0.25)  costR%  15.61
+      elevated > 1.5       n=  14  netPF   1.67 (+0.699)  SR  +3.02 (+3.17)  costR%  20.45
+  NAS100 in: baseline netPF 1.219 SR +0.85 n=685
+      suppressed < 0.6     n=   8  netPF   0.41 (-0.810)  SR  -0.42 (-1.27)  costR%   5.54
+      suppressed < 0.8     n= 108  netPF   1.46 (+0.241)  SR  +0.69 (-0.16)  costR%   7.10
+      elevated > 1.2       n= 148  netPF   1.02 (-0.199)  SR  +0.04 (-0.81)  costR%   4.13
+      elevated > 1.5       n=  41  netPF   1.21 (-0.007)  SR  +0.23 (-0.62)  costR%   3.85
+      elevated > 2.0       n=  10  netPF   1.52 (+0.297)  SR  +0.25 (-0.60)  costR%   3.46
+  NAS100 out: baseline netPF 0.837 SR -0.79 n=377
+      suppressed < 0.8     n=  64  netPF   0.59 (-0.249)  SR  -1.06 (-0.27)  costR%  15.03
+      elevated > 1.2       n=  83  netPF   0.91 (+0.077)  SR  -0.20 (+0.58)  costR%   9.52
+      elevated > 1.5       n=  19  netPF   0.60 (-0.241)  SR  -0.60 (+0.19)  costR%   9.58
+  SPX500 in: baseline netPF 1.109 SR +0.44 n=747
+      suppressed < 0.6     n=  28  netPF   0.82 (-0.287)  SR  -0.17 (-0.60)  costR%  12.46
+      suppressed < 0.8     n= 160  netPF   0.98 (-0.127)  SR  -0.04 (-0.47)  costR%  12.26
+      elevated > 1.2       n= 174  netPF   1.01 (-0.100)  SR  +0.02 (-0.42)  costR%   6.80
+      elevated > 1.5       n=  70  netPF   1.00 (-0.107)  SR  +0.00 (-0.43)  costR%   5.48
+      elevated > 2.0       n=  14  netPF   0.70 (-0.410)  SR  -0.27 (-0.70)  costR%   3.43
+  SPX500 out: baseline netPF 0.945 SR -0.26 n=88   [2017-only, ONE bull year -- NOT a real regime test]
+      suppressed < 0.8     n=   5  netPF   1.11 (+0.168)  SR  +0.54 (+0.80)  costR%  28.90
+      elevated > 1.2       n=   2  netPF   1.52 (+0.573)  SR  +1.50 (+1.77)  costR%  17.80
+  US30 in: baseline netPF 1.177 SR +0.68 n=602
+      suppressed < 0.6     n=  17  netPF   0.57 (-0.608)  SR  -0.41 (-1.10)  costR%   9.56
+      suppressed < 0.8     n= 142  netPF   1.21 (+0.031)  SR  +0.40 (-0.28)  costR%   8.70
+      elevated > 1.2       n=  99  netPF   0.69 (-0.489)  SR  -0.68 (-1.36)  costR%   4.95
+      elevated > 1.5       n=  49  netPF   1.13 (-0.047)  SR  +0.17 (-0.51)  costR%   4.50
+      elevated > 2.0       n=  17  netPF   1.32 (+0.143)  SR  +0.23 (-0.45)  costR%   3.91
+  US30 out: baseline netPF 0.695 SR -1.56 n=369
+      suppressed < 0.8     n=  73  netPF   0.68 (-0.016)  SR  -0.81 (+0.75)  costR%  12.34
+      elevated > 1.2       n=  52  netPF   0.67 (-0.028)  SR  -0.69 (+0.87)  costR%   6.77
+      elevated > 1.5       n=  10  netPF   0.39 (-0.306)  SR  -0.74 (+0.82)  costR%   6.74
+  XAUUSD in: baseline netPF 1.336 SR +1.14 n=465
+      suppressed < 0.8     n=  41  netPF   1.54 (+0.207)  SR  +0.56 (-0.59)  costR%  12.35
+      elevated > 1.2       n= 110  netPF   1.24 (-0.096)  SR  +0.44 (-0.70)  costR%   9.52
+      elevated > 1.5       n=  49  netPF   0.96 (-0.379)  SR  -0.06 (-1.20)  costR%   8.27
+      elevated > 2.0       n=   7  netPF   0.57 (-0.769)  SR  -2.38 (-3.52)  costR%  11.40
+  XAUUSD out: baseline netPF 1.463 SR +1.58 n=89   [2017-only, ONE bull year -- NOT a real regime test]
+
+################################################################################################################################################################
+  VERDICT
+################################################################################################################################################################
+  Filter cells with net PF > 1     : 15 / 34
+  Filter cells with net Sharpe > 0 : 15 / 34
+  Filter cells clearing DSR(cum) 0.95: 0 / 34
+
+  NO cell clears every gate -- no volatility threshold, on any of the 5 instruments,
+  in EITHER direction (elevated or suppressed), produces a config that is net-PF>1,
+  positive-Sharpe, holds in the real 2013-2017 out-of-regime window, AND clears a DSR
+  bar appropriate to the true cumulative trial count (N=1287, E[max SR] +4.04).
+
+  closest ELEVATED cell: EURUSD out [elevated > 1.5] SR +3.02 netPF 1.666 DSR_cum 0.393
+     FAILS: DSRcum>0.95, OOS-regime, not-conc, not-thin
+
+  closest SUPPRESSED cell: NAS100 in [suppressed < 0.8] SR +0.69 netPF 1.459 DSR_cum 0.000
+     FAILS: DSRcum>0.95, OOS-regime, not-conc, beats-B&H
+
+  results -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_vol_regime.csv , C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_vol_regime_scored.csv
+================================================================================================================================================================

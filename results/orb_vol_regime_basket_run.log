@@ -1,0 +1,47 @@
+======================================================================================================================================================
+  §10.9 ADDITIONAL VARIATION -- ELEVATED-VOL RETEST OR30/1R, 3-INDEX POOLED BASKET
+  (data-motivated: index elevated-vol cells are netPF>1 but individually thin + year-concentrated; pool them)
+======================================================================================================================================================
+
+[in] basket = NAS100 + US30 + SPX500
+  loading NAS100 in ...
+  loading US30 in ...
+  loading SPX500 in ...
+    elevated > 1.2: n= 421 (NAS100:148, US30:99, SPX500:174) grPF=1.045 netPF=0.925 SR=-0.22 maxDD=38.8% costR%=5.4 topYr%=nan vsB&H=lose
+    elevated > 1.5: n= 160 (NAS100:41, US30:49, SPX500:70) grPF=1.212 netPF=1.092 SR=+0.15 maxDD=17.8% costR%=4.8 topYr%=133 vsB&H=lose
+    elevated > 2.0: n=  41 (NAS100:10, US30:17, SPX500:14) grPF=1.164 netPF=1.079 SR=+0.08 maxDD=5.7% costR%=3.6 topYr%=132 vsB&H=lose
+
+[out] basket = NAS100 + US30
+  loading NAS100 out ...
+  loading US30 out ...
+    elevated > 1.2: n= 135 (NAS100:83, US30:52) grPF=0.994 netPF=0.804 SR=-0.57 maxDD=17.6% costR%=8.5 topYr%=nan vsB&H=lose
+    elevated > 1.5: n=  29 (NAS100:19, US30:10) grPF=0.624 netPF=0.521 SR=-0.83 maxDD=8.6% costR%=8.6 topYr%=nan vsB&H=lose
+    elevated > 2.0: NO TRADES
+
+######################################################################################################################################################
+  BASKET RESULT  (ranked by net Sharpe)
+######################################################################################################################################################
+  PRIOR cumulative: 1287 | NEW basket cells: 6 | NEW CUMULATIVE TOTAL: 1293
+  DSR vs full cumulative pool N=1293: E[max SR] +1.124 (batch mu -0.275 sd 0.420)
+  window   thr     n   grPF  netPF      SR  DSRcum   maxDD  costR%  topYr%  B&Hsr  vsB&H          flags
+  -----------------------------------------------------------------------------------------------------
+      in   1.5   160  1.212  1.092   +0.15   0.002   17.8%    4.8     133  +0.68   lose           CONC
+      in   2.0    41  1.164  1.079   +0.08   0.002    5.7%    3.6     132  +0.68   lose           CONC
+      in   1.2   421  1.045  0.925   -0.22   0.000   38.8%    5.4     n/a  +0.68   lose           CONC
+     out   1.2   135  0.994  0.804   -0.57   0.000   17.6%    8.5     n/a  +1.13   lose           CONC
+     out   1.5    29  0.624  0.521   -0.83   0.000    8.6%    8.6     n/a  +1.13   lose      THIN,CONC
+
+######################################################################################################################################################
+  ADDITIONAL-VARIATION VERDICT
+######################################################################################################################################################
+  in-regime cells netPF>1: 2/3 | SR>0: 2/3 | not-year-conc: 0/3 | beats EW-B&H: 0/3
+  out-regime (NAS100+US30) cells netPF>1: 0/2 | SR>0: 0/2
+  cells clearing DSR_cum > 0.95: 0/5
+
+  NO basket cell clears every gate. Pooling improves the SAMPLE (41->~160 trades at >1.5) but:
+    in elevated>1.5: SR +0.15 -> FAILS: DSR_cum 0.00, year-conc 133%, loses to B&H
+    in elevated>2.0: SR +0.08 -> FAILS: DSR_cum 0.00, year-conc 132%, loses to B&H
+    in elevated>1.2: SR -0.22 -> FAILS: netPF<=1, SR<=0, DSR_cum 0.00, year-conc nan%, loses to B&H
+
+  results -> C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\orb_vol_regime_basket.csv
+======================================================================================================================================================

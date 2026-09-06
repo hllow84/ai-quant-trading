@@ -1622,6 +1622,160 @@ extends it rather than reopening it.
 `results/retest_or30_1r_eurusd_run.log` (full run output),
 `results/eurusd_backfill_download.log` (download + merge sanity output).
 
+
+### 10.9 VOLATILITY-REGIME FILTER on the RETEST variant — FX + indices, both windows, tested 2026-09-06, killed
+
+**Why this batch exists.** Every ORB variant (§10, §10.1–10.8) died on the same
+mechanism: a tight OR-width stop makes fixed costs a large fraction of 1R, and
+the small in-regime gross edge is 2018–2025-specific. This section tests **one
+genuinely different hypothesis, pre-registered**: gate the RETEST OR30/1R
+variant by a **session volatility regime** — trade only when realised vol is
+elevated (or, as the inverse, only when it is suppressed). Elevated vol ⇒ wider
+opening range ⇒ wider 1R ⇒ cost a smaller fraction of 1R. This directly attacks
+the cost-to-risk ratio.
+
+**What is fixed (reused byte-for-byte from §10.5/§10.8).** Entry logic
+`strategies.orb.orb(..., retest=True, retest_tol_frac=0.10, **ET_SESSION)` with
+`or_minutes=30, target="1R", stop_mode="or_range"`; `simulate_trades` +
+`de_overlap`; 1% fixed-fractional risk; 09:30 ET DST-correct session anchor
+(unchanged for FX, per the §10.8 decision); each instrument on its established
+cost model (XAUUSD legacy $/oz; NAS100/US30/SPX500 `run_orb.COST_BPS` +
+`run_orb.slip_bps`; EURUSD the §10.8 model — commission 0.30 bps + `slip_bps`).
+Scoring = `run_orb_entry_filters.score_cands`, imported and called unchanged.
+**The vol filter never touches `orb()`** — it removes whole candidate days from
+the list `orb()` returns, by session date, so entry price / stop / 1R / the
+retest walk are identical to the unfiltered RETEST cell.
+
+**The volatility measure (pre-registered, causal).** Session (daily) ATR(14),
+Wilder RMA, computed on the RTH session bars exactly as
+`strategies.orb.wilder_dmi_direction` builds its daily bars. Then
+`ratio_D = ATR14_{D-1} / mean(ATR14_{D-90..D-1})` = `(atr / atr.rolling(90).mean()).shift(1)`
+— session D gated only by ATR history completed strictly before D. Look-ahead:
+the `.shift(1)` plus the rolling window's right edge at D-1 means session D's own
+bar never enters its gate value. Asserted in the runner; `score_cands`'s
+statistical guard also PASSES on every traded cell.
+
+**The grid.** Instruments XAUUSD, EURUSD, NAS100, US30, SPX500. Windows:
+in-regime 2018-2025 (all five); real out-of-regime 2013-2017 (EURUSD, NAS100,
+US30); 2017-only stub (XAUUSD, SPX500 — **ONE bull year, NOT a real regime
+test**, flagged exactly as §10.6). Filter modes per instrument-window: BASELINE
+(no filter — reproduces the §10.5/§10.8 RETEST cell), ELEVATED `ratio > {1.2,
+1.5, 2.0}`, SUPPRESSED `ratio < {0.8, 0.6}`. The brief listed "1.0 = no filter,
+baseline"; a literal `ratio > 1.0` is *not* no-filter (the ratio is centred near
+1.0), so the BASELINE row is the true unfiltered RETEST cell — **reproduction-
+checked** against `results/orb_entry_filters_scored.csv` (XAUUSD-in, NAS100-in/out,
+US30-in/out all exact to `n_trades` and `net_R_total`; EURUSD/SPX500 baselines
+match the §10.8/§10.6 numbers). **6 cells per instrument-window; 5×2×6 = 60 rows,
+50 of them new filter cells.**
+
+**Trial count.** The 10 baseline cells reproduce already-counted results and are
+not re-counted. **New this batch: 50 filter cells** (main grid) **+ 6 basket
+cells** (additional variation, below) **= 56.** PRIOR cumulative (through §30.1)
+**1237 → 1293.** DSR is reported against both a batch structural pool (N≈34
+finite filter cells, E[max SR] **+2.51**) and the full cumulative pool (**N=1287
+for the main grid, E[max SR] +4.04**; N=1293 for the basket) — E[max SR]
+estimated from the batch's own Sharpe mean/std at the full N. The cumulative bar
+is the primary one and it is high because the search is wide.
+
+**RESULT — main grid, top of the ranking by net Sharpe (full table
+`results/orb_vol_regime_scored.csv`):**
+
+| inst | win | filter | n | grPF | netPF | net SR | DSR (N=1287) | maxDD | costR% | topYr% | vs B&H | OOS-regime |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| EURUSD | out | elevated > 1.5 | **14** | 2.60 | 1.67 | **+3.02** | 0.39 | 2.3% | 20.5 | **100%** | BEAT | — (is the OOS window) |
+| XAUUSD | out(2017) | baseline | 89 | 2.24 | 1.46 | +1.58 | 0.01 | 4.5% | 16.9 | 100% | BEAT | stub |
+| SPX500 | out(2017) | elevated > 1.2 | **2** | 2.54 | 1.52 | +1.50 | 0.32 | 0.5% | 17.8 | 100% | lose | stub |
+| XAUUSD | in | baseline | 465 | 1.78 | 1.34 | +1.14 | 0.00 | 10.0% | 11.7 | 36% | lose | — |
+| NAS100 | in | baseline | 685 | 1.39 | 1.22 | +0.85 | 0.00 | 12.2% | 5.5 | 34% | BEAT | — |
+| NAS100 | in | suppressed < 0.8 | 108 | 1.74 | 1.46 | +0.69 | 0.00 | 6.9% | 7.1 | 66% | lose | **FAIL** |
+| US30 | in | baseline | 602 | 1.40 | 1.18 | +0.68 | 0.00 | 13.7% | 7.1 | 39% | BEAT | — |
+| XAUUSD | in | suppressed < 0.8 | 41 | 2.03 | 1.54 | +0.56 | 0.00 | 2.5% | 12.4 | 72% | lose | — |
+
+**FINDINGS:**
+
+1. **The hypothesised cost mechanism is REAL and confirmed on all 5 instruments.**
+   The elevated filter cuts `cost_R` as predicted: NAS100 in 5.5% → 3.5% of 1R
+   (`>2.0`), US30 7.1% → 3.9%, SPX500 9.7% → 3.4%, XAUUSD 11.7% → 8.3%, EURUSD
+   20.0% → 11.0%. The suppressed filter moves it the other way (NAS100 5.5% →
+   7.1%, EURUSD 20% → 24–27%) — exactly the sign the wider-OR-when-vol-high
+   argument predicts.
+
+2. **The cost improvement does NOT produce a surviving edge — 0 / 50 filter
+   cells clear every gate; 0 / 50 clear DSR.** On the indices the elevated cell
+   is net-PF > 1 at most thresholds (NAS100 1.02/1.21/1.52; US30 1.13/1.32 at
+   ≥1.5) but **net Sharpe falls vs the unfiltered baseline in almost every
+   in-regime cell** (NAS100 +0.85 → +0.04…+0.25; US30 +0.68 → mixed; XAUUSD
+   +1.14 → +0.44 or negative; SPX500 +0.44 → ~0), the **sample collapses**
+   (7–174 trades), and **year-concentration explodes** (NAS100 `>1.2` top-year
+   572%, SPX500 `>1.5` 8515% — i.e. one year many times the total P&L, the rest
+   large negatives).
+
+3. **The one high-Sharpe cell (EURUSD out, elevated > 1.5, SR +3.02, netPF
+   1.67) is 14 trades, 100% concentrated in a single year, in the 2013-2017
+   window with no further-out window to confirm it — and its in-regime sibling
+   (EURUSD in, elevated > 1.5) is netPF 0.86, SR −0.09, negative.** The filter
+   "helping" out-of-regime but not in-regime is the opposite of every prior ORB
+   result and is almost certainly a 14-trade artefact.
+
+4. **Suppressed (low-vol) filter: no rescue either.** Best cell NAS100 in
+   `<0.8` lifts netPF to 1.46 (from 1.22) but net Sharpe *drops* to +0.69, it
+   loses to B&H, and its real-OOS sibling (NAS100 out `<0.8`) is netPF 0.59, SR
+   −1.06 — **fails out of regime.**
+
+5. **Every real out-of-regime baseline is still negative** (NAS100 out −0.79,
+   US30 out −1.56, EURUSD out −0.14) and no filter, either direction, makes them
+   consistently positive.
+
+**ADDITIONAL VARIATION (data-motivated, run separately — `run_orb_vol_regime_basket.py`).**
+Finding 2 showed index elevated-vol cells are netPF > 1 but individually thin +
+year-concentrated. Single-name year-concentration is the exact failure mode §6
+fixed by **pooling instruments into a basket**. So: the same elevated-vol RETEST
+OR30/1R cell run on **NAS100 + US30 + SPX500 together** — one combined daily-
+return series, one position per instrument per day, per-instrument costs, no new
+parameter. In-regime 2018-2025 (3 indices) + real out-of-regime 2013-2017
+(NAS100 + US30; SPX500 has only a 2017 stub). **3 in + 3 out = 6 new cells;
+cumulative 1287 → 1293.**
+
+| window | thr | n (per member) | grPF | netPF | net SR | maxDD | costR% | topYr% | vs EW-B&H |
+|---|---|---|---|---|---|---|---|---|---|
+| in | >1.5 | 160 (41/49/70) | 1.212 | 1.092 | **+0.15** | 17.8% | 4.8 | **133%** | lose (+0.15 vs +0.68) |
+| in | >2.0 | 41 (10/17/14) | 1.164 | 1.079 | +0.08 | 5.7% | 3.6 | **132%** | lose |
+| in | >1.2 | 421 | 1.045 | 0.925 | −0.22 | 38.8% | 5.4 | — | lose |
+| out | >1.2 | 135 (83/52) | 0.994 | 0.804 | −0.57 | 17.6% | 8.5 | — | lose |
+| out | >1.5 | 29 (19/10) | 0.624 | 0.521 | −0.83 | 8.6% | 8.6 | — | lose |
+
+Pooling **improves the sample** (41 → 160 trades at `>1.5`) and **drops max
+drawdown hard** (5.7% at `>2.0`), and in-regime netPF stays > 1 — **but net
+Sharpe collapses to ~0** (+0.15, +0.08), **year-concentration is NOT fixed**
+(still 132–133%; the three US indices are too correlated for cross-index pooling
+to diversify the bad year away), it **loses to equal-weight buy-and-hold**, and
+the **real out-of-regime basket is net-PF 0.52–0.80, Sharpe negative**. DSR_cum
+0 / 5.
+
+**VERDICT — KILL. 56 new cells (50 filter + 6 basket), 0 survivors.** No
+volatility threshold, on any of the 5 instruments, in either direction (elevated
+or suppressed), and not the 3-index pooled basket, produces a config that is
+net-PF > 1 **and** positive-Sharpe **and** holds in the real 2013-2017
+out-of-regime window **and** clears a DSR bar appropriate to the true trial
+count (N=1293, E[max SR] ≈ +4.0). The volatility-regime filter does exactly what
+was hypothesised to the cost-to-risk ratio — a real, confirmed mechanical effect
+— but that improvement is swamped by sample collapse, extreme single-year
+concentration that survives cross-index pooling, a net-Sharpe *decline* vs the
+unfiltered baseline, and unchanged regime dependence. This closes the volatility-
+filter branch of the ORB thread: the cost problem is fixable, the *edge* is
+still not there. A different measure (intraday vol, a VIX/term-structure gate, a
+volatility-scaled position size rather than a binary day filter) would be a new
+hypothesis carrying its own trials.
+
+**Files (10.9):** `run_orb_vol_regime.py` (main 60-row grid, reproduction check,
+DSR, ranked table), `run_orb_vol_regime_basket.py` (the additional 3-index
+pooled variation). Results: `results/orb_vol_regime.csv`,
+`orb_vol_regime_scored.csv`, `orb_vol_regime_run.log`,
+`orb_vol_regime_basket.csv`, `orb_vol_regime_basket_run.log`. Reproduce:
+`py -3.14 run_orb_vol_regime.py && py -3.14 run_orb_vol_regime_basket.py`.
+
+**Cumulative trials: N=1293** (1237 prior + 50 filter + 6 basket).
+
 ---
 
 ## 11. THE M1 ROW — the last unrun timeframe, tested 2026-08-27, killed
