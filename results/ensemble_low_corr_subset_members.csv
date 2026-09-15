@@ -1,0 +1,27 @@
+kept_series_quality_blind
+D|Credit-spread FILTERED 1pct (SPY)
+A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)
+C|Pairs GLD-SLV N1.5
+A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2)
+A|VRP naked SVXY §20 (thr 1.5)
+C|MACD EURUSD
+C|Ichimoku EURUSD
+C|Pairs NAS100-US30 N2.0
+C|Ichimoku US30
+C|Turtle Sys2 NAS100
+C|Ichimoku XAUUSD
+C|MACD XAUUSD
+C|MACD ETHUSDT
+C|MACD-slow-n3 BTCUSDT
+C|Ichimoku BTCUSDT
+B|ICT-SMC XAUUSD in-regime 2018-2025
+B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)
+A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)
+B|ICT-SMC EURUSD in-regime 2018-2025
+B|ICT-SMC SPX500 in-regime 2018-2025
+A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session)
+A|MomoRot crypto-sectors §17 (N12/K5)
+B|ICT-SMC EURUSD out-of-regime 2013-2017 (full 5yr)
+A|ORB §10 same cell 2013-2017 (out-of-regime)
+A|Sneaky Pivot §9.4 same cell 2013-2017 (out-of-regime)
+"B|ICT-SMC XAUUSD out-of-regime 2017 (1yr, not a full regime test)"

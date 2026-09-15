@@ -1,0 +1,15 @@
+kept_series_positive_sharpe
+D|Credit-spread FILTERED 1pct (SPY)
+A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)
+A|VRP naked SVXY §20 (thr 1.5)
+C|Bollinger EURUSD
+C|Pairs NAS100-US30 N2.0
+C|Turtle Sys2 NAS100
+C|Ichimoku XAUUSD
+C|MACD ETHUSDT
+C|MACD-slow-n3 BTCUSDT
+C|Ichimoku BTCUSDT
+A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)
+A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session)
+A|MomoRot crypto-sectors §17 (N12/K5)
+A|Sneaky Pivot §9.4 same cell 2013-2017 (out-of-regime)

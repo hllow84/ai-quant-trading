@@ -1,0 +1,229 @@
+======================================================================================================================
+  SECTION 35 -- ROI RANKING: 2022-2026 / 2019-2026 / MAX PERIOD, every real strategy in the project
+======================================================================================================================
+
+Base inventory (sections 32-32.2): 64 series
+  [ORB gold RETEST] look-ahead guard: PASS, 554 trades, 2017-01-10 17:17:00+00:00 .. 2025-12-29 15:21:00+00:00
+Additional series (sections 33/34.1/34.2, not in the base file): 7
+TOTAL: 71 strategies with a real, saved daily return series
+
+
+======================================================================================================================
+  RANKED BY ROI -- MAX PERIOD (each strategy's own full real range)
+======================================================================================================================
+  rank strategy                                                             ROI  real range                days  full-window?
+  1    A|MomoRot crypto-sectors §17 (N12/K5)                            4101.0%  2020-02-01..2026-08-31  2404  YES
+  2    A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)                933.9%  2000-01-03..2026-08-28  9735  YES
+  3    MomoRot LONG-ONLY N=12 (sec 34.1 re-run, live from 2000-01-0      933.9%  2000-01-03..2026-08-28  9735  YES
+  4    Tail-hedge OTM SPY puts 1% alloc (sec 34.2)                       759.4%  1993-01-29..2026-06-16 12192  YES
+  5    A|MomoRot US-sector §12 (N12/K5, headline)                        687.6%  2000-01-03..2026-08-28  9735  YES
+  6    MomoRot LONG-SHORT N=12 (sec 34.1)                                668.8%  2000-01-03..2026-08-28  9735  YES
+  7    MomoRot LONG-ONLY N=6 (sec 34.1 re-run, live from 1999-07-01      647.0%  1999-07-01..2026-08-28  9921  YES
+  8    A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)                     563.3%  2011-10-04..2026-08-28  5443  YES
+  9    MomoRot LONG-SHORT N=6 (sec 34.1)                                 497.0%  1999-07-01..2026-08-28  9921  YES
+  10   C|Turtle Sys1 BTCUSDT                                             164.4%  2018-01-01..2026-08-31  3165  YES
+  11   D|On-chain active-address surge H20 (BTCUSDT)                     120.8%  2018-01-03..2026-08-31  3163  YES
+  12   A|MomoRot country-ETFs §17 (N12/K5)                               118.1%  2009-02-02..2026-08-28  6417  YES
+  13   Tail-hedge OTM SPY puts 2% alloc (sec 34.2)                       108.2%  1993-01-29..2026-06-16 12192  YES
+  14   C|Turtle Sys2 ETHUSDT                                             103.5%  2018-01-01..2026-08-31  3165  YES
+  15   A|VRP naked SVXY §20 (thr 1.2)                                     98.1%  2011-10-04..2026-08-28  5443  YES
+  16   C|Turtle Sys1 ETHUSDT                                              93.8%  2018-01-01..2026-08-31  3165  YES
+  17   C|Turtle Sys2 BTCUSDT                                              92.3%  2018-01-01..2026-08-31  3165  YES
+  18   C|Turtle Sys2 XAUUSD                                               90.7%  2017-01-02..2025-12-31  3286  YES
+  19   ORB gold RETEST (XAUUSD RETEST OR30/1R, sec 33)                    90.0%  2017-01-10..2025-12-29  3276  YES
+  20   C|Turtle Sys1 XAUUSD                                               83.5%  2017-01-02..2025-12-31  3286  YES
+  21   A|VRP §21-A fixed 20% sizing (thr 1.2)                             68.6%  2011-10-04..2026-08-28  5443  YES
+  22   A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/s       46.8%  2018-03-12..2025-12-09  2830  YES
+  23   D|Credit-spread FILTERED 1pct (SPY)                                38.4%  1993-01-29..2026-06-16 12192  YES
+  24   C|Turtle Sys2 SPX500                                               37.5%  2017-01-03..2025-12-31  3285  YES
+  25   A|VRP §21-A fixed 10% sizing (thr 1.2)                             32.1%  2011-10-04..2026-08-28  5443  YES
+  26   A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)                     21.5%  2018-01-03..2025-12-31  2920  YES
+  27   C|Turtle Sys2 NAS100                                               15.0%  2013-09-30..2025-12-31  4476  YES
+  28   C|Pairs NAS100-US30 N2.0                                           14.9%  2013-09-30..2025-12-31  4476  YES
+  29   C|Turtle Sys1 NAS100                                                8.9%  2013-09-30..2025-12-31  4476  YES
+  30   C|MACD-slow-n3 BTCUSDT                                              3.4%  2018-01-01..2026-08-31  3165  YES
+  31   C|Ichimoku ETHUSDT                                                  3.3%  2018-01-01..2026-08-31  3165  YES
+  32   C|MACD ETHUSDT                                                      3.2%  2018-01-01..2026-08-31  3165  YES
+  33   C|MACD BTCUSDT                                                      3.1%  2018-01-01..2026-08-31  3165  YES
+  34   C|MACD-slow-n3 ETHUSDT                                              3.1%  2018-01-01..2026-08-31  3165  YES
+  35   A|Sneaky Pivot §9.4 same cell 2013-2017 (out-of-regime)             1.3%  2013-10-30..2017-10-16  1448  YES
+  36   C|Bollinger NAS100                                                  1.1%  2013-09-30..2025-12-31  4476  YES
+  37   C|Ichimoku BTCUSDT                                                  0.8%  2018-01-01..2026-08-31  3165  YES
+  38   C|Pairs NAS100-US30 N1.5                                            0.7%  2013-09-30..2025-12-31  4476  YES
+  39   C|Bollinger US30                                                    0.5%  2013-09-30..2025-12-31  4476  YES
+  40   C|Ichimoku XAUUSD                                                   0.5%  2017-01-02..2025-12-31  3286  YES
+  41   C|Bollinger SPX500                                                  0.3%  2017-01-03..2025-12-31  3285  YES
+  42   C|Bollinger EURUSD                                                  0.2%  2013-01-01..2025-12-30  4747  YES
+  43   C|Ichimoku SPX500                                                   0.2%  2017-01-03..2025-12-31  3285  YES
+  44   C|Ichimoku EURUSD                                                   0.2%  2013-01-01..2025-12-30  4747  YES
+  45   C|Ichimoku NAS100                                                   0.2%  2013-09-30..2025-12-31  4476  YES
+  46   C|Ichimoku US30                                                    -0.0%  2013-09-30..2025-12-31  4476  YES
+  47   C|MACD SPX500                                                      -0.1%  2017-01-03..2025-12-31  3285  YES
+  48   C|Bollinger XAUUSD                                                 -0.2%  2017-01-02..2025-12-31  3286  YES
+  49   C|MACD US30                                                        -0.2%  2013-09-30..2025-12-31  4476  YES
+  50   C|MACD XAUUSD                                                      -0.3%  2017-01-02..2025-12-31  3286  YES
+  51   C|MACD EURUSD                                                      -0.3%  2013-01-01..2025-12-30  4747  YES
+  52   C|MACD NAS100                                                      -1.3%  2013-09-30..2025-12-31  4476  YES
+  53   C|Turtle Sys1 SPX500                                               -1.8%  2017-01-03..2025-12-31  3285  YES
+  54   C|Bollinger BTCUSDT                                                -1.9%  2018-01-01..2026-08-31  3165  YES
+  55   C|Bollinger ETHUSDT                                                -3.3%  2018-01-01..2026-08-31  3165  YES
+  56   C|Turtle Sys2 US30                                                 -7.2%  2013-09-30..2025-12-31  4476  YES
+  57   C|Turtle Sys1 US30                                                -11.5%  2013-09-30..2025-12-31  4476  YES
+  58   C|Turtle Sys2 EURUSD                                              -16.9%  2013-01-01..2025-12-30  4747  YES
+  59   C|Pairs GLD-SLV N1.5                                              -29.0%  2006-04-28..2026-08-27  7427  YES
+  60   C|Turtle Sys1 EURUSD                                              -36.0%  2013-01-01..2025-12-30  4747  YES
+  61   C|Pairs GLD-SLV N2.0                                              -37.7%  2006-04-28..2026-08-27  7427  YES
+  62   B|ICT-SMC SPX500 out-of-regime 2017 (1yr, not a full regime       -46.0%  2017-01-06..2018-01-03   363  YES
+  63   A|VRP naked SVXY §20 (thr 1.5)                                    -69.9%  2011-10-04..2026-08-28  5443  YES
+  64   B|ICT-SMC XAUUSD out-of-regime 2017 (1yr, not a full regime       -76.0%  2017-01-03..2017-12-29   361  YES
+  65   A|ORB §10 same cell 2013-2017 (out-of-regime)                     -76.9%  2013-10-21..2017-12-29  1531  YES
+  66   B|ICT-SMC EURUSD out-of-regime 2013-2017 (full 5yr)               -81.3%  2013-01-02..2017-12-29  1823  YES
+  67   B|ICT-SMC EURUSD in-regime 2018-2025                              -93.8%  2018-01-02..2025-12-30  2920  YES
+  68   A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2)                     -98.9%  2011-10-04..2026-08-28  5443  YES
+  69   B|ICT-SMC XAUUSD in-regime 2018-2025                              -99.8%  2018-01-02..2025-12-31  2921  YES
+  70   B|ICT-SMC SPX500 in-regime 2018-2025                             -100.0%  2018-01-05..2025-12-31  2918  YES
+  71   B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime wind     -100.0%  2018-01-01..2025-12-30  2921  YES
+
+======================================================================================================================
+  RANKED BY ROI -- 2019-01-01 .. latest available
+======================================================================================================================
+  rank strategy                                                             ROI  real range                days  full-window?
+  1    A|MomoRot crypto-sectors §17 (N12/K5)                            4101.0%  2020-02-01..2026-08-31  2404  PARTIAL (from 2020-02-01)
+  2    D|On-chain active-address surge H20 (BTCUSDT)                     441.2%  2019-01-01..2026-08-31  2800  YES
+  3    A|VRP naked SVXY §20 (thr 1.2)                                    202.7%  2019-01-01..2026-08-28  2797  YES
+  4    C|Turtle Sys1 BTCUSDT                                             167.1%  2019-01-01..2026-08-31  2800  YES
+  5    Tail-hedge OTM SPY puts 1% alloc (sec 34.2)                       122.5%  2019-01-01..2026-06-16  2724  YES
+  6    MomoRot LONG-ONLY N=12 (sec 34.1 re-run, live from 2000-01-0      112.4%  2019-01-01..2026-08-28  2797  YES
+  7    A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)                112.4%  2019-01-01..2026-08-28  2797  YES
+  8    C|Turtle Sys2 ETHUSDT                                              90.6%  2019-01-01..2026-08-31  2800  YES
+  9    A|MomoRot US-sector §12 (N12/K5, headline)                         89.4%  2019-01-01..2026-08-28  2797  YES
+  10   C|Turtle Sys2 BTCUSDT                                              83.5%  2019-01-01..2026-08-31  2800  YES
+  11   C|Turtle Sys2 XAUUSD                                               80.4%  2019-01-01..2025-12-31  2557  YES
+  12   C|Turtle Sys1 ETHUSDT                                              79.4%  2019-01-01..2026-08-31  2800  YES
+  13   MomoRot LONG-SHORT N=12 (sec 34.1)                                 79.2%  2019-01-01..2026-08-28  2797  YES
+  14   ORB gold RETEST (XAUUSD RETEST OR30/1R, sec 33)                    70.3%  2019-01-01..2025-12-29  2555  YES
+  15   A|MomoRot country-ETFs §17 (N12/K5)                                67.9%  2019-01-01..2026-08-28  2797  YES
+  16   C|Turtle Sys1 XAUUSD                                               67.1%  2019-01-01..2025-12-31  2557  YES
+  17   MomoRot LONG-ONLY N=6 (sec 34.1 re-run, live from 1999-07-01       61.0%  2019-01-01..2026-08-28  2797  YES
+  18   MomoRot LONG-SHORT N=6 (sec 34.1)                                  47.7%  2019-01-01..2026-08-28  2797  YES
+  19   Tail-hedge OTM SPY puts 2% alloc (sec 34.2)                        46.3%  2019-01-01..2026-06-16  2724  YES
+  20   A|VRP naked SVXY §20 (thr 1.5)                                     43.9%  2019-01-01..2026-08-28  2797  YES
+  21   A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/s       39.0%  2019-01-01..2025-12-09  2535  YES
+  22   A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)                     36.5%  2019-01-01..2025-12-31  2557  YES
+  23   A|VRP §21-A fixed 20% sizing (thr 1.2)                             31.8%  2019-01-01..2026-08-28  2797  YES
+  24   C|Turtle Sys1 NAS100                                               30.6%  2019-01-01..2025-12-31  2557  YES
+  25   C|Turtle Sys2 NAS100                                               25.1%  2019-01-01..2025-12-31  2557  YES
+  26   A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)                      23.6%  2019-01-01..2026-08-28  2797  YES
+  27   C|Turtle Sys2 SPX500                                               16.5%  2019-01-01..2025-12-31  2557  YES
+  28   A|VRP §21-A fixed 10% sizing (thr 1.2)                             15.2%  2019-01-01..2026-08-28  2797  YES
+  29   C|Pairs NAS100-US30 N2.0                                           12.7%  2019-01-01..2025-12-31  2557  YES
+  30   D|Credit-spread FILTERED 1pct (SPY)                                 7.7%  2019-01-01..2026-06-16  2724  YES
+  31   C|MACD-slow-n3 BTCUSDT                                              3.6%  2019-01-01..2026-08-31  2800  YES
+  32   C|MACD-slow-n3 ETHUSDT                                              3.5%  2019-01-01..2026-08-31  2800  YES
+  33   C|Pairs NAS100-US30 N1.5                                            3.3%  2019-01-01..2025-12-31  2557  YES
+  34   C|MACD BTCUSDT                                                      2.7%  2019-01-01..2026-08-31  2800  YES
+  35   C|Ichimoku ETHUSDT                                                  2.2%  2019-01-01..2026-08-31  2800  YES
+  36   C|MACD ETHUSDT                                                      2.0%  2019-01-01..2026-08-31  2800  YES
+  37   C|Ichimoku BTCUSDT                                                  0.6%  2019-01-01..2026-08-31  2800  YES
+  38   C|Ichimoku XAUUSD                                                   0.5%  2019-01-01..2025-12-31  2557  YES
+  39   C|Bollinger NAS100                                                  0.4%  2019-01-01..2025-12-31  2557  YES
+  40   C|Bollinger US30                                                    0.3%  2019-01-01..2025-12-31  2557  YES
+  41   C|Ichimoku SPX500                                                   0.3%  2019-01-01..2025-12-31  2557  YES
+  42   C|Ichimoku NAS100                                                   0.2%  2019-01-01..2025-12-31  2557  YES
+  43   C|Bollinger SPX500                                                  0.2%  2019-01-01..2025-12-31  2557  YES
+  44   C|Bollinger EURUSD                                                  0.1%  2019-01-01..2025-12-30  2556  YES
+  45   C|Ichimoku EURUSD                                                   0.1%  2019-01-01..2025-12-30  2556  YES
+  46   C|Ichimoku US30                                                    -0.0%  2019-01-01..2025-12-31  2557  YES
+  47   C|MACD SPX500                                                      -0.1%  2019-01-01..2025-12-31  2557  YES
+  48   C|Bollinger XAUUSD                                                 -0.1%  2019-01-01..2025-12-31  2557  YES
+  49   C|MACD US30                                                        -0.2%  2019-01-01..2025-12-31  2557  YES
+  50   C|MACD EURUSD                                                      -0.2%  2019-01-01..2025-12-30  2556  YES
+  51   C|MACD XAUUSD                                                      -0.4%  2019-01-01..2025-12-31  2557  YES
+  52   C|MACD NAS100                                                      -0.7%  2019-01-01..2025-12-31  2557  YES
+  53   C|Bollinger BTCUSDT                                                -1.9%  2019-01-01..2026-08-31  2800  YES
+  54   C|Bollinger ETHUSDT                                                -2.5%  2019-01-01..2026-08-31  2800  YES
+  55   C|Turtle Sys1 SPX500                                               -5.7%  2019-01-01..2025-12-31  2557  YES
+  56   C|Turtle Sys2 US30                                                -14.9%  2019-01-01..2025-12-31  2557  YES
+  57   C|Turtle Sys1 US30                                                -18.1%  2019-01-01..2025-12-31  2557  YES
+  58   C|Pairs GLD-SLV N2.0                                              -23.5%  2019-01-01..2026-08-27  2796  YES
+  59   C|Turtle Sys1 EURUSD                                              -27.6%  2019-01-01..2025-12-30  2556  YES
+  60   C|Turtle Sys2 EURUSD                                              -30.7%  2019-01-01..2025-12-30  2556  YES
+  61   C|Pairs GLD-SLV N1.5                                              -32.3%  2019-01-01..2026-08-27  2796  YES
+  62   A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2)                     -87.0%  2019-01-01..2026-08-28  2797  YES
+  63   B|ICT-SMC EURUSD in-regime 2018-2025                              -89.5%  2019-01-01..2025-12-30  2556  YES
+  64   B|ICT-SMC XAUUSD in-regime 2018-2025                              -99.7%  2019-01-01..2025-12-31  2557  YES
+  65   B|ICT-SMC SPX500 in-regime 2018-2025                             -100.0%  2019-01-01..2025-12-31  2557  YES
+  66   B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime wind     -100.0%  2019-01-01..2025-12-30  2556  YES
+
+======================================================================================================================
+  RANKED BY ROI -- 2022-01-01 .. latest available
+======================================================================================================================
+  rank strategy                                                             ROI  real range                days  full-window?
+  1    A|VRP naked SVXY §20 (thr 1.5)                                     78.6%  2022-01-01..2026-08-28  1701  YES
+  2    A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)                 68.6%  2022-01-01..2026-08-28  1701  YES
+  3    MomoRot LONG-ONLY N=12 (sec 34.1 re-run, live from 2000-01-0       68.6%  2022-01-01..2026-08-28  1701  YES
+  4    A|VRP naked SVXY §20 (thr 1.2)                                     67.8%  2022-01-01..2026-08-28  1701  YES
+  5    C|Turtle Sys2 XAUUSD                                               59.1%  2022-01-01..2025-12-31  1461  YES
+  6    A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)                     53.9%  2022-01-01..2025-12-31  1461  YES
+  7    MomoRot LONG-SHORT N=12 (sec 34.1)                                 53.1%  2022-01-01..2026-08-28  1701  YES
+  8    C|Turtle Sys1 XAUUSD                                               48.1%  2022-01-01..2025-12-31  1461  YES
+  9    ORB gold RETEST (XAUUSD RETEST OR30/1R, sec 33)                    43.1%  2022-01-01..2025-12-29  1459  YES
+  10   A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)                      42.2%  2022-01-01..2026-08-28  1701  YES
+  11   A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/s       38.9%  2022-01-01..2025-12-09  1439  YES
+  12   Tail-hedge OTM SPY puts 1% alloc (sec 34.2)                        37.4%  2022-01-01..2026-06-16  1628  YES
+  13   A|MomoRot US-sector §12 (N12/K5, headline)                         33.0%  2022-01-01..2026-08-28  1701  YES
+  14   C|Turtle Sys2 ETHUSDT                                              32.4%  2022-01-01..2026-08-31  1704  YES
+  15   D|On-chain active-address surge H20 (BTCUSDT)                      28.4%  2022-01-01..2026-08-31  1704  YES
+  16   A|MomoRot country-ETFs §17 (N12/K5)                                26.7%  2022-01-01..2026-08-28  1701  YES
+  17   C|Turtle Sys2 BTCUSDT                                              23.9%  2022-01-01..2026-08-31  1704  YES
+  18   C|Turtle Sys1 BTCUSDT                                              23.3%  2022-01-01..2026-08-31  1704  YES
+  19   C|Turtle Sys2 NAS100                                               19.9%  2022-01-01..2025-12-31  1461  YES
+  20   MomoRot LONG-ONLY N=6 (sec 34.1 re-run, live from 1999-07-01       18.9%  2022-01-01..2026-08-28  1701  YES
+  21   C|Turtle Sys1 NAS100                                               14.7%  2022-01-01..2025-12-31  1461  YES
+  22   C|Turtle Sys1 ETHUSDT                                              14.6%  2022-01-01..2026-08-31  1704  YES
+  23   A|VRP §21-A fixed 20% sizing (thr 1.2)                             14.1%  2022-01-01..2026-08-28  1701  YES
+  24   C|Pairs NAS100-US30 N2.0                                           13.2%  2022-01-01..2025-12-31  1461  YES
+  25   Tail-hedge OTM SPY puts 2% alloc (sec 34.2)                        11.8%  2022-01-01..2026-06-16  1628  YES
+  26   C|Pairs NAS100-US30 N1.5                                           10.6%  2022-01-01..2025-12-31  1461  YES
+  27   C|Turtle Sys2 SPX500                                                8.1%  2022-01-01..2025-12-31  1461  YES
+  28   A|VRP §21-A fixed 10% sizing (thr 1.2)                              7.0%  2022-01-01..2026-08-28  1701  YES
+  29   MomoRot LONG-SHORT N=6 (sec 34.1)                                   5.7%  2022-01-01..2026-08-28  1701  YES
+  30   D|Credit-spread FILTERED 1pct (SPY)                                 5.0%  2022-01-01..2026-06-16  1628  YES
+  31   C|Pairs GLD-SLV N2.0                                                1.8%  2022-01-01..2026-08-27  1700  YES
+  32   C|MACD BTCUSDT                                                      0.6%  2022-01-01..2026-08-31  1704  YES
+  33   C|Ichimoku XAUUSD                                                   0.6%  2022-01-01..2025-12-31  1461  YES
+  34   C|MACD ETHUSDT                                                      0.4%  2022-01-01..2026-08-31  1704  YES
+  35   C|Bollinger NAS100                                                  0.3%  2022-01-01..2025-12-31  1461  YES
+  36   C|Bollinger US30                                                    0.3%  2022-01-01..2025-12-31  1461  YES
+  37   C|MACD-slow-n3 BTCUSDT                                              0.2%  2022-01-01..2026-08-31  1704  YES
+  38   C|Bollinger SPX500                                                  0.2%  2022-01-01..2025-12-31  1461  YES
+  39   C|Ichimoku NAS100                                                   0.2%  2022-01-01..2025-12-31  1461  YES
+  40   C|MACD-slow-n3 ETHUSDT                                              0.1%  2022-01-01..2026-08-31  1704  YES
+  41   C|Bollinger BTCUSDT                                                 0.1%  2022-01-01..2026-08-31  1704  YES
+  42   C|Ichimoku EURUSD                                                   0.1%  2022-01-01..2025-12-30  1460  YES
+  43   C|Bollinger EURUSD                                                  0.1%  2022-01-01..2025-12-30  1460  YES
+  44   C|Ichimoku SPX500                                                  -0.0%  2022-01-01..2025-12-31  1461  YES
+  45   C|MACD EURUSD                                                      -0.1%  2022-01-01..2025-12-30  1460  YES
+  46   C|MACD US30                                                        -0.1%  2022-01-01..2025-12-31  1461  YES
+  47   C|Bollinger XAUUSD                                                 -0.2%  2022-01-01..2025-12-31  1461  YES
+  48   C|Ichimoku ETHUSDT                                                 -0.2%  2022-01-01..2026-08-31  1704  YES
+  49   C|MACD SPX500                                                      -0.2%  2022-01-01..2025-12-31  1461  YES
+  50   C|Ichimoku US30                                                    -0.3%  2022-01-01..2025-12-31  1461  YES
+  51   C|MACD XAUUSD                                                      -0.3%  2022-01-01..2025-12-31  1461  YES
+  52   C|Ichimoku BTCUSDT                                                 -0.6%  2022-01-01..2026-08-31  1704  YES
+  53   C|MACD NAS100                                                      -0.8%  2022-01-01..2025-12-31  1461  YES
+  54   C|Bollinger ETHUSDT                                                -1.4%  2022-01-01..2026-08-31  1704  YES
+  55   C|Turtle Sys1 SPX500                                               -2.8%  2022-01-01..2025-12-31  1461  YES
+  56   C|Pairs GLD-SLV N1.5                                               -8.4%  2022-01-01..2026-08-27  1700  YES
+  57   C|Turtle Sys2 EURUSD                                              -10.9%  2022-01-01..2025-12-30  1460  YES
+  58   C|Turtle Sys1 EURUSD                                              -12.6%  2022-01-01..2025-12-30  1460  YES
+  59   A|MomoRot crypto-sectors §17 (N12/K5)                             -14.9%  2022-01-01..2026-08-31  1704  YES
+  60   C|Turtle Sys2 US30                                                -16.0%  2022-01-01..2025-12-31  1461  YES
+  61   C|Turtle Sys1 US30                                                -17.8%  2022-01-01..2025-12-31  1461  YES
+  62   A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2)                     -61.9%  2022-01-01..2026-08-28  1701  YES
+  63   B|ICT-SMC EURUSD in-regime 2018-2025                              -76.3%  2022-01-01..2025-12-30  1460  YES
+  64   B|ICT-SMC XAUUSD in-regime 2018-2025                              -93.9%  2022-01-01..2025-12-31  1461  YES
+  65   B|ICT-SMC SPX500 in-regime 2018-2025                              -98.1%  2022-01-01..2025-12-31  1461  YES
+  66   B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime wind     -100.0%  2022-01-01..2025-12-30  1460  YES
+
+Saved: results/roi_ranking_all_strategies.csv (71 strategies x 3 windows)

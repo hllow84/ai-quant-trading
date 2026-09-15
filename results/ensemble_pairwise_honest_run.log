@@ -1,0 +1,176 @@
+================================================================================================================
+  SECTION 32.2 -- PAIRWISE-COMPLETE ENSEMBLE TEST (no fixed window, no zero-fill)
+================================================================================================================
+
+Component inventory: 64 series (user's brief said 24 -- actual saved inventory is 64, same file sections 32/32.1 used; running against the real count, not resized).
+
+HONESTY GATE -- zero-fill check (re-verified, not assumed from last time):
+  ensemble_correlation.to_calendar_grid() fills ONLY off-days *inside* a series' own [first,last]
+  range (a stated, legitimate flat-return convention); frame cells OUTSIDE that range are NaN, never 0.
+  equal_weight_available() = frame.mean(axis=1, skipna=True) -- verified again by source read below.
+  ASSERTION PASSED: equal_weight_available source contains skipna=True, no fillna(0) before the mean.
+
+PAIRWISE-COMPLETE CORRELATION MATRIX: 64x64, 2,016 unique pairs.
+  pairs with >= 250 genuinely-shared real days (TRUSTED)  : 1,916 (95.0%)
+  pairs with <  250 genuinely-shared real days (UNTRUSTED, marked NaN, not reported as a number): 100 (5.0%)
+  TRUSTED pairs only -- mean corr +0.030, median +0.010, |corr|>0.70: 28 (1.5%), |corr|<0.30: 1747 (91.2%)
+  Full matrix saved -> results/ensemble_pairwise_corr_matrix.csv (untrusted cells are real NaN)
+  Shared-day counts saved -> results/ensemble_pairwise_shared_days.csv
+
+LARGEST HONESTLY-COMBINABLE GROUP, QUALITY-BLIND (heuristic greedy search, 33 seed orders tried, NOT a certified max-clique -- exact max-clique is NP-hard and no exact solver was available; reported as the best heuristic result, best seed = 'highest-compatibility-degree-first'):
+  N = 23 members, all pairs within the group have >= 250 shared real days AND |corr| < 0.3:
+    - C|Pairs GLD-SLV N1.5  (own Sharpe -0.143, data 2006-04-28..2026-08-27)
+    - C|Pairs NAS100-US30 N1.5  (own Sharpe +0.037, data 2013-09-30..2025-12-31)
+    - C|MACD EURUSD  (own Sharpe -0.328, data 2013-01-01..2025-12-30)
+    - C|MACD XAUUSD  (own Sharpe -0.217, data 2017-01-02..2025-12-31)
+    - A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2)  (own Sharpe -0.661, data 2011-10-04..2026-08-28)
+    - C|Ichimoku EURUSD  (own Sharpe +0.271, data 2013-01-01..2025-12-30)
+    - C|Ichimoku XAUUSD  (own Sharpe +0.451, data 2017-01-02..2025-12-31)
+    - A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)  (own Sharpe +0.235, data 2018-01-03..2025-12-31)
+    - A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session)  (own Sharpe +0.533, data 2018-03-12..2025-12-09)
+    - B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)  (own Sharpe -12.700, data 2018-01-01..2025-12-30)
+    - B|ICT-SMC EURUSD in-regime 2018-2025  (own Sharpe -1.538, data 2018-01-02..2025-12-30)
+    - B|ICT-SMC SPX500 in-regime 2018-2025  (own Sharpe -3.439, data 2018-01-05..2025-12-31)
+    - B|ICT-SMC XAUUSD in-regime 2018-2025  (own Sharpe -2.949, data 2018-01-02..2025-12-31)
+    - C|MACD NAS100  (own Sharpe -0.499, data 2013-09-30..2025-12-31)
+    - C|MACD US30  (own Sharpe -0.106, data 2013-09-30..2025-12-31)
+    - A|VRP naked SVXY §20 (thr 1.5)  (own Sharpe +0.087, data 2011-10-04..2026-08-28)
+    - C|Ichimoku NAS100  (own Sharpe +0.115, data 2013-09-30..2025-12-31)
+    - A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)  (own Sharpe +0.629, data 2000-01-03..2026-08-28)
+    - C|Ichimoku US30  (own Sharpe -0.029, data 2013-09-30..2025-12-31)
+    - D|On-chain active-address surge H20 (BTCUSDT)  (own Sharpe +0.430, data 2018-01-03..2026-08-31)
+    - C|Ichimoku BTCUSDT  (own Sharpe +0.253, data 2018-01-01..2026-08-31)
+    - C|MACD BTCUSDT  (own Sharpe +0.586, data 2018-01-01..2026-08-31)
+    - C|Turtle Sys1 ETHUSDT  (own Sharpe +0.762, data 2018-01-01..2026-08-31)
+  !! 4/23 members have own full-history Sharpe < -1.0 (catastrophic) -- same section-32.1 lesson: quality-blind low-correlation filtering finds independent DISASTERS too, not just independent-and-healthy signals. A quality-gated version is run below for the fair best case.
+
+LARGEST HONESTLY-COMBINABLE GROUP, QUALITY-GATED (candidate pool restricted a priori to the 40/64 series with own full-history Sharpe > 0, same method, best seed = 'highest-compatibility-degree-first'):
+  N = 14 members:
+    - A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session)  (own Sharpe +0.533, data 2018-03-12..2025-12-09)
+    - C|Bollinger EURUSD  (own Sharpe +0.312, data 2013-01-01..2025-12-30)
+    - C|Pairs NAS100-US30 N2.0  (own Sharpe +0.246, data 2013-09-30..2025-12-31)
+    - A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)  (own Sharpe +0.235, data 2018-01-03..2025-12-31)
+    - C|Turtle Sys2 XAUUSD  (own Sharpe +0.821, data 2017-01-02..2025-12-31)
+    - C|MACD BTCUSDT  (own Sharpe +0.586, data 2018-01-01..2026-08-31)
+    - D|Credit-spread FILTERED 1pct (SPY)  (own Sharpe +0.567, data 1993-01-29..2026-06-16)
+    - D|On-chain active-address surge H20 (BTCUSDT)  (own Sharpe +0.430, data 2018-01-03..2026-08-31)
+    - C|Ichimoku BTCUSDT  (own Sharpe +0.253, data 2018-01-01..2026-08-31)
+    - A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)  (own Sharpe +0.629, data 2000-01-03..2026-08-28)
+    - C|Ichimoku SPX500  (own Sharpe +0.180, data 2017-01-03..2025-12-31)
+    - C|Turtle Sys1 NAS100  (own Sharpe +0.120, data 2013-09-30..2025-12-31)
+    - A|VRP naked SVXY §20 (thr 1.5)  (own Sharpe +0.087, data 2011-10-04..2026-08-28)
+    - C|Turtle Sys1 ETHUSDT  (own Sharpe +0.762, data 2018-01-01..2026-08-31)
+
+[QUALITY-BLIND] GROUP'S OWN HONEST FULL SPAN: 2000-01-03 .. 2026-08-31 (9,738 days)
+  live-component-count-per-day (yearly mean, full transparency table):
+2000     1.00
+2001     1.00
+2002     1.00
+2003     1.00
+2004     1.00
+2005     1.00
+2006     1.68
+2007     2.00
+2008     2.00
+2009     2.00
+2010     2.00
+2011     2.49
+2012     4.00
+2013     7.27
+2014    11.00
+2015    11.00
+2016    11.00
+2017    12.99
+2018    22.78
+2019    23.00
+2020    23.00
+2021    23.00
+2022    23.00
+2023    23.00
+2024    23.00
+2025    22.93
+2026     7.95
+  days with < 3 live group members (LOW-CONFIDENCE, flagged not dropped): 4,292 / 9,738 (44.1%)
+  COMBINED (full span, low-confidence days included): total_return=-94.5%  sharpe=-0.959  maxDD=98.2%  recovery_days=None  top_year_share=nan%  DSR=0.0000 (pool N=64)
+  HIGH-CONFIDENCE sub-period (>= 3 live, from 2011-10-04, 5,446 days): total_return=-97.9%  sharpe=-4.212  maxDD=98.2%  recovery_days=None  DSR=0.0000
+  STANDALONE comparison (each member's own full-history stats):
+    C|Pairs GLD-SLV N1.5                                         sharpe=-0.143  total_return=-29.0%  maxDD=44.2%
+    C|Pairs NAS100-US30 N1.5                                     sharpe=+0.037  total_return=+0.7%  maxDD=15.8%
+    C|MACD EURUSD                                                sharpe=-0.328  total_return=-0.3%  maxDD=0.4%
+    C|MACD XAUUSD                                                sharpe=-0.217  total_return=-0.3%  maxDD=0.5%
+    A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2)                sharpe=-0.661  total_return=-98.9%  maxDD=99.0%
+    C|Ichimoku EURUSD                                            sharpe=+0.271  total_return=+0.2%  maxDD=0.2%
+    C|Ichimoku XAUUSD                                            sharpe=+0.451  total_return=+0.5%  maxDD=0.2%
+    A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)               sharpe=+0.235  total_return=+21.5%  maxDD=33.5%
+    A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session) sharpe=+0.533  total_return=+46.8%  maxDD=14.7%
+    B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring) sharpe=-12.700  total_return=-100.0%  maxDD=100.0%
+    B|ICT-SMC EURUSD in-regime 2018-2025                         sharpe=-1.538  total_return=-93.8%  maxDD=94.8%
+    B|ICT-SMC SPX500 in-regime 2018-2025                         sharpe=-3.439  total_return=-100.0%  maxDD=100.0%
+    B|ICT-SMC XAUUSD in-regime 2018-2025                         sharpe=-2.949  total_return=-99.8%  maxDD=99.8%
+    C|MACD NAS100                                                sharpe=-0.499  total_return=-1.3%  maxDD=1.4%
+    C|MACD US30                                                  sharpe=-0.106  total_return=-0.2%  maxDD=0.7%
+    A|VRP naked SVXY §20 (thr 1.5)                               sharpe=+0.087  total_return=-69.9%  maxDD=91.8%
+    C|Ichimoku NAS100                                            sharpe=+0.115  total_return=+0.2%  maxDD=0.4%
+    A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)           sharpe=+0.629  total_return=+933.9%  maxDD=37.5%
+    C|Ichimoku US30                                              sharpe=-0.029  total_return=-0.0%  maxDD=0.4%
+    D|On-chain active-address surge H20 (BTCUSDT)                sharpe=+0.430  total_return=+120.8%  maxDD=65.6%
+    C|Ichimoku BTCUSDT                                           sharpe=+0.253  total_return=+0.8%  maxDD=1.0%
+    C|MACD BTCUSDT                                               sharpe=+0.586  total_return=+3.1%  maxDD=0.6%
+    C|Turtle Sys1 ETHUSDT                                        sharpe=+0.762  total_return=+93.8%  maxDD=17.8%
+
+[QUALITY-GATED] GROUP'S OWN HONEST FULL SPAN: 1993-01-29 .. 2026-08-31 (12,268 days)
+  live-component-count-per-day (yearly mean, full transparency table):
+1993     1.00
+1994     1.00
+1995     1.00
+1996     1.00
+1997     1.00
+1998     1.00
+1999     1.00
+2000     1.99
+2001     2.00
+2002     2.00
+2003     2.00
+2004     2.00
+2005     2.00
+2006     2.00
+2007     2.00
+2008     2.00
+2009     2.00
+2010     2.00
+2011     2.24
+2012     3.00
+2013     4.51
+2014     6.00
+2015     6.00
+2016     6.00
+2017     7.99
+2018    13.80
+2019    14.00
+2020    14.00
+2021    14.00
+2022    14.00
+2023    14.00
+2024    14.00
+2025    13.94
+2026     6.66
+  days with < 3 live group members (LOW-CONFIDENCE, flagged not dropped): 6,822 / 12,268 (55.6%)
+  COMBINED (full span, low-confidence days included): total_return=+317.2%  sharpe=+0.610  maxDD=20.1%  recovery_days=531  top_year_share=11.2%  DSR=0.0000 (pool N=64)
+  HIGH-CONFIDENCE sub-period (>= 3 live, from 2011-10-04, 5,446 days): total_return=+77.3%  sharpe=+0.541  maxDD=15.6%  recovery_days=706  DSR=0.0000
+  STANDALONE comparison (each member's own full-history stats):
+    A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session) sharpe=+0.533  total_return=+46.8%  maxDD=14.7%
+    C|Bollinger EURUSD                                           sharpe=+0.312  total_return=+0.2%  maxDD=0.1%
+    C|Pairs NAS100-US30 N2.0                                     sharpe=+0.246  total_return=+14.9%  maxDD=14.2%
+    A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)               sharpe=+0.235  total_return=+21.5%  maxDD=33.5%
+    C|Turtle Sys2 XAUUSD                                         sharpe=+0.821  total_return=+90.7%  maxDD=19.4%
+    C|MACD BTCUSDT                                               sharpe=+0.586  total_return=+3.1%  maxDD=0.6%
+    D|Credit-spread FILTERED 1pct (SPY)                          sharpe=+0.567  total_return=+38.4%  maxDD=3.7%
+    D|On-chain active-address surge H20 (BTCUSDT)                sharpe=+0.430  total_return=+120.8%  maxDD=65.6%
+    C|Ichimoku BTCUSDT                                           sharpe=+0.253  total_return=+0.8%  maxDD=1.0%
+    A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)           sharpe=+0.629  total_return=+933.9%  maxDD=37.5%
+    C|Ichimoku SPX500                                            sharpe=+0.180  total_return=+0.2%  maxDD=0.3%
+    C|Turtle Sys1 NAS100                                         sharpe=+0.120  total_return=+8.9%  maxDD=24.0%
+    A|VRP naked SVXY §20 (thr 1.5)                               sharpe=+0.087  total_return=-69.9%  maxDD=91.8%
+    C|Turtle Sys1 ETHUSDT                                        sharpe=+0.762  total_return=+93.8%  maxDD=17.8%
+
+Saved: results/ensemble_pairwise_honest_results.csv, ensemble_pairwise_corr_matrix.csv, ensemble_pairwise_shared_days.csv

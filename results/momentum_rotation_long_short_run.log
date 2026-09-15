@@ -1,0 +1,58 @@
+================================================================================================================
+  SECTION 34.1 -- LONG/SHORT MOMENTUM ROTATION vs LONG-ONLY BASELINE
+================================================================================================================
+
+Split: LONG top 5 @ 20% each (100% gross long), SHORT bottom 3 @ 10% each (30% gross short). Total gross exposure 130%. Risk-off behaviour unchanged from baseline (100% IEF, no shorts).
+
+Panel: 8453 rows x 28 cols, 1993-01-29 -> 2026-08-28, widened 27-instrument universe (section 12.2 canonical wider test)
+
+FULL PERIOD  LONG-ONLY  N=6 (live from 1999-07-01, guard=PASS):
+  Sharpe 0.558 (SPY 0.518)  CAGR 7.70% (SPY 8.43%)  maxDD 31.77% (SPY 55.19%)  recovery 513d  top_year_share 13.4%  beats_spy_sharpe=True
+
+FULL PERIOD  LONG-SHORT  N=6 (live from 1999-07-01, guard=PASS):
+  Sharpe 0.519 (SPY 0.518)  CAGR 6.81% (SPY 8.43%)  maxDD 30.23% (SPY 55.19%)  recovery 416d  top_year_share 16.9%  beats_spy_sharpe=True
+STRESS 2000-2009  LONG-ONLY  N=6: Sharpe 0.816 (SPY 0.067)  CAGR 13.01% (SPY -0.91%)  maxDD 31.77% (SPY 55.19%)  beats_spy_sharpe=True
+STRESS 2000-2009  LONG-SHORT  N=6: Sharpe 0.876 (SPY 0.067)  CAGR 12.72% (SPY -0.91%)  maxDD 24.86% (SPY 55.19%)  beats_spy_sharpe=True
+
+FULL PERIOD  LONG-ONLY  N=12 (live from 2000-01-03, guard=PASS):
+  Sharpe 0.630 (SPY 0.511)  CAGR 9.18% (SPY 8.36%)  maxDD 37.50% (SPY 55.19%)  recovery 801d  top_year_share 14.0%  beats_spy_sharpe=True
+
+FULL PERIOD  LONG-SHORT  N=12 (live from 2000-01-03, guard=PASS):
+  Sharpe 0.575 (SPY 0.511)  CAGR 7.97% (SPY 8.36%)  maxDD 32.63% (SPY 55.19%)  recovery 1148d  top_year_share 15.5%  beats_spy_sharpe=True
+STRESS 2000-2009  LONG-ONLY  N=12: Sharpe 0.704 (SPY 0.067)  CAGR 11.47% (SPY -0.91%)  maxDD 37.50% (SPY 55.19%)  beats_spy_sharpe=True
+STRESS 2000-2009  LONG-SHORT  N=12: Sharpe 0.673 (SPY 0.067)  CAGR 9.83% (SPY -0.91%)  maxDD 32.63% (SPY 55.19%)  beats_spy_sharpe=True
+
+================================================================================================================
+  DOWN-YEAR-SPECIFIC COMPARISON (SPY negative years only, N=12 shown -- both N behave the same way)
+================================================================================================================
+  SPY down years in the full available panel: [2000, 2001, 2002, 2008, 2018, 2022]
+
+  N=6:
+    2000: SPY  -9.74%   LONG-ONLY  +16.50%   LONG-SHORT  +22.18%   short-leg delta  +5.68pp
+    2001: SPY -11.76%   LONG-ONLY  -11.02%   LONG-SHORT  -11.07%   short-leg delta  -0.05pp
+    2002: SPY -21.58%   LONG-ONLY   -9.62%   LONG-SHORT   -3.90%   short-leg delta  +5.72pp
+    2008: SPY -36.79%   LONG-ONLY  +18.45%   LONG-SHORT  +18.20%   short-leg delta  -0.25pp
+    2018: SPY  -4.57%   LONG-ONLY   -8.83%   LONG-SHORT   -9.44%   short-leg delta  -0.61pp
+    2022: SPY -18.18%   LONG-ONLY  -14.25%   LONG-SHORT   -8.43%   short-leg delta  +5.81pp
+
+  N=12:
+    2000: SPY  -9.74%   LONG-ONLY   -5.07%   LONG-SHORT   -9.28%   short-leg delta  -4.21pp
+    2001: SPY -11.76%   LONG-ONLY   -9.20%   LONG-SHORT   -9.66%   short-leg delta  -0.46pp
+    2002: SPY -21.58%   LONG-ONLY   -8.76%   LONG-SHORT   -0.17%   short-leg delta  +8.58pp
+    2008: SPY -36.79%   LONG-ONLY  +16.94%   LONG-SHORT  +17.45%   short-leg delta  +0.51pp
+    2018: SPY  -4.57%   LONG-ONLY  -13.22%   LONG-SHORT  -14.64%   short-leg delta  -1.42pp
+    2022: SPY -18.18%   LONG-ONLY   +7.12%   LONG-SHORT  +13.04%   short-leg delta  +5.92pp
+
+================================================================================================================
+  DSR REFERENCE (pool = this batch's own 4 full-period cells: 2 variants x 2 N)
+================================================================================================================
+  FULL LONG-ONLY N=6: DSR=0.3745 (E[maxSR]=0.6191, pool N=4)
+  FULL LONG-SHORT N=6: DSR=0.3019 (E[maxSR]=0.6191, pool N=4)
+  FULL LONG-ONLY N=12: DSR=0.5230 (E[maxSR]=0.6191, pool N=4)
+  FULL LONG-SHORT N=12: DSR=0.4102 (E[maxSR]=0.6191, pool N=4)
+  STRESS LONG-ONLY N=6: DSR=0.4357 (E[maxSR]=0.8676, pool N=4)
+  STRESS LONG-SHORT N=6: DSR=0.5111 (E[maxSR]=0.8676, pool N=4)
+  STRESS LONG-ONLY N=12: DSR=0.3030 (E[maxSR]=0.8676, pool N=4)
+  STRESS LONG-SHORT N=12: DSR=0.2697 (E[maxSR]=0.8676, pool N=4)
+
+Saved: results/momentum_rotation_long_short_{full,stress}.csv, momentum_rotation_long_short_yearly_*.csv (8 tables)

@@ -1,0 +1,35 @@
+================================================================================================================
+  SECTION 34.2 -- TAIL-RISK HEDGE: SMALL CONSTANT ALLOCATION TO OTM SPY PUTS
+================================================================================================================
+
+Strike: 5% OTM (K=0.95xspot). Roll: monthly, 30d target tenor. Sigma: flat trailing VIX (skew ignored -- understates true hedge cost, flattering the hedge). r=4.5%. Costs: 2% half-spread + 0.5% commission on entry (buyer pays the ask), same sec 24/26 assumptions.
+
+Data: SPY+VIX daily, 1993-01-29 .. 2026-06-16, 8,402 days
+
+UNHEDGED SPY baseline (full period): Sharpe 0.648  CAGR 10.85%  total_return 3003.7%  maxDD 55.19%
+
+================================================================================================================
+  ALLOCATION 1% of equity spent on premium per roll
+================================================================================================================
+  Look-ahead guard: PASS (259 rolled puts)
+  FULL PERIOD (hedged): Sharpe 0.441  CAGR 6.66%  total_return 759.4%  maxDD 54.87%  recovery 1753d
+    vs UNHEDGED SPY: Sharpe 0.648  CAGR 10.85%  maxDD 55.19%
+  STEADY-STATE COST: mean annual hedge-overlay P&L in 32 calm years (excl. 2008, 2020) = -5.24%/yr (12% of calm years the hedge P&L was positive) -- this is the ongoing insurance premium bled in ordinary years.
+  2008 (full year): unhedged SPY -36.79%  |  hedged (alloc 1%) -20.87%  |  hedge offset +15.92pp (DOES meaningfully offset the loss)
+  2020 (full year): unhedged SPY +18.33%  |  hedged (alloc 1%) +11.01%  |  hedge offset -7.32pp (does NOT meaningfully offset the loss)
+  2020 acute crash (2020-02-19..2020-03-23): unhedged SPY -33.40%  |  hedged (alloc 1%) -33.14%  |  hedge offset +0.26pp (does NOT meaningfully offset the loss)
+  DSR reference (pool=this alloc's Sharpe + unhedged SPY's Sharpe, N=2): 0.1452 (E[maxSR]=0.6203)
+
+================================================================================================================
+  ALLOCATION 2% of equity spent on premium per roll
+================================================================================================================
+  Look-ahead guard: PASS (259 rolled puts)
+  FULL PERIOD (hedged): Sharpe 0.208  CAGR 2.22%  total_return 108.2%  maxDD 62.84%  recovery 2359d
+    vs UNHEDGED SPY: Sharpe 0.648  CAGR 10.85%  maxDD 55.19%
+  STEADY-STATE COST: mean annual hedge-overlay P&L in 32 calm years (excl. 2008, 2020) = -10.16%/yr (12% of calm years the hedge P&L was positive) -- this is the ongoing insurance premium bled in ordinary years.
+  2008 (full year): unhedged SPY -36.79%  |  hedged (alloc 2%) -3.89%  |  hedge offset +32.91pp (DOES meaningfully offset the loss)
+  2020 (full year): unhedged SPY +18.33%  |  hedged (alloc 2%) +4.08%  |  hedge offset -14.25pp (does NOT meaningfully offset the loss)
+  2020 acute crash (2020-02-19..2020-03-23): unhedged SPY -33.40%  |  hedged (alloc 2%) -32.88%  |  hedge offset +0.52pp (does NOT meaningfully offset the loss)
+  DSR reference (pool=this alloc's Sharpe + unhedged SPY's Sharpe, N=2): 0.0113 (E[maxSR]=0.5894)
+
+Saved: results/tail_hedge_otm_puts_summary.csv, tail_hedge_otm_puts_{trades,daily_ret}_alloc{1,2}pct.csv

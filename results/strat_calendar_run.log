@@ -1,0 +1,44 @@
+STRATEGY 4 -- CALENDAR/SEASONALITY, significance test BEFORE any backtest
+
+
+################################################################################################################
+  SPX500  (2017-01-04 -> 2025-12-31, 2645 trading days)
+################################################################################################################
+
+  [Santa Claus rally] n_on=61  mean_on=+0.0705%/day  mean_off=+0.0471%/day
+    Welch t-test: t=+0.21, p=0.8377
+    Bootstrap (10000 resamples of same-size random-day baskets): p=0.8603
+    -> NOT significant on both tests. NO tradeable rule built -- clean non-finding, stated plainly.
+
+  [Sell in May (long Nov-Apr)] n_on=1302  mean_on=+0.0452%/day  mean_off=+0.0500%/day
+    Welch t-test: t=-0.12, p=0.9074
+    Bootstrap (10000 resamples of same-size random-day baskets): p=0.9071
+    -> NOT significant on both tests. NO tradeable rule built -- clean non-finding, stated plainly.
+
+  [Turn-of-month] n_on=432  mean_on=+0.0232%/day  mean_off=+0.0524%/day
+    Welch t-test: t=-0.55, p=0.5857
+    Bootstrap (10000 resamples of same-size random-day baskets): p=0.6028
+    -> NOT significant on both tests. NO tradeable rule built -- clean non-finding, stated plainly.
+
+  SPX500: NONE of the three named effects passed both significance tests. No backtest was forced on a non-finding for this instrument.
+
+################################################################################################################
+  BTCUSDT  (2018-01-02 -> 2026-08-31, 3164 trading days)
+################################################################################################################
+
+  [Santa Claus rally] n_on=56  mean_on=+0.3894%/day  mean_off=+0.1046%/day
+    Welch t-test: t=+0.81, p=0.4205
+    Bootstrap (10000 resamples of same-size random-day baskets): p=0.5143
+    -> NOT significant on both tests. NO tradeable rule built -- clean non-finding, stated plainly.
+
+  [Sell in May (long Nov-Apr)] n_on=1569  mean_on=+0.1406%/day  mean_off=+0.0792%/day
+    Welch t-test: t=+0.53, p=0.5996
+    Bootstrap (10000 resamples of same-size random-day baskets): p=0.6065
+    -> NOT significant on both tests. NO tradeable rule built -- clean non-finding, stated plainly.
+
+  [Turn-of-month] n_on=416  mean_on=+0.2254%/day  mean_off=+0.0922%/day
+    Welch t-test: t=+0.84, p=0.4023
+    Bootstrap (10000 resamples of same-size random-day baskets): p=0.4383
+    -> NOT significant on both tests. NO tradeable rule built -- clean non-finding, stated plainly.
+
+  BTCUSDT: NONE of the three named effects passed both significance tests. No backtest was forced on a non-finding for this instrument.

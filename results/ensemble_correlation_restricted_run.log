@@ -1,0 +1,61 @@
+==============================================================================================================
+  SECTION 32.1 -- BUG AUDIT: staggered-inception regime blending in the section-32 ensemble test
+==============================================================================================================
+
+SOURCE CHECK (verified by reading code, not inferred): equal_weight_available() uses frame.mean(axis=1, skipna=True); inverse_vol_weight() zero-weights (not zero-fills) absent series.
+The hypothesized fillna(0)-before-averaging bug is NOT present in the source.
+
+LIVE-COMPONENT COUNT PER CALENDAR DAY, full 1993-2026 stitched frame:
+  mean=21.39  median=6.0  min=1  max=59
+  yearly mean live count:
+1993     1.00
+1994     1.00
+1995     1.00
+1996     1.00
+1997     1.00
+1998     1.00
+1999     1.00
+2000     2.99
+2001     3.00
+2002     3.00
+2003     3.00
+2004     3.00
+2005     3.00
+2006     4.36
+2007     5.00
+2008     5.00
+2009     5.91
+2010     6.00
+2011     7.46
+2012    12.00
+2013    21.42
+2014    32.00
+2015    32.00
+2016    32.00
+2017    43.72
+2018    57.79
+2019    58.00
+2020    58.92
+2021    59.00
+2022    59.00
+2023    59.00
+2024    59.00
+2025    58.92
+2026    25.54
+
+  days with <5 live components : 4,837 / 12,268
+  days with <=1 live component : 2,530 / 12,268
+
+THIN PRE-2018 PERIOD ALONE (1993-2017, mean live=9.30): equal-weight Sharpe=+0.484
+
+RESTRICTED WINDOW 2018-01-01..2025-12-31 (60 series with any data): mean live=58.70  min=51  max=59
+
+CORRECTED RESULTS, RESTRICTED TO THE GENUINELY-POPULATED WINDOW (same 4 methods, same code, only the date window changes):
+  EQUAL-WEIGHT ALL (restricted, N=60)                          SR=  -4.552  ret=    -75.0%  maxDD=  75.3%  DSR=0.0000
+  INVERSE-VOL-WEIGHT ALL (restricted, N=60)                    SR=  -0.848  ret=     -0.6%  maxDD=   0.6%  DSR=0.0000
+  LOW-CORR SUBSET, quality-blind (restricted, N=20)            SR= -11.065  ret=    -99.2%  maxDD=  99.2%  DSR=0.0000
+  LOW-CORR SUBSET, positive-Sharpe-only (restricted, N=12)     SR=  +0.239  ret=     +7.3%  maxDD=  15.1%  DSR=0.0000
+
+Saved: results/ensemble_combined_results_CORRECTED_restricted_window.csv
+
+VERDICT: the section-32 headline numbers (Sharpe -0.15 / +0.47 / -1.63 / +0.68) were flattered by blending a thin, quality-dominated pre-2018 regime with the fully-populated post-2018 basket. Restricted to the honest, consistently-populated window, ALL FOUR methods are materially worse -- the best one (low-corr, positive-Sharpe-only) collapses from +421.1% / Sharpe +0.68 to +7.3% / Sharpe +0.24. The original section-32 KILL verdict stands and is STRENGTHENED, not reversed, by this correction.

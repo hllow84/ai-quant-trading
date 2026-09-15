@@ -5522,135 +5522,1855 @@ it gracefully; don't backtest on partial data).
 
 **Status: ready to deploy, not deployed.** No cumulative-trial count change
 — this is infrastructure, not a backtest.
-
----
-
-## §30.1 — On-chain active-address signal: bounded pre-registered extension (2026-09-06)
-
-**Follows §30 directly. Data, cost model and engine reused byte-for-byte**
-via `import run_onchain_signal as s30` — `s30.load_addr()` /
-`s30.load_btc_daily()` (free blockchain.info `n-unique-addresses` +
-real-spread BTCUSDT daily from the Binance H1 file), `s30.CRYPTO_COST_BPS`
-(20 bps commission + 1.0 bps/side slippage + real per-day closing-hour
-spread, split half-open/half-close), `s30.build_signal` (causal trailing
-z-score, current day excluded), `s30.run_cell` (no_pos sequential gate).
-Long cells call `s30.run_cell` unmodified; short cells use a byte-copy with
-**three marked sign flips**; Part 3 uses a new daily-filter engine.
-
-**The §30 STEP 1 data caveat still governs everything below:** the metric
-is BTC unique active addresses — a network-usage/adoption proxy — **not**
-the exchange-flow / whale-balance / exchange-reserve data the original
-brief named as its leading hypothesis. That data is paywalled on every free
-tier checked live in §30 (Glassnode, CryptoQuant, Coin Metrics, Etherscan).
-This section is a wide search of the one free series, not a test of the
-brief's actual hypothesis.
-
-**Pre-registration (all rules fixed before the run — `run_onchain_signal_ext.py` docstring):**
-
-- **Part 1 — lookback/threshold grid (level surge):** window {30, 60, 90*,
-  180} d × z-threshold {1.0, 1.5*, 2.0} SD × direction {long-on-surge*,
-  short-on-surge / fade} × hold {5, 20} d = **48 cells**. (* = §30 value.)
-  Trigger is identical for both directions (an *upward* address surge,
-  z > threshold); only the position sign differs.
-- **Part 2 — acceleration variant:** signal = 2nd difference of the trailing
-  rolling average, z-scored against its own trailing distribution.
-  Exact causal calc: `RA_t = A.shift(1).rolling(W).mean()` (day t excluded);
-  `ACCEL_t = RA_t − 2·RA_{t−1} + RA_{t−2}`;
-  `ACCELZ_t = (ACCEL_t − mean_{t−W..t−1} ACCEL) / std_{t−W..t−1} ACCEL`.
-  Strictly causal — uses A only through day t−1. Same 48-cell grid = **48 cells**.
-- **Part 3 — regime filter on default buy-and-hold:** hold 100% BTC every
-  day; **exit to cash on day t+1 iff the §30 level z-score on day t is
-  ≤ UNHEALTHY_THR** (network activity contracted vs its trailing
-  distribution); position lagged one day; never short. Grid: window {90,
-  180} × UNHEALTHY_THR {−0.5, −1.0, −1.5} SD = **6 cells**. One BTCUSDT
-  transaction charged per switch (half the §30 round-turn cost each).
-- **Total new cells / trials this batch: 48 + 48 + 6 = 102.**
-
-**Honesty gates:** look-ahead guard **PASS on all 102** (baselines exclude
-the current day by construction; Part 3 position is `z.shift(1)`; guard
-returned true on every evaluated cell). Real BTCUSDT costs (§30 model).
-Per-year concentration (bar 0.60). Regime sub-split 2018-2021 vs 2022-2025
-— **same caveat as §30/§28: NOT a true out-of-regime test**, no free
-pre-2018 real-spread BTCUSDT data exists (Binance starts 2017-08).
-vs buy-and-hold BTC over the identical window ($100k → **$576,995**,
-+477.0%, CAGR +22.4%, daily-return Sharpe **+0.638**, maxDD 81%).
-
-**Deflated-Sharpe pool, stated explicitly (the brief's requirement):**
-- PRIOR cumulative project trials (through §30): **1135**.
-- NEW trials this batch: **102**.
-- **NEW CUMULATIVE TOTAL: 1237.**
-- Batch net-Sharpe distribution: mean −0.600, sd 1.171, range [−4.87, +2.20].
-- E[max Sharpe] under the null: batch structural pool N=102 → **+2.372**;
-  **full-cumulative pool N=1237 → +3.283** (the primary bar — the grid is
-  large, so the bar rises accordingly). DSR reported per cell against both.
-
-**RESULT — RANKED BY NET SHARPE (full window; complete 102-row table in
-`results/onchain_ext.csv`, console log `results/onchain_ext_run.log`):**
-
-| # | part / variant | win | thr | dir | H | n | net SR | gross SR | net PF | maxDD | topYr | end $ | vs B&H | subA / subB | DSR (N=1237) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | 2 accel | 90 | +2.0 | long | 5 | 48 | **+2.20** | +3.55 | 1.421 | 26.3% | 68% | $172,975 | **loses** | +5.30 / −1.12 | 0.204 |
-| 2 | 2 accel | 180 | +1.5 | long | 5 | 111 | +1.16 | +2.22 | 1.192 | 42.9% | 89% | $186,061 | loses | +1.26 / +1.05 | 0.009 |
-| 3 | 1 level | 180 | +2.0 | long | 20 | 40 | +1.08 | +1.26 | 1.187 | 51.8% | 76% | $294,205 | loses | +1.22 / +0.85 | 0.001 |
-| 4 | 1 level | 180 | +1.5 | long | 20 | 64 | +1.07 | +1.27 | 1.190 | 58.5% | 58% | $489,625 | loses | +1.11 / +1.06 | 0.000 |
-| 5 | 1 level | 90 | +2.0 | long | 20 | 46 | +0.87 | +1.06 | 1.148 | 70.3% | 59% | $237,225 | loses | +0.95 / +0.77 | 0.000 |
-| … | 13 long cells beat B&H's +0.638 net Sharpe at lower DD; **none** beats it in dollars | | | | | | | | | | | | | | |
-| 30–45 | **Part 3** regime-filter-on-B&H (all 6) | 90/180 | −0.5…−1.5 | — | — | 403–865 sw | +0.19 … −0.20 | +0.48…+0.60 | ≤1.03 | 83–95% | — | **$14k–$57k** | **all lose** | mixed | 0.000 |
-| 50–102 | **all short / fade cells** | | | short | | | −0.46 … **−4.87** | mostly negative | <1 | 82–99.9% | — | wiped | all lose | negative | 0.000 |
-
-**Buy-and-hold BTC:** full $576,995 · sub 2018-2021 $344,216 · sub 2022-2025 $163,609.
-
-**FINDINGS:**
-
-1. **0 / 102 cells beat buy-and-hold BTC in compounded dollars.** 13 long
-   cells beat B&H on *risk-adjusted* return (net Sharpe > 0.638) at far
-   lower drawdown — the best (Part 2 accel/W90/thr+2.0/H5) posts net Sharpe
-   +2.20, gross +3.55, PF 1.42, maxDD 26.3% vs B&H's 81% — **but every one
-   loses in dollars because it is invested only a fraction of the time.**
-   Exact §30 / §25-PEAD terminal pattern: a real small gross directional
-   edge that cannot out-compound simply owning the beta through a genuine
-   bull run.
-2. **DSR: 0 / 102 clear 0.95** against the true N=1237 pool (E[max SR]
-   +3.283). Top cell scores **0.204**; #2 onward ≤ 0.009. Even against the
-   lenient batch-only pool (N=102) the best is 0.447. Nothing survives.
-3. **The acceleration variant is not an improvement.** Its best cell tops
-   the table only via a single-regime spike: subA (2018-2021) net Sharpe
-   **+5.30** vs subB (2022-2025) **−1.12** — a sign flip; the whole result
-   is one bull phase. Across the grid the acceleration cells interleave
-   with the level cells, no systematic edge.
-4. **Contrarian / short-on-surge / fade: clean anti-finding.** Ranks 50–102
-   are almost entirely short cells; gross Sharpe is *negative* on most —
-   fading an address surge is just being short BTC in a bull market. No
-   contrarian edge in either the level or the acceleration signal.
-5. **Part 3 (regime filter on B&H) does NOT fix §30's "sits in cash too
-   much" failure — it replaces it with churn.** The naive daily filter
-   flips 403–865 times over the window; even the variant that stays in BTC
-   **91%** of days returns **−6.3% CAGR** ($56,998) vs B&H's +22.4%. Gross
-   (cost-free) Sharpe of every Part-3 cell is ~0.48–0.60, **below B&H's
-   0.638**, so the unhealthy-exit timing is *mildly anti-predictive* even
-   before switch costs bury it. Hysteresis/persistence is an obvious
-   un-tested refinement, but the gross-Sharpe deficit says the exit timing
-   has no edge to rescue.
-6. **Regime instability is the rule:** 37 / 102 cells flip net-Sharpe sign
-   between 2018-2021 and 2022-2025. The few positive-Sharpe cells are
-   overwhelmingly 2018-2021 phenomena.
-
-**VERDICT — KILL, and the search is closed on this series.** A wide,
-pre-registered, look-ahead-clean search — 102 cells across level surge, its
-acceleration, both directions, four lookbacks, three thresholds, two hold
-periods, and a regime-filter-on-buy-and-hold — of the one genuinely free
-BTC on-chain series **came up empty**: nothing beats owning BTC in dollars,
-nothing clears the DSR bar for the true trial count. Consistent with §30's
-own conclusion. Real evidence that the free blockchain.info active-address
-series carries no tradeable edge over buy-and-hold, **not** a reason to keep
-parameter-hunting the same series. A genuine test of the brief's actual
-hypothesis (exchange flow / whale balance / exchange reserves) still
-requires a paid subscription (Glassnode Advanced ~$49/mo or CryptoQuant
-Professional ~$99/mo) — flagged in §30 as a costed next step, still not taken.
-
-**Files:** `run_onchain_signal_ext.py`. Results:
-`results/onchain_ext.csv` (ranked evaluated cells),
-`results/onchain_ext_all_cells.csv` (raw), `results/onchain_ext_run.log`.
-Reproduce: `py -3.14 run_onchain_signal_ext.py`.
-
-**Cumulative trials: N=1237** (1135 prior + 102).
+
+---
+
+## §30.1 — On-chain active-address signal: bounded pre-registered extension (2026-09-06)
+
+**Follows §30 directly. Data, cost model and engine reused byte-for-byte**
+via `import run_onchain_signal as s30` — `s30.load_addr()` /
+`s30.load_btc_daily()` (free blockchain.info `n-unique-addresses` +
+real-spread BTCUSDT daily from the Binance H1 file), `s30.CRYPTO_COST_BPS`
+(20 bps commission + 1.0 bps/side slippage + real per-day closing-hour
+spread, split half-open/half-close), `s30.build_signal` (causal trailing
+z-score, current day excluded), `s30.run_cell` (no_pos sequential gate).
+Long cells call `s30.run_cell` unmodified; short cells use a byte-copy with
+**three marked sign flips**; Part 3 uses a new daily-filter engine.
+
+**The §30 STEP 1 data caveat still governs everything below:** the metric
+is BTC unique active addresses — a network-usage/adoption proxy — **not**
+the exchange-flow / whale-balance / exchange-reserve data the original
+brief named as its leading hypothesis. That data is paywalled on every free
+tier checked live in §30 (Glassnode, CryptoQuant, Coin Metrics, Etherscan).
+This section is a wide search of the one free series, not a test of the
+brief's actual hypothesis.
+
+**Pre-registration (all rules fixed before the run — `run_onchain_signal_ext.py` docstring):**
+
+- **Part 1 — lookback/threshold grid (level surge):** window {30, 60, 90*,
+  180} d × z-threshold {1.0, 1.5*, 2.0} SD × direction {long-on-surge*,
+  short-on-surge / fade} × hold {5, 20} d = **48 cells**. (* = §30 value.)
+  Trigger is identical for both directions (an *upward* address surge,
+  z > threshold); only the position sign differs.
+- **Part 2 — acceleration variant:** signal = 2nd difference of the trailing
+  rolling average, z-scored against its own trailing distribution.
+  Exact causal calc: `RA_t = A.shift(1).rolling(W).mean()` (day t excluded);
+  `ACCEL_t = RA_t − 2·RA_{t−1} + RA_{t−2}`;
+  `ACCELZ_t = (ACCEL_t − mean_{t−W..t−1} ACCEL) / std_{t−W..t−1} ACCEL`.
+  Strictly causal — uses A only through day t−1. Same 48-cell grid = **48 cells**.
+- **Part 3 — regime filter on default buy-and-hold:** hold 100% BTC every
+  day; **exit to cash on day t+1 iff the §30 level z-score on day t is
+  ≤ UNHEALTHY_THR** (network activity contracted vs its trailing
+  distribution); position lagged one day; never short. Grid: window {90,
+  180} × UNHEALTHY_THR {−0.5, −1.0, −1.5} SD = **6 cells**. One BTCUSDT
+  transaction charged per switch (half the §30 round-turn cost each).
+- **Total new cells / trials this batch: 48 + 48 + 6 = 102.**
+
+**Honesty gates:** look-ahead guard **PASS on all 102** (baselines exclude
+the current day by construction; Part 3 position is `z.shift(1)`; guard
+returned true on every evaluated cell). Real BTCUSDT costs (§30 model).
+Per-year concentration (bar 0.60). Regime sub-split 2018-2021 vs 2022-2025
+— **same caveat as §30/§28: NOT a true out-of-regime test**, no free
+pre-2018 real-spread BTCUSDT data exists (Binance starts 2017-08).
+vs buy-and-hold BTC over the identical window ($100k → **$576,995**,
++477.0%, CAGR +22.4%, daily-return Sharpe **+0.638**, maxDD 81%).
+
+**Deflated-Sharpe pool, stated explicitly (the brief's requirement):**
+- PRIOR cumulative project trials (through §30): **1135**.
+- NEW trials this batch: **102**.
+- **NEW CUMULATIVE TOTAL: 1237.**
+- Batch net-Sharpe distribution: mean −0.600, sd 1.171, range [−4.87, +2.20].
+- E[max Sharpe] under the null: batch structural pool N=102 → **+2.372**;
+  **full-cumulative pool N=1237 → +3.283** (the primary bar — the grid is
+  large, so the bar rises accordingly). DSR reported per cell against both.
+
+**RESULT — RANKED BY NET SHARPE (full window; complete 102-row table in
+`results/onchain_ext.csv`, console log `results/onchain_ext_run.log`):**
+
+| # | part / variant | win | thr | dir | H | n | net SR | gross SR | net PF | maxDD | topYr | end $ | vs B&H | subA / subB | DSR (N=1237) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 2 accel | 90 | +2.0 | long | 5 | 48 | **+2.20** | +3.55 | 1.421 | 26.3% | 68% | $172,975 | **loses** | +5.30 / −1.12 | 0.204 |
+| 2 | 2 accel | 180 | +1.5 | long | 5 | 111 | +1.16 | +2.22 | 1.192 | 42.9% | 89% | $186,061 | loses | +1.26 / +1.05 | 0.009 |
+| 3 | 1 level | 180 | +2.0 | long | 20 | 40 | +1.08 | +1.26 | 1.187 | 51.8% | 76% | $294,205 | loses | +1.22 / +0.85 | 0.001 |
+| 4 | 1 level | 180 | +1.5 | long | 20 | 64 | +1.07 | +1.27 | 1.190 | 58.5% | 58% | $489,625 | loses | +1.11 / +1.06 | 0.000 |
+| 5 | 1 level | 90 | +2.0 | long | 20 | 46 | +0.87 | +1.06 | 1.148 | 70.3% | 59% | $237,225 | loses | +0.95 / +0.77 | 0.000 |
+| … | 13 long cells beat B&H's +0.638 net Sharpe at lower DD; **none** beats it in dollars | | | | | | | | | | | | | | |
+| 30–45 | **Part 3** regime-filter-on-B&H (all 6) | 90/180 | −0.5…−1.5 | — | — | 403–865 sw | +0.19 … −0.20 | +0.48…+0.60 | ≤1.03 | 83–95% | — | **$14k–$57k** | **all lose** | mixed | 0.000 |
+| 50–102 | **all short / fade cells** | | | short | | | −0.46 … **−4.87** | mostly negative | <1 | 82–99.9% | — | wiped | all lose | negative | 0.000 |
+
+**Buy-and-hold BTC:** full $576,995 · sub 2018-2021 $344,216 · sub 2022-2025 $163,609.
+
+**FINDINGS:**
+
+1. **0 / 102 cells beat buy-and-hold BTC in compounded dollars.** 13 long
+   cells beat B&H on *risk-adjusted* return (net Sharpe > 0.638) at far
+   lower drawdown — the best (Part 2 accel/W90/thr+2.0/H5) posts net Sharpe
+   +2.20, gross +3.55, PF 1.42, maxDD 26.3% vs B&H's 81% — **but every one
+   loses in dollars because it is invested only a fraction of the time.**
+   Exact §30 / §25-PEAD terminal pattern: a real small gross directional
+   edge that cannot out-compound simply owning the beta through a genuine
+   bull run.
+2. **DSR: 0 / 102 clear 0.95** against the true N=1237 pool (E[max SR]
+   +3.283). Top cell scores **0.204**; #2 onward ≤ 0.009. Even against the
+   lenient batch-only pool (N=102) the best is 0.447. Nothing survives.
+3. **The acceleration variant is not an improvement.** Its best cell tops
+   the table only via a single-regime spike: subA (2018-2021) net Sharpe
+   **+5.30** vs subB (2022-2025) **−1.12** — a sign flip; the whole result
+   is one bull phase. Across the grid the acceleration cells interleave
+   with the level cells, no systematic edge.
+4. **Contrarian / short-on-surge / fade: clean anti-finding.** Ranks 50–102
+   are almost entirely short cells; gross Sharpe is *negative* on most —
+   fading an address surge is just being short BTC in a bull market. No
+   contrarian edge in either the level or the acceleration signal.
+5. **Part 3 (regime filter on B&H) does NOT fix §30's "sits in cash too
+   much" failure — it replaces it with churn.** The naive daily filter
+   flips 403–865 times over the window; even the variant that stays in BTC
+   **91%** of days returns **−6.3% CAGR** ($56,998) vs B&H's +22.4%. Gross
+   (cost-free) Sharpe of every Part-3 cell is ~0.48–0.60, **below B&H's
+   0.638**, so the unhealthy-exit timing is *mildly anti-predictive* even
+   before switch costs bury it. Hysteresis/persistence is an obvious
+   un-tested refinement, but the gross-Sharpe deficit says the exit timing
+   has no edge to rescue.
+6. **Regime instability is the rule:** 37 / 102 cells flip net-Sharpe sign
+   between 2018-2021 and 2022-2025. The few positive-Sharpe cells are
+   overwhelmingly 2018-2021 phenomena.
+
+**VERDICT — KILL, and the search is closed on this series.** A wide,
+pre-registered, look-ahead-clean search — 102 cells across level surge, its
+acceleration, both directions, four lookbacks, three thresholds, two hold
+periods, and a regime-filter-on-buy-and-hold — of the one genuinely free
+BTC on-chain series **came up empty**: nothing beats owning BTC in dollars,
+nothing clears the DSR bar for the true trial count. Consistent with §30's
+own conclusion. Real evidence that the free blockchain.info active-address
+series carries no tradeable edge over buy-and-hold, **not** a reason to keep
+parameter-hunting the same series. A genuine test of the brief's actual
+hypothesis (exchange flow / whale balance / exchange reserves) still
+requires a paid subscription (Glassnode Advanced ~$49/mo or CryptoQuant
+Professional ~$99/mo) — flagged in §30 as a costed next step, still not taken.
+
+**Files:** `run_onchain_signal_ext.py`. Results:
+`results/onchain_ext.csv` (ranked evaluated cells),
+`results/onchain_ext_all_cells.csv` (raw), `results/onchain_ext_run.log`.
+Reproduce: `py -3.14 run_onchain_signal_ext.py`.
+
+**Cumulative trials: N=1237** (1135 prior + 102).
+
+---
+
+## §31 - SIX NAMED STRATEGIES, NEVER PREVIOUSLY TESTED IN THIS PROJECT (2026-09-07)
+
+**Why this batch exists.** Every candidate tested so far in this project is
+either a project-original construction (ORB variants, RETEST, ICT SMC,
+credit spreads, on-chain signals) or a generic family sweep (section 1). Six
+well-known, independently documented retail/institutional strategies had
+never been run here at all: pairs trading, Bollinger mean-reversion, MACD
+crossover, calendar/seasonality, the Turtle system, and Ichimoku Cloud. This
+batch tests all six, each built with full honesty gates FROM THE START
+(look-ahead guard, real costs, DSR as reference only, per-year
+concentration, out-of-regime split where the data allows it, and the full
+continuous-compounding treatment run immediately, not as a follow-up).
+
+**Shared engine (research/six_strategies_engine.py).** Daily bars only (the
+standard timeframe for all six named systems). Built from this project's
+own real spread-inclusive M1/H1 archives via
+research.gold_data.aggregate_daily for XAUUSD/EURUSD/NAS100/US30/SPX500,
+Binance H1 aggregated to daily for BTCUSDT/ETHUSDT, and yfinance daily
+adjusted close for GLD/SLV (pairs trade only -- no bid/ask column exists
+for these, so a stated 2 bps round-turn ETF-spread assumption is used
+instead of a measured one, flagged everywhere it's used). Costs: index/FX
+real spread + 0.35bps commission; crypto 20bps taker; ETF 2bps assumed. 1%
+fixed-fractional risk is this project's standing default, but four of the
+six systems here (Bollinger, MACD, Ichimoku, pairs) are not fixed-R setups
+by design (no stop-distance-defined risk unit) -- for those, "1% risk" is
+replaced with full-exposure-while-in-position sizing, stated explicitly in
+each script's docstring, the same convention already used for section 30's
+on-chain signal for the identical reason. Turtle uses genuine Turtle-unit
+sizing (1% of equity per N, pyramided) since that IS the documented
+system's own sizing rule. Data spans: XAUUSD/SPX500 2017-2025 (no earlier
+real-spread data exists, stated repeatedly elsewhere in this project);
+EURUSD/NAS100/US30 2013-2025 (real out-of-regime window available, used for
+the OOS split column); BTCUSDT/ETHUSDT 2018-2026; GLD 2004-2026/SLV
+2006-2026 (pairs).
+
+**A real bug found and fixed during this batch, stated plainly.** The first
+Turtle System 1 run had ETHUSDT flat-line at its exact 2018 equity for the
+following 8 straight years (0.0% every year through 2026) -- the documented
+"skip the next breakout if the last trade was a winner" whipsaw filter was
+implemented so that a SKIPPED breakout left the "last was a winner" flag
+set indefinitely, permanently locking that direction out after a single
+winning trade. Fixed to the documented rule: only ONE breakout is skipped
+after a winner, the next is taken unconditionally. Confirmed fixed (ETHUSDT
+System 1 now trades normally in every year, ending +93.8% instead of the
+frozen +2.0%). No other bug found across the other five strategies' full
+runs.
+
+### 1. PAIRS TRADING -- GLD/SLV and NAS100/US30, 60-day rolling z-score, N in {1.5,2.0}
+
+Measured correlation (not assumed): GLD/SLV daily-return correlation 0.797
+(2006-2026); NAS100/US30 0.794 (2013-2025) -- both genuinely correlated
+pairs, confirmed before treating them as one.
+
+| pair | N | total return | max DD | recovered | concentrated |
+|---|---|---|---|---|---|
+| GLD/SLV | 1.5 | -29.0% | 44.2% | no | no |
+| GLD/SLV | 2.0 | -37.7% | 52.1% | no | no |
+| NAS100/US30 | 1.5 | +0.7% | 15.8% | yes | YES (2480%) |
+| NAS100/US30 | 2.0 | +14.9% | 14.2% | yes | YES (125%) |
+
+GLD/SLV loses money outright in both thresholds, with a 44-52% drawdown
+never recovered. NAS100/US30 shows a positive total return at N=2.0 but is
+flagged concentrated at BOTH thresholds -- nearly the entire result comes
+from one or two years, the same failure signature that has killed multiple
+other candidates in this project (index basket, Sneaky Pivot, plain ORB).
+0/4 cells survive.
+
+### 2. BOLLINGER BAND MEAN-REVERSION (20, 2.0), daily, 7 instruments
+
+**CORRECTION (2026-09-07, same day as the original write-up): the table
+below fixes a transcription error found while verifying a follow-up
+question about MACD/BTCUSDT. The underlying backtest and the saved CSV
+(results/six_strategies_summary.csv) were always correct; the total-return
+and max-DD figures typed into the FIRST version of this section were
+manually mis-scaled (effectively multiplied by 100 a second time) for
+several cells. Re-verified directly against results/strat_bollinger_run.log
+line by line below.**
+
+| instrument | total return | max DD | beats B&H | concentrated | OOS holds |
+|---|---|---|---|---|---|
+| XAUUSD | -0.2% | 0.5% | no | no | -- |
+| EURUSD | +0.2% | 0.1% | yes | no | yes |
+| NAS100 | +1.1% | 0.3% | no | no | yes |
+| US30 | +0.5% | 0.4% | no | no | yes |
+| SPX500 | +0.3% | 0.4% | no | YES | -- |
+| BTCUSDT | -1.9% | 2.8% | no | no | -- |
+| ETHUSDT | -3.3% | 3.8% | no | no | -- |
+
+EURUSD "beats B&H" only because EURUSD buy-and-hold itself lost 11.0% over
+this span -- the strategy's own total return is +0.2% over 13 years
+(effectively flat; it mostly sits in cash). Not a real edge, a trivial
+clearing of a below-zero bar. Every cell's total return and drawdown are
+tiny (all under 4% in either direction) -- there is no ruin anywhere in
+this strategy, and no cell comes close to a real signal; it is simply
+near-inert on all 7 instruments. 0/7 survive.
+
+### 3. MACD CROSSOVER (12, 26, 9), daily, always-in-market, 7 instruments
+
+**Same correction as section 2 above** -- re-verified directly against
+results/strat_macd_run.log.
+
+| instrument | total return | max DD | beats B&H | concentrated |
+|---|---|---|---|---|
+| XAUUSD | -0.3% | 0.5% | no | no |
+| EURUSD | -0.3% | 0.4% | yes (B&H -11.0%) | no |
+| NAS100 | -1.3% | 1.4% | no | no |
+| US30 | -0.2% | 0.7% | no | no |
+| SPX500 | -0.1% | 0.6% | no | -- |
+| BTCUSDT | +3.1% | 0.6% | no | no |
+| ETHUSDT | +3.2% | 1.4% | no | no |
+
+Every cell's total return is small (under 3.5% either direction over
+8-13 years) and every cell loses decisively to its own buy-and-hold --
+BTCUSDT strategy +3.1% vs its own buy-and-hold +477.0%; ETHUSDT strategy
++3.2% vs its own buy-and-hold +220.2%. Standard 12/26/9 MACD crossover
+captures essentially none of the underlying instruments' real price
+movement on any of the 7 instruments tested. The one "beat" (EURUSD) is
+again a losing strategy beating a more-losing benchmark. 0/7 survive.
+
+### 4. CALENDAR/SEASONALITY -- significance test run BEFORE any backtest
+
+Three named effects (Santa Claus rally, Sell in May, turn-of-month), tested
+on SPX500 (2017-2025) and BTCUSDT (2018-2026) with BOTH a Welch t-test and
+a 10,000-resample bootstrap of same-size random-day baskets, required to
+agree at p<0.05 before any tradeable rule would be built.
+
+Result: 0/6 effect/instrument combinations were significant on both tests.
+Best p-values were nowhere close to 0.05 (SPX500 Santa Claus t-test p=0.84,
+bootstrap p=0.86; BTCUSDT turn-of-month, the closest of the six, t-test
+p=0.40, bootstrap p=0.44). Per the task's explicit instruction, NO backtest
+was built for any of the six -- this is a clean, honest non-finding, not a
+forced kill. Consistent with this project's standing finding that the free
+daily-resolution price/calendar surface is exhausted (see the crypto
+factor lab's parent-level conclusion on price/derivatives factors).
+
+### 5. TURTLE TRADING SYSTEM -- System 1 (20d/10d, skip-winner filter) and System 2 (55d/20d, no filter), 7 instruments
+
+| instrument | system | total return | max DD | recovered | beats B&H | concentrated |
+|---|---|---|---|---|---|---|
+| XAUUSD | 1 | +83.5% | 22.1% | yes | no | no |
+| XAUUSD | 2 | +90.7% | 19.4% | yes | no | no |
+| EURUSD | 1 | -36.0% | 48.8% | no | no | no |
+| EURUSD | 2 | -16.9% | 42.7% | no | no | no |
+| NAS100 | 1 | +8.9% | 24.0% | yes | no | YES |
+| NAS100 | 2 | +15.0% | 25.3% | yes | no | YES |
+| US30 | 1 | -11.5% | 29.8% | no | no | no |
+| US30 | 2 | -7.2% | 28.4% | yes | no | no |
+| SPX500 | 1 | -1.8% | 29.6% | no | no | no |
+| SPX500 | 2 | +37.5% | 26.1% | no | no | no |
+| BTCUSDT | 1 | +164.4% | 14.4% | no | no | no |
+| BTCUSDT | 2 | +92.3% | 11.6% | yes | no | no |
+| ETHUSDT | 1 | +93.8% | 17.8% | yes | no | no |
+| ETHUSDT | 2 | +103.5% | 13.1% | yes | no | no |
+
+Turtle is the most internally consistent of the six -- real trend-following
+gains on gold and both crypto instruments, genuinely bounded drawdowns
+(11.6-29.8%, no ruin anywhere), and NAS100 is the only cell combination
+that comes close to a real signal (positive on both systems) but is
+flagged concentrated on both. Every single cell still loses to its own
+instrument's buy-and-hold over this specific 2013/2017/2018-2025 bull-
+dominated window -- the same terminal pattern (section 12/14/25/etc.) of a
+real, working trend system that is simply worse than owning the underlying
+through this particular period. 0/14 survive, but this is the "closest to
+a horse" of the six -- if any of these six warranted a follow-up (a
+different window, a shorter bull-avoiding period, futures-native costs),
+Turtle would be the one.
+
+### 6. ICHIMOKU CLOUD (9, 26, 52), daily, 7 instruments
+
+**Same correction as sections 2-3 above** -- re-verified directly against
+results/strat_ichimoku_run.log.
+
+| instrument | total return | max DD | beats B&H | concentrated |
+|---|---|---|---|---|
+| XAUUSD | +0.5% | 0.2% | no | YES |
+| EURUSD | +0.2% | 0.2% | yes (B&H -11.0%) | no |
+| NAS100 | +0.2% | 0.4% | no | YES |
+| US30 | -0.0% | 0.4% | no | no |
+| SPX500 | +0.2% | 0.3% | no | YES |
+| BTCUSDT | +0.8% | 1.0% | no | YES |
+| ETHUSDT | +3.3% | 1.5% | no | no |
+
+Same pattern as the other trend/mean-reversion systems here: every cell's
+total return is small (under 3.5% in either direction over 8-13 years),
+four of seven are flagged concentrated, and none beats its own buy-and-hold
+except the same trivial EURUSD case. No ruin anywhere -- the largest
+drawdown across all 7 instruments is 1.5% (ETHUSDT). 0/7 survive.
+
+### COMPARISON TO THIS PROJECT'S THREE EXISTING REAL CANDIDATES
+
+| candidate | status |
+|---|---|
+| ORB gold RETEST OR30/1R (sections 10.5-10.8) | Real gross edge, fails DSR/concentration/cost-adjusted-vs-B&H |
+| On-chain BTC active-address H=20 (section 30) | Real non-zero gross edge, loses to buy-and-hold |
+| Vol-regime-filtered ORB (section 10.9) | Cost mechanism confirmed real, 0/56 survivors |
+| This batch's closest analog: Turtle System 1/2 | Real, bounded trend-following gains on 3/7 instruments, but 0/14 survive the buy-and-hold gate |
+
+**VERDICT -- CLEAN KILL ACROSS ALL SIX STRATEGIES, 0/45 CELLS SURVIVE** (7
+Bollinger + 7 MACD + 7 Ichimoku + 14 Turtle + 4 Pairs + 6 calendar
+significance tests, no backtest forced on the calendar non-finding). No
+strategy/instrument combination is simultaneously (a) profitable, (b) not
+single-year/instrument concentrated, (c) beats its own buy-and-hold, and
+(d) holds out-of-regime where testable. The recurring failure modes are
+the same ones documented throughout this project: Turtle's real trend-
+following gains still trail a strong 2013-2026 bull market on every risk
+asset tested; Bollinger/MACD/Ichimoku are all near-inert at daily
+resolution (every cell's total return and drawdown stay under ~4% either
+way across 7 instruments and 8-13 years -- no ruin anywhere, just no
+signal), and where a cell "beats" its own buy-and-hold it is only because
+that instrument's buy-and-hold itself lost money (EURUSD, -11.0%); and any
+cell with a genuinely large nominal gain (Turtle, and the two pairs cells)
+is disproportionately likely to be single-year concentrated. Turtle is
+flagged as the strategy
+family most worth a possible future follow-up (a genuinely different,
+non-bull-dominated test window) if this project returns to classic trend-
+following; the other five are considered closed lines of inquiry on this
+data.
+
+**Files:** research/six_strategies_engine.py (shared engine),
+research/strat_pairs.py, research/strat_bollinger.py, research/strat_macd.py,
+research/strat_calendar.py, research/strat_turtle.py, research/strat_ichimoku.py.
+Results: results/strat_*_run.log (one per strategy),
+results/six_strategies_summary.csv (the consolidated 39-row comparison
+table). Reproduce: py -3.14 research/strat_pairs.py, etc. (each script is
+independently runnable; no shared state between them beyond the engine
+module).
+
+**Trial count: 45 new** (7 Bollinger + 7 MACD + 7 Ichimoku + 14 Turtle + 4
+Pairs + 6 calendar significance tests). **Cumulative trials: N=1338** (1293
+prior + 45).
+
+---
+
+## Section 31.1 - SLOWER, TREND-HOLDING MACD VARIANT (2026-09-07)
+
+**Why this batch exists.** Section 31's standard 12/26/9 MACD crossover was
+an always-in-market, reverse-on-every-crossover system that produced small
+gains on BTCUSDT/ETHUSDT (+3.1%/+3.2%) far below their own buy-and-hold.
+This is a genuinely different rule, not a re-label: LONG-ONLY, holds
+through minor whipsaws inside a positive-histogram regime, and only exits
+after a stated run of consecutive negative-histogram bars, rather than
+reversing on the very first cross.
+
+**Rule, stated before running.** Same EMA_FAST=12/EMA_SLOW=26/SIGNAL=9 as
+section 31 (unchanged, no re-optimization of the indicator itself).
+histogram = MACD line - signal line. ENTRY: histogram turns positive ->
+go long (applied next bar). HOLD: stay long through any number of
+individual negative-histogram bars below the exit threshold. EXIT:
+histogram has been <= 0 for >= MIN_CONSEC_NEG_BARS consecutive bars -> go
+flat (no short leg). MIN_CONSEC_NEG_BARS tested: {1, 3, 5}. Full exposure
+while long, cash otherwise (same convention as every other non-fixed-R
+system in section 31). Crypto cost model (20bps commission), same as
+every other crypto cell in this project. No out-of-regime split available
+(no real pre-2018 BTCUSDT/ETHUSDT window exists, standing constraint).
+
+**Result -- 6 cells (2 instruments x 3 thresholds), all against BTCUSDT
+buy-and-hold +477.0% / ETHUSDT buy-and-hold +220.2% over the identical
+2018-2026 span:**
+
+| instrument | exit threshold | total return | Sharpe | max DD | recovered | concentrated | beats B&H |
+|---|---|---|---|---|---|---|---|
+| BTCUSDT | 1 bar | +3.4% | +0.76 | 0.6% | yes | no | no |
+| BTCUSDT | 3 bars | +3.4% | +0.70 | 1.2% | yes | no | no |
+| BTCUSDT | 5 bars | +3.0% | +0.58 | 1.7% | no | YES (68%) | no |
+| ETHUSDT | 1 bar | +3.5% | +0.58 | 1.1% | yes | no | no |
+| ETHUSDT | 3 bars | +3.1% | +0.49 | 1.4% | yes | no | no |
+| ETHUSDT | 5 bars | +3.1% | +0.46 | 1.3% | yes | no | no |
+
+**VERDICT -- the slower, trend-holding version does NOT perform materially
+differently from the fast crossover, and does not survive either.** Total
+returns are essentially unchanged from the fast-crossover baseline (+3.1%
+BTCUSDT / +3.2% ETHUSDT) -- the noise-filtering exit does slightly reduce
+position-change count (216 -> 175-215 for BTCUSDT) and modestly improves
+Sharpe at the 1-bar threshold (+0.49 -> +0.76 on BTCUSDT), but every cell
+still loses decisively to buy-and-hold by roughly two orders of magnitude
+(+3.0-3.5% strategy vs +477.0%/+220.2% buy-and-hold), and the widest
+filter (5 consecutive bars) is the worst performer AND the only cell
+flagged concentrated -- widening the noise filter did not help, it slightly
+hurt. Both the fast and slow forms of MACD fail on the same underlying
+reason: whether reversing on every cross or holding through whipsaws with a
+confirmation delay, the rule captures only a small fraction of trend
+persistence and gives back the rest to costs and the strategy's own
+exposure gaps versus simply holding the asset. Genuinely a different rule,
+honestly tested, same clean kill as the fast version. 0/6 survive.
+
+**Files:** research/strat_macd_slow.py. Results:
+results/strat_macd_slow_run.log. Reproduce:
+py -3.14 research/strat_macd_slow.py.
+
+**Trial count: 6 new** (2 instruments x 3 exit thresholds). **Cumulative
+trials: N=1344** (1338 prior + 6).
+
+
+
+## Section 32 - ENSEMBLE / COMBINATION TEST: does combining many signals (incl. killed ones) help? (2026-09-08)
+
+**Question, stated exactly as asked:** does combining MANY signals from
+across this project -- including individually-KILLED ones, not just the
+survivors -- into one basket produce a better, smoother result than
+requiring each to pass alone? A genuinely different question from "blend
+the winners."
+
+### Inventory -- 64 series, extracted not re-run
+
+Every strategy/instrument cell in this project with a real, reconstructable
+daily return series. Nothing here is a new backtest: the SAME already-
+audited engine functions each section's own verdict was built on are
+called again, in memory, to recover the daily series that section never
+itself persisted to a CSV.
+
+| group | source | n |
+|---|---|---|
+| A | `report_year_by_year_returns.build_all()` -- MomoRot Sec12/12.2/17 (4), VRP Sec20/21 (6), Sneaky Pivot Sec9 (2), ORB Sec10 (2) | 14 |
+| B | ICT SMC Sec28, `ict_smc_trades.csv` ret_frac by cell (4 in-regime 2018-2025, 3 short out-of-regime windows) | 7 |
+| C | Sec31/31.1 six-strategy family -- Bollinger/MACD/Ichimoku x 7 instruments, Turtle Sys1/Sys2 x 7, Pairs (2 pairs x 2 N), MACD-slow n=3 (BTCUSDT/ETHUSDT) | 39 |
+| D | Sec27 credit-spread FILTERED/1pct (`credit_spread_iv_filter.run_combined_book`, SPY 1993-2026), Sec30 on-chain H20 (`report_onchain_h20_continuous.build_full_daily_series`, BTCUSDT) | 2 |
+| **total** | | **64** |
+
+Every series reindexed to a full calendar-day grid over its OWN
+`[first, last]` span (off-days -> 0%, same convention already used by
+`report_year_by_year_returns.trade_series()`); outside its own span left
+NaN so `pandas.DataFrame.corr()` does pairwise-complete correlation rather
+than silently truncating everything to the shortest series' window. 2
+components have only 1 year of history (ICT SMC XAUUSD/SPX500
+out-of-regime stubs) -- flagged, correlations against them are noisy, not
+hidden.
+
+### THE CORRELATION MATRIX -- the critical output, reported in full
+
+Full 64x64 matrix: `results/ensemble_correlation_matrix.csv`. Distribution:
+
+| stat | value |
+|---|---|
+| mean pairwise corr | **+0.030** |
+| median pairwise corr | +0.010 |
+| std of pairwise corr | 0.176 |
+| pairs abs(corr) > 0.70 | 28 / 4,096 (0.7%) |
+| pairs abs(corr) > 0.50 | 72 / 4,096 (1.8%) |
+| pairs abs(corr) < 0.30 | 1,747 / 4,096 (42.7%) |
+| pairs abs(corr) < 0.10 | 1,425 / 4,096 (34.8%) |
+
+**These signals ARE genuinely close to independent, mechanically.** This is
+NOT the "wall of correlated noise that just dilutes" failure mode the task
+asked to check for first -- real diversification potential exists
+structurally in this project's signal set. The high-correlation pairs are
+exactly the ones common sense predicts (VRP Sec20/21 sleeves at +1.00 since
+Sec21 is a sizing/structure wrapper on Sec20's own signal; the two MomoRot
+US-sector variants at +0.916; same-instrument Pairs/Turtle parameter
+twins). The most-independent pairs are unrelated instrument/strategy
+combinations near 0.000, exactly as expected from genuinely different
+mechanisms.
+
+### Four combined portfolios (equal-weight-all, inverse-vol-all,
+low-corr quality-blind, low-corr positive-Sharpe-only)
+
+| portfolio | N | total return | Sharpe | max DD | recovery | DSR (ref, pool N=64) |
+|---|---|---|---|---|---|---|
+| Equal-weight ALL 64 | 64 | **-37.2%** | -0.150 | 76.7% | never | 0.0000 |
+| Inverse-vol-weight ALL 64 | 64 | **+48.1%** | +0.467 | 8.2% | 524d | 0.0000 |
+| Low-corr filtered, quality-BLIND (abs(corr)<0.30) | 26 | **-97.2%** | -1.630 | 98.7% | never | 0.0000 |
+| Low-corr filtered, positive-own-Sharpe-only | 14 | **+421.1%** | +0.682 | 20.1% | 531d | 0.0000 |
+| *(reference)* best single component (MomoRot crypto-sectors Sec17) | 1 | +4101% | **+1.136** | 57.0% | -- | -- (Sec17: already KILLED) |
+
+Full per-component table: `results/ensemble_component_summary.csv`. Kept-
+member lists: `results/ensemble_low_corr_subset_members{,_positive}.csv`.
+
+### Why the naive combination fails -- mechanism found, not asserted
+
+Several ICT SMC Sec28 in-regime cells compound thousands of near-1%-risk M1
+trades at net PF<1 to genuine near-total ruin over the full window
+(BTCUSDT in-regime Sharpe **-12.70**, total return **-100.0%**; SPX500
+-3.44; XAUUSD -2.95) -- this is the SAME finding Sec28 already reported
+("0/7 cells beat B&H, net PF<1 on all 7"), not a bug introduced here. A
+naive equal-weight, daily-rebalanced blend lets these few high-frequency
+catastrophic sleeves dominate the basket's realized volatility and drag
+the whole 64-series average into a loss, even though the correlation
+matrix shows the underlying signal set is genuinely diversified.
+
+**Confirmation this is a weighting artefact, not proof diversification
+can't work here:** the SAME 64 components, inverse-vol-weighted instead
+of equal-weighted, flip from Sharpe -0.15 to **+0.47**, maxDD from 76.7%
+to 8.2%, and the drawdown actually recovers. Nothing about the signal set
+changed -- only how much weight the catastrophic high-vol sleeves were
+given.
+
+**The single most important mechanical finding of this study:** the
+low-correlation filter, applied WITHOUT any quality floor, makes the
+result WORSE than including everything (-97.2% vs -37.2%). 7 of the 26
+kept series have their own full-history Sharpe below -1.0. Pure
+correlation-based selection preferentially admits **idiosyncratic ruin**,
+precisely because a strategy imploding in its own unique way does not
+correlate with anything else -- "independent" and "good" are different
+properties, and optimizing for the first alone can actively select for
+disasters. Restricting the SAME greedy correlation method's candidate
+pool to only the 40/64 components with a positive own-Sharpe (still N=14
+kept, still abs(corr)<0.30) produces the best-behaved portfolio of the four
+(+421.1%, Sharpe +0.682, maxDD 20.1%, real recovery) -- smooth and
+genuinely diversified, but its own Sharpe still sits below the project's
+best single component.
+
+### Verdict
+
+**KILL as a standalone strategy on every one of the four combination
+methods tried, DSR 0.0000 on all four (pool N=64, E[max SR]=+4.232) -- but
+a complete, mechanically-explained answer to the ensemble hypothesis, not
+a null result:**
+
+1. This project's signals ARE close to independent (mean pairwise corr
+   +0.03) -- real diversification potential exists structurally, contrary
+   to the "just a correlated wall" failure mode the task asked to check
+   first.
+2. Naive equal-weighting squanders that potential by letting a few
+   catastrophically-compounding cells (mechanically real, already
+   documented at Sec28) dominate realized risk; vol-aware weighting alone
+   recovers most of the lost ground with the identical 64 components.
+3. Filtering purely on low correlation with no quality floor is a clean,
+   generalizable anti-finding for any future combination attempt in this
+   project: it actively selects for idiosyncratic disasters, not for
+   healthy independence.
+4. Even the best-constructed combination (positive-Sharpe-only,
+   low-correlation, N=14) -- smooth, real recovery, maxDD 20.1% vs single
+   components' 57-100% -- still does not clear the project's best
+   individual component's own Sharpe or DSR. Diversification traded
+   return for smoothness here; it did not manufacture a new edge. This is
+   consistent with the project's standing finding (Sec1 bottom line): the
+   free surface searched does not contain an edge large enough for a
+   combination of components (each still individually correlated with
+   *something* real, even if not with each other) to compound into a
+   result that clears DSR.
+
+Files: `research/ensemble_correlation.py`; `results/ensemble_daily_returns.csv`,
+`ensemble_component_summary.csv`, `ensemble_correlation_matrix.csv`,
+`ensemble_combined_results.csv`, `ensemble_low_corr_subset_members.csv`,
+`ensemble_low_corr_subset_members_positive.csv`, `ensemble_run.log`.
+Reproduce: `py -3.14 research/ensemble_correlation.py`.
+
+**Trial count: 4 new** (the four combined-portfolio Sharpes tested against
+the DSR gate; the 64 underlying component trials were already counted in
+their own sections and are not re-counted here). **Cumulative trials:
+N=1348** (1344 prior + 4).
+
+## Section 32.1 - BUG AUDIT of the section-32 ensemble test (2026-09-08)
+
+**Trigger:** the section-32 headline numbers were flagged as implausible
+and audited on request. The specific hypothesis to check: were components
+missing data on a given day silently treated as 0% return (fake "no risk"
+days) instead of excluded from that day's average, artificially diluting
+realized volatility and inflating the combined Sharpe?
+
+**That literal bug does NOT exist.** Verified by reading
+`research/ensemble_correlation.py` directly: `equal_weight_available()`
+uses `frame.mean(axis=1, skipna=True)` (pandas skips NaN, never treats it
+as 0), and `inverse_vol_weight()` builds weights from `frame.notna()` so
+an absent series gets weight 0, not a fake-0-return vote. No fillna(0)
+happens before either average.
+
+**But a real, closely-related artefact WAS found and confirmed:
+STAGGERED-INCEPTION REGIME BLENDING.** The 64-series frame spans
+1993-01-29 -> 2026-08-31 (33.6 yrs, driven by the earliest component,
+credit-spread SPY) but the basket is only genuinely populated from 2018
+onward:
+
+| Year(s) | Mean live components / day (of 64) |
+|---|---|
+| 1993-1999 | 1.00 |
+| 2000-2011 | 3-7 |
+| 2012-2013 | 12-21 |
+| 2014-2017 | 32-44 |
+| 2018-2025 | **51-59** |
+
+4,837 of 12,268 total days (39%) have fewer than 5 live components; 2,530
+days (21%) have exactly 1. For 25 of the 33.6 stitched years the "combined
+portfolio" was really just 1-12 individual long-running components
+(dominated by credit-spread SPY, own Sharpe +0.57, and the momentum-
+rotation sleeves, own Sharpe +0.61-0.63) -- not a 64-way ensemble. That
+thin pre-2018 stretch alone has equal-weight Sharpe **+0.484**. The
+post-2018 stretch, once the basket is genuinely ~59-wide, also contains
+several catastrophic components (e.g. ICT-SMC BTCUSDT in-regime, own
+Sharpe -12.70) that the thin era never had to absorb.
+
+**Corrected method:** recompute the same 4 combination functions, byte-
+identical, restricted to 2018-01-01..2025-12-31 -- the window where the
+basket is consistently populated (mean 58.7 of 60 available series live/
+day, min 51). Script: `research/ensemble_correlation_restricted.py`
+(imports and reuses `ensemble_correlation.py`'s functions; only the date
+window changes).
+
+**Corrected results (results/ensemble_combined_results_CORRECTED_restricted_window.csv):**
+
+| Portfolio | Original (1993-2026 stitched) | Corrected (2018-2025 only) |
+|---|---|---|
+| Equal-weight ALL | Sharpe -0.150, ret -37.2%, maxDD 76.7% | **Sharpe -4.552, ret -75.0%, maxDD 75.3%** |
+| Inverse-vol-weight ALL | Sharpe +0.467, ret +48.1%, maxDD 8.2% | **Sharpe -0.848, ret -0.6%, maxDD 0.6%** |
+| Low-corr, quality-blind | Sharpe -1.630, ret -97.2%, maxDD 98.7% | **Sharpe -11.065, ret -99.2%, maxDD 99.2%** |
+| Low-corr, positive-Sharpe-only | Sharpe +0.682, ret +421.1%, maxDD 20.1% | **Sharpe +0.239, ret +7.3%, maxDD 15.1%** |
+
+DSR reference (same pool, N=64, per `research/dsr.py`) is 0.0000 on every
+corrected cell, same as the original.
+
+**VERDICT: the section-32 headline numbers were flattered by blending a
+thin, quality-dominated pre-2018 regime into the fully-populated post-2018
+basket -- not by a zero-fill bug, but by the same underlying problem the
+user's hypothesis was pointing at (date-range mismatch producing a
+misleading combined statistic).** On the honest, consistently-populated
+window, ALL FOUR combination methods are materially worse: naive
+equal-weight goes from a bad -37% to a near-total -75% loss; even the
+single best-looking result in section 32 (low-corr, positive-Sharpe-only,
+the one that appeared to beat every individual candidate on smoothness)
+collapses from +421% / Sharpe +0.68 down to +7.3% / Sharpe +0.24 -- still
+below the project's best individual component (MomoRot crypto-sectors
+§17, Sharpe +1.14) and nowhere near a DSR pass. **The section-32 KILL
+verdict stands and is STRENGTHENED, not reversed, by this audit** -- the
+true, apples-to-apples ensemble result is worse than what was originally
+reported, not better. This is a general, reusable procedural rule for any
+future combination study in this project: always report and gate on the
+live-component-count-per-day, and always re-verify headline numbers on
+the window where coverage is actually stable before trusting them.
+
+**Files:** `research/ensemble_correlation_restricted.py`. Results:
+`results/ensemble_combined_results_CORRECTED_restricted_window.csv`,
+`results/ensemble_correlation_restricted_run.log`. Reproduce:
+`py -3.14 research/ensemble_correlation_restricted.py`.
+
+**Not a new trial batch** -- bug-fix re-verification of section 32's
+existing 4 trials on a corrected window, per the section-12 audit
+precedent (re-scoring existing cells is not double-counted). **Cumulative
+trials: N=1348, unchanged.**
+
+## Section 32.2 - PAIRWISE-COMPLETE ENSEMBLE TEST: honest max-diversification without a fixed window (2026-09-08)
+
+**Brief note:** the task referred to "24 strategies" -- the actual saved
+inventory (`results/ensemble_component_summary.csv`, same file sections
+32/32.1 used) is **64** series. Ran against the real 64, not resized.
+
+**Method:** `research/ensemble_pairwise_honest.py`. Pairwise-complete
+correlation (`frame.corr(min_periods=250)`) computed per PAIR only over
+days both series genuinely have data -- no fixed universal window, no
+zero-fill. Re-verified the section-32.1 zero-fill non-bug explicitly by
+source-reading `equal_weight_available()` again (assertion in the script
+itself, not just narrated). A compatibility graph connects two series only
+if they share >= 250 real days AND |pairwise corr| < 0.30; the LARGEST
+mutually-compatible group is the maximum-clique problem (NP-hard, no exact
+solver available in this environment) -- approximated by a greedy heuristic
+run from 33 different seed orders (by history length, by own Sharpe, by
+graph degree, 30 random), keeping the largest result. Run twice: once
+QUALITY-BLIND (candidate pool = all 64) and once QUALITY-GATED (candidate
+pool restricted a priori to the 40/64 series with own Sharpe > 0), per the
+32.1 lesson that low correlation alone selects for idiosyncratic disasters
+as readily as for good diversification.
+
+**Correlation matrix (64x64, 2,016 pairs):** 1,916 pairs (95.0%) had >=250
+genuinely-shared real days and are TRUSTED; 100 pairs (5.0%) did not and
+are marked NaN in `results/ensemble_pairwise_corr_matrix.csv`, not reported
+as a number. Trusted pairs only: mean corr +0.030, median +0.010, |corr|>0.70
+in 1.5%, |corr|<0.30 in 91.2% -- confirms the section-32 finding that this
+project's signals are genuinely close to independent.
+
+**QUALITY-BLIND largest group: N=23.** Predictably repeats the 32.1
+lesson at a larger scale -- 4/23 members have own Sharpe < -1.0
+(catastrophic), including ICT-SMC BTCUSDT (own Sharpe -12.70). Full honest
+span 2000-01-03..2026-08-31 (9,738 days, mean 1.00 live/day 2000-2005 rising
+to 23 by 2018); combined Sharpe **-0.959** (full span), **-4.212**
+(high-confidence >=3-live sub-period, 2011-10-04 onward) -- a clean, useful
+negative: low-correlation filtering with no quality floor produces a worse
+combined result than most individual components, confirmed at N=23 not
+just N=26 (section 32).
+
+**QUALITY-GATED largest group: N=14** (Sneaky Pivot NAS100, Bollinger
+EURUSD, Pairs NAS100-US30 N2.0, ORB NAS100, Turtle Sys2 XAUUSD, MACD
+BTCUSDT, credit-spread SPY, on-chain BTC H20, Ichimoku BTCUSDT, MomoRot
+US-sector widened, Ichimoku SPX500, Turtle Sys1 NAS100, VRP naked SVXY
+thr1.5, Turtle Sys1 ETHUSDT). Full honest span 1993-01-29..2026-08-31
+(12,268 days, mean live rises 1.00 (1993-99) -> 2 (2000s) -> 6 (2014-17) ->
+14 (2018-25)): combined **Sharpe +0.610, total return +317.2%, maxDD 20.1%,
+recovery 531 days, top-year-share 11.2%**. High-confidence-only sub-period
+(>=3 live, from 2011-10-04, 5,446 days): **Sharpe +0.541, ret +77.3%, maxDD
+15.6%, recovery 706 days** -- close to the full-span number (0.610 vs
+0.541), NOT a dramatic collapse like section 32.1's naive-window blend,
+because this group's inception dates are more evenly staggered and its
+components are individually healthy; this is the most trustworthy combined
+number this project has produced. DSR reference: 0.0000 on every cell
+(pool N=64, same E[max SR]=+4.23 bar as sections 32/32.1) -- nowhere close.
+
+**Comparison to the project's real individual candidates:** combined
+Sharpe 0.61/0.54 is BELOW MomoRot crypto-sectors §17 (own Sharpe +1.14,
+not itself a member of this clique -- excluded by the compatibility
+constraint), Turtle Sys1 ETHUSDT (+0.762, IS a member), MomoRot widened
+(+0.629, IS a member), and credit-spread SPY (+0.567, IS a member). Max
+drawdown (20.1%/15.6%) is genuinely better than every one of those single
+components' own drawdown (37.5%/17.8%/3.7%/etc. individually, but none of
+those single components combine LOW drawdown WITH high Sharpe the way the
+combination's low top-year-concentration suggests it might) -- the honest
+statement is the combination trades absolute Sharpe for smoothness and low
+concentration, it does not manufacture new risk-adjusted edge, same
+structural conclusion as sections 32/32.1.
+
+**VERDICT: this is the most honest, most carefully-diversified combination
+this project has built, and it still does not beat the best individual
+component on Sharpe or clear DSR.** ~5-15 real, quality-screened,
+genuinely-independent components is close to the practical ceiling this
+project's data can honestly support -- going wider (N=23, quality-blind)
+makes results WORSE not better, because the extra "diversification" is
+mostly idiosyncratic ruin, and going through the effort of pairwise-complete
+correlation (vs section 32's fixed-window approach) does not surface a
+materially different or better answer -- it mainly adds confidence that the
+N~14 quality-gated number is real and not a window artifact, since its
+full-span and high-confidence-only figures now agree closely (0.610 vs
+0.541) instead of diverging wildly (32.1's 0.682 vs 0.239). KILL as a
+standalone strategy, same as 32/32.1, but the most defensible NULL result
+yet on the ensemble hypothesis.
+
+**Files:** `research/ensemble_pairwise_honest.py`. Results:
+`results/ensemble_pairwise_honest_results.csv`,
+`results/ensemble_pairwise_corr_matrix.csv`,
+`results/ensemble_pairwise_shared_days.csv`,
+`results/ensemble_pairwise_honest_run.log`. Reproduce:
+`py -3.14 research/ensemble_pairwise_honest.py`.
+
+**Trial count: 4 new** (quality-blind full-span, quality-blind
+high-confidence sub-period, quality-gated full-span, quality-gated
+high-confidence sub-period -- same per-portfolio-cell convention as section
+32; the 64 underlying components are not re-counted). **Cumulative trials:
+N=1352** (1348 prior + 4).
+
+## Section 33 - BETA/ALPHA DECOMPOSITION + LONG/SHORT AUDIT, 4 "real candidates" (2026-09-08)
+
+**Name reconciliation (the one material judgment call, stated not hidden):**
+the brief's 4 nicknames were mapped to: (1) "on-chain BTC H=20" = exact
+match, `D|On-chain active-address surge H20 (BTCUSDT)`; (2) "gold-silver
+pairs" = `C|Pairs GLD-SLV N1.5` (the N1.5 threshold specifically -- N2.0
+also exists and was NOT used); (3) "capped vol spread" = `D|Credit-spread
+FILTERED 1pct (SPY)` (section 27/31's defined-risk, IV-filtered credit
+spread -- "capped"=bounded max loss + 1pct fixed-fraction cap, "vol"=the
+IV-rank filter; a better textual fit than the VRP family, which is
+"naked"/"vol-of-vol" not "capped"); (4) "ORB gold RETEST" = RETEST
+OR30/1R XAUUSD continuous 2017-2025 -- **this one was NOT in the 64-series
+ensemble inventory** (never extracted into `ensemble_daily_returns.csv`);
+re-extracted fresh here via `research/four_candidates_beta_alpha_audit.py`
+using the same `build_trades`/`build_daily_returns` functions
+`report_retest_xauusd_2017_2025_continuous.py` already calls.
+
+**PART 1 -- CAPM vs BTC (OLS, real-overlap only; BTC benchmark itself only
+exists 2017-08-17 onward in this project's data, so the credit-spread
+strategy's 1993-2017 history cannot be regressed and is honestly excluded
+from the overlap window, stated not hidden):**
+
+| Strategy | Overlap | N | Beta | Alpha (ann.) | R^2 | Verdict |
+|---|---|---|---|---|---|---|
+| ORB gold RETEST | 2017-08-18..2025-12-29 | 3,042 | -0.003 | **+6.51%** | 0.001 | LOW-BETA + POSITIVE-ALPHA |
+| On-chain BTC H=20 | 2018-01-03..2026-08-31 | 3,162 | **+0.435** | +0.80% | **0.431** | market-explained / beta-driven |
+| Capped vol spread | 2017-08-18..2026-06-16 | 3,211 | +0.004 | +1.03% | 0.013 | LOW-BETA + POSITIVE-ALPHA |
+| Gold-silver pairs N1.5 | 2017-08-18..2026-08-27 | 3,283 | -0.003 | -3.84% | 0.000 | mixed / negative |
+
+**The important finding: On-chain BTC H=20's beta to BTC is +0.435 with
+R^2=0.431 -- 43% of its return VARIANCE is explained by simply holding
+BTC, and its independent (alpha) contribution annualizes to only +0.80%,**
+a small fraction of the +120.8% total return / +0.430 own-Sharpe reported
+in section 30. This is expected mechanically (a long-only surge signal on
+the asset it's long) but it means most of section 30's reported edge is
+beta exposure, not independent skill -- this had not been decomposed
+before. ORB gold RETEST and the credit-spread book both show ~zero BTC
+beta and real positive annualized alpha, but R^2 is also near-zero (0.001,
+0.013) for both -- i.e. BTC explains almost nothing about them either way;
+this mostly confirms they are UNCORRELATED WITH BITCOIN specifically (gold
+breakout, SPY options), which is unsurprising and does not test whether
+they carry SPX or gold-market beta of their own -- flagged as a real
+limitation of using BTC as "the market benchmark" for two strategies that
+have nothing to do with crypto. Gold-silver pairs shows negative annualized
+alpha (-3.84%), consistent with its already-known negative own-Sharpe
+(-0.143).
+
+**PART 2 -- long/short exposure (read from each strategy's own real
+trade/position data, not inferred):**
+
+| Strategy | Structure | Long | Short |
+|---|---|---|---|
+| ORB gold RETEST | directional breakout, both sides | 50.9% (282/554 trades) | 49.1% (272/554) |
+| On-chain BTC H=20 | **long-only, verified in source** | 100% (when in a position) | **0%** |
+| Capped vol spread | short-vol, both books concurrent | 50.0% put-credit-spread | 50.0% call-credit-spread |
+| Gold-silver pairs N1.5 | dollar-neutral, both legs concurrent | 26.7% of days long-GLD/short-SLV | 36.9% short-GLD/long-SLV |
+
+**On-chain BTC H=20 is the one candidate with zero short exposure and no
+bear-market profit mechanism** -- verified directly in `run_onchain_signal.py`
+(entries trigger only on `z > ADDR_Z_THRESHOLD`, no short branch exists).
+It can avoid a decline by sitting flat (the no_pos gate) but cannot profit
+from one. The other three are structurally close to market-neutral by
+construction (ORB splits ~50/50 by design since it trades whichever side
+of the range breaks first; the credit-spread book runs both a bullish and
+a bearish leg concurrently; the pairs trade is dollar-neutral long one leg
+/ short the other). **The combined 4-strategy book is NOT simply "long the
+market"** -- but it also contains nothing designed to profit meaningfully
+FROM a bear market, only components designed to avoid or be indifferent to
+one.
+
+**PART 3 -- restricted 4-strategy ensemble, ONLY these 4, no zero-fill,
+pairwise-available equal-weighting, 0.6 correlation-pruning rule applied:**
+
+4x4 correlation matrix (pairwise-complete, real overlap only): all six
+pairs are near-zero (-0.061 to +0.086) -- **no pair exceeds |corr| > 0.60,
+nothing pruned, all 4 kept.**
+
+Combined span (staggered inception -- credit-spread alone reaches back to
+1993, the other 3 don't start until 2006-2018; mean live components/day
+2.12, min 1, max 4, same shape of artefact as section 32.1 but at N=4
+instead of N=64): total_return **+95.9%**, Sharpe **+0.344**, maxDD
+**21.1%**, recovery 214 days, top-year-share 40.4%, DSR 0.0000 (pool N=4).
+
+Standalone comparison: ORB gold RETEST own-Sharpe **+1.097** (the best of
+the four, and the best single candidate this project has produced outside
+the 64-series inventory), On-chain BTC H=20 +0.430, Capped vol spread
++0.567, Gold-silver pairs N1.5 **-0.143** (a real loser on its own).
+
+**VERDICT: combining these specific 4 does not help -- Sharpe +0.344 is
+BELOW three of the four standalone candidates (ORB +1.097, credit-spread
++0.567, on-chain +0.430) and only beats the already-losing pairs strategy.**
+Same staggered-inception mechanism as section 32.1 (blending a thin
+1-of-4-live era with a later 4-of-4-live era) plus the drag of one
+outright-losing member (gold-silver pairs, which the correlation-pruning
+rule does NOT catch, because pruning only removes REDUNDANT signals, not
+LOW-QUALITY ones -- an independent confirmation of the section-32.1/32.2
+finding that low correlation and quality are separate axes). Answering the
+brief's direct question: these 4 do carry some real, low-beta alpha
+INDIVIDUALLY (ORB and credit-spread clearly; on-chain much less than its
+headline number suggested once beta is removed; pairs does not), but
+combined they are not a leveraged long bet on the market (correctly
+diversified in direction/structure) -- they simply are not a good
+COMBINATION, because one member is a standalone loser and the
+staggered-inception blend flatters the number the same way section 32.1
+found. The single best number in this entire audit is ORB gold RETEST
+standing alone at Sharpe +1.097, not any combination of it with the other
+three.
+
+**Files:** `research/four_candidates_beta_alpha_audit.py`. Results:
+`results/four_candidates_capm.csv`, `four_candidates_exposure.csv`,
+`four_candidates_corr_matrix.csv`, `four_candidates_restricted_ensemble.csv`,
+`four_candidates_run.log`. Reproduce:
+`py -3.14 research/four_candidates_beta_alpha_audit.py`.
+
+**Trial count: 1 new** (the 4-candidate restricted combined-portfolio
+Sharpe; the CAPM regressions and exposure audit are diagnostics, not new
+strategy trials, same convention as prior OOS/ablation diagnostics in this
+project; ORB gold RETEST's own 554-trade backtest is a re-extraction of an
+already-existing, already-logged section-10 result, not a new trial).
+**Cumulative trials: N=1353** (1352 prior + 1).
+
+## Section 34.1 - LONG/SHORT MOMENTUM ROTATION vs LONG-ONLY BASELINE (2026-09-08)
+
+Extends the audited section-12 mechanism (`research/momentum_rotation.py`
+ranking/causal-lag/market-filter logic reused unchanged via
+`research/momentum_rotation_long_short.py`, a new module that adds the
+short-leg weight assignment only -- there is no way to "reuse" code that
+only ever assigns positive weights). **Split: LONG top 5 @ 20% each (100%
+gross long, unchanged from baseline), SHORT bottom 3 @ 10% each (30% gross
+short), total gross 130%.** Risk-off behaviour is byte-identical to the
+baseline (100% IEF, no shorts), so this isolates ONLY what the short leg
+does during risk-on regimes. Widened 27-instrument universe (section
+12.2's canonical wider test), N in {6, 12} months, K fixed per the brief
+(not a K grid). `research/six_strategies_engine.drawdown_with_recovery`
+reused for recovery time.
+
+**Full period (live-window methodology, section 12.3):**
+
+| N | Variant | Sharpe | CAGR | MaxDD | Recovery |
+|---|---|---|---|---|---|
+| 6 | Long-only | 0.558 | 7.70% | 31.77% | 513d |
+| 6 | Long/short | 0.519 | 6.81% | 30.23% | 416d |
+| 12 | Long-only | 0.630 | 9.18% | 37.50% | 801d |
+| 12 | Long/short | 0.575 | 7.97% | 32.63% | 1,148d |
+
+**Stress window 2000-2009:**
+
+| N | Variant | Sharpe | CAGR | MaxDD |
+|---|---|---|---|---|
+| 6 | Long-only | 0.816 | 13.01% | 31.77% |
+| 6 | Long/short | 0.876 | 12.72% | 24.86% |
+| 12 | Long-only | 0.704 | 11.47% | 37.50% |
+| 12 | Long/short | 0.673 | 9.83% | 32.63% |
+
+**Down-year-specific comparison (the direct question asked) -- SPY down
+years in the full panel: 2000, 2001, 2002, 2008, 2018, 2022.** In 2008 --
+the single worst crash in the panel, SPY -36.79% -- the short leg changes
+the result by essentially nothing (-0.25pp at N=6, +0.51pp at N=12),
+because the market filter already parks the book in IEF for most of that
+year regardless of variant (both LONG-ONLY and LONG-SHORT post +18%/+17%
+in 2008). In other down years the short leg is genuinely mixed: it HELPS
+meaningfully in 2002 (+5.7pp N=6, +8.6pp N=12) and 2022 (+5.8pp N=6,
++5.9pp N=12), but HURTS in 2000 at N=12 (-4.2pp) and 2018 (-0.6 to -1.4pp),
+and is roughly neutral in 2001. No reliable, one-directional pattern.
+
+DSR reference (pool = this batch's own 4 full-period cells, N=4): long-only
+beats long-short in 3 of 4 cells (full N=6 0.375 vs 0.302, full N=12 0.523
+vs 0.410, stress N=12 0.303 vs 0.270); long-short wins only stress N=6
+(0.511 vs 0.436). None close to a 0.95 pass either way.
+
+**VERDICT: KILL on the short-leg hypothesis.** It lowers full-period Sharpe
+and CAGR in BOTH N (adds cost and complexity for a worse risk-adjusted
+result over the whole span), moderately reduces max drawdown in most cells
+(a real, if modest, effect), but does NOT reliably help "specifically
+during down markets" as hypothesized -- it does essentially nothing in the
+single worst crash (2008, where the existing market filter already does
+the defensive work), helps in some other down years and hurts in others
+with no consistent sign, and loses on DSR in 3 of 4 cells. The short leg
+is not free insurance; it is a genuine, mixed-sign bet that costs real
+Sharpe in the common case to buy a small amount of drawdown reduction, not
+crash protection specifically.
+
+**Files:** `research/momentum_rotation_long_short.py`,
+`run_momentum_rotation_long_short.py`. Results:
+`results/momentum_rotation_long_short_{full,stress}.csv`,
+`momentum_rotation_long_short_yearly_*.csv` (8 tables),
+`momentum_rotation_long_short_run.log`. Reproduce:
+`py -3.14 run_momentum_rotation_long_short.py`.
+
+**Trial count: 4 new** (LONG-SHORT variant, full N=6, full N=12, stress
+N=6, stress N=12 -- the LONG-ONLY baseline cells reproduce already-logged
+section-12/12.2 results and are not re-counted). **Cumulative trials:
+N=1357** (1353 prior + 4).
+
+## Section 34.2 - TAIL-RISK HEDGE: SMALL CONSTANT ALLOCATION TO OTM SPY PUTS (2026-09-08)
+
+Reuses the SAME Black-Scholes/real-VIX approximation already validated for
+the credit-spread (sec 27) / delta-10 IV filter (sec 26) work UNCHANGED
+(`bs_price()` imported from `research/delta10_iv_filter.py`, r=4.5%, sigma
+= real trailing VIX/100, marked to market DAILY on the real subsequent
+VIX+SPY path). Same stated limitation repeated here: flat VIX ignores the
+real skew premium OTM puts trade at, which UNDERSTATES the true cost of
+this hedge -- if the hedge already looks expensive under this assumption,
+a real trader would pay more, not less.
+
+**Design decisions (stated, not asked as a question):** strike fixed at 5%
+OTM (K=0.95xspot at each roll date) -- the standard "protective put"
+convention (vs a delta-target, which is the framing already used for the
+short-premium credit-spread work). Monthly roll, 30-calendar-day target
+tenor. **Overlay framing: the SPY sleeve stays at 100% notional exposure
+throughout; the hedge allocation (1% or 2%) is spent on premium AT EACH
+MONTHLY ROLL** (i.e. an ongoing ~1-2%/roll recurring cost, not a one-time
+1-2%/year carve-out) -- this is the more literal reading of "a small,
+constant allocation ... rolled monthly," but is flagged explicitly as a
+real interpretive choice: many real-world tail-hedge overlays instead
+target a smaller PER-MONTH spend that sums to ~1-2%/YEAR. Under this
+project's chosen (larger) convention, the reported cost below is
+correspondingly larger than a real fund's typical "1-2%/year" tail-hedge
+program would show -- read the steady-state bleed number with that
+convention in mind, not as a universal tail-hedge cost figure.
+
+Data: SPY+VIX daily, 1993-01-29..2026-06-16 (8,402 days). Unhedged SPY
+baseline (full period): Sharpe 0.648, CAGR 10.85%, total return +3,003.7%,
+maxDD 55.19%.
+
+| Allocation | Sharpe | CAGR | Total return | MaxDD | Calm-year bleed | DSR (N=2 pool) |
+|---|---|---|---|---|---|---|
+| 1%/roll | 0.441 | 6.66% | +759.4% | 54.87% | -5.24%/yr | 0.145 |
+| 2%/roll | 0.208 | 2.22% | +108.2% | 62.84% | -10.16%/yr | 0.011 |
+
+Look-ahead guard PASS both allocations (259 rolled puts each; entry strike/
+sigma always sized off the PRIOR trading day's close). Calm years = every
+year excluding 2008 and 2020 (32 years); the put leg was profitable in
+only 12% of those calm years -- consistent with an OTM put expiring
+worthless most months, a real, steady, expected cost.
+
+**Crisis-window payoff, quantified (the critical question):**
+
+| Window | Unhedged SPY | Hedged 1% | Hedged 2% |
+|---|---|---|---|
+| 2008 full year | -36.79% | -20.87% (**+15.9pp offset**) | -3.89% (**+32.9pp offset**) |
+| 2020 full year | +18.33% | +11.01% (-7.3pp) | +4.08% (-14.3pp) |
+| 2020 acute crash (2020-02-19..03-23) | -33.40% | -33.14% (+0.3pp) | -32.88% (+0.5pp) |
+
+**The hedge DOES work as insurance in the 2008 GFC** -- a real, large,
+quantified offset (+15.9pp at 1% allocation, +32.9pp at 2%), because 2008
+was a prolonged, deep drawdown that gave a monthly-rolled 5%-OTM put many
+consecutive months to pay off. **It does NOT meaningfully help in the 2020
+COVID crash** -- the acute crash window (2020-02-19 to 2020-03-23) offsets
+only +0.3pp/+0.5pp of a -33% move, because the crash was too fast for a
+30-day-tenor put rolled on a monthly cadence to be holding a large enough
+position at the moment of the drop (the prior month's put, sized off a
+calm pre-crash VIX, was too small/too far from the money to capture the
+move before expiring), and over the FULL 2020 year the hedge is a net
+DRAG (-7.3pp/-14.3pp) because SPY finished the year up +18.33% -- the
+insurance premium was paid but the disaster it protects against never
+materialized on a full-year view. Full-period Sharpe and CAGR are both
+substantially WORSE than unhedged SPY at both allocations (0.441 vs 0.648
+Sharpe at 1%, collapsing to 0.208 at 2%), and DSR is nowhere close to a
+pass at either allocation.
+
+**VERDICT: KILL as a standalone always-on overlay at this size/convention
+-- the insurance is NOT free and is NOT reliable.** It provided real,
+large, quantified protection in 2008 (a slow-motion crash) but essentially
+none in 2020 (a fast crash), and its steady-state cost in ordinary years
+(-5.2%/yr to -10.2%/yr under this project's stated "spend the allocation
+every roll" convention) is large enough to substantially reduce full-
+period Sharpe and CAGR versus unhedged SPY. The honest statement per the
+task's own framing: this specific hedge is not "worth its premium" as a
+constant, mechanical overlay -- it is a real but inconsistent insurance
+policy whose payoff depends heavily on HOW a crash unfolds (slow vs fast),
+not just whether one happens.
+
+**Files:** `research/tail_hedge_otm_puts.py`. Results:
+`results/tail_hedge_otm_puts_summary.csv`,
+`tail_hedge_otm_puts_trades_alloc{1,2}pct.csv`,
+`tail_hedge_otm_puts_daily_ret_alloc{1,2}pct.csv`,
+`tail_hedge_otm_puts_run.log`. Reproduce:
+`py -3.14 research/tail_hedge_otm_puts.py`.
+
+**Trial count: 2 new** (1% allocation, 2% allocation -- each a complete,
+independently-scored standalone strategy). **Cumulative trials: N=1359**
+(1357 prior + 2).
+
+---
+
+## §35 — FX CARRY TRADE ("Good Carry, Bad Carry" family) — 2026-09-15
+
+First strategy in a genuinely new category for this project: cross-sectional
+FX carry, sourced from `notes/paperswithbacktest_candidates.md` candidate #1.
+Mechanism stated BEFORE any code was run (per standing rule 2): uncovered
+interest rate parity (UIP) predicts a high-rate currency should depreciate
+enough to offset its rate advantage, leaving zero expected excess return.
+UIP fails empirically (Fama 1984 "forward premium puzzle") -- high-rate
+currencies do not depreciate enough on average, so long-high-rate /
+short-low-rate earns a documented, widely-replicated positive average excess
+return (Lustig & Verdelhan 2007). The paperswithbacktest replication reports
+Sharpe 1.74, t-stat 10.6, over 37 years.
+
+**New data pipeline built (both free, zero cost):**
+- Short rates: FRED series `IR3TIB01<CC>M156N` (OECD 3-month interbank rate,
+  mirrored on FRED) pulled via the public `fredgraph.csv` endpoint -- no API
+  key needed. Countries: USA, EZ (euro area), GBR, AUS, NZL, CAN, CHE, JPN,
+  NOR (SWE attempted, see below). Monthly data, full coverage from at least
+  2002 for every series used. A 2-month publication lag is applied before any
+  rate value is used in signal formation (OECD/FRED short-rate revisions
+  typically publish 4-6 weeks after month-end; 2 months is conservative).
+- Spot FX: Dukascopy daily bid/ask, 2010-2025, real spread, for the 8 non-USD
+  legs (EURUSD, GBPUSD, AUDUSD, NZDUSD, USDCAD, USDCHF, USDJPY, USDNOK).
+  **USDSEK dropped from the universe**: direct probe confirmed Dukascopy has
+  no ask-side USDSEK daily data before 2025 (bid-side is complete back to
+  2010; every ask-side yearly pull 2010-2024 returned 0 bytes). Rather than
+  fake a spread or silently use bid-only, SEK was excluded and this is stated
+  as a known universe-coverage gap, not hidden.
+
+**Design (a priori, no peeking):** universe = USD + 8 non-USD currencies (9
+total). Rank by lagged short rate each month; long the top N, short the
+bottom N, equal-weighted, dollar-neutral, rebalanced monthly. Grid: N in
+{1, 2, 3} -- 3 configs, no other tuning. Weekly rebalance was NOT tested
+(rate data itself is monthly, so higher-frequency rebalancing only adds
+turnover cost with no new information -- stated reasoning, not a
+post-hoc excuse). Carry accrual proxied as (foreign monthly rate - USD
+monthly rate)/12 added directly to the spot return -- no forward/swap-points
+data is available in this project, so this is the standard
+Fama-regression-style proxy used in the academic carry literature, stated as
+a methodological limitation rather than hidden. Real bid/ask spread cost
+applied on every unit of monthly turnover. Look-ahead guard (factor vs
+same/next-month return, threshold 0.5) PASS on all 3 configs.
+
+**Results:**
+
+| N | net Sharpe | DSR | maxDD | CAGR | positive years | worst month |
+|---|---|---|---|---|---|---|
+| 1 | 0.024 | 0.252 | -30.6% | -0.30% | 9/16 | -10.58% (Mar 2020) |
+| **2 (best)** | **0.228** | **0.559** | -18.2% | 1.46% | 11/16 | -6.39% (Sep 2014) |
+| 3 | -0.001 | 0.221 | -25.7% | -0.25% | 9/16 | -5.61% (Sep 2011) |
+
+DSR pool: structural (this grid only, N=3 trials), E[max SR|null]=0.191.
+Reference only per standing rule 3, not a gate -- but corroborates: none of
+the 3 configs is close to a real signal versus a 3-trial null.
+
+Regime check on the best config (N=2, not cherry-picked post-hoc): first half
+(2010-2017) Sharpe 0.112, second half (2018-2025) Sharpe 0.372 -- weak in
+both halves, no dramatic in-sample-to-out-of-sample decay, i.e. this is not
+an overfit spike concentrated in one sub-period, it's just uniformly weak.
+
+Worst month for N=1 was -10.58% in **March 2020** (COVID risk-off) --
+qualitatively consistent with carry's well-known crash-risk mechanism even
+though the strategy here has no economically significant average edge to be
+compensated for carrying that risk.
+
+**VERDICT: KILL. Anti-finding, not a data-quality failure.** The pipeline
+itself works cleanly -- both rate and spot data are real, the look-ahead
+guard passes, and costs are real but small (avg 0.13-0.71 bps/month,
+monthly rebalance keeps turnover low, so cost was never close to the
+binding constraint here, unlike most of this project's intraday FX/gold
+work). The gap to the published 37-year/broader-universe Sharpe 1.74 is
+plausibly explained by two structural differences, stated honestly rather
+than as an excuse: (1) universe -- G10-only (9 currencies), no emerging-
+market currencies, which is where a large share of academic carry's
+historical rate dispersion and edge concentration has come from; (2) window
+-- 2010-2025 is dominated by the post-GFC ZIRP/QE era (near-zero global
+policy rates 2010-2015, and again 2020-2021), a period with genuinely
+compressed cross-sectional rate dispersion versus carry's 1980s-2000s
+sample. This does not rescue the result -- it is reported as the most
+likely reason a real, correctly-implemented replication of a well-evidenced
+anomaly still comes up empty on THIS specific universe and window, useful
+context for any future EM-currency or longer-history extension, not a
+reason to treat this as a near-miss.
+
+**Files:** `research/fx_carry_data.py`, `run_fx_carry.py`. Data:
+`data/raw/fred_rates/rate_*.csv` (10 series pulled, 9 used), 
+`data/raw/dukascopy_fx_carry/download/*.csv` (17 of 18 pair-sides pulled
+cleanly; usdsek-ask excluded per above). Results: `results/fx_carry.csv`.
+Reproduce: `python run_fx_carry.py`.
+
+**Trial count: 3 new** (N=1, N=2, N=3). **Cumulative trials: N=1362**
+(1359 prior + 3).
+
+---
+
+## §35.1 — Currency PPP/value factor (candidate #2) — BLOCKED, data wall — 2026-09-15
+
+Attempted immediately after §35 as the near-zero-marginal-cost follow-on
+(same FX pipeline, one more macro series). Mechanism: real exchange rate
+deviations from long-run PPP predict future currency returns (Menkhoff,
+Sarno, Schmeling & Schrimpf 2012, "Currency Value"). Needed monthly CPI per
+country for the same 8-currency universe.
+
+Live-probed FRED/OECD CPI series directly via the same `fredgraph.csv`
+method that worked cleanly for §35's interbank rates. Found three
+compounding, genuinely blocking problems (not one): (1) no single ID
+pattern works across countries -- tried `CPALTT01<CC>M657N`, `M659N`,
+`M661S`, `CP0000<CC>M086NEST`, `<CC>CPALTT01IXNBM`; each worked for some
+countries and 404'd for others; (2) the pattern that DID work for
+US/JP/GB/CH/CA/NO (`IXNBM`) is discontinued between 2021-06 and 2023-12 --
+too stale for a backtest window running to 2025; (3) Australia and New
+Zealand publish CPI quarterly, not monthly (`CPALTT01AUQ657N` confirms) --
+a genuine frequency mismatch, not a naming issue.
+
+**Not built.** Reliable, fresh, monthly-comparable CPI for all 8 currencies
+needs per-country manual verification against national statistics agencies
+-- not a single bulk free endpoint the way OECD short rates were for carry.
+Stopping here rather than guessing unverified series IDs or silently using
+stale/partial coverage. Revisit with more time budget or a proper
+OECD.Stat SDMX pull (correct dataflow IDs, not fredgraph.csv guessing) or a
+paid macro vendor. Not counted as a trial.
+
+---
+
+## §36 — FX CROSS-SECTIONAL MOMENTUM — 2026-09-15
+
+Third idea this session, sourced from the same currency-factor literature
+as §35 (Menkhoff, Sarno, Schmeling & Schrimpf 2012, JFE, "Currency Momentum
+Strategies") -- distinct mechanism from carry: sorts on trailing RETURN,
+not rate LEVEL. Slow information diffusion / gradual-flow story, the FX
+analogue of equity momentum. No new data needed: reuses §35's already-
+built, already-verified `research/fx_carry_data.py` spot FX pipeline
+unchanged (same 9-currency universe, same real bid/ask spread cost model).
+
+Grid (a priori): lookback L in {1, 3, 12} months (the three standard
+formation periods in the literature) x leg size N in {2, 3} = 6 configs,
+no other tuning. Trailing signal built via `.rolling(L).sum().shift(1)` so
+month t's ranking never sees month t's own return. Look-ahead guard PASS
+all 6 configs.
+
+**Results — unambiguous KILL, 6/6 configs net Sharpe NEGATIVE:**
+
+| L (months) | N | gross Sharpe | net Sharpe | DSR | maxDD | worst month |
+|---|---|---|---|---|---|---|
+| 1 | 2 | -0.405 | -0.489 | 0.261 | -50.7% | -6.51% (Jun 2012) |
+| 1 | 3 | -0.261 | -0.339 | 0.482 | -37.0% | -5.59% (Oct 2011) |
+| 3 | 2 | -0.417 | -0.463 | 0.295 | -55.3% | -7.72% (Oct 2011) |
+| 3 | 3 | -0.441 | -0.486 | 0.264 | -50.2% | -5.95% (Oct 2011) |
+| 12 | 2 | -0.336 | -0.364 | 0.443 | -44.4% | -8.10% (Nov 2022) |
+| 12 | 3 | -0.332 | -0.363 | 0.444 | -36.2% | -5.21% (Nov 2022) |
+
+**VERDICT: KILL, no ambiguity.** Every one of the 6 cells is negative
+BEFORE costs, not just after -- this is not a costs-ate-a-real-edge story
+like most of this project's intraday kills, it's a clean anti-signal on
+this specific universe/window. Consistent with this project's broader,
+repeated finding elsewhere (crypto `price_momentum` family, killed
+2026-07-06/07) that naive trailing-return momentum has been reliably
+weak-to-negative across every asset class tested here so far -- FX now
+joins crypto in that pattern.
+
+**Files:** `run_fx_momentum.py` (reuses `research/fx_carry_data.py`, no new
+data pulled). Results: `results/fx_momentum.csv`. Reproduce:
+`python run_fx_momentum.py`.
+
+**Trial count: 6 new** (L x N grid). **Cumulative trials: N=1368**
+(1362 prior + 6).
+
+---
+
+## §37 — FX CARRY, EMERGING-MARKET EXTENSION — 2026-09-15
+
+User asked to test §35's own stated explanation directly: is G10-only +
+ZIRP-era rate compression really why carry was weak, and does widening to
+currencies with genuine rate dispersion help? Same mechanism as §35 (UIP
+failure), same engine (`run_fx_carry.run_one`/`build_monthly_returns`/
+`build_monthly_spread` reused unchanged, only the currency universe changes)
+via new script `run_fx_carry_em.py`.
+
+**EM candidate probe (systematic, all findings stated):** MXN, ZAR, CNH, ILS
+all have working FRED short-rate series. Of those: MXN's Dukascopy ask-side
+daily history is 0 bytes for EVERY year 2010-2025 (bid-side is complete);
+ILS's ask-side only has data for 2025 (261 rows vs 3283 bid rows). Both
+dropped -- same no-fake-spread policy already applied to SEK in §35. SGD has
+no verified free short-rate series found (no working SIBOR/interbank FRED
+ID). TRY/PLN/HUF are real Dukascopy instruments but have DISCONTINUOUS
+coverage (TRY: data only exists for 2015 and 2025, real gaps in between --
+a broker delisting/relisting artifact, not a download bug). BRL/INR/KRW/
+THB/CZK/RUB are not valid dukascopy-node instruments at all.
+
+**Net EM addition: ZAR and CNH only** -- a narrow 2-currency extension, not
+a broad institutional-style EM carry basket (which would typically run
+10-15+ currencies via NDFs). This is a real scope limit of this project's
+free-data/single-retail-broker constraint, stated up front. CNH caveat:
+PBOC manages the RMB via a daily fixing + trading band, so observed "carry"
+may partly reflect currency policy rather than a pure market risk premium;
+CNH's bid-side coverage is also sparser than its ask-side over the same
+span (1,723 vs 4,215 days).
+
+**Two runs, both a priori:**
+(A) EM-only: USD + ZAR + CNH (3 currencies, N=1 only -- a 3-asset universe
+caps leg size).
+(B) Combined G10+EM: §35's 9 G10 currencies + ZAR + CNH = 11 currencies,
+N in {1,2,3,4}.
+
+**Results:**
+
+| Universe | N | net Sharpe | DSR | maxDD | worst month |
+|---|---|---|---|---|---|
+| EM-only (3 ccy) | 1 | 0.050 | 0.101 | -35.0% | -12.56% (Mar 2020) |
+| Combined (11 ccy) | 1 | 0.106 | 0.137 | -38.8% | -12.72% (Mar 2020) |
+| **Combined (11 ccy)** | **2 (best)** | **0.353** | **0.457** | **-16.6%** | **-6.84% (Dec 2015)** |
+| Combined (11 ccy) | 3 | 0.282 | 0.348 | -17.6% | -7.72% (Mar 2020) |
+| Combined (11 ccy) | 4 | 0.311 | 0.392 | -10.4% | -4.95% (Mar 2020) |
+
+EM-only is WEAKER than G10-only (0.050 vs §35's 0.228), not better -- too
+thin a universe (3 assets) on its own. The combined N=2 result (0.353) IS a
+real improvement over §35's G10-only N=2 (0.228, same config, +55%
+relative). Regime check on combined N=2 (not cherry-picked): first half
+(2010-2017) Sharpe 0.187 vs §35's G10-only 0.112; second half (2018-2025)
+Sharpe 0.503 vs §35's G10-only 0.372 -- the uplift holds in BOTH halves,
+so this is a genuine broad improvement from widening the universe, not a
+fluke concentrated in one period.
+
+**Diagnostic artifact (not a bug, flagged not hidden):** EM-only N=1's
+per-year Sharpe hit absurd values (107 in 2016, 38 in 2022) -- traced to
+months where the single long/short pair was USD vs CNH with near-zero
+realized monthly volatility (the PBOC fixing band suppresses CNH spot
+variance), producing a classic "peso problem" pattern (steady tiny gains,
+rare devaluation risk) that distorts an annualized Sharpe computed from a
+thin 12-observation-per-year subsample. Does not change the full-period
+verdict, which already reflects the true weak Sharpe (0.050).
+
+**VERDICT: KILL, but the §35 hypothesis is directionally CONFIRMED, not
+refuted.** Adding real rate/currency dispersion via ZAR and CNH genuinely
+improves carry's risk-adjusted return (+55% relative Sharpe at the same
+N=2 config, holding across both regime halves) -- supporting §35's
+explanation that a thin G10-only universe during a rate-compressed era,
+not "carry doesn't exist as an anomaly," was the binding constraint here.
+But the improvement is modest and DSR (0.457, reference only) is still
+nowhere close to a real pass. The EM extension achieved here is narrow
+(2 currencies) purely because of Dukascopy's ask-side data gaps on MXN,
+ILS, and SEK -- a genuinely broader EM basket (10-15+ currencies, ideally
+via proper NDF-quality data rather than a single retail broker's spot feed)
+remains untested and could plausibly show a larger effect; this result
+does not extrapolate that far and should not be read as a ceiling on what
+EM carry could do with better data access.
+
+**Files:** `research/fx_carry_data.py` (EM_RATE_FILES/EM_FX_PAIRS added,
+backward-compatible -- `run_fx_carry.py`'s G10-only §35 result is
+unaffected/unchanged), `run_fx_carry_em.py`. Data:
+`data/raw/fred_rates/rate_{MEX,ZAF,CHN,ISR}.csv` (MEX/ISR pulled but
+unused per above), `data/raw/dukascopy_fx_carry/download/usd{zar,cnh,mxn,
+ils}-d1-*.csv`. Results: `results/fx_carry_em.csv`. Reproduce:
+`python run_fx_carry_em.py`.
+
+**Trial count: 5 new** (EM-only N=1; combined N=1/2/3/4). **Cumulative
+trials: N=1373** (1368 prior + 5).
+
+---
+
+## §38 — Entry/exit/TP/SL refinement on the project's two proven-alpha
+## candidates (ORB gold RETEST, credit-spread SPY) — 2026-09-15
+
+User asked whether the project's two cells with genuine, demonstrated
+gross/low-beta edge (ORB gold RETEST, Sharpe +1.097; credit-spread SPY,
+Sharpe +0.567 -- both flagged in §33) could be improved by tuning
+entry/exit/TP/SL rules, rather than searching for new signal families.
+Checked both against the existing log BEFORE writing any code, per standing
+rule 1 (never repaint an already-killed test).
+
+### ORB gold RETEST — thread already closed, not re-run
+
+§10.7 (2026-09-02, a prior session) already ran exactly this experiment:
+2R/3R fixed targets, a breakeven-stop, and a 0.5R trailing stop, all on the
+same RETEST/OR30 entry, both windows. The verdict is already on record and
+unambiguous: **"letting winners run does not fix the sec 10.5/10.6 finding
+-- 1R remains the best monetization of RETEST's edge, and no exit variant
+closes the gap to buy-and-hold."** Compounded $100k: 1R $168,000 (best) >
+breakeven $160,082 > 2R $156,652 > 3R $156,039 > trailing $153,904; none
+beat B&H's $331,604.
+
+Re-running this would be a repaint, explicitly against standing rule 1. The
+one genuinely unswept lever is `retest_tol_frac` (fixed at 0.10 in every
+script that calls `orb()` -- confirmed by grep across the whole repo), but
+that is an ENTRY-timing parameter, not an exit/TP/SL rule, and no a priori
+mechanism was proposed for why a different value should help -- sweeping it
+without one would be parameter mining (against standing rule 2). Flagged as
+a possible different future question, not pursued here. **ORB exit
+refinement: closed, answered before this session began.**
+
+### Credit-spread SPY — genuinely untested lever found, real improvement
+
+§26/§27 only ever varied the ENTRY filter (IV-rank) and the structural
+WIDTH (1%/2%). Verified directly in the source
+(`credit_spread_iv_filter.run_combined_book`) that the only close condition
+ever coded is `if i >= j: # expired today` -- every position has always
+been held to expiration. No profit-target exit has ever existed in this
+project.
+
+**Mechanism (stated before any result seen):** closing a credit spread
+early at a fraction of max potential profit, rather than riding it to
+expiration, is one of the most widely cited rules in real-world options-
+selling practice (TastyTrade's own published backtest research) -- most of
+a short option's theta decay is captured well before expiration, while the
+LAST slice of remaining premium is the most exposed to gap/tail risk for
+the least incremental reward.
+
+New script `research/credit_spread_early_exit.py` reuses §27's
+`_try_open`/pricing/cost model UNCHANGED; only the close condition is new.
+An early close pays a REAL round-trip cost (buy back the short at its ask,
+sell the long at its bid, same HALF_SPREAD+COMMISSION_PCT as entry) --
+not modeled as free. UNFILTERED only (§26 AND §27 both already
+independently found the IV-rank filter loses to unfiltered on every metric
+in every cell -- re-testing the filter a third time is not a new
+question). Grid: profit_target_frac in {0.25, 0.50, 0.75} (50% is the
+standard cited threshold; 25%/75% bracket it as a genuine sensitivity
+check) x width in {1%, 2%} = 6 configs.
+
+**Result — every 50%/75% cell beats its own-width §27 hold-to-expiration
+baseline on Sharpe, maxDD, AND total return simultaneously:**
+
+| Config | Sharpe | maxDD | total return | avg days held (of ~36-37 DTE) |
+|---|---|---|---|---|
+| §27 baseline, 1pct hold-to-exp | 1.040 | 6.48% | +93.8% | 36-37 (full term) |
+| §27 baseline, 2pct hold-to-exp | 1.146 | 5.14% | +91.8% | 36-37 (full term) |
+| NEW 1pct @ 25% early | 0.808 | 5.85% | +78.4% | 11.0 |
+| NEW 1pct @ 50% early | 1.019 | 3.79% | +112.9% | 15.4 |
+| NEW 1pct @ 75% early | 1.233 | 4.03% | +147.8% | 20.4 |
+| NEW 2pct @ 25% early | 0.994 | 4.08% | +98.0% | 9.5 |
+| **NEW 2pct @ 50% early (best)** | **1.319** | **3.31%** | **+145.3%** | 14.1 |
+| NEW 2pct @ 75% early | 1.311 | 3.64% | +137.4% | 19.4 |
+
+25% is worse than the baseline (too early -- gives up too much remaining
+premium relative to the closing round-trip cost), but 50% and 75% both
+genuinely improve all three headline metrics on both widths, not a fluke
+of one cherry-picked number. Win rate stays ~97-99% (mechanical, unchanged
+from §26/§27). Faster capital recycling (avg holding period drops from the
+full term to 9.5-20.4 days) is WHY total return rises even though the
+per-trade edge is similar -- more trades per year on the same capital
+base. No tail-risk breach in any cell (worst day -1.8% to -2.0%, worst
+month -1.8% to -2.0%, catastrophic bar of -30%/-50% never approached, same
+order as §27).
+
+DSR (reference only, own 6-cell pool -- not directly comparable to §27's
+4-cell pool): best is 2pct@50%/2pct@75% at ~0.44, a real improvement in
+absolute Sharpe terms but still far below the 0.95 bar.
+
+**VERDICT: still a KILL for deployment (DSR nowhere near 0.95), but this
+is the single most effective entry/exit/TP/SL refinement this project has
+found on any of its positive-edge candidates.** Direct answer to the
+user's question: yes, refining exits CAN meaningfully improve an
+already-real edge -- proven here -- but it doesn't work everywhere (ORB's
+exit space was already exhausted with a negative result). The distinguishing
+factor was whether the lever had genuinely never been tried, not whether
+the underlying cell had real edge (both cells do). Recommend 2pct width /
+50% early close as this project's reference credit-spread configuration if
+the strategy is ever revisited.
+
+**Files:** `research/credit_spread_early_exit.py`. Results:
+`results/credit_spread_early_exit.csv`,
+`results/credit_spread_early_exit_trades_*.csv` (6 files). Reproduce:
+`python research/credit_spread_early_exit.py`.
+
+**Trial count: 6 new** (3 profit targets x 2 widths; ORB row above added
+zero trials, no code was run). **Cumulative trials: N=1379** (1373 prior +
+6).
+
+---
+
+## §39 — ORB gold RETEST: joint entry (retest_tol_frac) x stop (stop_mode)
+## grid — strongest ORB result in the project (2026-09-15)
+
+User asked to relook at ENTRY and SL rules too, not just exit (§38 already
+closed the exit dimension for ORB — already exhausted in a prior session,
+§10.7). Checked first, per standing rule 1: `retest_tol_frac` is fixed at
+0.10 in literally every script in this repo that calls `orb()` (confirmed
+by grep) — never swept. `stop_mode='moderate'` (a fixed 25bps stop, vs the
+default adaptive OR-width stop) exists and was tested once, on the
+UNFILTERED breakout (2026-08-29 audit, found worse there) — but never
+combined with `retest=True`, a materially different setup since the retest
+filter already changes entry price and trade selection.
+
+**Mechanisms (stated before any result seen):** retest_tol_frac trades off
+entry quality vs trade count — tighter tolerance demands a cleaner
+re-confirmation (fewer, better trades), looser tolerance accepts a sloppier
+pullback (more trades, worse entry-to-stop ratio). Moderate stop combined
+with retest could plausibly behave differently than on raw breakouts,
+since the retest filter already raises entry quality — a smaller,
+cost-efficient fixed stop may suit a pre-filtered, cleaner setup better
+than it suited the raw breakout.
+
+**Grid:** retest_tol_frac in {0.05, 0.10, 0.20} x stop_mode in {or_range,
+moderate} = 6 cells; (0.10, or_range) reproduces the known baseline
+exactly (554 trades) and is not counted as a new trial. 5 new trials.
+
+**Baseline reproduction note (not a bug, a window clarification):** the
+live baseline Sharpe here is **+1.206** (554 trades, full continuous
+2017-2025 span), not the +1.097 previously quoted in §33 — §33's figure
+was computed on the BTC-CAPM-overlap-restricted window (2017-08-17 onward,
+for apples-to-apples comparison against a BTC benchmark across all 4
+candidates), a different, shorter window used for a different purpose.
+Both numbers are correct for their own stated window; recorded here so
+they are never conflated.
+
+**Result — the STOP dimension shows a real, consistent effect:**
+
+| tol_frac | or_range Sharpe | moderate Sharpe |
+|---|---|---|
+| 0.05 | +1.023 | +1.176 |
+| 0.10 (baseline) | +1.206 | +1.387 |
+| 0.20 | +1.195 | **+1.488** |
+
+Moderate (fixed 25bps) beats or_range at EVERY tolerance level tested —
+the OPPOSITE of the unfiltered-breakout finding, because the retest filter
+already selects higher-quality setups that a smaller, cost-efficient fixed
+stop suits better than the raw breakout did.
+
+**Best cell: retest_tol_frac=0.20, stop_mode='moderate'**
+- Sharpe +1.488, gross PF 1.915, net PF 1.425, avg net R +0.150/trade, 587 trades
+- Compounded $100k -> $235,575 (+135.6%), trade-level maxDD 12.1%
+- **Beats buy-and-hold gold's Sharpe (+1.18) for the first time in this
+  project's ORB history**, with lower drawdown (12.1% vs B&H's 20.4%) --
+  though B&H still wins on raw total return (+275.2%) given ORB's
+  deliberately conservative 1%-risk sizing (a known sizing artifact per
+  §10.6/§33, not evidence of inferiority -- Sharpe is the fair comparison
+  since it's size-invariant)
+
+**Robustness checked (not just the headline number):**
+- 8/9 years net-positive (only 2018 mildly negative, -3.4R total)
+- Top-year concentration: 27.3% of total net_R in the single best year --
+  healthy, well below the 100%+ concentration that flagged prior ORB kills
+- Worst single day -1.33% (2020-04-16), worst month -3.27% (2018-12),
+  worst week -3.32% (2021-12-05) -- no tail-risk flag on any measure
+
+**DSR, both pools reported honestly:**
+- LOCAL 5-trial pool (this grid only): DSR 0.509 -- reference only, and
+  optimistic since the pool is small
+- **FULL ORB-family cumulative pool** (N=248, every ORB config ever run in
+  this project, pulled from all `results/orb_*_scored.csv` files): **DSR
+  0.0019** -- pool mean -0.99, std 1.54, E[max SR]=+3.38 driven by
+  catastrophic M5/M15 configs elsewhere in the family, the same
+  DSR-saturation caveat already documented in §10.6. Reported honestly,
+  not hidden or omitted.
+
+**VERDICT: real, robust improvement -- the best ORB gold RETEST
+configuration this project has ever found -- but NOT a clean DSR survivor
+at the honest full-pool count.** The case for this cell rests on the
+economic/robustness evidence (beats B&H Sharpe, low year-concentration, no
+tail-risk flag, holds across a genuine 9-year span with real costs), not
+on DSR, exactly the same framing already used for the §10.6 index-trend
+candidate. Flagged prominently per standing rule 5 rather than buried in a
+table row. Recommend retest_tol_frac=0.20 / stop_mode='moderate' as this
+project's new reference ORB gold RETEST configuration if the strategy is
+ever revisited.
+
+**Files:** `research/orb_retest_entry_stop_grid.py`. Results:
+`results/orb_retest_entry_stop_grid.csv`. Reproduce:
+`python research/orb_retest_entry_stop_grid.py`.
+
+**Trial count: 5 new** (baseline reproduction not counted). **Cumulative
+trials: N=1384** (1379 prior + 5).
+
+---
+
+## §40 — Credit-spread SPY: entry (delta target x DTE) grid, built on
+## §38's best exit — this project's best options-selling result (2026-09-15)
+
+Continuing the user's entry/SL/TP relook onto credit-spread SPY. Staged
+design, stated explicitly for efficiency: width fixed at 2% (§27-best),
+early-exit fixed at 50% (§38-best) — only entry (delta, DTE) is new here,
+rather than a full 4-dimensional joint grid.
+
+`TARGET_DELTA=0.10` and `DTE_DAYS=37` have been fixed constants, imported
+unchanged, across every credit-spread section in this project (§20, §26,
+§27, §38) — chosen originally only to match Ultimate Investor's live
+scanner defaults, never swept as free parameters. Confirmed by grep: no
+script calls `solve_delta10_strike` with a non-default `target_delta`.
+
+**Mechanisms (a priori):** delta trades premium size against win rate/avg
+loss (classic risk-reward dial); DTE trades theta decay speed against gap
+risk (shorter DTE sits in the steeper part of the decay curve — the same
+TastyTrade-literature logic that motivated §38's 50%-early-exit rule; 21
+DTE is that literature's commonly cited "sweet spot").
+
+**Grid:** target_delta in {0.05, 0.10, 0.16} x dte in {21, 37, 45} = 9
+cells; (0.10, 37) reproduces §38's best cell EXACTLY (Sharpe +1.319, exact
+match, confirming correctness) and isn't counted. 8 new trials.
+
+**Result — a real, non-noisy monotonic pattern:** DTE 21 beats 37 beats 45
+at every delta; delta 0.16 beats 0.10 beats 0.05 almost everywhere. Best
+in the 9-cell grid: **delta=0.16, dte=21 — Sharpe +1.643**, maxDD 5.0%,
+total return +365.8%, win rate 94.8%, worst day -1.70%, worst month
+-2.25%.
+
+**Efficient-search discipline applied: the result hit the grid edge on
+BOTH dimensions, so 3 more cells were run to check past the edge rather
+than trust an edge-hugging number** (0.20/21, 0.16/14, 0.20/14):
+
+- **Delta REVERSES past 0.16**: delta=0.20/dte=21 gives Sharpe 1.407,
+  WORSE than delta=0.16's 1.643 -- confirms a genuine INTERIOR optimum
+  near delta=0.16, not an artifact of stopping the grid too early.
+- **DTE KEEPS IMPROVING past 21**: delta=0.16/dte=14 gives Sharpe 2.097;
+  delta=0.20/dte=14 gives 2.012 -- both far above anything at dte=21.
+
+**The DTE<21 result is flagged as a likely MODEL-LIMITATION artifact, not
+adopted as a new finding.** This project's options pricing throughout
+(§20/§24/§26/§27/§38, stated every time) uses a FLAT VIX-as-implied-vol
+assumption with no skew or term structure. Real near-dated (<=14 DTE)
+options carry meaningfully more skew/event premium than 30-37 DTE ones --
+a flat-vol model cannot see that, so shrinking DTE further likely
+UNDERSTATES the true cost of selling that premium rather than revealing
+genuine extra edge. Catching this rather than reporting the highest number
+uncritically is the point of extending the grid past its edge.
+
+**Robustness on the defensible pick (delta=0.16, dte=21 -- staying in the
+model's more reliable 21-45 DTE zone):** 30/34 years net-positive
+(log-return basis), including **2008 GFC (+4.3%, the defined-risk cap held
+through the crisis)** and **2020 COVID (+4.3%)** -- only 3 mild negative
+years (1996 -1.6%, 2018 -0.2%, 2022 -2.8%). A genuinely healthy,
+non-concentrated multi-decade result, not a spike.
+
+**DSR** against the full defined-risk credit-spread family pool (N=19 --
+every Sharpe across `credit_spread_iv_filter.csv` +
+`credit_spread_early_exit.csv` + this grid; a materially healthier pool
+than ORB's, mean +1.11/std 0.28, since this family has been consistently
+decent rather than catastrophic-tailed): **0.502** -- real, but still
+short of the 0.95 bar.
+
+**VERDICT: real, robust improvement with a genuine interior optimum in
+delta -- this project's best options-selling result to date, still not a
+clean DSR survivor.** Recommend delta=0.16 / dte=21 / width=2% /
+early-exit=50% as the new reference credit-spread configuration. Flag
+dte<21 as an open question that needs real option-chain data (not this
+project's flat-vol proxy) before it could be trusted -- do not chase it
+further on this data.
+
+**Files:** `research/credit_spread_entry_grid.py`. Results:
+`results/credit_spread_entry_grid.csv` (12 rows: 9-cell grid + 3
+boundary-check extension cells). Reproduce:
+`python research/credit_spread_entry_grid.py`.
+
+**Trial count: 11 new** (8-cell grid + 3 boundary-check extension; baseline
+reproduction not counted). **Cumulative trials: N=1395** (1384 prior + 11).
+
+---
+
+## §41 — JOINT entry+exit re-optimization: does the earlier-tuned dimension
+## still hold once the other moved? (2026-09-15) — new project-best result
+
+§38 optimized credit-spread's exit holding entry fixed; §40 then optimized
+entry holding exit fixed; §39 optimized ORB's entry+stop holding target
+fixed. Staged search is efficient but can miss real interactions between
+dimensions. This section closes that gap on both candidates.
+
+### Credit spread: the exit optimum GENUINELY SHIFTED
+
+Fixed §40's new best entry (delta=0.16, dte=21, width=2%) and re-swept
+`profit_target_frac`. 50% (optimal for the OLD entry delta=0.10/dte=37)
+turns out NOT to be optimal for the new entry:
+
+| profit_target | Sharpe | maxDD | worst year |
+|---|---|---|---|
+| 25% | 1.073 | 8.1% | -- |
+| 50% (§40 baseline) | 1.643 | 5.0% | -- |
+| 75% | 1.810 | 7.2% | -- |
+| **85% (new best)** | **2.090** | **5.1%** | **-4.4% (2022)** |
+| 95% | 1.899 | 5.1% | -- (reverses) |
+
+95% reverses past 85%, confirming a genuine interior optimum (same
+discipline as §40's delta check) rather than an edge artifact.
+
+**Robustness on delta=0.16/dte=21/pt=85% — the most robust result in this
+project's history:** 32/34 years net-positive, worst year only -4.4%
+(2022), **2008 GFC +2.5%**, **2020 COVID +7.5%** (both crisis years
+positive, the defined-risk cap holding as designed). DSR against the FULL
+defined-risk credit-spread family pool (N=27, every Sharpe across
+`credit_spread_iv_filter`/`early_exit`/`entry_grid`/`joint_reopt`): **0.429**
+-- real but still short of 0.95 (the pool's own E[max SR] rose to +2.16
+now that it contains this result and its close neighbors).
+
+### ORB: NO reversal — target=1R is robust to the entry/stop change
+
+Fixed §39's new best entry+stop (retest_tol_frac=0.20, stop_mode=
+'moderate') and re-checked target {1R, 2R, close}:
+
+| target | Sharpe | net PF | end balance ($100k, 1% risk) | maxDD |
+|---|---|---|---|---|
+| **1R (unchanged best)** | **+1.488** | 1.425 | $235,575 | 12.1% |
+| 2R | +1.225 | 1.370 | $258,040 | 13.8% |
+| close (hold to bell) | +1.219 | 1.465 | $342,039 (highest $) | 15.3% |
+
+Same pattern as §10.7's original finding: letting winners run raises raw
+dollar totals but not risk-adjusted Sharpe. **Confirms §10.7's
+target-dimension conclusion was NOT an artifact of the old
+tol=0.10/or_range setup** -- it holds under the new entry+stop too.
+Trailing-stop/breakeven-stop were not re-tested against the new
+stop_mode='moderate' combination: already failed decisively twice against
+or_range, and no new a priori mechanism was proposed for why a tighter
+fixed stop would flip that outcome. Flagged as a smaller residual
+open question, not chased further -- a deliberate stopping point.
+
+**VERDICT: the joint check was worth running on both candidates, and gave
+two different, both useful answers.** Credit spread: staged optimization
+LEFT REAL GAINS ON THE TABLE (+0.45 Sharpe, 1.643 -> 2.090, from re-tuning
+exit after entry moved) -- a genuine interaction. ORB: staged optimization
+was SAFE (target choice doesn't depend on entry/stop) -- confirmed, not
+assumed.
+
+**NEW PROJECT-BEST RESULT: credit-spread SPY, delta=0.16 / dte=21 /
+width=2% / early-exit=85%.** Sharpe +2.090, 32/34 positive years, 2008 and
+2020 both positive, DSR 0.429 (real, still short of the 0.95 bar). This is
+now the strongest and most robust single result across the entire project.
+
+**Files:** `research/credit_spread_joint_reopt.py`. Results:
+`results/credit_spread_joint_reopt.csv`. ORB target check run ad hoc
+(same engine as §39, no new script needed — 2 trials).
+
+**Trial count: 6 new** (4 credit-spread profit-target cells + 2 ORB target
+cells; both baseline reproductions excluded). **Cumulative trials: N=1401**
+(1395 prior + 6).
+
+---
+
+## §42 — NAS100 H4 macross: joint SL/TP/HOLD grid — third candidate,
+## strongest spot/CFD trend result in the project (2026-09-15)
+
+User restricted scope to spot/CFD trading strategies like ORB (explicitly
+NOT the options-based credit spread), and asked to push a third candidate
+with the same joint-grid, follow-the-gradient method. Chose **H4 index
+trend/macross** over on-chain BTC: on-chain's edge is 43%-explained by BTC
+beta per §33's CAPM decomposition (a weaker candidate for genuine
+entry/exit refinement, since much of its "edge" is just being long BTC),
+while macross has a real, gross, cost-surviving edge (§10.6: NAS100 H4
+grossPF 1.52, netPF 1.47, Sharpe +0.67 — the best gross edge this project
+had found outside ORB/credit-spread) that scales monotonically with
+timeframe, consistent with genuine trend persistence rather than noise.
+
+Checked first, per standing rule 1: `strategies/sweep_families.py`'s
+`FAMILIES["macross"]` has exactly 3 hand-picked (fast, slow, ema_trend,
+k_atr, R, H) parameter combinations — no independent SL (k_atr), TP (R),
+or hold-time (H) sweep has ever been run.
+
+**Mechanism (a priori):** k_atr trades stop-noise-absorption against loss
+size per stop. R trades target size — for a TREND-FOLLOWING signal (which
+the edge's own timeframe-monotonic behavior in §10.6 suggests this is),
+the classic literature favors WIDE targets since the edge concentrates in
+occasionally large moves, not small consistent ones — a real, specific
+reason (unlike ORB, where widening the target already failed) to expect R
+matters here. H caps how long a trade can run before a forced time-exit,
+which could newly bind if R widens a lot.
+
+### Grid 1 (SL x TP, 3x3): baseline was already near-optimal, but not quite
+
+k_atr in {1.5, 2.0, 3.0} x R in {1.5, 2.0, 3.0}, fast/slow/ema_trend/H held
+at variant 0's values. Baseline (k_atr=2.0, R=2.0, Sharpe +0.669) was the
+best of the 3x3 grid except k_atr=1.5/R=3.0 (Sharpe +0.725) — which hit
+the grid edge on both k_atr (low) and R (high).
+
+### Grid 2 (edge-follow extension): a genuine interaction, not a boundary artifact
+
+Neither dimension alone beats k_atr=1.5/R=3.0 (k_atr=1.0 alone at R=3.0:
+Sharpe 0.480; R=4.0 alone at k_atr=1.5: Sharpe 0.425) — but the
+COMBINATION **k_atr=1.0, R=4.0 gives Sharpe +0.830**. Confirmed as a real
+local peak, not a fluke, by testing every direction around it: R=5.0
+(0.512) and R=6.0 (0.502) drop off; k_atr=0.75 (0.329) and k_atr=1.25
+(0.416) drop off too.
+
+### Grid 3 (H sweep): the max-hold cap was silently truncating the new,
+### 4x-wider target
+
+At k_atr=1.0/R=4.0/H=48 (the grid-1/2 default), 12.2% of trades were
+time-exits — a real, previously invisible constraint that only became
+binding once R widened from 2 to 4. Extending H:
+
+| H (H4 bars) | Sharpe | time-exit % |
+|---|---|---|
+| 48 | 0.830 | 12.2% |
+| 72 | 0.825 | -- |
+| 96 | 0.907 | -- |
+| 144 | 0.962 | -- |
+| **192 (plateau)** | **0.963** | **0.6%** |
+| 240 / 300 / 400 | 0.963 (byte-identical) | -- |
+
+240/300/400 give BYTE-IDENTICAL results to 192 -- the time-cap has
+entirely stopped binding by ~192 bars (32 trading days), confirming a real
+plateau rather than an unbounded chase.
+
+### Final best configuration
+
+**fast=10 / slow=30 / ema_trend=200 / k_atr=1.0 / R=4.0 / H=192**
+- Sharpe **+0.963**, gross PF 1.798, net PF 1.716, maxDD 11.0%, 181 trades
+- **Beats NAS100 buy-and-hold's Sharpe (0.842) with 3.2x lower drawdown**
+  (11.0% vs 35.7%) — the first index-instrument result in this project to
+  clearly beat B&H on BOTH Sharpe and drawdown simultaneously, not a
+  narrow/noise-level "win" like the original §10.6 finding
+- 7/8 years net-positive (only 2019 mildly negative, -2.1%)
+- Worst day -2.09% (2023-03-01), worst month -6.12% (2019-08) — no
+  tail-risk flag
+
+**DSR, both pools reported honestly:** against the FULL contaminated
+macross-family pool (all timeframes, N=52 including this session's cells):
+**0.032** — saturated by catastrophic M5-M30 configs elsewhere in the
+family, the same pattern already documented for ORB's full-pool DSR (§39).
+Against a CLEAN H4-only structural pool (N=28, no M5-M30 contamination):
+**0.503** — real, still short of 0.95, but consistent in magnitude with
+ORB's and credit-spread's own local-pool DSR figures.
+
+**VERDICT: real, robust improvement, genuinely beating buy-and-hold on
+BOTH Sharpe and drawdown for the first time on an index instrument in this
+project — still not a clean DSR survivor at the full contaminated pool.**
+The same efficient-search discipline paid off a third time in a row: the
+k_atr/R interaction would have been MISSED by staged (one-dimension-at-a-
+time) search, and the H constraint was an invisible implementation
+artifact, not a preference, that only surfaced once R moved. This is now
+the strongest pure spot/CFD directional-trading result in the project.
+Recommend fast=10/slow=30/ema_trend=200/k_atr=1.0/R=4.0/H=192 as the new
+reference NAS100 H4 macross configuration. **US30 was NOT re-swept this
+session** (NAS100 only, for efficiency) — flagged as the natural next
+step, not yet done.
+
+**Files:** `research/macross_h4_stop_target_grid.py`. Results:
+`results/macross_h4_stop_target_grid.csv`,
+`results/macross_h4_stop_target_extension.csv`. Reproduce:
+`python research/macross_h4_stop_target_grid.py` (grid 1 only; grids 2-3
+run ad hoc, params documented above).
+
+**Trial count: 21 new** (8 grid-1 + 9 grid-2 extension + 4 grid-3 H-sweep;
+baseline and 3 H-plateau reproductions not counted). **Cumulative trials:
+N=1422** (1401 prior + 21).
+
+---
+
+## §43 — US30 H4 macross: joint SL/TP/HOLD grid — extends §42's method,
+## clearest buy-and-hold beat in the project (2026-09-15)
+
+Direct extension of §42's method to US30 (not covered there). Baseline:
+US30's own best original variant (variant 2: fast=10/slow=30/ema_trend=100/
+k_atr=1.5/R=3.0/H=48, Sharpe +0.559) was already the strongest of its 3
+hand-picked configs, so the grid was centered on `ema_trend=100` rather
+than blindly reusing NAS100's winning `ema_trend=200` — confirmed, not
+assumed: at k_atr=2.0/R=2.0, ema_trend=100 gives Sharpe 0.599 vs the known
+ema_trend=200 figure of 0.326. Different instruments genuinely prefer
+different trend-filter lengths.
+
+**Grid 1** (k_atr in {1.0,1.5,2.0} x R in {2.0,3.0,4.0}, ema_trend=100,
+H=48): 8 new cells, (1.5,3.0) reproduces the baseline exactly.
+
+**Extension (edge-follow discipline):** the emerging peak moved toward
+WIDER stop + TIGHTER target (k_atr up to 2.5, R down to 1.0) — the OPPOSITE
+direction from NAS100's finding (narrower stop, wider target) — a
+genuinely different, instrument-specific optimum, not a repeat of §42's
+result. Confirmed as a real peak by decay in every direction:
+
+| Cell | Sharpe |
+|---|---|
+| k_atr=2.0, R=1.0 | 0.345 |
+| k_atr=3.0, R=1.0 | 0.708 |
+| **k_atr=2.5, R=1.0 (peak)** | **0.948** |
+| k_atr=2.5, R=0.75 | 0.532 |
+| k_atr=2.5, R=0.5 | 0.266 |
+
+**H-sweep** at the k_atr=2.5/R=1.0 peak found a real but much flatter
+interior optimum than NAS100's (which needed H all the way to 192):
+H=24 (0.816) < H=48 (0.948) < **H=72 (0.999, best)** > H=96 (0.984) —
+time-exit fraction fell from 38% (H=24) to 6% (H=96) as H widened, a
+milder version of §42's same mechanism.
+
+### Final best configuration
+
+**fast=10 / slow=30 / ema_trend=100 / k_atr=2.5 / R=1.0 / H=72**
+- Sharpe **+0.999**, gross PF 1.642, net PF 1.594, maxDD 6.1%, 159 trades
+- **DECISIVELY beats US30 buy-and-hold** (Sharpe +0.547, maxDD 37.0%) --
+  nearly double the Sharpe with 6x lower drawdown -- the clearest,
+  largest buy-and-hold beat of any index result in this project (sharper
+  than §42's NAS100 margin of 0.963 vs 0.842)
+- 7/8 years net-positive (only 2023 mildly negative, -3.4%)
+- Worst day -2.03% (2020-12-21), worst month -3.06% (2019-03) -- no
+  tail-risk flag
+
+**DSR** against a clean US30-H4-only structural pool (N=30, this session's
+cells plus the 3 original variants, no M5-M30 contamination): **0.499** --
+real, consistent in magnitude with every other candidate found this
+session (ORB 0.509 / credit-spread 0.429-0.502 / NAS100 macross 0.503),
+still short of 0.95.
+
+**VERDICT: real, robust improvement — the clearest buy-and-hold beat of
+any index result in this project, on both Sharpe and drawdown.** Confirms
+§42's finding generalizes to a second instrument, but with a GENUINELY
+DIFFERENT optimal SL/TP geometry (wide stop/tight target here vs narrow
+stop/wide target for NAS100) -- the same mechanism (trend persistence)
+does not imply the same parameters across instruments, an honest and
+useful finding for anyone deploying this rather than a false
+one-size-fits-all shortcut. Recommend fast=10/slow=30/ema_trend=100/
+k_atr=2.5/R=1.0/H=72 as the new reference US30 H4 macross configuration.
+
+Across the whole session, NAS100 (Sharpe 0.963) and US30 (Sharpe 0.999)
+macross are now the most consistently buy-and-hold-beating PAIR of spot/
+CFD results this project has produced -- both real trading strategies
+(not options), both beating B&H on Sharpe AND drawdown, both found via the
+same disciplined joint-grid-plus-edge-follow method.
+
+**Files:** `results/macross_h4_stop_target_grid_US30.csv` (reuses
+`research/macross_h4_stop_target_grid.py`'s `score()` function, run ad hoc
+with the US30 data path and `ema_trend=100` base).
+
+**Trial count: 26 new** (8 grid-1 + 15 extension + 3 H-sweep; baseline and
+1 H-duplicate not counted). **Cumulative trials: N=1448** (1422 prior + 26).

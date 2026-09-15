@@ -1,0 +1,78 @@
+================================================================================================================
+  SECTION 33 -- BETA/ALPHA DECOMPOSITION + LONG/SHORT AUDIT + RESTRICTED 4-STRATEGY ENSEMBLE
+================================================================================================================
+
+Building ORB gold RETEST fresh (not in the 64-series ensemble file -- new extraction)...
+  [ORB gold RETEST] look-ahead guard: PASS, 554 trades, 2017-01-10 17:17:00+00:00 .. 2025-12-29 15:21:00+00:00
+Building BTC daily benchmark (Binance M1 spot, 2017-08-17 onward)...
+  BTC benchmark real range: 2017-08-18 .. 2026-09-01, 3,288 days
+  ORB gold RETEST (XAUUSD, RETEST OR30/1R): 2017-01-10 .. 2025-12-29, 3,276 real days
+  On-chain BTC H=20: 2018-01-03 .. 2026-08-31, 3,163 real days
+  Capped vol spread (Credit-spread FILTERED 1pct, SPY): 1993-01-29 .. 2026-06-16, 12,192 real days
+  Gold-silver pairs (GLD-SLV N1.5): 2006-04-28 .. 2026-08-27, 7,427 real days
+
+================================================================================================================
+  PART 1 -- BETA/ALPHA DECOMPOSITION vs BTC (OLS, real-overlap only)
+================================================================================================================
+
+  ORB gold RETEST (XAUUSD, RETEST OR30/1R)
+    overlap with BTC benchmark: 2017-08-18 .. 2025-12-29  (n=3042 real days)
+    beta=-0.0030   alpha(daily)=+0.000173   alpha(annualized)=+6.51%   R^2=0.0011
+    VERDICT: LOW-BETA + POSITIVE-ALPHA (real, market-independent skill)
+
+  On-chain BTC H=20
+    overlap with BTC benchmark: 2018-01-03 .. 2026-08-31  (n=3162 real days)
+    beta=+0.4350   alpha(daily)=+0.000022   alpha(annualized)=+0.80%   R^2=0.4307
+    VERDICT: market-explained / beta-driven
+
+  Capped vol spread (Credit-spread FILTERED 1pct, SPY)
+    overlap with BTC benchmark: 2017-08-18 .. 2026-06-16  (n=3211 real days)
+    beta=+0.0035   alpha(daily)=+0.000028   alpha(annualized)=+1.03%   R^2=0.0132
+    VERDICT: LOW-BETA + POSITIVE-ALPHA (real, market-independent skill)
+
+  Gold-silver pairs (GLD-SLV N1.5)
+    overlap with BTC benchmark: 2017-08-18 .. 2026-08-27  (n=3283 real days)
+    beta=-0.0025   alpha(daily)=-0.000107   alpha(annualized)=-3.84%   R^2=0.0003
+    VERDICT: mixed -- flagged, read the numbers
+
+================================================================================================================
+  PART 2 -- LONG/SHORT EXPOSURE AUDIT (read from each strategy's own real trade/position data)
+================================================================================================================
+
+  ORB gold RETEST: 554 trades, LONG 282 (50.9%), SHORT 272 (49.1%) -- takes BOTH sides, directional breakout, not structurally biased long by construction (whichever side of the opening range breaks first).
+
+  On-chain BTC H=20: LONG-ONLY by construction (verified in run_onchain_signal.py -- entries trigger only on z > ADDR_Z_THRESHOLD, no short branch exists in the trade-building loop; section 30's own docstring states this a priori). 100% long when in a position, 0% short, flat the rest of the time (no_pos gate).
+
+  Capped vol spread (Credit-spread FILTERED 1pct): 362 trades, PUT-CREDIT-SPREAD (bull-put, bullish-tilted short-vol) 181 (50.0%), CALL-CREDIT-SPREAD (bear-call, bearish-tilted short-vol) 181 (50.0%) -- BOTH books run concurrently with shared capital, approximating a short-strangle/short-vol structure. This is NOT a simple long or short directional bet -- it profits from range-bound markets and is hurt by large moves in EITHER direction, though the two legs' deltas are not guaranteed to net to exactly zero on any given day.
+
+  Gold-silver pairs (N1.5): dollar-neutral pairs trade -- when in a position it is ALWAYS simultaneously long one leg and short the other (0.5x each, gross exposure 1x). Time in long-GLD/short-SLV: 26.7%, short-GLD/long-SLV: 36.9%, flat: 36.4%. Structurally market-neutral by construction, not a net directional bet on either metal or the broader market.
+
+  COMBINED-PORTFOLIO EXPOSURE SUMMARY: of the 4 candidates, only ORB gold RETEST carries outright net directional risk on any given trade (but splits both ways over time, 51%/49% long/short). On-chain BTC H=20 is the ONE candidate that is structurally a pure long-only bet on BTC rising -- it has ZERO short exposure and is flat (not short) the rest of the time, so it offers NO protection if BTC falls; it can only avoid losing by being out of the market, not by profiting from a decline. The credit-spread and pairs strategies are both structurally close to market-neutral by construction (short-vol and dollar-neutral respectively), so the combined 4-strategy book is NOT simply 'long the market' -- but it also has no strategy in it designed to profit meaningfully FROM a bear market, only ones designed to avoid or be indifferent to one.
+
+================================================================================================================
+  PART 3 -- RESTRICTED 4-STRATEGY ENSEMBLE (ONLY these 4, pairwise-available, no zero-fill)
+================================================================================================================
+
+  4x4 CORRELATION MATRIX (pairwise-complete, real overlapping days only):
+                        ORB gold RETEST  On-chain BTC H=20  Capped vol spread  Gold-silver pairs N1.5
+ORB gold RETEST                   1.000             -0.061              0.012                   0.030
+On-chain BTC H=20                -0.061              1.000              0.068                  -0.005
+Capped vol spread                 0.012              0.068              1.000                   0.086
+Gold-silver pairs N1.5            0.030             -0.005              0.086                   1.000
+
+  No pair among these 4 exceeds |corr| > 0.6. Nothing pruned -- all 4 kept.
+
+  BUILDING COMBINED PORTFOLIO -- KEPT SET: ['ORB gold RETEST', 'On-chain BTC H=20', 'Capped vol spread', 'Gold-silver pairs N1.5']
+  Full honest span: 1993-01-29 .. 2026-08-31 (12,268 days)
+  live-component-count-per-day: mean=2.12  min=1  max=4
+
+  COMBINED (4-candidate restricted ensemble, kept N=4):
+    total_return=+95.9%  sharpe=+0.344  maxDD=21.1%  recovery_days=214  top_year_share=40.4%  DSR=0.0000 (pool N=4)
+
+  STANDALONE comparison (each of the 4, own full-history stats):
+    ORB gold RETEST                     sharpe=+1.097  total_return=+90.0%  maxDD=10.0%
+    On-chain BTC H=20                   sharpe=+0.430  total_return=+120.8%  maxDD=65.6%
+    Capped vol spread                   sharpe=+0.567  total_return=+38.4%  maxDD=3.7%
+    Gold-silver pairs N1.5              sharpe=-0.143  total_return=-29.0%  maxDD=44.2%
+
+Saved: results/four_candidates_capm.csv, four_candidates_exposure.csv, four_candidates_corr_matrix.csv, four_candidates_restricted_ensemble.csv

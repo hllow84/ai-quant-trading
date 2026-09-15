@@ -1,0 +1,5 @@
+strategy,structure,pct_long,pct_short,n_trades
+ORB gold RETEST,"directional breakout, both sides",50.90252707581227,49.09747292418773,554.0
+On-chain BTC H=20,long-only (verified in source),100.0,0.0,
+Capped vol spread (Credit-spread FILTERED 1pct),"short-vol, both bull-put + bear-call books concurrent",50.0,50.0,362.0
+Gold-silver pairs (N1.5),"dollar-neutral, both legs concurrent",26.666666666666668,36.89149560117302,

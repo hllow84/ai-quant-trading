@@ -1,0 +1,2 @@
+method,kept,dropped,first,last,n_days,total_return,sharpe,max_dd,recovery_days,top_year_share,dsr,dsr_pool_n
+4-CANDIDATE RESTRICTED ENSEMBLE (kept N=4),"ORB gold RETEST, On-chain BTC H=20, Capped vol spread, Gold-silver pairs N1.5",none,1993-01-29,2026-08-31,12268,0.959495993116058,0.34439860514232445,0.2111134944490397,214,0.4042500512611244,4.515065440513621e-05,4

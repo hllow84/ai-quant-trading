@@ -1,0 +1,58 @@
+2017 file:      XAUUSD_M1_2017_spot_dukascopy.csv: 323,514 bars, 2017-01-02 23:00:00+00:00 -> 2017-12-29 21:58:00+00:00
+2018-2025 file: XAUUSD_M1_2018_2025_spot_dukascopy.csv: 1,827,147 bars, 2018-01-01 23:00:00+00:00 -> 2025-12-31 21:58:00+00:00
+Gap between files: 3 days 01:02:00 (New Year weekend / holiday close -- not a data hole)
+Continuous frame: 2,150,661 bars, 2017-01-02 23:00:00+00:00 -> 2025-12-31 21:58:00+00:00
+
+RETEST OR30/1R trades over the full continuous span: 554
+First trade entry: 2017-01-10 17:17:00+00:00   Last trade exit: 2025-12-29 15:21:00+00:00
+
+==============================================================================================================
+  YEAR-BY-YEAR -- ONE CONTINUOUS $100,000 ACCOUNT, RETEST OR30/1R, XAUUSD, 2017-2025
+==============================================================================================================
+  year    trades   start equity     end equity  year return %  gross PF   net PF   win %
+  ----------------------------------------------------------------------------------------------------------
+  2017        89        100,000        113,066        +13.1%     2.243    1.463   61.8%
+  2018        59        113,066        111,512         -1.4%     1.450    0.956   57.6%
+  2019        81        111,512        114,001         +2.2%     1.630    1.077   56.8%
+  2020        60        114,001        127,179        +11.6%     2.126    1.630   63.3%
+  2021        67        127,179        132,780         +4.4%     1.523    1.191   58.2%
+  2022        75        132,780        160,471        +20.9%     2.385    1.919   65.3%
+  2023        37        160,471        158,802         -1.0%     1.209    0.942   56.8%
+  2024        32        158,802        168,760         +6.3%     2.123    1.738   62.5%
+  2025        54        168,760        189,951        +12.6%     2.169    1.821   61.1%
+  ----------------------------------------------------------------------------------------------------------
+  TOTAL      554        100,000        189,951        +90.0%
+==============================================================================================================
+
+Era split within the SAME continuous run (no capital reset at the boundary):
+  2017 alone:            100,000 ->      113,066  (+13.1%), 89 trades
+  2018-2025 alone:       113,066 ->      189,951  (+68.0%), 465 trades
+
+==============================================================================================================
+  FULL-PERIOD CONTINUOUS RESULT, 2017-01-02 -> 2025-12-31 (9 years, ONE account)
+==============================================================================================================
+  Starting balance:        $100,000
+  Ending balance:          $189,951
+  Total return:            +90.0%
+  Total trades:            554
+  Look-ahead guard:        PASS
+  Gross PF (whole span):   1.844
+  Net PF (whole span):     1.354
+  Sharpe (daily, ann.):    +1.21
+  Max drawdown (daily-resampled equity, sec-10-style metric): 10.0%
+  Max drawdown (TRADE-BY-TRADE equity path, the real worst peak-to-trough this
+    exact account would have hit before recovering): 10.0%
+    -> peak equity $119,231 reached before the trough; trough reached at trade exiting 2019-07-09
+
+==============================================================================================================
+  BUY-AND-HOLD XAUUSD COMPARISON, SAME 2017-01-02 -> 2025-12-31 SPAN, SAME $100,000
+==============================================================================================================
+  XAUUSD price:            $1,151.17 (2017-01-02)  ->  $4,319.19 (2025-12-31)
+  Buy-and-hold ending:     $375,200
+  Buy-and-hold return:     +275.2%
+  Buy-and-hold Sharpe:     +1.18
+  Buy-and-hold max DD:     20.4%
+
+  STRATEGY  +90.0%  vs  BUY-AND-HOLD  +275.2%  -> strategy LOSES TO buy-and-hold on continuous dollars
+
+Year-by-year table saved: C:\Claude Code\AI Quant Trading\crypto-factor-lab\results\retest_xauusd_2017_2025_continuous.csv

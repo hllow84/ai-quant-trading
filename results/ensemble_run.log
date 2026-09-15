@@ -1,0 +1,178 @@
+==============================================================================================================
+  SECTION 32 -- ENSEMBLE / COMBINATION TEST: does combining many signals (incl. killed ones) help?
+==============================================================================================================
+
+Extracting every reconstructable daily return series...
+TOTAL SERIES: 64
+
+PER-COMPONENT SUMMARY (top 15 by own full-history Sharpe):
+                                              name      first       last  n_days  years  total_return   sharpe   max_dd  recovery_days  top_year_share
+             A|MomoRot crypto-sectors §17 (N12/K5) 2020-02-01 2026-08-31    2404    6.6     41.009567 1.135826 0.570444            NaN        0.772618
+                             C|Turtle Sys1 BTCUSDT 2018-01-01 2026-08-31    3165    8.7      1.644460 1.042855 0.144309            NaN        0.425540
+                             C|Turtle Sys2 ETHUSDT 2018-01-01 2026-08-31    3165    8.7      1.035380 0.871152 0.131236          113.0        0.312145
+                            C|MACD-slow-n3 BTCUSDT 2018-01-01 2026-08-31    3165    8.7      0.033635 0.836583 0.011987          733.0        0.524784
+                              C|Turtle Sys2 XAUUSD 2017-01-02 2025-12-31    3286    9.0      0.907185 0.821342 0.194429          812.0        0.558676
+                             C|Turtle Sys2 BTCUSDT 2018-01-01 2026-08-31    3165    8.7      0.923295 0.802799 0.115991           29.0        0.220561
+                             C|Turtle Sys1 ETHUSDT 2018-01-01 2026-08-31    3165    8.7      0.937544 0.762438 0.178246          628.0        0.446908
+                              C|Turtle Sys1 XAUUSD 2017-01-02 2025-12-31    3286    9.0      0.835049 0.755320 0.221043         1137.0        0.521224
+                                C|Ichimoku ETHUSDT 2018-01-01 2026-08-31    3165    8.7      0.032612 0.689911 0.015038            NaN        0.348737
+A|MomoRot US-sector widened 27-univ §12.2 (N12/K5) 2000-01-03 2026-08-28    9735   26.7      9.339118 0.629334 0.375044          801.0        0.140288
+        A|MomoRot US-sector §12 (N12/K5, headline) 2000-01-03 2026-08-28    9735   26.7      6.876350 0.607082 0.390294          836.0        0.138271
+                                C|Bollinger NAS100 2013-09-30 2025-12-31    4476   12.3      0.010528 0.593322 0.002617          559.0        0.226754
+                                    C|MACD BTCUSDT 2018-01-01 2026-08-31    3165    8.7      0.031226 0.585966 0.006474            NaN        0.530090
+                            C|MACD-slow-n3 ETHUSDT 2018-01-01 2026-08-31    3165    8.7      0.030976 0.585146 0.013970          193.0        0.562600
+               D|Credit-spread FILTERED 1pct (SPY) 1993-01-29 2026-06-16   12192   33.4      0.383868 0.566657 0.037334         1218.0        0.087211
+
+PER-COMPONENT SUMMARY (bottom 10 by own full-history Sharpe):
+                                                                            name      first       last  n_days  years  total_return     sharpe   max_dd  recovery_days  top_year_share
+                                                             C|Bollinger ETHUSDT 2018-01-01 2026-08-31    3165    8.7     -0.033335  -0.613054 0.037989            NaN             NaN
+                                   A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2) 2011-10-04 2026-08-28    5443   14.9     -0.989397  -0.661441 0.989773            NaN             NaN
+                             B|ICT-SMC EURUSD out-of-regime 2013-2017 (full 5yr) 2013-01-02 2017-12-29    1823    5.0     -0.813189  -1.462925 0.838515            NaN             NaN
+                                            B|ICT-SMC EURUSD in-regime 2018-2025 2018-01-02 2025-12-30    2920    8.0     -0.938428  -1.537810 0.947958            NaN             NaN
+               B|ICT-SMC SPX500 out-of-regime 2017 (1yr, not a full regime test) 2017-01-06 2018-01-03     363    1.0     -0.460268  -2.009882 0.542645            NaN             NaN
+                                   A|ORB §10 same cell 2013-2017 (out-of-regime) 2013-10-21 2017-12-29    1531    4.2     -0.769170  -2.087413 0.790426            NaN             NaN
+                                            B|ICT-SMC XAUUSD in-regime 2018-2025 2018-01-02 2025-12-31    2921    8.0     -0.998423  -2.949249 0.998454            NaN             NaN
+                                            B|ICT-SMC SPX500 in-regime 2018-2025 2018-01-05 2025-12-31    2918    8.0     -0.999863  -3.439035 0.999862            NaN             NaN
+               B|ICT-SMC XAUUSD out-of-regime 2017 (1yr, not a full regime test) 2017-01-03 2017-12-29     361    1.0     -0.759846  -4.752629 0.786263            NaN             NaN
+B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring) 2018-01-01 2025-12-30    2921    8.0     -1.000000 -12.699937 1.000000            NaN             NaN
+
+!! 2 series have < 2 years of history -- correlation vs these is unstable, flagged not hidden:
+                                                             name      first       last  years
+B|ICT-SMC SPX500 out-of-regime 2017 (1yr, not a full regime test) 2017-01-06 2018-01-03    1.0
+B|ICT-SMC XAUUSD out-of-regime 2017 (1yr, not a full regime test) 2017-01-03 2017-12-29    1.0
+
+CORRELATION MATRIX: 64x64 (4,096 unique pairs), saved in full -> results/ensemble_correlation_matrix.csv
+  mean pairwise corr    : +0.030
+  median pairwise corr  : +0.010
+  std of pairwise corr  : 0.176
+  pairs |corr| > 0.70   : 28 (0.7%)
+  pairs |corr| > 0.50   : 72 (1.8%)
+  pairs |corr| < 0.30   : 1,747 (42.7%)
+  pairs |corr| < 0.10   : 1,425 (34.8%)
+
+TOP 15 MOST-CORRELATED PAIRS (|corr|):
+  +1.000  A|VRP §21-A fixed 10% sizing (thr 1.2)  <->  A|VRP §21-A fixed 20% sizing (thr 1.2)
+  +1.000  A|VRP naked SVXY §20 (thr 1.2)  <->  A|VRP §21-A fixed 20% sizing (thr 1.2)
+  +1.000  A|VRP naked SVXY §20 (thr 1.2)  <->  A|VRP §21-A fixed 10% sizing (thr 1.2)
+  +0.916  A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)  <->  A|MomoRot US-sector §12 (N12/K5, headline)
+  +0.916  C|Pairs NAS100-US30 N1.5  <->  C|Pairs NAS100-US30 N2.0
+  +0.857  C|Pairs GLD-SLV N1.5  <->  C|Pairs GLD-SLV N2.0
+  +0.821  C|Turtle Sys1 XAUUSD  <->  C|Turtle Sys2 XAUUSD
+  -0.817  C|Bollinger XAUUSD  <->  C|Turtle Sys1 XAUUSD
+  +0.813  A|VRP naked SVXY §20 (thr 1.5)  <->  A|VRP §21-A fixed 20% sizing (thr 1.2)
+  +0.813  A|VRP naked SVXY §20 (thr 1.5)  <->  A|VRP §21-A fixed 10% sizing (thr 1.2)
+  +0.813  A|VRP naked SVXY §20 (thr 1.2)  <->  A|VRP naked SVXY §20 (thr 1.5)
+  +0.789  A|MomoRot US-sector §12 (N12/K5, headline)  <->  A|MomoRot country-ETFs §17 (N12/K5)
+  +0.776  A|VRP naked SVXY §20 (thr 1.2)  <->  A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)
+  +0.776  A|VRP §21-A fixed 10% sizing (thr 1.2)  <->  A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)
+  +0.776  A|VRP §21-A fixed 20% sizing (thr 1.2)  <->  A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)
+
+15 MOST-INDEPENDENT PAIRS (|corr| closest to 0):
+  +0.000  B|ICT-SMC EURUSD in-regime 2018-2025  <->  D|On-chain active-address surge H20 (BTCUSDT)
+  -0.000  A|VRP naked SVXY §20 (thr 1.2)  <->  C|Turtle Sys1 XAUUSD
+  -0.000  A|VRP §21-A fixed 10% sizing (thr 1.2)  <->  C|Turtle Sys1 XAUUSD
+  -0.000  A|VRP §21-A fixed 20% sizing (thr 1.2)  <->  C|Turtle Sys1 XAUUSD
+  -0.000  C|Pairs GLD-SLV N1.5  <->  C|Turtle Sys1 NAS100
+  +0.000  C|Turtle Sys1 XAUUSD  <->  C|Turtle Sys2 ETHUSDT
+  -0.000  A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)  <->  C|Turtle Sys1 ETHUSDT
+  -0.000  C|Ichimoku ETHUSDT  <->  C|Turtle Sys1 XAUUSD
+  +0.000  A|MomoRot country-ETFs §17 (N12/K5)  <->  A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)
+  -0.000  A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)  <->  C|Bollinger SPX500
+  +0.000  B|ICT-SMC EURUSD in-regime 2018-2025  <->  C|Bollinger BTCUSDT
+  +0.000  A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)  <->  C|MACD EURUSD
+  +0.000  A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session)  <->  C|Bollinger ETHUSDT
+  -0.001  A|VRP naked SVXY §20 (thr 1.5)  <->  C|Pairs GLD-SLV N2.0
+  +0.001  A|VRP §21-B vol-of-vol breaker +20% (thr 1.2)  <->  C|MACD EURUSD
+
+LOW-CORRELATION-FILTERED SUBSET, QUALITY-BLIND (greedy, longest-history-first, threshold |corr|<0.3):
+  kept 26/64 series:
+    - D|Credit-spread FILTERED 1pct (SPY)
+    - A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)
+    - C|Pairs GLD-SLV N1.5
+    - A|VRP §21-C paired VIXY hedge h=1.0 (thr 1.2)
+    - A|VRP naked SVXY §20 (thr 1.5)
+    - C|MACD EURUSD
+    - C|Ichimoku EURUSD
+    - C|Pairs NAS100-US30 N2.0
+    - C|Ichimoku US30
+    - C|Turtle Sys2 NAS100
+    - C|Ichimoku XAUUSD
+    - C|MACD XAUUSD
+    - C|MACD ETHUSDT
+    - C|MACD-slow-n3 BTCUSDT
+    - C|Ichimoku BTCUSDT
+    - B|ICT-SMC XAUUSD in-regime 2018-2025
+    - B|ICT-SMC BTCUSDT in-regime 2018-2025 (no out-of-regime window -- see docstring)
+    - A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)
+    - B|ICT-SMC EURUSD in-regime 2018-2025
+    - B|ICT-SMC SPX500 in-regime 2018-2025
+    - A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session)
+    - A|MomoRot crypto-sectors §17 (N12/K5)
+    - B|ICT-SMC EURUSD out-of-regime 2013-2017 (full 5yr)
+    - A|ORB §10 same cell 2013-2017 (out-of-regime)
+    - A|Sneaky Pivot §9.4 same cell 2013-2017 (out-of-regime)
+    - B|ICT-SMC XAUUSD out-of-regime 2017 (1yr, not a full regime test)
+  !! 7/26 kept series have their own full-history Sharpe < -1.0 (catastrophic, not merely losing) -- low correlation was achieved partly by admitting IDIOSYNCRATIC RUIN, not just
+     independent-but-healthy signals. This is checked directly by the quality-filtered variant below.
+
+LOW-CORRELATION-FILTERED SUBSET, POSITIVE-OWN-SHARPE ONLY (same greedy method, candidate pool restricted to the 40/64 series with own full-history Sharpe > 0):
+  kept 14/40 eligible series:
+    - D|Credit-spread FILTERED 1pct (SPY)
+    - A|MomoRot US-sector widened 27-univ §12.2 (N12/K5)
+    - A|VRP naked SVXY §20 (thr 1.5)
+    - C|Bollinger EURUSD
+    - C|Pairs NAS100-US30 N2.0
+    - C|Turtle Sys2 NAS100
+    - C|Ichimoku XAUUSD
+    - C|MACD ETHUSDT
+    - C|MACD-slow-n3 BTCUSDT
+    - C|Ichimoku BTCUSDT
+    - A|ORB §10 best cell 2018-2025 (NAS100 OR30 2R)
+    - A|Sneaky Pivot §9 best cell 2018-2025 (NAS100 swing/sneaky/session)
+    - A|MomoRot crypto-sectors §17 (N12/K5)
+    - A|Sneaky Pivot §9.4 same cell 2013-2017 (out-of-regime)
+
+==============================================================================================================
+  COMBINED PORTFOLIO RESULTS
+==============================================================================================================
+
+  ALL 64 COMPONENTS, EQUAL-WEIGHT
+    span            : 1993-01-29 -> 2026-08-31  (33.6 yrs, 12268 days)
+    total return    : -37.2%
+    Sharpe (ann.)   : -0.150
+    max drawdown    : 76.7%
+    recovery        : NOT recovered
+    top-year share  : n/a
+    DSR (reference) : 0.0000  (pool N=64, E[max SR]=+4.232, z=-25.42)
+
+  ALL 64 COMPONENTS, INVERSE-VOL-WEIGHT
+    span            : 1993-01-29 -> 2026-08-31  (33.6 yrs, 12268 days)
+    total return    : +48.1%
+    Sharpe (ann.)   : +0.467
+    max drawdown    : 8.2%
+    recovery        : 524 days
+    top-year share  : 17%
+    DSR (reference) : 0.0000  (pool N=64, E[max SR]=+4.232, z=-21.68)
+
+  LOW-CORR SUBSET, QUALITY-BLIND (N=26)
+    span            : 1993-01-29 -> 2026-08-31  (33.6 yrs, 12268 days)
+    total return    : -97.2%
+    Sharpe (ann.)   : -1.630
+    max drawdown    : 98.7%
+    recovery        : NOT recovered
+    top-year share  : n/a
+    DSR (reference) : 0.0000  (pool N=64, E[max SR]=+4.232, z=-34.41)
+
+  LOW-CORR SUBSET, POSITIVE-SHARPE-ONLY (N=14)
+    span            : 1993-01-29 -> 2026-08-31  (33.6 yrs, 12268 days)
+    total return    : +421.1%
+    Sharpe (ann.)   : +0.682
+    max drawdown    : 20.1%
+    recovery        : 531 days
+    top-year share  : 18%
+    DSR (reference) : 0.0000  (pool N=64, E[max SR]=+4.232, z=-20.32)
+
+  BEST SINGLE COMPONENT BY OWN SHARPE (for comparison, not a fair pool-adjusted comparison):
+    A|MomoRot crypto-sectors §17 (N12/K5): Sharpe +1.136, total return +4101.0%, max DD 57.0%
+
+Files: results/ensemble_daily_returns.csv, ensemble_component_summary.csv, ensemble_correlation_matrix.csv, ensemble_combined_results.csv, ensemble_low_corr_subset_members.csv, ensemble_low_corr_subset_members_positive.csv
