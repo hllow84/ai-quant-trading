@@ -8218,3 +8218,90 @@ so far in this project.
 
 **Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
 trials: N=1570** (unchanged).
+
+---
+
+## §56/§57 — THE LAST TWO REMAINING PAIRINGS — completing all C(5,2)=10
+## combinations from this project's 5-leg candidate pool (2026-09-16)
+
+User asked to try the last two remaining pairings, completing every
+possible combination of this project's five candidates (NAS100 macross,
+NAS100 breakout, US30 macross, US30 breakout, ORB gold): **NAS100
+breakout + US30 macross (§56)** and **ORB gold + NAS100 breakout (§57)**
+— the only two of the 10 possible pairs not yet tested (§44/§47/§48/§49/
+§50/§53/§54/§55 covered the other eight). Method identical to every prior
+pairing: both legs' own unchanged engines/params, daily returns aligned
+on the union of trading days, tested at both fixed 50/50 and in-sample
+risk-parity weight.
+
+### §56 — NAS100 breakout + US30 macross
+
+Quality gap ~1.9x (0.999/0.526) — between §50's 1.8x (worked cleanly)
+and §47's 3.2x (failed under 50/50).
+
+| Weighting | Sharpe | maxDD | Years positive |
+|---|---|---|---|
+| NAS100 breakout standalone | +0.526 | 11.9% | — |
+| US30 macross standalone | +0.999 | 6.1% | — |
+| naive average of the two legs | +0.763 | — | — |
+| Fixed 50/50 combined | +0.848 | **4.3%** | 7/8 |
+| **Risk-parity (35%/65%) combined** | **+0.966** | 4.4% | 7/8 |
+
+Correlation +0.022 (low, consistent with every non-gold pairing). Neither
+weighting beats US30 macross alone on Sharpe (+0.999), but risk-parity
+comes very close (+0.966, within 0.033) — and BOTH weightings roughly
+HALVE the max drawdown relative to either leg standalone (4.3-4.4% vs
+6.1%/11.9%) — a genuine, substantial drawdown benefit even where the
+Sharpe gap to the best leg isn't fully closed.
+
+### §57 — ORB gold + NAS100 breakout
+
+Quality gap ~2.8x (1.488/0.526) — the SECOND-largest gap tested (behind
+only §47's 3.2x), pairing this project's single strongest leg with its
+single weakest.
+
+| Weighting | Sharpe | maxDD | Years positive |
+|---|---|---|---|
+| ORB gold standalone | +1.488 | 12.1% | — |
+| NAS100 breakout standalone | +0.526 | 11.9% | — |
+| naive average of the two legs | +1.007 | — | — |
+| Fixed 50/50 combined | +1.224 | 9.2% | 8/9 |
+| Risk-parity (51%/49%) combined | +1.233 | 9.2% | 8/9 |
+
+**Correlation -0.020 — the FIRST NEGATIVE correlation measured in this
+project's entire combined-book work** (every other pairing has been
+weakly positive, +0.004 to +0.079). Despite this, and despite testing
+risk-parity, NEITHER weighting comes close to beating gold alone
+(+1.488) — confirming §47's lesson directly: **a large enough quality
+gap (here ~2.8x) dominates even the best possible correlation this
+project has found.** Risk-parity barely moves the needle here (+1.224 ->
++1.233) because the two legs' realized volatilities are similar enough
+(51/49 weights, nearly the fixed 50/50 split already) that there was
+little room for risk-parity to reallocate.
+
+**VERDICT ON BOTH, AND ON THE FULL 10-PAIRING PROJECT: quality gap size
+remains the single most reliable predictor of whether a combined book
+beats its best individual leg, more reliable than correlation alone —
+confirmed a final time across the full combinatorial set.** Correlation
+in this project has been uniformly low (-0.020 to +0.079 across all 10
+pairs, gold pairings the lowest) but that alone never fully overcomes a
+gap larger than roughly 1.8-2x; risk-parity reliably narrows the gap
+(recovering 60-100% of it across the mixed/muted pairings) but has never
+been observed to fully close a gap above ~2x in this project's ten
+tested combinations. **The two cleanest, most useful results from the
+entire ten-pairing exploration remain §48 (US30 macross+breakout,
+same-instrument) and §54 (ORB gold+US30 macross, cross-asset-class) —
+both had small gaps (<1.75x) and near-zero-or-lowest correlations, and
+both beat every individual leg outright under plain 50/50 weighting,
+no rescue needed.**
+
+**Files:** `research/nas100_breakout_us30_macross_combined_book.py`,
+`research/orb_gold_nas100_breakout_combined_book.py`. Results:
+`results/nas100_breakout_us30_macross_combined_book.csv`,
+`results/orb_gold_nas100_breakout_combined_book.csv`. Reproduce:
+`python research/nas100_breakout_us30_macross_combined_book.py` and
+`python research/orb_gold_nas100_breakout_combined_book.py`.
+
+**Trial count: 0 new** (both are portfolio checks, no parameter search).
+**Cumulative trials: N=1570** (unchanged). **All C(5,2)=10 combined-book
+pairings from this project's 5-leg candidate pool are now complete.**
