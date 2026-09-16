@@ -8583,3 +8583,70 @@ sizing, unlike the 1x case in §58 where it was essentially zero.
 **Trial count: 0 new** (fixed-multiplier FTMO check + two-phase chain
 on already-scored legs, not a parameter search). **Cumulative trials:
 N=1570** (unchanged).
+
+---
+
+## §60 — CHAINED TWO-PHASE FUNDING PROBABILITY at 2x-5x, for comparison
+## against §59's 6x reference — the tradeoff curve is monotonically
+## rising across the whole tested range (2026-09-16)
+
+User asked to run the same realistic CHAINED two-phase funding metric
+introduced in §59 (Phase 1 must pass, then Phase 2 must ALSO pass
+starting immediately after, in the same continuous attempt) at 2x, 3x,
+4x, and 5x standard risk, for direct comparison against 6x. §58's
+sensitivity sweep only reported INDEPENDENT per-phase pass rates at each
+multiplier; this closes the gap by running the harder, realistic chained
+metric across the full range at once.
+
+| Risk multiplier | Sharpe | maxDD | Total return (8.97y) | Years positive | Phase 1 (indep.) | Phase 2 (indep.) | **CHAINED (funded)** | DD-breach rate |
+|---|---|---|---|---|---|---|---|---|
+| 2x | +1.793 | 6.1% | +187.2% | 9/9 | 0.0% | 13.2% | **0.0%** | 0.0% |
+| 3x | +1.793 | 9.1% | +380.4% | 9/9 | 3.8% | 33.0% | **0.9%** | 0.0% |
+| 4x | +1.793 | 12.1% | +696.5% | 9/9 | 14.2% | 43.4% | **5.7%** | 0.0% |
+| 5x | +1.793 | 15.0% | +1,208.9% | 9/9 | 18.9% | 47.2% | **12.3%** | 4.7% |
+| 6x (§59 reference) | +1.793 | 17.9% | +2,032.0% | 9/9 | 32.1% | 47.2% | **15.1%** | 12.3% |
+
+(Sharpe is identical at every row by construction — a linear rescaling
+of the same return series does not change it; every other column moves.)
+
+**The chained funded rate rises MONOTONICALLY across the entire 2x-6x
+range tested — it has not yet turned over within this range.** At 2x it
+is exactly 0% because Phase 1 itself never passes (0.0% independent) even
+though Phase 2 alone would pass 13.2% of the time in isolation — the
+chaining requirement is what makes low multipliers look far worse here
+than §58's Phase-2-only number would suggest on its own. Drawdown-limit
+breaches stay at a genuine ZERO through 4x, appear only mildly at 5x
+(4.7% of attempts), and become material at 6x (12.3%) — confirming the
+2x-4x range is essentially risk-free with respect to the FTMO drawdown
+floors (the whole shortfall there is pure speed), while 5x-6x is where
+the tradeoff against real risk-limit exposure actually begins to bite.
+
+**Important scope note on "6x is near-peak":** §58's "near-peak" framing
+was based on INDEPENDENT per-phase rates (Phase 1 peaked near 6x-8x,
+Phase 2 near 4x-6x) — but the CHAINED metric computed here is still
+rising at 6x within the tested 2x-6x range, and was not extended to 7x-
+10x in this section (the user asked specifically for 2x-5x vs 6x). It
+remains an open, unanswered question whether the chained funded rate
+peaks somewhere above 6x (§58's independent-rate data suggests 8x's
+higher Phase 1 rate, 45.3%, could plausibly push the chained number
+higher still before the same daily-loss erosion seen in the independent
+sweep starts pulling it back down) or whether chaining's extra
+constraint changes where that peak actually falls. Not resolved here —
+flagged explicitly rather than assumed.
+
+**VERDICT: the full 2x-6x picture confirms 6x is the best of the range
+actually tested for the metric that matters (15.1% chained-funded,
+versus 12.3% at 5x and near-zero below that), and clarifies exactly where
+the tradeoff curve's shape changes — real drawdown-limit risk only
+becomes material from 5x onward, not before.** Whether pushing past 6x
+would improve the chained funded rate further, and at what additional
+drawdown-breach cost, remains untested and is the natural next question
+if this line of inquiry continues.
+
+**Files:** `research/ftmo_check_risk_multiplier_sweep.py` (reuses
+`research/ftmo_check_6x_reference.py`'s `two_phase_chain()` unchanged).
+Results: `results/ftmo_check_risk_multiplier_sweep.csv`. Reproduce:
+`python research/ftmo_check_risk_multiplier_sweep.py`.
+
+**Trial count: 0 new** (fixed-multiplier FTMO checks on already-scored
+legs, not a parameter search). **Cumulative trials: N=1570** (unchanged).
