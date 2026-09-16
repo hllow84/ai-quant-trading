@@ -45,7 +45,7 @@ from research.metrics import max_drawdown, sharpe
 RESULTS = _ROOT / "results"
 BARS_PER_YEAR = 252
 MAX_DAYS = 60
-BEST_DAY_CAP = 0.30
+BEST_DAY_CAP = None    # 2026-09-16 correction: verified against ftmo.com -- the 2-Step ruleset has NO Best Day/consistency rule at all
 RISK_MULTIPLIER = 6.0   # adopted reference sizing, per user direction after §58
 
 

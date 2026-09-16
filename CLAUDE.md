@@ -25,15 +25,21 @@ itself (§58): 0% Challenge pass rate at the project's standard 1% risk/trade
 convention, but for a genuinely different reason than every earlier FTMO-hunt
 kill — it never once breaches the 5% daily or 10% total drawdown limit across 106
 rolling 60-day windows, it simply never compounds fast enough to hit the +10%/+5%
-Phase 1/2 target in time (best-ever 60-day return in 9 years was +5.77%). §59
-adopted 6x standard risk (§58's near-peak sensitivity point) as the FTMO reference
-sizing and computed the REALISTIC chained two-phase probability (Phase 1 must pass,
-THEN Phase 2 must also pass in the same attempt): **15.1% funded** (34/106 pass
-Phase 1, 16/106 pass both) — at maxDD 17.9%, still 9/9 years net-positive, but now
-with real (not negligible) daily-loss/total-DD exposure (13 of 106 attempts breach
-a limit). A genuine, quantified tradeoff between "gets funded" and "trades at the
-size this project's own general standing rules recommend" — reported as computed,
-not resolved toward either conclusion.** `research_log.md` has the per-test detail.
+Phase 1/2 target in time (best-ever 60-day return in 9 years was +5.77%). §59-§61
+then swept risk-per-trade multipliers computing a chained two-phase funded
+probability (Phase 1 must pass, THEN Phase 2 must also pass in the same attempt) —
+**but §62 (verified live against ftmo.com) found and corrected a fabricated "Best
+Day/consistency" rule those sections had applied: FTMO's actual 2-Step
+Challenge/Verification product (the one being modelled, 5%/10%/10%/5%/4-days) has
+NO such rule at all — it exists only on the 1-Step account, at 50% not 30%, and
+even there is a soft non-terminating gate, never an account termination.**
+Correcting this MATERIALLY changes the conclusion: the true chained-funding peak
+is a broad 12x-15x plateau (centered at 14x, ~33% funded probability, maxDD ~39%),
+not 6x (~15% funded, maxDD 18%) as §61 had wrongly concluded — roughly DOUBLE the
+optimal risk level, with correspondingly higher real drawdown exposure. §58's
+"1x never passes, purely on speed" finding is unaffected (it was never driven by
+the erroneous rule). Treat §62 as authoritative over §59-§61's superseded numbers.
+`research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)
 

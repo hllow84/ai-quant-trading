@@ -8706,3 +8706,129 @@ Reproduce: `python research/ftmo_check_risk_multiplier_sweep.py`.
 
 **Trial count: 0 new** (fixed-multiplier FTMO checks on already-scored
 legs, not a parameter search). **Cumulative trials: N=1570** (unchanged).
+
+---
+
+## §62 — CORRECTION: §58-§61's "Best Day / consistency" rule was
+## FABRICATED and WRONG — verified live against ftmo.com, the real
+## 2-Step ruleset has NO such rule at all, and the true chained-funding
+## peak is at ~13-15x, not 6x (2026-09-16)
+
+User asked to verify what maxDD limit FTMO actually uses. Live web
+lookup (ftmo.com/en/trading-objectives/, cross-checked against two
+independent third-party rule summaries) confirmed the 5%-daily / 10%-
+total (static) / +10%-Phase1 / +5%-Phase2 / 4-min-trading-days numbers
+this project's `research/ftmo_rules.py` has modelled since before this
+session were and remain CORRECT for FTMO's 2-Step Challenge product.
+**But the same lookup revealed that §58's `research/
+ftmo_challenge_daily.py` had ALSO added a 30%-threshold "Best Day /
+consistency" rule as a hard, account-terminating filter — and that rule
+is simply WRONG for the 2-Step product being modelled, on three
+independent counts, not a modelling assumption that "varies by account
+type" as it was originally caveated:**
+
+1. **The 2-Step Challenge/Verification has NO Best Day or consistency
+   rule at all, in either phase or on the funded account** — confirmed
+   directly from FTMO's own Trading Objectives page and independently
+   corroborated.
+2. Where FTMO's Best Day rule DOES exist, it applies **only to the
+   1-Step account**, at a **50% threshold**, not the 30% assumed here.
+3. Even on the 1-Step account, breaching it is **explicitly a SOFT,
+   non-terminating "payout gate"** (the trader must keep generating
+   profit until compliant) — never an account termination, which is
+   how §58-§61 were applying it to a product that doesn't even have the
+   rule.
+
+**This means every "consistency-adjusted" figure reported in §58, §59,
+§60, and §61 was computed against a fabricated rule and understates the
+true pass/funding rate — sometimes by a large margin.** `research/
+ftmo_challenge_daily.py` has been corrected: `best_day_cap` now defaults
+to `None` (disabled, correct for the 2-Step product), kept only as an
+option for anyone who later wants to correctly model the 1-Step
+account's real, soft 50% gate. All three FTMO scripts
+(`ftmo_check_best_candidate.py`, `ftmo_check_6x_reference.py`,
+`ftmo_check_risk_multiplier_sweep.py`) were updated and re-run.
+
+**Corrected results — §58's 1x-risk numbers are UNCHANGED** (0% Challenge
+pass rate at both phases was always driven entirely by `no_target`, never
+by the fabricated consistency rule, so that specific finding stands
+as-is). **§59/§60/§61's multiplier-sweep conclusions are NOT unchanged —
+the erroneous rule was materially suppressing pass rates at every
+multiplier above ~4x, and suppressing them by DIFFERENT amounts at
+different multipliers** (the erroneous filter's bite is path-dependent,
+not a constant discount, because it depends on which specific day within
+each specific challenge attempt happens to be the "best day" — a detail
+that varies non-linearly with the risk multiplier even though the
+underlying return series is only linearly rescaled). The corrected full
+sweep (2x-50x):
+
+| Multiplier | maxDD | Phase 1 (indep.) | Phase 2 (indep.) | **CHAINED (funded), CORRECTED** | Old (wrong) chained value | DD-breach rate |
+|---|---|---|---|---|---|---|
+| 2x | 6.1% | 0.0% | 13.2% | 0.0% | 0.0% | 0.0% |
+| 3x | 9.1% | 3.8% | 34.0% | 0.9% | 0.9% | 0.0% |
+| 4x | 12.1% | 14.2% | 50.0% | 8.5% | 5.7% | 0.0% |
+| 5x | 15.0% | 19.8% | 63.2% | 17.0% | 12.3% | 4.7% |
+| 6x | 17.9% | 33.0% | 70.8% | **25.5%** | ~~15.1%~~ | 12.3% |
+| 7x | 20.7% | 39.6% | 68.9% | 27.4% | ~~11.3%~~ | 24.5% |
+| 8x | 23.4% | 45.3% | 65.1% | 29.2% | ~~10.4%~~ | 36.8% |
+| 9x | 26.1% | 43.4% | 60.4% | 29.2% | ~~7.5%~~ | 48.1% |
+| 10x | 28.8% | 42.5% | 56.6% | 31.1% | ~~7.5%~~ | 53.8% |
+| 12x | 33.9% | 44.3% | 52.8% | 31.1% | ~~5.7%~~ | 61.3% |
+| 13x | 36.4% | 43.4% | 52.8% | 32.1% | (not tested) | 62.3% |
+| **14x** | 38.9% | 44.3% | 53.8% | **33.0% (PEAK)** | ~~5.7%~~ | 62.3% |
+| 15x | 41.3% | 45.3% | 53.8% | 32.1% | (not tested) | 63.2% |
+| 16x | 43.6% | 41.5% | 50.0% | 28.3% | (not tested) | 67.9% |
+| 18x-20x | 48-52% | ~37% | ~44% | 23.6% | (not tested) | 73.6% |
+| 25x | 62.0% | 36.8% | 40.6% | 20.8% | (not tested) | 77.4% |
+| 30x-50x | 70-93% | 28-36% | 28-37% | 15-22% | (not tested) | 78-85% |
+
+**§61's central claim ("6x is CONFIRMED as the true peak") is RETRACTED.
+The corrected true peak is a broad plateau spanning roughly 12x-15x,
+centered at 14x, with a chained funding probability of 33.0% — materially
+higher than the erroneous 15.1% figure previously reported for 6x, and
+the plateau itself is meaningfully HIGHER-RISK than previously
+concluded.** At the corrected peak (14x = 14% notional risk/trade), the
+standalone 8.97-year equity curve's own maxDD is 38.9% and 62.4% of
+individual 60-day challenge ATTEMPTS breach a daily-loss or total-DD
+limit at some point — both far more extreme than the (already elevated)
+6x picture. Past the 12x-15x plateau the curve declines the same way it
+did before correction, just from a higher, later peak: by 40x-50x, more
+than 84% of attempts breach a limit and funded probability falls back
+toward 15%.
+
+**VERDICT: this is a genuine correction, not a refinement — the entire
+"6x is optimal" conclusion from §59-§61 was built on a rule that does
+not exist for the product being modelled, and the true answer is both
+quantitatively different (33.0% vs 15.1% peak funded probability) AND
+qualitatively different (the optimal risk level is roughly DOUBLE what
+was previously concluded, with correspondingly higher real drawdown
+exposure).** This does not change the §58 finding that 1x standard risk
+never passes (that was never affected by the erroneous rule), and it
+does not change any of §35-§57's Sharpe/maxDD/DSR results (the
+consistency-rule error was contained entirely to the FTMO-Challenge-
+specific analysis in §58-§61, not the underlying strategy backtests).
+Flagged prominently, per this project's own standing rule 7 (honest
+reporting — never hide a bug, correct it visibly), rather than quietly
+patched. Whoever revisits this line of inquiry should treat §62's table
+as authoritative and §59-§61's superseded numbers as historical record
+only (retained, not deleted, so the correction itself remains legible).
+
+**Files corrected:** `research/ftmo_challenge_daily.py` (default
+`best_day_cap` changed from `0.30` to `None`, docstring rewritten with
+the verified real ruleset and an explicit correction note),
+`research/ftmo_check_best_candidate.py`, `research/
+ftmo_check_6x_reference.py`, `research/ftmo_check_risk_multiplier_
+sweep.py` (all three re-run with the corrected model; `MULTIPLIERS`
+extended to `2x-50x` to find the corrected peak). Results:
+`results/ftmo_check_best_candidate.csv`, `results/
+ftmo_check_6x_reference.csv`, `results/ftmo_check_risk_multiplier_
+sweep.csv` (all regenerated). Reproduce: re-run any of the three
+scripts.
+
+**Trial count: 0 new** (a bug-fix + re-run of existing FTMO-ruleset
+checks, not a parameter search). **Cumulative trials: N=1570**
+(unchanged).
+
+Sources verified live 2026-09-16:
+- [FTMO Trading Objectives](https://ftmo.com/en/trading-objectives/)
+- [Does FTMO Have a Consistency Rule? (PropVator)](https://propvator.com/blog/does-ftmo-have-a-consistency-rule/)

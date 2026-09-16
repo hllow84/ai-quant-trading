@@ -71,7 +71,7 @@ from strategies.sweep_families import breakout_retest, TF_DELTA
 RESULTS = _ROOT / "results"
 US30_DATA = _ROOT / "data" / "US30_M1_2018_2025_cfd_dukascopy.csv"
 MAX_DAYS = 60          # FTMO Challenge/Verification runway, days
-BEST_DAY_CAP = 0.30    # assumed consistency threshold, stated in ftmo_challenge_daily.py
+BEST_DAY_CAP = None    # 2026-09-16 correction: verified against ftmo.com -- the 2-Step ruleset has NO Best Day/consistency rule at all
 
 
 def gold_leg_daily_returns():
@@ -132,8 +132,9 @@ def main():
 
     data_start, data_end = idx.min(), idx.max()
     print(f"Combined data span: {data_start.date()} -> {data_end.date()} ({len(idx)} days)\n")
-    print(f"FTMO Challenge simulation: max_days={MAX_DAYS}, best_day_cap={BEST_DAY_CAP:.0%} "
-          f"(assumed consistency threshold, stated explicitly)\n")
+    print(f"FTMO Challenge simulation: max_days={MAX_DAYS}, best_day_cap={BEST_DAY_CAP} "
+          f"(None = correct for the 2-Step ruleset, which has no consistency rule -- "
+          f"verified against ftmo.com 2026-09-16)\n")
 
     rows = []
     for label, series in [

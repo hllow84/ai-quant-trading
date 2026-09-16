@@ -34,8 +34,9 @@ from research.metrics import max_drawdown, sharpe
 RESULTS = _ROOT / "results"
 BARS_PER_YEAR = 252
 MAX_DAYS = 60
-BEST_DAY_CAP = 0.30
-MULTIPLIERS = (2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 14.0)
+BEST_DAY_CAP = None    # 2026-09-16 correction: verified against ftmo.com -- the 2-Step ruleset has NO Best Day/consistency rule at all
+MULTIPLIERS = (2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 13.0, 14.0,
+               15.0, 16.0, 18.0, 20.0, 25.0, 30.0, 40.0, 50.0)
 
 
 def main():
