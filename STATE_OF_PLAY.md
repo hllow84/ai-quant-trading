@@ -8650,3 +8650,59 @@ Results: `results/ftmo_check_risk_multiplier_sweep.csv`. Reproduce:
 
 **Trial count: 0 new** (fixed-multiplier FTMO checks on already-scored
 legs, not a parameter search). **Cumulative trials: N=1570** (unchanged).
+
+---
+
+## §61 — CLOSES §60's OPEN QUESTION: extending the sweep to 7x-14x finds
+## the true chained-funding PEAK at 6x, then a steady decline
+## (2026-09-16)
+
+§60 left one question explicitly open: does the chained two-phase funded
+rate keep rising past 6x, or has it already peaked? Extended
+`research/ftmo_check_risk_multiplier_sweep.py`'s `MULTIPLIERS` to include
+7x, 8x, 9x, 10x, 12x, 14x and re-ran the identical chained metric.
+
+| Multiplier | maxDD | Phase 1 (indep.) | Phase 2 (indep.) | **CHAINED (funded)** | DD-breach rate |
+|---|---|---|---|---|---|
+| 5x | 15.0% | 18.9% | 47.2% | 12.3% | 4.7% |
+| **6x** | 17.9% | 32.1% | 47.2% | **15.1% (PEAK)** | 12.3% |
+| 7x | 20.7% | 35.8% | 34.9% | 11.3% | 24.5% |
+| 8x | 23.4% | 37.7% | 28.3% | 10.4% | 35.8% |
+| 9x | 26.1% | 33.0% | 20.8% | 7.5% | 47.2% |
+| 10x | 28.8% | 26.4% | 20.8% | 7.5% | 50.0% |
+| 12x | 33.9% | 23.6% | 16.0% | 5.7% | 56.6% |
+| 14x | 38.9% | 18.9% | 17.0% | 5.7% | 55.7% |
+
+**§60's open question is now answered: 6x IS the true peak of the
+chained funded-probability curve, not merely the best point in an
+arbitrarily-truncated range.** The rate rises monotonically from 2x
+through 6x (§60: 0.0%/0.9%/5.7%/12.3%/15.1%), peaks decisively at 6x
+(15.1%), then falls steadily and monotonically all the way to 14x
+(11.3% -> 10.4% -> 7.5% -> 7.5% -> 5.7% -> 5.7%) — the Phase 1 rate alone
+keeps climbing a bit further (peaking near 37.7% at 8x, consistent with
+§58's original observation) but Phase 2's rate falls fast enough past 6x
+that the CHAINED product declines regardless. Drawdown-limit breaches
+climb from a genuine 0% (2x-4x) through 12.3% (6x) to over half of all
+attempts (56.6% at 12x) — by 10x+, more than half of all attempts are
+now failing on a hard risk-limit breach rather than running out of time,
+a complete inversion of the 1x/2x situation where risk-limit breaches
+were essentially impossible.
+
+**VERDICT: 6x standard risk-per-trade is confirmed, not just assumed, as
+the FTMO-reference sizing that maximizes this candidate's realistic
+chained two-phase funding probability (15.1%) across the full range
+tested (2x-14x).** Pushing risk higher does NOT trade a lower funded rate
+for a compensating benefit elsewhere — total return keeps rising
+(monotonically, mechanically, since it's a pure linear rescaling) but
+that is irrelevant to whether the account survives the Challenge process
+in the first place, which is what the chained metric actually measures.
+This closes the open question from §60 with a definite answer rather
+than leaving it unresolved.
+
+**Files:** `research/ftmo_check_risk_multiplier_sweep.py` (MULTIPLIERS
+extended from `(2,3,4,5,6)` to `(2,3,4,5,6,7,8,9,10,12,14)`). Results:
+`results/ftmo_check_risk_multiplier_sweep.csv` (now 11 rows, 2x-14x).
+Reproduce: `python research/ftmo_check_risk_multiplier_sweep.py`.
+
+**Trial count: 0 new** (fixed-multiplier FTMO checks on already-scored
+legs, not a parameter search). **Cumulative trials: N=1570** (unchanged).

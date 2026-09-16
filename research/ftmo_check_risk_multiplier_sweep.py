@@ -35,7 +35,7 @@ RESULTS = _ROOT / "results"
 BARS_PER_YEAR = 252
 MAX_DAYS = 60
 BEST_DAY_CAP = 0.30
-MULTIPLIERS = (2.0, 3.0, 4.0, 5.0, 6.0)
+MULTIPLIERS = (2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 14.0)
 
 
 def main():
