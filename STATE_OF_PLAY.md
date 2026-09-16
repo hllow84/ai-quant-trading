@@ -7452,3 +7452,103 @@ legs and the combined book). Reproduce:
 
 **Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
 trials: N=1448** (unchanged).
+
+---
+
+## §45 — US30 H4 BREAKOUT-RETEST: joint lookback (N) x stop (k_atr) x
+## target (R) x hold (H) grid — fourth candidate, best raw Sharpe in the
+## project's pure spot/CFD family (2026-09-16)
+
+User asked for a fourth candidate pushed through the same joint-grid +
+follow-the-gradient-past-the-edge method as ORB gold RETEST (§39),
+credit-spread SPY (§38/40/41), and NAS100+US30 macross (§42/43). Re-read
+`results/sweep_indices_scored.csv` directly (not from memory) rather than
+reuse another macross timeframe/instrument, per standing rule 1 — a fourth
+macross cell would not be a new signal family. Found the breakout_retest
+family instead: across all 75 originally-swept breakout cells (5
+instruments x 5 timeframes x 3 hand-picked variants), exactly ONE has a
+genuinely positive net Sharpe — **US30 H4 variant 2 (N=20, k_atr=1.5,
+R=1.5, H=24): grossPF 1.232, netPF 1.183, Sharpe +0.400, maxDD 24.1%, 484
+trades** — every other breakout cell in the family is net Sharpe <= +0.207,
+most sharply negative (family mean Sharpe -2.96, driven by catastrophic
+M5-M30 configs). Confirmed by grep: `strategies/sweep_families.py`
+FAMILIES["breakout"] has exactly 3 hand-picked variants, no independent
+SL/TP/lookback sweep ever run on this family.
+
+**Mechanisms (a priori, stated before any result seen):** N (breakout
+lookback) trades level significance against signal frequency — longer
+lookback demands a more significant prior high/low (fewer, cleaner
+breakouts) at the cost of trade count. k_atr trades stop-noise-absorption
+against loss size, the same mechanism as every prior family. R is a
+genuinely OPEN question for this family, unlike macross (trend-following,
+wide target favored by §10.6's own timeframe-monotonic finding) or ORB
+(already found wide targets fail, §10.7) — a breakout-retest entry
+captures a short post-breakout continuation, not a persistent multi-day
+trend, so neither a wide nor narrow target was assumed in advance.
+
+**Grid 1** (N in {10,20,30} x k_atr in {1.0,1.5,2.0} x R in {1.0,1.5,2.0},
+H=24 fixed): 26 new cells, (20,1.5,1.5) reproduces the known baseline
+EXACTLY (n=484, grossPF 1.232, netPF 1.183, Sharpe +0.400, maxDD 24.1% —
+confirming the re-implementation is correct). Best of the 3x3x3 grid:
+**N=10/k_atr=2.0/R=1.0, Sharpe +0.558** — hit the grid edge on BOTH k_atr
+(high) and R (low) simultaneously.
+
+**Extension (edge-follow discipline, same as §39-43) — 7 successive
+rounds, each following the gradient the previous round revealed, 49 new
+cells:**
+
+| Round | Finding |
+|---|---|
+| 1-2 | k_atr and R BOTH keep improving as k_atr rises / R falls — pushed both further: k_atr=4.0/R=0.5 reached Sharpe +0.935 |
+| 3-4 | R=0.25 is a genuine interior optimum (R=0.15 gives 0.790, R=0.10 gives 0.624 — both WORSE, confirming reversal, not an unbounded chase) |
+| 5 | N=20/k_atr=4.0/R=0.25 (not N=10) is the true peak once R moved: **Sharpe +1.508** — decay confirmed in every direction (N=15/25/30, k_atr=3.5/4.5/5.0, R=0.15/0.35 all lower) |
+| 6-7 | H sweep at the confirmed N/k_atr/R peak found H matters (R shrank 6x from baseline's 1.5, the same "does the old H still fit" check as §42): H=18/20/22 form a genuine 3-cell PLATEAU (Sharpe +1.644/+1.684/+1.670); H=14 spikes higher (+1.940) but is flanked by lower values on both sides (H=12: +1.531, H=16: +1.696) — a single-cell spike, not adopted, per the project's own standing plateau-selection rule (never argmax on the grid) |
+
+**Final recommended configuration: N=20 / k_atr=4.0 / R=0.25 / H=20**
+(center of the H=18-22 plateau)
+- Sharpe **+1.684**, gross PF 1.332, net PF 1.262, maxDD **4.1%**, 634
+  trades, win rate 72.1%
+- Cost is a sane 4.8% of gross R per trade on average (not a near-zero-cost
+  artifact) — mechanism checks out: win small/often (72% win rate) against
+  a wide stop that's rarely hit but costly when it is (net_R skew -1.74),
+  the same high-win-rate/rare-large-loss archetype as this project's
+  credit-spread family, arrived at independently on a completely different
+  instrument and signal type
+- **DECISIVELY beats US30 buy-and-hold** (Sharpe +0.547, maxDD 37.0%,
+  §43): more than 3x the Sharpe with ~9x lower drawdown — the largest
+  Sharpe of any pure spot/CFD result in this project, beating ORB gold
+  RETEST (+1.488, §39) and both macross candidates (+0.963/+0.999, §42/43)
+- **8/8 years net-positive** (2018-2025) — every year positive is a first
+  for any candidate in this project; worst year 2022 still +1.3%
+- Worst day -1.0% (2019-12-30), worst month -2.6% (2023-05) — no tail-risk
+  flag by any measure
+
+**DSR, both pools reported honestly (baseline reproduction excluded from
+both):**
+- LOCAL grid+extension pool (this candidate's own 75 trials): **DSR
+  0.3455** — real, still short of 0.95
+- **FULL breakout-family pool** (N=105: 30 original multi-instrument cells
+  + this session's 75): **DSR 0.0000** — saturated by the family's own
+  catastrophic M5-M30 configs (family mean Sharpe -2.96), the same
+  full-pool-contamination pattern already documented for ORB (§39) and
+  macross (§42/43)
+
+**VERDICT: real, robust improvement — the strongest raw Sharpe and the
+first 8/8-year candidate in the project's spot/CFD history — still not a
+clean DSR survivor at the full contaminated pool.** Same lesson as every
+prior joint-grid session: the true optimum (N=20/k_atr=4.0/R=0.25) was
+nowhere near the original 3x3x3 grid or even its first two extension
+rounds — it only emerged after following the gradient through 4 successive
+rounds, and the H-plateau vs H=14-spike distinction is a direct,
+concrete application of the project's own "plateau, not argmax" rule
+rather than reporting the single highest number found. Recommend
+N=20/k_atr=4.0/R=0.25/H=20 as this project's new reference US30 H4
+breakout-retest configuration.
+
+**Files:** `research/breakout_us30_h4_stop_target_grid.py`. Results:
+`results/breakout_us30_h4_stop_target_grid.csv` (27 grid-1 rows + 49
+extension rows). Reproduce:
+`python research/breakout_us30_h4_stop_target_grid.py`.
+
+**Trial count: 75 new** (26 grid-1 + 49 extension; baseline reproduction
+excluded). **Cumulative trials: N=1523** (1448 prior + 75).
