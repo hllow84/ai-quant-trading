@@ -8384,3 +8384,128 @@ no rescue needed.**
 **Trial count: 0 new** (both are portfolio checks, no parameter search).
 **Cumulative trials: N=1570** (unchanged). **All C(5,2)=10 combined-book
 pairings from this project's 5-leg candidate pool are now complete.**
+
+---
+
+## §58 — FTMO CHALLENGE RULESET CHECK on the honest deployable best
+## candidate — fails on SPEED, not on risk (2026-09-16)
+
+First time any candidate found in the 2026-09-15/16 entry/exit-refinement
++ combined-book work has actually been run through the FTMO ruleset
+itself (CLAUDE.md standing rule 6: 5% daily loss, 10% total loss, +10%/
++5% Phase 1/2 profit target, 4 min trading days, Best Day consistency
+rule, 60-day challenge window) — everything through §57 measured Sharpe/
+maxDD/year-positivity on a standalone equity curve, not challenge
+pass/fail, which is a different, harder, path-dependent, all-or-nothing
+test.
+
+**Candidate chosen: ORB gold RETEST + US30 breakout, ROLLING (causal,
+deployable) risk-parity weighting (§52) — Sharpe +1.793, maxDD 3.1%,
+9/9 years net-positive.** Not credit-spread SPY (§41's raw-Sharpe project
+best, +2.090): that is an OPTIONS strategy, and FTMO-style prop accounts
+are forex/CFD/futures accounts — running a short-vertical income
+strategy through an FTMO challenge is not a like-for-like proposition the
+way a spot/CFD strategy is. Among the CFD-tradeable candidates, §52's
+combined book is the strongest and most robust.
+
+**Method:** both legs' own trade engines reused unchanged (same as §49/
+§52), each leg's daily RET_FRAC series built at the project-standard 1%
+fixed-fractional risk convention (`research/ftmo_engine.RISK_PER_TRADE`,
+the same basis for every Sharpe/maxDD figure reported for these legs
+throughout §39-§57), combined under §52's causal monthly-rebalanced
+risk-parity weight. A new daily-return FTMO Challenge simulator
+(`research/ftmo_challenge_daily.py`) extends `research/ftmo_rules.py`'s
+existing per-trade engine to work on a combined, dynamically-weighted
+portfolio return series, AND adds the Best Day/consistency rule
+(assumed threshold: no single day's profit exceeds 30% of total profit
+at the pass point — stated explicitly as an assumption, per this
+project's existing FTMO-rules-module convention of flagging exactly
+which parameters are modelling choices). Rolling monthly-start
+challenges across the full 2017-2025 span (106 overlapping 60-day
+windows).
+
+**RESULT, at the project-standard 1% risk-per-trade convention: 0%
+CHALLENGE PASS RATE, Phase 1 AND Phase 2, under all three weighting
+schemes (fixed 50/50, in-sample RP, rolling RP) — but for a reason that
+is GOOD news, not bad:**
+
+| Weighting | Phase 1 (10%) pass rate | Phase 2 (5%) pass rate | Failure reason |
+|---|---|---|---|
+| Fixed 50/50 | 0.0% | 0.0% | 106/106 `no_target` |
+| In-sample RP | 0.0% | 0.0% | 106/106 `no_target` |
+| Rolling RP (deployable) | 0.0% | 0.0% | 106/106 `no_target` |
+
+**Every single one of the 106 rolling 60-day windows failed for the SAME
+reason: the target was never reached in time — NOT ONE breached the 5%
+daily loss or 10% total drawdown limit.** The underlying issue is scale,
+not risk: at 1% risk/trade the combined book's own CAGR is only ~6.1%
+(compounded return +70.2% over its full 8.97-year span), and the best
+60-day window ever observed in nine years of history returned only
++5.77% — the 10% Phase 1 target was never once reached in-sample, let
+alone out-of-sample. This is the direct, mechanical consequence of the
+project's own conservative 1% fixed-fractional risk convention (CLAUDE.md
+standing rule 6's stated FTMO risk convention is 0.5-1%/trade) applied to
+a strategy whose edge is real but individually modest per trade.
+
+**Supplementary risk-scaling analysis (informative, not a parameter
+search — the underlying trades are UNCHANGED; only the fixed-fractional
+risk multiplier applied to the SAME return stream is varied, a pure
+linear rescaling): what risk-per-trade would this candidate need to have
+a realistic shot at passing, and does it still respect the drawdown
+limits?**
+
+| Risk multiplier (x 1%) | maxDD | Phase 1 pass (raw/consistency) | Phase 2 pass (raw/consistency) |
+|---|---|---|---|
+| 1x (project standard) | 3.1% | 0.0% / 0.0% | 0.0% / 0.0% |
+| 2x | 6.1% | 0.0% / 0.0% | 13.2% / 13.2% |
+| 3x | 9.1% | 3.8% / 3.8% | 34.0% / 33.0% |
+| 4x | 12.1% | 14.2% / 14.2% | 50.0% / 43.4% |
+| **5x** | 15.0% | 19.8% / 18.9% | 63.2% / 47.2% |
+| **6x (near-peak)** | 17.9% | **33.0% / 32.1%** | 70.8% / **47.2%** |
+| 8x | 23.4% | 45.3% / 37.7% | 65.1% / 28.3% |
+| 10x | 28.8% | 42.5% / 26.4% (daily-loss breaches now dominant) | 56.6% / 20.8% |
+
+Sharpe is unchanged across every row (+1.793 — a linear rescaling of a
+return series leaves Sharpe invariant by construction); only maxDD and
+challenge pass rate move. Pass rate rises with risk multiplier up to
+roughly 6x-8x, then FALLS as daily-loss and total-DD breaches start
+dominating over "ran out of time" as the binding constraint — the
+expected shape once increased position size starts making the 5%/10%
+drawdown ceilings bind for the first time. **6x risk-per-trade
+(effectively ~6% notional risk per trade) is the rough sweet spot found
+here: Phase 1 consistency-adjusted pass rate 32.1%, Phase 2 47.2%, still
+zero total-DD breaches, only 9 daily-loss breaches out of 106 Phase-1
+windows.** This is well above what most real FTMO account rules
+consider a professional/responsible risk-per-trade level (0.5-2% is the
+typical recommended range) — a genuine tension between "pass the
+challenge quickly" and "trade at a size this project's own standing
+rules would otherwise recommend," stated honestly rather than picking a
+number and presenting it as free.
+
+**VERDICT: the candidate's risk-management profile is EXCELLENT (zero
+drawdown-limit breaches across 106 rolling windows at standard sizing,
+and even at moderately elevated sizing) but its ABSOLUTE RETURN is too
+slow at the project's standard risk convention to pass an FTMO Challenge
+within the standard 60-day window.** This is a genuinely different
+failure mode from every FTMO-hunt kill earlier in this project (§1-§34),
+which mostly failed because the underlying edge itself was too weak or
+too costly, not because a real edge was sized too conservatively. Whether
+this candidate is "FTMO-viable" therefore depends entirely on the
+account's risk tolerance and time pressure: at the project's own standard
+1%/trade convention it will never pass in 60 days; at ~5-6x that sizing
+it becomes genuinely competitive (~30-50% pass rates) while still
+respecting the hard drawdown floors most of the time. No single risk
+multiplier is being adopted as a new project recommendation here — this
+section reports the honest tradeoff curve, not a chosen answer, since the
+right choice depends on risk preferences outside this project's own
+standing conventions.
+
+**Files:** `research/ftmo_challenge_daily.py` (new daily-return Challenge
+simulator, extends `research/ftmo_rules.py`'s per-trade engine with the
+Best Day rule), `research/ftmo_check_best_candidate.py`. Results:
+`results/ftmo_check_best_candidate.csv`. Reproduce:
+`python research/ftmo_check_best_candidate.py`.
+
+**Trial count: 0 new** (FTMO-ruleset check + a linear risk-rescaling
+sensitivity sweep on already-scored legs, not a parameter search).
+**Cumulative trials: N=1570** (unchanged).

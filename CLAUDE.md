@@ -20,10 +20,16 @@ tested (§44-§57): the honest, deployable best is **ORB gold + US30 breakout un
 rolling (causal, no-look-ahead) risk-parity weighting — Sharpe +1.793, maxDD 3.1%,
 9/9 years net-positive (§52)**. None of these clears this project's DSR bar against
 its full contaminated family pool — every verdict rests on stated economic/
-robustness evidence, not DSR. None has been run through the FTMO ruleset itself
-(5%/10% drawdown, profit target, min trading days, Best Day rule) — that remains
-an open next step if FTMO-style prop trading is the deployment target, as opposed
-to a personal/fund book. `research_log.md` has the per-test detail.
+robustness evidence, not DSR. **This candidate WAS run through the FTMO ruleset
+itself (§58): 0% Challenge pass rate at the project's standard 1% risk/trade
+convention, but for a genuinely different reason than every earlier FTMO-hunt
+kill — it never once breaches the 5% daily or 10% total drawdown limit across 106
+rolling 60-day windows, it simply never compounds fast enough to hit the +10%/+5%
+Phase 1/2 target in time (best-ever 60-day return in 9 years was +5.77%). Scaling
+risk-per-trade to ~5-6x standard makes it competitive (~30-50% pass rates) while
+still respecting drawdown floors most of the time — a real tradeoff between
+"passes the challenge" and "trades at the size this project's own standing rules
+recommend," reported but not resolved.** `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)
 

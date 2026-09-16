@@ -1,0 +1,7 @@
+weighting,n_challenges,n_pass_raw,n_pass_consistency,pass_rate_raw,pass_rate_consistency,reasons,median_days_to_pass,phase
+Fixed 50/50,106,0,0,0.0,0.0,{'no_target': 106},,1
+Fixed 50/50,106,0,0,0.0,0.0,{'no_target': 106},,2
+In-sample risk-parity (§51),106,0,0,0.0,0.0,{'no_target': 106},,1
+In-sample risk-parity (§51),106,0,0,0.0,0.0,{'no_target': 106},,2
+"Rolling risk-parity (§52, deployable)",106,0,0,0.0,0.0,{'no_target': 106},,1
+"Rolling risk-parity (§52, deployable)",106,0,0,0.0,0.0,{'no_target': 106},,2
