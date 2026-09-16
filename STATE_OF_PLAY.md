@@ -1,6 +1,15 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-03 (§25 — POST-EARNINGS-ANNOUNCEMENT DRIFT, event-driven, yfinance earnings-surprise data (63 large-caps, 4,735 events, 2006-2026). The gross drift is unambiguously real — +1.2% over 20d / +3.4% over 60d, 58-65% event win rate, OOS *stronger* than IS, not year-concentrated, clears net PF / Sharpe / OOS / concentration gates — but 0/12 cells beat equal-weight buy-and-hold of the universe (best CAGR +12.8% vs B&H +15.8%). KILL, same terminal reason as §12/§14: a real edge that still loses to owning the beta. Data caveats (estimate PIT integrity, survivorship) both flatter the result, so the kill is solid. Same day: §24 long calls, §18.1 ML-on-positioning, §12.6 rebalance-frequency, §10.8 EURUSD RETEST.).** Read this file first in any new session. It is the
+**Last updated: 2026-09-16 (§56/§57 — the last two combined-book pairings,
+completing ALL C(5,2)=10 combinations across this project's 5 spot/CFD-plus-
+gold candidate legs. See the 2026-09-16 blockquote below section 1 for the
+full current-state summary — it supersedes the "FTMO hunt concluded, no
+edge" framing that follows: since 2026-09-15, four real, buy-and-hold-
+beating candidates were found via a joint entry/exit/SL/TP-refinement
+method, and combined-book work (with risk-parity weighting) pushed the
+project's honest best deployable result to Sharpe +1.793, maxDD 3.1%, 9/9
+years net-positive. Cumulative trial count N=1570.).** Read this file
+first in any new session. It is the
 standalone briefing: where the research stands, what was settled, what is still
 open, and which files matter. `research_log.md` holds the per-test detail;
 `CLAUDE.md` holds the standing working rules.
@@ -119,9 +128,79 @@ open, and which files matter. `research_log.md` holds the per-test detail;
 > finding is stronger than first reported. A widened 27-instrument universe
 > (§12.2) changes nothing: still 0/4, DSR is still the only binding gate.
 
+> **2026-09-15/16 — FOUR REAL, BUY-AND-HOLD-BEATING CANDIDATES FOUND, AND A
+> DEPLOYABLE COMBINED BOOK BUILT ON TOP OF THEM (§35-§57).** Everything above
+> this line predates a real change in direction: rather than searching for new
+> signal families, the project's already-real-edge cells were pushed through a
+> disciplined JOINT entry/exit/SL/TP grid ("tune everything together, then
+> follow the gradient past the grid edge before trusting an edge-hugging
+> result — never argmax, always confirm a plateau") instead of the staged,
+> one-dimension-at-a-time tuning used everywhere earlier. Four candidates now
+> genuinely beat their own instrument's buy-and-hold on a risk-adjusted basis:
+> **ORB gold RETEST** (XAUUSD, Sharpe +1.488, §39), **credit-spread SPY**
+> (options, Sharpe +2.090, this project's single best result, §41),
+> **NAS100 H4 macross** (Sharpe +0.963, §42) and **US30 H4 macross**
+> (Sharpe +0.999, §43), plus **US30 H4 breakout-retest** (Sharpe +1.684, §45,
+> the strongest pure spot/CFD single-leg result). A fifth family member,
+> **NAS100 H4 breakout-retest** (Sharpe +0.526, §46), was found weaker and
+> does NOT beat its own buy-and-hold — kept in the candidate pool for
+> portfolio-construction purposes but not counted as a fifth win. None of the
+> five clears this project's DSR bar against its full contaminated family
+> pool (the same historical DSR-saturation issue documented for every family
+> in this project) — every verdict rests on economic/robustness evidence
+> (beats B&H, year-by-year positivity, no tail-risk flag), stated explicitly,
+> not on DSR.
+>
+> **Combined-book work (§44-§57) then tested every C(5,2)=10 pairing of
+> these five legs** (plus one 3-way not attempted) at both fixed 50/50 and
+> in-sample/rolling risk-parity weighting. Two structural lessons emerged,
+> both non-obvious and now well-evidenced: **(1)** near-zero correlation is a
+> robust, recurring property across every instrument/family/asset-class
+> pairing tried (range -0.020 to +0.079 across all 10 pairs — even the one
+> negative correlation found didn't help when the quality gap was too big);
+> **(2)** whether a combined book actually beats its own best individual leg
+> is predicted far better by the SIZE OF THE QUALITY GAP between the two legs
+> than by correlation alone — pairings with a gap under ~1.8x reliably beat
+> both legs outright even under plain 50/50 (§44, §48, §54's record-low
+> +0.004 correlation); pairings with a gap over ~2.8x never closed the gap
+> even with risk-parity and a negative correlation (§47, §57); pairings in
+> between land as partial, muted improvements (§49, §50, §53, §55, §56).
+> Risk-parity (inverse-volatility weighting, §51) is the adopted default
+> going forward — it reliably narrows whatever gap exists, sometimes
+> dramatically (§47's "failed" pairing was fully rescued by it) — and a
+> genuinely CAUSAL, walk-forward version of it (§52, monthly rebalance,
+> trailing 90-day vol, no look-ahead) was confirmed to retain most of the
+> in-sample benefit, so this is not a look-ahead artifact.
+>
+> **THE PROJECT'S HONEST, DEPLOYABLE BEST RESULT AS OF THIS WRITING:**
+> **ORB gold RETEST + US30 breakout, rolling (causal) risk-parity weighted
+> (§52): Sharpe +1.793, maxDD 3.1%, 9/9 years net-positive** (every year of
+> its 2017-2025 span, including the worst, still positive) — the most
+> robust result in this project's history, on any candidate, any window.
+> The in-sample (non-deployable) version of the same pairing reaches Sharpe
+> +1.900 (§51); the single cleanest, no-rescue-needed win under plain 50/50
+> is the sibling pairing ORB gold + US30 macross (§54, Sharpe +1.513 fixed,
+> correlation +0.004, the lowest measured in the project). **Read §35
+> onward for the full detail; this paragraph is the one-stop summary for
+> anyone who does not have time to read fifty sections.**
+
 ---
 
 ## 1. BOTTOM LINE — the FTMO hunt is concluded, and the answer is no
+
+> **UPDATE 2026-09-16 — the headline below ("no edge was found") describes
+> the state of the project through §34 and is retained as the historical
+> record it always was. It is superseded by the 2026-09-15/16 blockquote
+> immediately above: four real, buy-and-hold-beating candidates now exist,
+> and a combined, risk-parity-weighted book of two of them reaches Sharpe
+> +1.793 with 9/9 positive years. Read that blockquote first; treat
+> everything in section 1 below as describing the FTMO-specific hunt only
+> (a narrower question than "is there any tradeable edge in this project"),
+> which is still true on its own terms — none of the four winning
+> candidates has been run through the FTMO ruleset (5%/10% drawdown limits,
+> profit target, minimum trading days, Best Day rule), a genuinely open
+> next step if FTMO-style prop trading (rather than a personal or fund
+> book) is the deployment target.**
 
 **Across 946 systematic backtest configurations, no FTMO-viable edge was found —
 and no own-capital edge either (§6).** The closest thing to a positive result in

@@ -6,11 +6,24 @@ holds the longer crypto-factor-research context; this file is the enforced ruleb
 ALL work in `crypto-factor-lab` (crypto factors AND forex/gold FTMO strategies).
 
 ## START HERE
-**Read `STATE_OF_PLAY.md` (repo root) before doing anything else.** It is the
-standalone briefing: what has been settled (the FTMO hunt is concluded — no viable
-edge across 345 trials, with the structural reason), the one live lead (diversified
-index trend-following on the macross family), the DSR gate repair, the open next
-steps, and a full data/code inventory. `research_log.md` has the per-test detail.
+**Read `STATE_OF_PLAY.md` (repo root) before doing anything else — start with its
+top banner and the 2026-09-15/16 blockquote right before section 1, which is the
+current one-stop summary.** Short version: the original FTMO-ruleset hunt (§1-§34,
+no viable edge across ~1085 trials) is superseded by later work. As of 2026-09-16
+(cumulative trial count N=1570) there are **four real candidates that beat their
+own instrument's buy-and-hold** — ORB gold RETEST (XAUUSD, Sharpe +1.488, §39),
+credit-spread SPY (options, Sharpe +2.090, §41), NAS100 H4 macross (Sharpe +0.963,
+§42) and US30 H4 macross (Sharpe +0.999, §43) — plus US30 H4 breakout-retest
+(Sharpe +1.684, §45, the strongest single spot/CFD leg). All ten pairwise
+combined-books of these candidates (plus the weaker NAS100 breakout, §46) were
+tested (§44-§57): the honest, deployable best is **ORB gold + US30 breakout under
+rolling (causal, no-look-ahead) risk-parity weighting — Sharpe +1.793, maxDD 3.1%,
+9/9 years net-positive (§52)**. None of these clears this project's DSR bar against
+its full contaminated family pool — every verdict rests on stated economic/
+robustness evidence, not DSR. None has been run through the FTMO ruleset itself
+(5%/10% drawdown, profit target, min trading days, Best Day rule) — that remains
+an open next step if FTMO-style prop trading is the deployment target, as opposed
+to a personal/fund book. `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)
 
