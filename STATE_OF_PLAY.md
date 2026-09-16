@@ -8109,3 +8109,57 @@ Reproduce: `python research/nas100_macross_us30_breakout_combined_book.py`.
 
 **Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
 trials: N=1570** (unchanged).
+
+---
+
+## §54 — ORB gold RETEST + US30 MACROSS combined book — a seventh
+## pairing, lowest correlation yet, a clean win under plain 50/50
+## (2026-09-16)
+
+Completes the "ORB gold x both US30 candidates" set: §49 paired gold with
+US30 breakout, this section pairs gold with US30's OTHER family, macross
+(§43, Sharpe +0.999 standalone). Unlike §49 (where gold was the WEAKER
+leg vs US30 breakout's +1.684), here gold is the STRONGER leg (+1.488 vs
+macross's +0.999, quality gap ~1.49x) — a genuinely different shape,
+worth testing directly rather than assuming the outcome, per §53's own
+conclusion that gap size alone is not fully predictive. Method identical
+to every prior pairing: both legs' own unchanged engines/params, daily
+returns aligned on the union of trading days, tested at both fixed 50/50
+and in-sample risk-parity weight.
+
+**Result — a clean win, no risk-parity rescue needed:**
+
+| Weighting | Sharpe | maxDD | Years positive |
+|---|---|---|---|
+| ORB gold standalone | +1.488 | 12.1% | — |
+| US30 macross standalone | +0.999 | 6.1% | — |
+| naive average of the two legs | +1.243 | — | — |
+| **Fixed 50/50 combined** | **+1.513** | **4.7%** | 8/9 |
+| Risk-parity (36%/64%) combined | +1.489 | 4.2% | 8/9 |
+
+Correlation: **+0.004 — the LOWEST of any pairing tested in this project**
+(previous low was §49's +0.011). Plain fixed 50/50 already beats BOTH
+legs individually (not just the average) here — no risk-parity rescue
+needed, unlike §47/§49/§53's mixed or muted results. Risk-parity actually
+gives a marginally LOWER Sharpe than fixed 50/50 here (+1.489 vs +1.513,
+the second such case after §50) though it further improves maxDD (4.2%
+vs 4.7%) — a reminder that risk-parity is not a strict Sharpe-improving
+operation in every case, it optimizes for equal risk contribution, which
+is not always identical to maximizing Sharpe. 8/9 years net-positive
+under both weightings.
+
+**VERDICT: a clean, low-effort diversification win, and the lowest
+correlation measured in this project's entire combined-book work.**
+Confirms gold and US equity indices remain the most reliably decorrelated
+pairing available across every family combination tried (§49 and §54 are
+this project's two lowest-correlation results, both featuring ORB gold).
+Neither weighting scheme was forced to rescue anything here — a useful
+data point that not every pairing needs risk-parity to show a genuine
+benefit; it depends on the specific legs, not a fixed rule.
+
+**Files:** `research/orb_gold_us30_macross_combined_book.py`. Results:
+`results/orb_gold_us30_macross_combined_book.csv`. Reproduce:
+`python research/orb_gold_us30_macross_combined_book.py`.
+
+**Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
+trials: N=1570** (unchanged).
