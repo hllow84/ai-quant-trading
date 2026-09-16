@@ -7552,3 +7552,91 @@ extension rows). Reproduce:
 
 **Trial count: 75 new** (26 grid-1 + 49 extension; baseline reproduction
 excluded). **Cumulative trials: N=1523** (1448 prior + 75).
+
+---
+
+## §46 — NAS100 H4 BREAKOUT-RETEST: same joint grid extended to the
+## second instrument — real improvement, but does NOT beat buy-and-hold
+## (2026-09-16)
+
+User asked to check NAS100 breakout too, extending §45's method to the
+second (and only other) genuinely positive breakout cell. Baseline
+(re-read from `results/sweep_indices_scored.csv` directly): **NAS100 H4
+breakout_retest variant 1 (N=50, k_atr=1.0, R=2.0, H=48): grossPF 1.156,
+netPF 1.104, Sharpe +0.102, maxDD 15.2%, 347 trades** — the only NAS100
+breakout cell across all 5 timeframes tested with a net PF above 1 (H1/
+M30/M15/M5 all net Sharpe <= -0.05). Weaker starting point than US30's
++0.400 (§45), but real and never independently swept — same
+justification. NAS100's own best original variant uses N=50/H=48
+geometry (not US30's N=20/H=24), so the grid was centered there per §43's
+precedent that different instruments in the same family warrant different
+starting geometries — confirmed, not assumed. Reused
+`research/breakout_us30_h4_stop_target_grid.py`'s `score()`/`run_cell()`
+unchanged; only the data path and grid center differ.
+
+**Grid 1** (N in {30,50,70} x k_atr in {0.75,1.0,1.5} x R in {1.5,2.0,3.0},
+H=48 fixed): 26 new cells, (50,1.0,2.0) reproduces the baseline exactly.
+Best: **N=70/k_atr=1.0/R=2.0, Sharpe +0.366** — hit the grid edge on N
+(highest tested).
+
+**Extension (edge-follow discipline, same as §39-45) — 3 rounds, 21 new
+cells (7+9+5):**
+- Round 1: pushed N further (90, 110) to test whether 70 was a real edge
+  — **both worse** (0.149, -0.031), confirming N=70 is a genuine interior
+  peak, not an artifact of stopping the grid early. R=1.75 (untested in
+  grid 1) beat R=2.0: Sharpe +0.399.
+- Round 2: fine-tuned R (1.6-1.9) and k_atr (0.85-1.15) around the new
+  peak — R=1.75/k_atr=1.0 held as the best combination, confirmed by decay
+  on both sides of each dimension. H=60 (+0.410) beat the fixed H=48.
+- Round 3: swept H further at the confirmed N=70/k_atr=1.0/R=1.75 peak —
+  **H=84/90/96 form a genuine 3-cell plateau (Sharpe +0.534/+0.526/+0.523)**,
+  decaying on both sides (H=72: +0.431, H=120: +0.438) — the same
+  plateau-not-argmax discipline applied in §45's H-sweep.
+
+**Final recommended configuration: N=70 / k_atr=1.0 / R=1.75 / H=90**
+(center of the H=84-96 plateau)
+- Sharpe **+0.526**, gross PF 1.306, net PF 1.244, maxDD 11.9%, 302
+  trades, win rate 43.4% — a real, 5x improvement over the +0.102 baseline
+- Cost is 2.3% of gross R per trade (sane, no artifact)
+- **Does NOT beat NAS100 buy-and-hold** (Sharpe +0.842, §42) — unlike
+  US30's breakout candidate (§45, decisively beat US30 B&H) and unlike
+  NAS100's OWN macross candidate (§42, Sharpe +0.963, beat B&H). Only
+  **4/8 years net-positive** (2019/2021/2023/2024 positive, 2018/2020/
+  2022/2025 negative) with 2024 alone carrying ~59% of total return —
+  more concentrated and less robust than every other candidate in this
+  project's recent run (all of which were 6-8/8 years positive). Worst day
+  -1.1%, worst month -5.2% — no catastrophic tail flag, but the
+  concentration is a real, honestly-reported weakness, not hidden.
+
+**DSR, both pools reported honestly:**
+- LOCAL grid+extension pool (this candidate's own 47 trials): **DSR
+  0.4531** — real, still short of 0.95
+- **FULL breakout-family pool** (N=152: 30 original multi-instrument cells
+  + §45's 75 US30 cells + this session's 47 NAS100 cells): **DSR 0.0000**
+  — same full-pool-contamination pattern as every other family in this
+  project
+
+**VERDICT: a real, substantial improvement over the NAS100 breakout
+baseline (5x the Sharpe) via the same rigorous edge-follow method — but a
+WEAKER, less robust result than §45's US30 breakout candidate on every
+axis that matters (beats B&H vs. doesn't, 4/8 vs 8/8 positive years, 59%
+vs ~27% year-concentration).** Genuinely useful negative-comparative
+finding, consistent with §43's own observation that this project's
+trend/breakout families do not transfer their optimal parameters (or their
+edge strength) across instruments — US30 is the stronger breakout
+instrument, NAS100 is the stronger macross instrument (§42 vs this
+section), an asymmetry worth remembering rather than assuming either
+instrument is uniformly better. Recommend N=70/k_atr=1.0/R=1.75/H=90 as
+NAS100's reference breakout configuration IF this family is ever
+deployed on NAS100, but do NOT rank it alongside the four B&H-beating
+candidates (ORB, credit-spread, both macross legs, US30 breakout) — it is
+a real edge that has not cleared the project's own "beats buy-and-hold"
+bar.
+
+**Files:** `research/breakout_nas100_h4_stop_target_grid.py`. Results:
+`results/breakout_nas100_h4_stop_target_grid.csv` (27 grid-1 rows + 20
+extension rows). Reproduce:
+`python research/breakout_nas100_h4_stop_target_grid.py`.
+
+**Trial count: 47 new** (26 grid-1 + 21 extension cells). **Cumulative
+trials: N=1570** (1523 prior + 47).
