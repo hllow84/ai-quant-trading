@@ -8509,3 +8509,77 @@ Best Day rule), `research/ftmo_check_best_candidate.py`. Results:
 **Trial count: 0 new** (FTMO-ruleset check + a linear risk-rescaling
 sensitivity sweep on already-scored legs, not a parameter search).
 **Cumulative trials: N=1570** (unchanged).
+
+---
+
+## §59 — 6x RISK-PER-TRADE ADOPTED AS THE FTMO REFERENCE SIZING —
+## chained two-phase "actually gets funded" probability: 15.1%
+## (2026-09-16)
+
+User directed adopting 6x standard risk-per-trade (identified in §58's
+sensitivity sweep as the near-peak pass-rate point: Phase 1
+consistency-adjusted 32.1%, Phase 2 47.2%, before daily-loss/total-DD
+breaches start dominating at 8-10x) as the reference FTMO sizing for
+§52's ORB gold + US30 breakout rolling-risk-parity book. This section
+goes one step further than §58's independent per-phase pass rates: it
+computes the REALISTIC, CHAINED two-phase probability — Phase 1 must
+pass, THEN Phase 2 must ALSO pass starting from the day Phase 1 ended,
+in the same continuous attempt — which is the number that actually
+matters for deciding whether to attempt this, since the two independent
+per-phase rates in §58 overstate the true "gets funded" chance (nothing
+requires them to both land in the same attempt).
+
+**Standalone metrics at 6x (Sharpe unchanged from 1x by construction —
+a linear rescaling of the same return series; only maxDD, absolute
+return, and challenge dynamics change):**
+- Sharpe +1.793, **maxDD 17.9%**, total compounded return **+2,032%**
+  over the full 8.97-year span
+- **9/9 years still net-positive** even at 6x sizing (worst: 2018,
+  +4.5%) — the extraordinary year-by-year robustness found at 1x (§52)
+  survives the 6x rescaling essentially unchanged, since scaling a
+  return series doesn't change which years are net-positive unless a
+  year's return flips sign, which none do here
+- Worst single day: -6.35% (this SPECIFIC day would itself trigger a
+  5%-daily-loss breach if it fell inside an active challenge window —
+  consistent with daily_loss appearing as a real, non-trivial failure
+  reason below, not just a theoretical possibility)
+
+**Realistic chained two-phase result — the number that matters:**
+
+| Metric | Value |
+|---|---|
+| Rolling monthly challenge starts tested | 106 |
+| Phase 1 passes (consistency-adjusted) | 34 (32.1%) |
+| **FULLY FUNDED — Phase 1 then Phase 2 in the same attempt** | **16 (15.1%)** |
+
+Failure-point breakdown across all 106 attempts: 66 never reach the
+Phase 1 target in time (`no_target`), 16 succeed at both phases
+(`target`, the funded outcome), 12 breach the 5% daily loss limit at
+some point in the attempt, 11 pass on raw profit but fail the assumed
+30% Best Day consistency check, 1 breaches the 10% total drawdown floor.
+**Roughly two-thirds of all attempts still fail purely on speed (never
+breach a limit), even at 6x sizing** — the same fundamental "too slow"
+issue found at 1x in §58 is reduced, not eliminated, by the risk
+increase; the remaining shortfall is now split between running out of
+time and genuinely bumping into the risk limits for the first time.
+
+**VERDICT: 15.1% is a real, honestly-computed number for someone
+actually planning to attempt this candidate at 6x standard risk on a
+two-step FTMO Challenge — meaningfully lower than either phase's own
+independent pass rate (32.1% / 47.2%) would suggest in isolation, because
+getting funded requires BOTH to land in the same continuous attempt.**
+This is neither a strong "yes, do this" nor a clean "no" — a ~1-in-6.6
+chance of full funding at a risk level (6% notional/trade) well above
+this project's own general standing convention (0.5-1%) is a real,
+quantifiable tradeoff, reported as computed rather than rounded toward
+either conclusion. The 12 daily-loss and 1 total-DD breaches confirm
+that 6x is not a free lunch — real risk-limit exposure exists at this
+sizing, unlike the 1x case in §58 where it was essentially zero.
+
+**Files:** `research/ftmo_check_6x_reference.py`. Results:
+`results/ftmo_check_6x_reference.csv` (per-challenge-attempt detail,
+106 rows). Reproduce: `python research/ftmo_check_6x_reference.py`.
+
+**Trial count: 0 new** (fixed-multiplier FTMO check + two-phase chain
+on already-scored legs, not a parameter search). **Cumulative trials:
+N=1570** (unchanged).
