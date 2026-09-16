@@ -8832,3 +8832,66 @@ checks, not a parameter search). **Cumulative trials: N=1570**
 Sources verified live 2026-09-16:
 - [FTMO Trading Objectives](https://ftmo.com/en/trading-objectives/)
 - [Does FTMO Have a Consistency Rule? (PropVator)](https://propvator.com/blog/does-ftmo-have-a-consistency-rule/)
+
+---
+
+## §63 — PERIOD-ROBUSTNESS CHECK on §62's corrected funding-probability
+## numbers — the 14x peak is more front-loaded/period-dependent than the
+## 6x point (2026-09-16)
+
+User asked whether the FTMO funding-probability work had been tested
+against different historical sub-periods, or only pooled across the
+full 2017-2025 sample. It had not — §58-§62 all reported one pooled
+number across all 106 rolling monthly-start challenges. This section
+splits the SAME already-computed challenge outcomes (§62's corrected,
+no-fabricated-rule model) by which era each challenge's START date
+falls in — a pure post-hoc partition, no re-simulation — at both
+reference points examined so far: 6x (§59's original point) and 14x
+(§62's corrected true peak).
+
+**Result:**
+
+| Split | 6x funded rate | 14x funded rate |
+|---|---|---|
+| Full pooled sample (106 challenges) | 25.5% | 33.0% |
+| 2017-2021 (H1, n=52) | 28.8% | 42.3% |
+| 2021-2025 (H2, n=54) | 22.2% | 24.1% |
+| 2017-2020 (T1, n=39) | 30.8% | 43.6% |
+| 2020-2023 (T2, n=40) | 17.5% | 27.5% |
+| 2023-2025 (T3, n=27) | 29.6% | 25.9% |
+
+**At 6x, the decline from the earliest to the latest era is moderate**
+(28.8% -> 22.2% across halves, a ~6.6pp gap) with a dip in the 2020-2023
+middle third (17.5%, likely reflecting the COVID-era volatility spike
+and its aftermath) that recovers by 2023-2025 (29.6%). **At 14x, the
+decline is far more pronounced** (42.3% -> 24.1% across halves, a
+~18.2pp gap — nearly HALVING) and does not recover in the most recent
+third (25.9%, similar to the middle third rather than bouncing back like
+6x's did). **The 14x pooled headline of 33.0% is disproportionately
+carried by the 2017-2020 period (43.6%) — the two most recent thirds
+(2020-2023, 2023-2025) average only ~26.7%, much closer to 6x's own
+pooled figure than to 14x's own headline.**
+
+**VERDICT: this is a real, material robustness caveat on §62's corrected
+"14x is the true peak" finding — the funding-rate ADVANTAGE of 14x over
+6x is substantially front-loaded into the earlier (2017-2020) portion of
+the sample and has been shrinking over time, while 6x's own funding rate
+is comparatively STABLE across eras.** This does not overturn §62's
+correction (14x's pooled average genuinely is higher than 6x's across
+the full sample, and the underlying "Best Day rule" bug fix stands
+regardless of this section's findings) — but it means anyone choosing
+between the two multipliers going forward should weight the MORE RECENT
+performance more heavily than the pooled full-sample average suggests,
+which favors 6x's greater period-to-period stability over 14x's higher
+but less consistent pooled number. Neither multiplier is adopted or
+rejected here — the tradeoff is reported, not resolved, consistent with
+every prior FTMO-sizing section in this project.
+
+**Files:** `research/ftmo_check_period_robustness.py` (reuses `research/
+ftmo_check_6x_reference.py`'s `two_phase_chain()` unchanged). Results:
+`results/ftmo_check_period_robustness.csv`. Reproduce:
+`python research/ftmo_check_period_robustness.py`.
+
+**Trial count: 0 new** (a period-based partition of already-computed
+FTMO challenge outcomes, not a parameter search or new backtest).
+**Cumulative trials: N=1570** (unchanged).

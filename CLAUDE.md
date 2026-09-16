@@ -38,8 +38,15 @@ is a broad 12x-15x plateau (centered at 14x, ~33% funded probability, maxDD ~39%
 not 6x (~15% funded, maxDD 18%) as §61 had wrongly concluded — roughly DOUBLE the
 optimal risk level, with correspondingly higher real drawdown exposure. §58's
 "1x never passes, purely on speed" finding is unaffected (it was never driven by
-the erroneous rule). Treat §62 as authoritative over §59-§61's superseded numbers.
-`research_log.md` has the per-test detail.
+the erroneous rule). **§63 then checked period-robustness and found 14x's
+advantage is front-loaded: split by era, 14x's funded rate falls from 42.3%
+(2017-2021) to 24.1% (2021-2025), nearly halving, while 6x is comparatively
+stable (28.8% -> 22.2%) — the two most recent thirds of history average ~26.7%
+under 14x, much closer to 6x's own number than to 14x's pooled headline.** Neither
+multiplier is adopted as a final recommendation; §62's correction stands, but §63
+is a real reason to weight recent performance over the full-sample pooled average
+when actually choosing a sizing. Treat §62+§63 together as authoritative over
+§59-§61's superseded numbers. `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)
 
