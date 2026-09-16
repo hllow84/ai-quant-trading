@@ -7640,3 +7640,78 @@ extension rows). Reproduce:
 
 **Trial count: 47 new** (26 grid-1 + 21 extension cells). **Cumulative
 trials: N=1570** (1523 prior + 47).
+
+---
+
+## §47 — NAS100 + US30 H4 BREAKOUT combined book — a real, useful
+## NEGATIVE finding: equal-weighting a strong leg with a weak leg hurts
+## (2026-09-16)
+
+User asked to check the combined NAS100+US30 breakout book, the same
+portfolio-construction check as §44's macross combined book, applied to
+the two breakout-retest legs found in §45 (US30, Sharpe +1.684, beats
+B&H) and §46 (NAS100, Sharpe +0.526, does NOT beat B&H). Explicitly a
+different setup from §44: there, both legs were independently strong; here
+one leg is strong and one is weak, so the question was whether
+diversification still helps riding the weak leg alongside the strong one,
+or whether it just drags the book down. Method identical to §44 (both
+legs' unchanged session-best params, same cost model/H4 resample/
+strictly_after=True, daily log-returns aligned on the union of trading
+days, 50/50 fixed weight, missing days = flat). Zero new trials — a
+portfolio check on two already-scored cells.
+
+**Result:**
+
+| | Sharpe | maxDD |
+|---|---|---|
+| NAS100 standalone (§46) | +0.526 | 11.9% |
+| US30 standalone (§45) | +1.684 | 4.1% |
+| naive average of the two legs | +1.105 | 8.0% |
+| **50/50 combined book** | **+0.967** | **5.0%** |
+
+Correlation of the two legs' daily log-returns (2,365 aligned days,
+2018-2025): **+0.041** — effectively uncorrelated, the same near-zero
+correlation found for the macross pair in §44. But UNLIKE §44, low
+correlation does NOT translate into a win here: **the 50/50 combined book
+underperforms BOTH the naive average of the two legs' Sharpes AND holding
+US30 alone on 100% of the book, on BOTH Sharpe and drawdown**
+(combined Sharpe +0.967 < US30-only's +1.684; combined maxDD 5.0% >
+US30-only's 4.1%). Combined book is only 6/8 years positive (worst: 2025,
+-1.1%) versus US30 alone's 8/8.
+
+**Why this differs from §44's genuine diversification win:** correlation
+being near-zero is necessary but not sufficient for a fixed-weight
+combination to help — it only helps when the legs are of comparable
+quality (§44: Sharpe +0.963 and +0.999, both real, both beating their own
+B&H). Here the two legs are NOT comparable (§45's +1.684 vs §46's +0.526,
+already flagged in §46 as the weaker/more-concentrated result that fails
+to beat NAS100 B&H) — blending a weak leg into a strong one at a fixed
+50/50 weight dilutes the strong leg's edge faster than the near-zero
+correlation can recover through variance reduction. The arithmetic
+mechanism is simple and worth stating plainly: expected return is a linear
+combination of the two legs' means, but with such an asymmetric quality
+gap, halving exposure to the far-better leg costs more expected return
+than the (still real, but comparatively small at this quality gap)
+variance-reduction benefit of near-zero correlation can pay back.
+
+**VERDICT: a real, useful NEGATIVE finding, not a repeat of §44's positive
+one.** Correlation-based diversification is not a free lunch that helps
+regardless of leg quality — combining ONLY helps when the legs are
+comparably strong (§44), and equal-weighting a strong leg with a
+materially weaker one just drags the book toward the weaker leg's
+profile. For deployment purposes, the honest recommendation from this
+project's own two combined-book checks is: **combine NAS100+US30 MACROSS
+(§44, real win), do NOT equal-weight NAS100+US30 BREAKOUT — hold US30
+breakout alone instead (§45's +1.684 standalone beats any 50/50 blend
+with §46's weaker NAS100 leg)**. A quality-weighted (not equal-weighted)
+blend was not tested here — flagged as a possible follow-up, not pursued,
+since the project's scope has been the entry/exit/SL/TP refinement
+question, not portfolio-weight optimization.
+
+**Files:** `research/breakout_h4_combined_book.py`. Results:
+`results/breakout_h4_combined_book.csv` (per-day return series for both
+legs and the combined book). Reproduce:
+`python research/breakout_h4_combined_book.py`.
+
+**Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
+trials: N=1570** (unchanged).
