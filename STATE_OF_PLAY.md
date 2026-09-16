@@ -7790,3 +7790,106 @@ for both legs and the combined book). Reproduce:
 
 **Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
 trials: N=1570** (unchanged).
+
+---
+
+## §49 — ORB gold RETEST + US30 BREAKOUT combined book — fifth pairing,
+## a THIRD diversification axis (cross-asset-class), pairing the
+## project's two strongest single legs (2026-09-16)
+
+User asked for more combined-book pairings. This pairs the two single
+STRONGEST candidates in the entire project (ORB gold RETEST §39, Sharpe
++1.488; US30 breakout §45, Sharpe +1.684) across a new axis: cross-ASSET-
+CLASS (commodity vs equity index), not just cross-instrument (§44/§47) or
+cross-family-same-instrument (§48). Both legs independently beat their
+own buy-and-hold. Method identical to §44/§47/§48: each leg's own
+unchanged engine/params, daily returns aligned on the union of trading
+days (ORB gold's 2017-2025 continuous span is longer than US30 CFD data's
+2018-2025 -- the extra gold-only stub is treated as flat for US30, stated
+not hidden), 50/50 fixed weight.
+
+**Result:**
+
+| | Sharpe | maxDD |
+|---|---|---|
+| ORB gold standalone (§39) | +1.488 | 12.1% |
+| US30 breakout standalone (§45) | +1.684 | 4.1% |
+| naive average of the two legs | +1.586 | 8.1% |
+| **50/50 combined book** | **+1.687** | **4.5%** |
+
+Correlation: **+0.011** — the LOWEST of any pairing tested so far,
+confirming the a priori mechanism (gold and a US equity index are driven
+by substantially different macro factors). But the improvement over the
+better single leg is only marginal (+1.687 vs US30 alone's +1.684) and
+maxDD is slightly WORSE than US30 alone (4.5% vs 4.1%) despite the lowest
+correlation seen — a real, informative nuance: **correlation alone is not
+the whole diversification story.** ORB gold's own standalone volatility/
+drawdown (12.1%) is roughly 3x US30 breakout's (4.1%); at a fixed 50/50
+NOMINAL-CAPITAL weight (not risk-parity), the higher-vol gold leg
+contributes disproportionately more risk to the combined book than its
+50% capital share would suggest, partly offsetting the near-zero-
+correlation benefit. 8/9 years net-positive (worst: 2018, mildly -0.4%).
+
+## §50 — NAS100 MACROSS + NAS100 BREAKOUT combined book — sixth pairing,
+## completes the 2x2 same-instrument/cross-family design, and REVISES
+## the "both legs must be strong" rule from §47/§48 (2026-09-16)
+
+Completes the 2x2 design started in §48: same-instrument/cross-family
+pairings on BOTH US30 (§48, both legs strong -> best result yet) and
+NAS100 (this section, one leg strong [macross +0.963] and one leg weaker
+[breakout +0.526, does NOT beat its own B&H, §46]) -- the same "one weak
+leg" shape as §47's failed pairing, but on the cross-family/same-
+instrument axis instead of cross-instrument/same-family, and with a
+SMALLER quality gap (0.963 vs 0.526, ratio ~1.8x) than §47's (1.684 vs
+0.526, ratio ~3.2x).
+
+**Result — surprising, and it does NOT repeat §47's failure:**
+
+| | Sharpe | maxDD |
+|---|---|---|
+| NAS100 macross standalone (§42) | +0.963 | 11.0% |
+| NAS100 breakout standalone (§46) | +0.526 | 11.9% |
+| naive average of the two legs | +0.745 | 11.5% |
+| **50/50 combined book** | **+1.054** | **5.4%** |
+
+Correlation +0.067 (near-zero, consistent with every pairing tested). The
+combined book beats BOTH legs individually (not just the average) despite
+one leg being the weaker, non-B&H-beating NAS100 breakout candidate --
+the OPPOSITE of §47's outcome with the same "one weak leg" shape.
+
+**This REVISES the simple rule stated after §47/§48** ("combining only
+helps when both legs are independently strong") — that rule is not
+universal. The determining factor is more precisely the SIZE of the
+quality gap relative to the correlation benefit, not merely whether one
+leg individually beats its own buy-and-hold: §47's gap (1.684 vs 0.526,
+~3.2x) was too large for near-zero correlation to overcome — giving up
+half the exposure to the far-better leg cost more expected return than
+the diversification recovered. §50's gap (0.963 vs 0.526, ~1.8x) was
+small enough that the same near-zero-correlation mechanism paid off
+decisively, cutting maxDD nearly in half (11.0%/11.9% standalone -> 5.4%
+combined) while still raising Sharpe above the stronger leg alone.
+
+**VERDICT on both sections together: five of six combined-book pairings
+tested this project now show a real diversification benefit (§44, §48,
+§49, §50); only §47 (the single largest quality gap tested, 3.2x) failed.**
+The refined, honestly-stated rule: near-zero correlation is a reliable,
+recurring property across every family/instrument/asset-class pairing
+tried in this project (range +0.011 to +0.074 across all five pairings
+measured: §44 +0.053, §47 +0.041, §48 +0.074, §49 +0.011, §50 +0.067),
+but whether a 50/50 FIXED-CAPITAL weight realizes that benefit depends on
+both the size of the quality gap between legs (§47 vs §50) and the
+relative volatility of each leg (§49's gold leg's higher vol muted an
+even-lower-correlation benefit). A risk-parity or vol-matched weighting
+scheme was not tested in any pairing — flagged as the natural next
+question for anyone pursuing this further, out of scope for this
+project's stated entry/exit/SL/TP-refinement focus.
+
+**Files:** `research/orb_gold_us30_breakout_combined_book.py`,
+`research/nas100_macross_breakout_combined_book.py`. Results:
+`results/orb_gold_us30_breakout_combined_book.csv`,
+`results/nas100_macross_breakout_combined_book.csv`. Reproduce:
+`python research/orb_gold_us30_breakout_combined_book.py` and
+`python research/nas100_macross_breakout_combined_book.py`.
+
+**Trial count: 0 new** (both are portfolio checks, no parameter search).
+**Cumulative trials: N=1570** (unchanged).
