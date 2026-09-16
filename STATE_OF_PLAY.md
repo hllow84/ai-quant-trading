@@ -7374,3 +7374,81 @@ with the US30 data path and `ema_trend=100` base).
 
 **Trial count: 26 new** (8 grid-1 + 15 extension + 3 H-sweep; baseline and
 1 H-duplicate not counted). **Cumulative trials: N=1448** (1422 prior + 26).
+
+---
+
+## §44 — NAS100 + US30 H4 macross COMBINED BOOK — 50/50 fixed-weight
+## portfolio check on the two §42/§43 session-best legs (2026-09-16)
+
+User asked whether the two new NAS100 (§42) and US30 (§43) macross
+candidates work as a combined book. Not a parameter search — both legs
+reuse their already-found session-best configs UNCHANGED (NAS100:
+fast=10/slow=30/ema_trend=200/k_atr=1.0/R=4.0/H=192; US30:
+fast=10/slow=30/ema_trend=100/k_atr=2.5/R=1.0/H=72), each re-run with the
+identical cost model/H4 resample/strictly_after=True resolution as §42/§43
+to regenerate each leg's own daily return series, then combined at a fixed
+50/50 capital weight (missing-trade days = flat/0 for that leg, dates
+aligned on the union). **Adds 0 to the project's trial count** — this is a
+portfolio-construction check on two already-scored cells, not a new
+backtest search.
+
+**Mechanism (a priori):** two H4 macross trend-followers on different US
+equity indices could plausibly be highly correlated (same macro trend
+regime drives both indices) — in which case combining does little beyond
+diversifying idiosyncratic noise — or could differ enough in entry timing
+(different ema_trend length, k_atr/R geometry means the two systems open
+and close trades at different times even when both are "long the US
+trend") that the combination captures a genuine diversification benefit.
+Stated before running: real edge if measured correlation is low AND
+combined Sharpe beats the better of the two standalone legs, not just
+their average.
+
+**Result:**
+
+| | Sharpe | maxDD |
+|---|---|---|
+| NAS100 standalone (§42) | +0.963 | 11.0% |
+| US30 standalone (§43) | +0.999 | 6.1% |
+| naive average of the two legs | +0.981 | 8.6% |
+| **50/50 combined book** | **+1.135** | **5.7%** |
+
+Correlation of the two legs' daily log-return series (2,344 aligned
+trading days, 2018-2025): **+0.053** — effectively uncorrelated, despite
+both being US-index H4 trend-followers. The combined book beats BOTH
+individual legs on Sharpe (not just their average) and beats the lower of
+the two legs' drawdowns (5.7% vs US30's own 6.1%) — genuine
+diversification, not just noise-averaging. 7/8 years net-positive (worst:
+2019, -0.0%, effectively flat, an improvement on both legs' own worst
+years).
+
+**Why the correlation is so low despite both being "US index trend"
+strategies:** the two configurations have very different trade geometry
+(NAS100: k_atr=1.0/R=4.0/H=192, tight stop/wide target/long hold; US30:
+k_atr=2.5/R=1.0/H=72, wide stop/tight target/short hold) — §42 and §43
+each independently found instrument-specific optima at OPPOSITE ends of
+the stop/target spectrum (already flagged in §43 as "the same mechanism
+does not imply the same parameters across instruments"). That geometry
+difference means the two systems hold different trades at different
+times even when both are net-long the same broad US-equity trend, which
+is enough to decorrelate the two P&L streams almost completely.
+
+**DSR:** not applicable — no new parameter search was run, so there is no
+new trial to deflate. The relevant DSR figures remain each leg's own
+(§42: 0.503 clean H4 pool; §43: 0.499 clean US30-H4 pool).
+
+**VERDICT: real, useful finding — running NAS100 and US30 macross as a
+combined 50/50 book is superior to holding either alone**, on both Sharpe
+and drawdown, with no repaint/mining risk since neither leg's parameters
+were touched. This is a portfolio-allocation result, not a signal-search
+result, but it strengthens the case for the macross family as the
+project's best pure spot/CFD candidate: two instruments, two genuinely
+different (not copy-pasted) optimal geometries, combined into one
+lower-drawdown, higher-Sharpe book.
+
+**Files:** `research/macross_h4_combined_book.py`. Results:
+`results/macross_h4_combined_book.csv` (per-day return series for both
+legs and the combined book). Reproduce:
+`python research/macross_h4_combined_book.py`.
+
+**Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
+trials: N=1448** (unchanged).
