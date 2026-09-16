@@ -7715,3 +7715,78 @@ legs and the combined book). Reproduce:
 
 **Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
 trials: N=1570** (unchanged).
+
+---
+
+## §48 — US30 MACROSS + US30 BREAKOUT combined book — a fourth combined-
+## book pairing, on a NEW axis (same instrument, different signal
+## families) — the best combined-book result in the project (2026-09-16)
+
+User asked for a fourth combined-book pairing. §44/§47 both tested
+same-family/cross-instrument (macross NAS100+US30; breakout NAS100+US30).
+This section tests a genuinely different axis instead of repeating the
+same one on a third instrument: **same instrument (US30), two different
+signal families** — trend-continuation macross (§43) vs breakout-retest
+(§45) — both of which independently beat US30 buy-and-hold (Sharpe
++0.547, maxDD 37.0%). Chosen deliberately over a third same-family pairing
+because both US30 legs are individually strong (unlike §47's mismatched
+pair), giving a fair test of whether cross-FAMILY diversification on one
+instrument behaves like cross-INSTRUMENT diversification on one family
+(§44) or like the failure mode in §47.
+
+**Mechanism (a priori):** a moving-average-crossover trend trigger and a
+breakout-level trigger are structurally different signals even on the
+same instrument/timeframe — one reacts to sustained directional drift,
+the other to a specific price level being breached — so there is a real
+reason to expect meaningfully lower correlation between them than between
+two variants of the SAME family on the same instrument, worth confirming
+rather than assuming.
+
+**Result:**
+
+| | Sharpe | maxDD |
+|---|---|---|
+| US30 macross standalone (§43) | +0.999 | 6.1% |
+| US30 breakout standalone (§45) | +1.684 | 4.1% |
+| naive average of the two legs | +1.342 | 5.1% |
+| **50/50 combined book** | **+1.707** | **3.4%** |
+
+Correlation of the two legs' daily log-returns (1,915 aligned trading
+days, 2018-2025): **+0.074** — effectively uncorrelated, confirming the a
+priori mechanism (different signal families decorrelate even on the same
+instrument, not just across instruments in the same family). The combined
+book beats BOTH legs individually (not just their average) on Sharpe, and
+beats the lower of the two legs' drawdowns too (3.4% vs breakout's own
+4.1%). **8/8 years net-positive — every single year, including the worst
+(2023, still +0.4%)** — the most robust year-by-year profile of any
+result in this project, combined or standalone.
+
+**This is now the best combined-book result and, on a risk-adjusted
+basis, arguably the best single result in the project's pure spot/CFD
+history** (Sharpe +1.707, ahead of US30 breakout alone at +1.684, ORB gold
+RETEST's +1.488, and both individual macross legs) — only the
+options-based credit-spread SPY (Sharpe +2.090, a different asset class
+per the user's own scoping) is higher.
+
+**VERDICT: confirms the §44 lesson generalizes to a NEW diversification
+axis, and gives the clean opposite comparison to §47's failure.** The
+determining factor for whether equal-weight combining helps is NOT
+same-instrument vs cross-instrument, and NOT same-family vs cross-family
+— it is whether BOTH legs are independently strong. §44 (cross-instrument,
+same family, both strong) worked. §48 (same instrument, cross-family,
+both strong) also works, and works even better (+1.707, its own two legs'
+correlation even lower than §44's). §47 (cross-instrument, same family,
+one weak) failed for the same reason regardless of the instrument/family
+axis: a materially weaker leg dilutes a stronger one under fixed 50/50
+weighting no matter how low the correlation is. Recommend the US30
+macross+breakout 50/50 book as this project's strongest combined
+spot/CFD configuration if either strategy family is ever deployed on
+US30.
+
+**Files:** `research/us30_macross_breakout_combined_book.py`. Results:
+`results/us30_macross_breakout_combined_book.csv` (per-day return series
+for both legs and the combined book). Reproduce:
+`python research/us30_macross_breakout_combined_book.py`.
+
+**Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
+trials: N=1570** (unchanged).
