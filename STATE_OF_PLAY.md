@@ -8163,3 +8163,58 @@ benefit; it depends on the specific legs, not a fixed rule.
 
 **Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
 trials: N=1570** (unchanged).
+
+---
+
+## §55 — ORB gold RETEST + NAS100 MACROSS combined book — an eighth
+## pairing, completes "ORB gold x both NAS100 candidates" — a near-miss
+## on beating the stronger leg (2026-09-16)
+
+Completes the "ORB gold x both NAS100 candidates" set, in parallel to
+§49/§54's "ORB gold x both US30 candidates" set: ORB gold (§39, Sharpe
++1.488) paired with NAS100 macross (§42, Sharpe +0.963), quality gap
+~1.55x, close to §54's ORB gold+US30 macross gap (~1.49x, which produced
+this project's cleanest win). Worth testing directly whether NAS100
+macross behaves like its sibling US30 macross when paired with gold, per
+§53's finding that the specific legs matter, not just gap size. Method
+identical to every prior pairing.
+
+**Result:**
+
+| Weighting | Sharpe | maxDD | Years positive |
+|---|---|---|---|
+| ORB gold standalone | +1.488 | 12.1% | — |
+| NAS100 macross standalone | +0.963 | 11.0% | — |
+| naive average of the two legs | +1.225 | — | — |
+| Fixed 50/50 combined | +1.400 | 6.4% | 9/9 |
+| **Risk-parity (59%/41%) combined** | **+1.475** | **6.6%** | 9/9 |
+
+Correlation +0.021 (low, but not as low as §54's record +0.004 —
+NAS100 macross does NOT decorrelate from gold quite as cleanly as its
+US30 sibling did, confirming §53's point that the specific instrument
+matters, not just "any US equity index vs gold"). Fixed 50/50
+underperforms gold alone (+1.400 vs +1.488) — a muted result, similar in
+shape to §49/§50/§53. Risk-parity recovers most of the gap (+1.475) and
+comes very close to matching gold alone standalone, within 0.013 Sharpe
+— the closest any muted/mixed pairing has come to fully closing the gap
+under risk-parity. Both weightings hold 9/9 years net-positive — every
+year of the combined 9-year span stays positive regardless of weighting
+choice, the same excellent robustness pattern every ORB-gold-containing
+pairing has shown (§49, §54, §55 all report 8/9 or 9/9).
+
+**VERDICT: a near-miss, not a clean win — genuinely informative alongside
+§54's clean win on the sibling US30 pairing.** Two structurally similar
+pairings (gold + a US-index macross leg, similar quality gap) produced
+noticeably different correlations (US30: +0.004, NAS100: +0.021) and
+different outcomes (US30: clean win under plain 50/50; NAS100: muted,
+needs risk-parity to nearly close the gap) — reinforcing §53's lesson
+that instrument identity matters at the level of the specific pairing,
+not just the abstract family/gap-size categories used to predict outcomes
+so far in this project.
+
+**Files:** `research/orb_gold_nas100_macross_combined_book.py`. Results:
+`results/orb_gold_nas100_macross_combined_book.csv`. Reproduce:
+`python research/orb_gold_nas100_macross_combined_book.py`.
+
+**Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
+trials: N=1570** (unchanged).
