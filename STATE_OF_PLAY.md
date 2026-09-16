@@ -8047,3 +8047,65 @@ implementation.
 **Trial count: 0 new** (re-weighting of already-scored legs with a
 causal, walk-forward rule — no new backtest). **Cumulative trials:
 N=1570** (unchanged).
+
+---
+
+## §53 — NAS100 MACROSS + US30 BREAKOUT combined book — a new pairing on
+## a COMBINED axis (cross-instrument AND cross-family at once) — a real
+## but muted diversification benefit (2026-09-16)
+
+A new pairing not yet tested: every prior pairing varied only ONE axis at
+a time (§44/§47/§49/§50 held family fixed while varying instrument or
+asset class; §48/§50 held instrument fixed while varying family). This
+pairs NAS100 macross (§42, Sharpe +0.963, beats NAS100 B&H) with US30
+breakout (§45, Sharpe +1.684, beats US30 B&H) — different instrument AND
+different family simultaneously. Quality gap ~1.75x, similar in size to
+§50's ~1.8x gap (which worked well under fixed 50/50). Method identical
+to every prior pairing: both legs' own unchanged engines/params, daily
+returns aligned on the union of trading days, both fixed 50/50 AND
+in-sample risk-parity weights computed (per §51's now-adopted default).
+
+**Result:**
+
+| Weighting | Sharpe | maxDD | Years positive |
+|---|---|---|---|
+| NAS100 macross standalone | +0.963 | 11.0% | — |
+| US30 breakout standalone | +1.684 | 4.1% | — |
+| naive average of the two legs | +1.323 | — | — |
+| Fixed 50/50 combined | +1.221 | 5.8% | 8/8 |
+| **Risk-parity (21%/79%) combined** | **+1.634** | **3.4%** | 8/8 |
+
+Correlation +0.079 (near-zero, consistent with every pairing). Fixed
+50/50 underperforms BOTH the naive average and holding US30 breakout
+alone — a muted result, similar in shape to §49/§50's quality-gap
+pattern rather than §44/§48's clean wins. Risk-parity recovers most (but
+not quite all) of the gap: Sharpe rises from +1.221 to +1.634 and maxDD
+drops from 5.8% to 3.4%, but the combined book still does not QUITE beat
+holding US30 breakout alone (+1.684) even under risk-parity — unlike
+§50, where a similarly-sized quality gap (1.8x) DID let even fixed 50/50
+beat both legs outright. **This shows the instrument/family axis itself
+also matters, not just the numerical size of the quality gap** — the
+same ~1.8x gap produced a clean win on NAS100-only (§50) but only a
+partial recovery here on a cross-instrument/cross-family pairing,
+presumably reflecting a different realized correlation/volatility
+structure between the specific legs involved, not a fixed rule that can
+be read off gap size alone.
+
+**VERDICT: a real but genuinely mixed/muted result, reported honestly
+rather than forced into either the "wins" or "fails" bucket.** Confirms,
+once again, that near-zero correlation is a robust, recurring finding
+across every pairing tried in this project (now measured six times, all
+in the +0.011 to +0.079 range) — but whether that correlation translates
+into a decisive combined-book win depends on a mix of factors (quality
+gap size, relative volatility, and apparently the specific legs
+involved) that this project has not fully reduced to a single predictive
+rule. Risk-parity remains the right DEFAULT weighting choice (it recovers
+most of the available value here, as everywhere else tested), but it is
+not guaranteed to make every pairing beat its best individual leg.
+
+**Files:** `research/nas100_macross_us30_breakout_combined_book.py`.
+Results: `results/nas100_macross_us30_breakout_combined_book.csv`.
+Reproduce: `python research/nas100_macross_us30_breakout_combined_book.py`.
+
+**Trial count: 0 new** (portfolio check, no parameter search). **Cumulative
+trials: N=1570** (unchanged).
