@@ -7893,3 +7893,88 @@ project's stated entry/exit/SL/TP-refinement focus.
 
 **Trial count: 0 new** (both are portfolio checks, no parameter search).
 **Cumulative trials: N=1570** (unchanged).
+
+---
+
+## §51 — RISK-PARITY RE-WEIGHTING of all five combined-book pairings —
+## rescues §47's "failed" pairing and produces the project's best-ever
+## result (2026-09-16)
+
+Direct follow-up to the open question flagged in §49: does inverse-
+volatility (risk-parity) weighting recover the diversification benefit
+that a fixed 50/50 NOMINAL-CAPITAL split muted when the two legs have very
+different standalone volatility? Applied `w_i proportional to 1/std_i`
+(exact equal-risk-contribution for two assets when correlation is zero,
+a close approximation at this project's near-zero correlations of +0.011
+to +0.074) to all five already-scored pairings (§44/§47/§48/§49/§50),
+reusing each pairing's already-saved daily-return CSVs unchanged — pure
+re-weighting, zero new backtests.
+
+**Result — improves 4 of 5 pairings, one dramatically:**
+
+| Pairing | Weights (A/B) | Fixed 50/50 Sharpe/maxDD | Risk-parity Sharpe/maxDD | Delta |
+|---|---|---|---|---|
+| §44 NAS100+US30 macross | 0.28/0.72 | +1.135 / 5.7% | **+1.230 / 3.6%** | +0.095 |
+| §47 NAS100+US30 breakout | 0.27/0.73 | +0.967 / 5.0% | **+1.382 / 3.9%** | **+0.416** |
+| §48 US30 macross+breakout | 0.40/0.60 | +1.707 / 3.4% | **+1.824 / 3.0%** | +0.117 |
+| §49 ORB gold+US30 breakout | 0.28/0.72 | +1.687 / 4.5% | **+1.900 / 2.8%** | +0.213 |
+| §50 NAS100 macross+breakout | 0.42/0.58 | +1.054 / 5.4% | +1.016 / 4.9% | -0.038 |
+
+**§47's previously-failed pairing is RESCUED by risk-parity** (Sharpe
++0.967 -> +1.382, maxDD 5.0% -> 3.9%) — confirming that the fixed-50/50
+failure diagnosed in §47 really was a WEIGHTING artifact, not evidence
+that the pairing itself lacks diversification value: NAS100 breakout's
+standalone volatility is ~2.7x US30 breakout's, so the naive 50/50 gave
+NAS100 breakout far more realized risk than its edge justified. Risk-
+parity still does not push §47 above holding US30 breakout alone
+(+1.684) — the underlying quality gap (§46 vs §45) is real, not just a
+weighting illusion, but risk-parity captures most of the available
+diversification value that 50/50 threw away. §50 is the lone case where
+risk-parity is marginally WORSE than 50/50 (-0.038) — consistent with
+§50 already having the smallest quality gap of the mismatched pairings,
+where 50/50 happened to be closer to the true optimum by chance.
+
+**NEW PROJECT-BEST RESULTS, both under risk-parity:**
+- **ORB gold + US30 breakout (§49), risk-parity weights 28%/72%: Sharpe
+  +1.900, maxDD 2.8%, 9/9 years net-positive (every single year,
+  including the worst, 2018, still +0.9%)** — the most robust result in
+  the project's entire history, cross-asset-class, and higher Sharpe than
+  any pure spot/CFD result found by entry/exit refinement alone
+- **US30 macross + breakout (§48), risk-parity weights 40%/60%: Sharpe
+  +1.824, maxDD 3.0%, 8/8 years net-positive (worst, 2023, still +1.0%)**
+  — a close second, entirely on one instrument
+
+Both now sit just behind credit-spread SPY (§41, Sharpe +2.090, a
+different asset class per the user's own scoping) as the strongest
+results in the project, and both are dramatically more robust on a
+year-by-year basis (9/9 and 8/8 positive years respectively) than any
+single-leg candidate found via entry/exit refinement alone.
+
+**Caveats, stated plainly:** weights were computed ONCE from each leg's
+full-sample daily-return standard deviation — an in-sample choice. A
+genuinely deployable risk-parity scheme would re-estimate weights on a
+rolling/walk-forward basis, which was not attempted here (this section
+answers "does risk-parity work in principle," not "here is a deployable
+rebalancing rule"). DSR/deflation was not computed for weighting choices
+since this is not a parameter search — no p-hacking risk from testing one
+principled, pre-specified weighting rule (inverse-vol) against the
+already-established fixed-weight baseline, but this is a real, honest
+limitation on how far the headline numbers should be trusted for live
+deployment.
+
+**VERDICT: risk-parity weighting is a clear, low-effort improvement over
+fixed 50/50 for combining these legs, worth adopting as the default
+weighting scheme for any future combined-book work in this project.**
+It does not manufacture edge from nothing (§50's quality-gap pairing
+still doesn't beat US30 breakout alone even under risk-parity) but it
+reliably captures more of the real diversification value that a naive
+50/50 split leaves on the table whenever the two legs' volatilities
+differ meaningfully — which, in this project, has been true of every
+pairing tested.
+
+**Files:** `research/combined_book_risk_parity.py`. Results:
+`results/combined_book_risk_parity.csv`. Reproduce:
+`python research/combined_book_risk_parity.py`.
+
+**Trial count: 0 new** (re-weighting of five already-scored portfolio
+checks, no parameter search). **Cumulative trials: N=1570** (unchanged).
