@@ -64,8 +64,23 @@ multiplier forever, never adapts — a methodological trap now documented), but
 a ROLLING 2-year window at a 20% cap beats fixed 6x on the same challenge
 pool (30.5% vs 28.0% funded) while staying more stable across eras than
 14x — the closest thing to an actual resolution of the sizing question,
-though still a single stated rule, not a swept optimum (§66). `research_log.md`
-has the per-test detail.
+though still a single stated rule, not a swept optimum (§66).
+**2026-09-17 §67 (CRITICAL — read before any live-money discussion):** the
+out-of-regime test that killed every prior "winner" in this project (index
+basket, Sneaky Pivot, original ORB) was finally run on the actual §39-§66
+refined candidates, using continuous real-spread NAS100/US30 H1 data
+2013-2017 and a XAUUSD 2017 stub. **4 of 5 individual candidates FAIL**
+(NAS100 macross, US30 macross Sharpe -1.175, US30 breakout, US30 momentum
+Sharpe -0.966/maxDD 45.9%) — same failure signature as every earlier
+candidate. **The §48/§65 combined book (US30 macross+breakout) also fails,
+losing money out-of-regime** (Sharpe -0.70/-0.61, total return -8.9%/-7.6%,
+1/5 years positive). Only ORB gold RETEST and the §52 ORB gold+US30
+breakout book "survive," but both rest on a THIN single-year (2017) gold
+sample, not a robust multi-year confirmation. **Do not treat any
+2018-2025-only backtest result in this project as sufficient grounds for
+live deployment** — this is exactly the failure mode the project's own
+out-of-regime convention exists to catch, and it caught it again.
+`research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)
 

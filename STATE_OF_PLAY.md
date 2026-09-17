@@ -9118,3 +9118,84 @@ Reproduce: `python research/ftmo_check_walkforward_multiplier.py`.
 **Trial count: 0 new** (sizing-policy walk-forward check on already-
 scored legs, not a parameter search). **Cumulative trials: N=1645
 unchanged.**
+
+---
+
+## §67 — THE OUT-OF-REGIME TEST, FINALLY RUN ON THE ACTUAL REFINED
+## CANDIDATES — 4 OF 5 FAIL, INCLUDING THE COMBINED BOOK. USER ASKED
+## ABOUT GOING LIVE; THIS IS WHY NOT YET (2026-09-17)
+
+User asked whether to deploy real money. Before answering, a critical
+gap was closed: the out-of-regime test that has killed every prior
+"winner" in this project (index basket §2, Sneaky Pivot §9.4, the
+original ORB §10, M1 momentum §11 — all looked real on 2018-2025 and
+died or badly degraded on 2013-2017 data, UNCHANGED) had never been run
+on the Sec39-Sec66 candidates. Those were found AND tuned entirely on
+2018-2025 data via the joint grid method — this was the obvious next
+check before any live-money decision, and it had simply not been done
+yet.
+
+**Data:** NAS100 and US30 have continuous (non-RTH, real-spread) H1 data
+2013-09-30→2017-12-29 (`data/NAS100_H1_2013_2017_cfd_dukascopy.csv`,
+`data/US30_H1_2013_2017_cfd_dukascopy.csv`), resampled to H4 exactly
+like the 2018-2025 M1 data — a genuine ~4.25-year out-of-regime window.
+XAUUSD only has a 2017 M1 stub (`data/XAUUSD_M1_2017_spot_dukascopy.csv`)
+— a single year, NOT a full pre-2018 window — weaker evidence, stated
+explicitly throughout.
+
+**Method:** re-ran each candidate's EXACT already-tuned params (no
+re-optimization — that would defeat the point) on the out-of-regime
+data, same cost model/engine/resolution as the in-regime version.
+
+**RESULT — 4 of 5 individual candidates FAIL:**
+
+| Candidate | OOR Sharpe | OOR B&H Sharpe | netPF | maxDD | Verdict |
+|---|---|---|---|---|---|
+| NAS100 H4 macross (§42) | −0.081 | +1.185 | 1.009 | 24.9% | **FAILS** |
+| US30 H4 macross (§43) | **−1.175** | +0.989 | 0.619 | 24.4% | **FAILS badly** |
+| US30 H4 breakout-retest (§45) | +0.377 | +0.989 | 0.880 | 5.6% | FAILS (loses to B&H, but not a money-loser) |
+| US30 H4 momentum (§64) | **−0.966** | +0.989 | 0.675 | **45.9%** | **FAILS badly** |
+| ORB gold RETEST (§39) | +1.421 | +1.147 | 1.392 | 4.5% | SURVIVES (2017 stub only) |
+
+**The combined books fail too.** US30 macross + US30 breakout (§48/§65,
+the second-best FTMO candidate) tested over the SAME full 2013-2017
+window: fixed 50/50 Sharpe **−0.702**, rolling risk-parity **−0.613**,
+total compounded return **−8.9%/−7.6%**, only 1/5 years positive — a
+real money-losing period, not just "loses to B&H." Since one of its two
+legs (macross) is the worst individual failure in the table, this is
+expected, not surprising — but it directly means **the second-strongest
+FTMO-ruleset candidate (§65) loses money out-of-regime.**
+
+**ORB gold + US30 breakout (§52, the actual "honest deployable best")
+was ALSO checked**, but only on the thin 2017-only overlap (gold has no
+earlier data): fixed 50/50 Sharpe +1.371, maxDD 2.9%, +6.5% return — it
+looks fine, but this is carried almost entirely by gold's own strong
+2017 (Sharpe +1.354 standalone), on a single year of data, not
+independent confirmation across the fuller 2013-2016 window the way the
+index-only tests got.
+
+**VERDICT: this is a real, sobering result, and it lands exactly where
+this project's own history would predict.** 2018-2025 was, once again,
+shown to be a favorable regime for parameters tuned on it — the same
+pattern that killed the index basket, Sneaky Pivot, and the original ORB
+in earlier sections. The one candidate (ORB gold RETEST) and the one
+combined book (§52) that "survive" both do so on the SAME thin,
+single-year (2017) gold evidence — not the kind of robust multi-year
+out-of-regime confirmation the index legs could have gotten and failed.
+**This is a strong reason NOT to deploy real money on any of these
+candidates yet**, and a strong argument for prioritizing a genuine
+multi-year pre-2018 XAUUSD data pull (flagged as in-progress-but-
+apparently-never-completed as far back as 2026-09-01, per project
+memory) before revisiting this question. It does not retroactively
+invalidate the Sharpe/maxDD/DSR findings in §35-§66 (those were honestly
+reported as in-regime results all along, with DSR explicitly NOT
+cleared) — but it removes any basis for treating "beats B&H in
+2018-2025" as sufficient grounds for live deployment.
+
+**Files:** `research/out_of_regime_check_refined_candidates.py`.
+Results: `results/out_of_regime_check_refined_candidates.csv`. Combined-
+book checks were run ad hoc (not yet scripted into a saved file) —
+should be formalized if this line of work continues.
+
+**Trial count: 0 new** (re-running already-tuned configs on different
+data, not a parameter search). **Cumulative trials: N=1645 unchanged.**
