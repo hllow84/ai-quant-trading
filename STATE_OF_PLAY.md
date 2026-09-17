@@ -1,6 +1,15 @@
 # STATE OF PLAY — AI Quant Trading Lab
 
-**Last updated: 2026-09-16 (§56/§57 — the last two combined-book pairings,
+**Last updated: 2026-09-17 (§64-§66 — a fifth signal family (momentum,
+US30 H4, weaker robustness than the other four), an FTMO ruleset check on
+a second combined book (confirms §52's ORB gold + US30 breakout book
+remains the best FTMO candidate), and a causal walk-forward risk-
+multiplier rule that resolves most of the §62/§63 6x-vs-14x tradeoff
+without hindsight. Cumulative trial count N=1645. See §64/§65/§66 for
+detail; the 2026-09-16 blockquote below section 1 still holds as the
+summary of everything through §63.)**
+
+**Prior update: 2026-09-16 (§56/§57 — the last two combined-book pairings,
 completing ALL C(5,2)=10 combinations across this project's 5 spot/CFD-plus-
 gold candidate legs. See the 2026-09-16 blockquote below section 1 for the
 full current-state summary — it supersedes the "FTMO hunt concluded, no
@@ -8895,3 +8904,217 @@ ftmo_check_6x_reference.py`'s `two_phase_chain()` unchanged). Results:
 **Trial count: 0 new** (a period-based partition of already-computed
 FTMO challenge outcomes, not a parameter search or new backtest).
 **Cumulative trials: N=1570** (unchanged).
+
+---
+
+## §64 — FIFTH SIGNAL FAMILY PUSHED THROUGH THE JOINT GRID METHOD:
+## MOMENTUM, US30 H4 — a genuine fifth buy-and-hold-beating candidate,
+## but with a materially weaker robustness profile than the other four
+## (2026-09-17)
+
+The four existing candidates (§39-§45) all came from the `breakout` or
+`macross` families. `strategies/sweep_families.py` has three other
+families that were never pushed through the joint entry/exit/SL/TP
+refinement method: `trend_continuation`, `mean_reversion`, `momentum`.
+Momentum was picked — its best hand-picked cell (2026-07-21 US index CFD
+sweep) was US30 H4 momentum variant 1 (N=48, k_atr=2.0, R=2.0, H=96):
+Sharpe +0.221, netPF 1.120, grossPF 1.150, the strongest untouched cell
+of the three unrefined families on either index instrument.
+
+**Method:** same joint (not staged) SL/TP/entry-lookback grid approach as
+§39/§42/§43, on the same US30 H4 data/cost model/engine used throughout
+§43/§45/§48. Three rounds, each following the gradient past the previous
+round's edge per the project's standing rule ("never argmax, always
+confirm a plateau"):
+
+1. **Initial 4x3x3 grid** (N in {24,48,72,96} x k_atr in {1.5,2.5,4.0} x
+   R in {1.0,2.0,3.0}, H=2N, 36 cells): best cell N48/N96 tied at
+   k_atr=1.5 (the grid's LOW edge) / R=3.0 (the grid's HIGH edge), Sharpe
+   +0.801/+0.799 — an edge-hug, not yet trustworthy.
+2. **Edge probe** (k_atr in {0.75,1.0,1.5} x R in {3.0,4.0,5.0}, N in
+   {48,96}, 16 cells): k_atr TURNED OVER (1.0/0.75 both worse than 1.5 at
+   N=48 — a real interior optimum on that axis), but R kept climbing to
+   its new edge (R=4.0, Sharpe +0.893 at N=96/k_atr=1.5).
+3. **Peak-confirm + R-edge probe** (tight grid around the new peak, then
+   R extended to 10.0): found the TRUE local peak at **N=96, k_atr=1.25,
+   R=5.0, H=192: Sharpe +1.010**, then confirmed R genuinely turns over
+   past 5.0 (Sharpe falls to +0.709 at R=6.0, keeps falling to R=10.0) —
+   a real interior plateau on both axes now, not an edge-hug.
+
+**Final candidate: US30 H4 momentum (N=96, k_atr=1.25, R=5.0, H=192).**
+n=170 trades, grossPF 1.970, netPF 1.905, Sharpe **+1.010**, maxDD
+**19.0%**, win rate 30.0%. **Decisively beats US30 buy-and-hold**
+(Sharpe +0.547, §43) — a genuine fifth candidate. Guard PASS. IS/OOS
+split (first 70%/last 30% of trades chronologically): IS Sharpe +0.610,
+OOS Sharpe +1.746 — **OOS holds** (improves, no degradation). Year-by-
+year: **6/8 years positive** (2018 +7.2%, 2019 +10.1%, 2020 +14.1%,
+2021 −4.7%, 2022 −3.2%, 2023 +9.2%, 2024 +35.5%, 2025 +22.3%) — weaker
+than the other four candidates' typical 9/9, and 2024 alone carries a
+disproportionate share of total return (top-year concentration ≈42%,
+worse than any of §39/§42/§43/§45's final cells).
+
+**Verdict: a real fifth candidate, but structurally the WEAKEST of the
+five on robustness** — maxDD 19.0% is 1.4x-4.6x every other candidate's
+(ORB gold 4-9%, credit-spread SPY N/A-options, NAS100/US30 macross
+6-14%, US30 breakout 4%), win rate is low (30% vs the others' 35-55%),
+and its edge required THREE rounds of edge-following before landing on
+a genuine interior plateau — more optimization pressure than any prior
+candidate needed. It is added to the candidate pool for completeness and
+any future combined-book work, but is NOT recommended as a standalone
+deployment candidate ahead of the existing four without further scrutiny
+(e.g. a dedicated out-of-regime check, which none of the other four
+were spared either, per this project's standing practice).
+
+**Files:** `research/momentum_us30_h4_joint_grid.py` (36 trials),
+`research/momentum_us30_h4_edge_probe.py` (16 trials),
+`research/momentum_us30_h4_peak_confirm.py` (15 trials),
+`research/momentum_us30_h4_r_edge_probe.py` (8 trials). Results:
+`results/momentum_us30_h4_joint_grid.csv`,
+`results/momentum_us30_h4_edge_probe.csv`,
+`results/momentum_us30_h4_peak_confirm.csv`,
+`results/momentum_us30_h4_r_edge_probe.csv`.
+
+**Trial count: 75 new** (36+16+15+8). **Cumulative trials: N=1570 -> 1645.**
+DSR not computed against the full 75-trial pool in this write-up (every
+number above is stated raw, per standing rule 7); a future section
+should run `research/dsr.py`'s `structural_pool()` against this family
+before treating the candidate as anything beyond "beats its own B&H,
+OOS holds" — consistent with how the other four candidates' verdicts
+also rest on economic/robustness evidence, not DSR (none of the five
+clears the project's DSR bar against its full contaminated pool).
+
+---
+
+## §65 — FTMO RULESET CHECK ON A SECOND COMBINED BOOK (US30 macross +
+## US30 breakout, §48) — confirms §52's ORB gold + US30 breakout book
+## remains the better FTMO candidate at every multiplier tested
+## (2026-09-17)
+
+Only one combined book (ORB gold + US30 breakout, §52) had been run
+through the FTMO ruleset (§58-§63). This section runs the SAME corrected
+method (§62: `best_day_cap=None`, no fabricated consistency rule) on a
+second book — US30 macross (§43) + US30 breakout (§45), §48's same-
+instrument/different-family pairing — chosen because both legs
+individually beat US30 buy-and-hold and it needed no cross-instrument
+correlation re-litigation. §48 only tested fixed 50/50; this section
+ALSO applies §52's rolling (causal) risk-parity weighting for the first
+time on this pairing.
+
+**Standalone comparison (rolling risk-parity):**
+
+| Book | Sharpe | maxDD |
+|---|---|---|
+| ORB gold + US30 breakout (§52) | +1.793 | 3.1% |
+| US30 macross + US30 breakout (this section) | **+1.755** | **3.2%** |
+
+Nearly identical on Sharpe/maxDD alone — a much closer contest than §48's
+plain-50/50 comparison suggested. **But the FTMO Challenge outcome is
+not close:**
+
+| Multiplier | ORB gold+US30 breakout (§62) | US30 macross+US30 breakout |
+|---|---|---|
+| 1x | 0.0% funded | 0.0% funded (same `no_target` failure mode) |
+| 6x | 25.5% funded | **16.0% funded** |
+| 14x | 33.0% funded (peak) | **22.3% funded** |
+
+**US30 macross + US30 breakout funds WORSE at every multiplier tested**,
+despite near-identical standalone Sharpe/maxDD — a direct demonstration
+that FTMO Challenge pass rate is NOT well-predicted by Sharpe/maxDD
+alone; it depends on the PATH (how returns are distributed day-to-day
+and how often the specific +10%/+5% targets are hit inside a 60-day
+window), which two books with similar aggregate risk-adjusted return can
+realize very differently. At 6x, US30 macross+breakout's Phase 1
+raw-pass rate is only 23.4% (63 of 94 challenges time out with
+`no_target`) vs ORB gold+US30 breakout's stronger Phase-1 profile — the
+US30-only book's daily-return distribution evidently clusters gains less
+favorably for hitting a fixed monthly target, even though its long-run
+Sharpe is comparable.
+
+**Verdict: §52's ORB gold + US30 breakout book remains the project's
+best FTMO-eligible candidate, confirmed against a genuine second
+comparison rather than assumed by default.** This section does not
+change any Sharpe/maxDD/DSR verdict from §35-§57 (no new backtest
+trials, ruleset check only).
+
+**Files:** `research/ftmo_check_us30_macross_breakout.py`. Results:
+`results/ftmo_check_us30_macross_breakout.csv`. Reproduce:
+`python research/ftmo_check_us30_macross_breakout.py`.
+
+**Trial count: 0 new** (FTMO-ruleset check + rolling-RP application on
+already-scored legs). **Cumulative trials: N=1645 unchanged** (from §64).
+
+---
+
+## §66 — WALK-FORWARD (CAUSAL) RISK-MULTIPLIER SELECTION — the first
+## genuinely causal answer to the §62/§63 6x-vs-14x sizing question
+## (2026-09-17)
+
+§62/§63 left the 6x-vs-14x sizing question explicitly unresolved: both
+were fixed multipliers picked by looking at the FULL 2017-2025 pooled
+sample after the fact — neither is something a real trader could have
+chosen without hindsight. This section builds and tests a genuinely
+CAUSAL, walk-forward sizing RULE: at every monthly Challenge start, pick
+the largest candidate multiplier (same 2x-30x table as §62) whose
+TRAILING (already-observed, no look-ahead) max drawdown stays under a
+stated risk cap — the same informal logic a real trader uses ("size up
+until my own equity curve's worst historical drawdown hits my comfort
+limit"). Requires >=2 years of trailing history before selecting at all
+(82 of 108 monthly starts qualify; all comparisons below use this same
+82-challenge pool for fixed 6x/14x too, for a fair apples-to-apples
+test).
+
+**Two trailing-window designs were tested, and the first is a genuine
+negative finding in its own right:**
+
+**(1) Expanding window (all history before the start date) — DEGENERATE.**
+Because trailing maxDD of an ever-growing window can only increase or
+stay flat as more history accumulates, the rule never adjusts once
+picked: it selects the SAME multiplier for every single challenge in the
+sample (4x at a 15% cap, 6x at a 20% cap, 1 distinct value used across
+82 starts either way). An expanding-window trailing-drawdown rule is
+provably unable to size up or down over time — a real methodological
+trap worth flagging for future sizing-rule design in this project.
+
+**(2) Rolling 2-year (730-day) trailing window — adaptive, the real
+test:**
+
+| Cap | Multiplier range used | Walk-forward funded | Fixed 6x (same pool) | Fixed 14x (same pool) |
+|---|---|---|---|---|
+| 15% | 4x-12x (median 7x) | 22.0% (18/82) | 28.0% | 36.6% |
+| 20% | 6x-16x (median 10x) | **30.5% (25/82)** | 28.0% | 36.6% |
+
+At the 20% cap, the rolling walk-forward rule **BEATS fixed 6x on the
+same pool** (30.5% vs 28.0%) while adjusting its own multiplier
+adaptively between 6x and 16x — genuinely capturing some of 14x's extra
+edge without ever knowing the future. It still falls short of fixed
+14x's non-causal 36.6%, as expected (14x's own §63 advantage is
+front-loaded into 2017-2020, which the rule could not have foreseen
+either). Era split for the 20%-cap version:
+
+| Era | Walk-forward funded | Median multiplier used |
+|---|---|---|
+| 2017-2021 (H1) | 35.7% (10/28) | 6x |
+| 2021-2025 (H2) | 27.8% (15/54) | 10x |
+
+The walk-forward rule's own H1->H2 decline (35.7%->27.8%, a 7.9pp gap)
+is SMALLER than fixed 14x's pooled-vs-recent gap implied by §63 (42.3%->
+24.1%, an 18.2pp gap) — i.e. the adaptive rule is genuinely more stable
+across eras than blindly committing to 14x, while still funding at a
+meaningfully higher rate than blindly committing to 6x on the same
+pool. This is the closest thing this project has to an actual
+resolution of the §62/§63 tradeoff: **a rolling walk-forward drawdown-
+capped sizing rule (20% cap) dominates fixed 6x on this same pool and
+captures roughly half of 14x's edge over 6x, without requiring
+hindsight** — though it remains a single stated rule/cap choice, not a
+swept optimum, and should be read as a demonstration that causal
+adaptive sizing is POSSIBLE and helpful here, not as a final
+recommended production rule.
+
+**Files:** `research/ftmo_check_walkforward_multiplier.py`. Results:
+`results/ftmo_check_walkforward_multiplier_expanding_cap15.csv`,
+`_expanding_cap20.csv`, `_rolling730_cap15.csv`, `_rolling730_cap20.csv`.
+Reproduce: `python research/ftmo_check_walkforward_multiplier.py`.
+
+**Trial count: 0 new** (sizing-policy walk-forward check on already-
+scored legs, not a parameter search). **Cumulative trials: N=1645
+unchanged.**

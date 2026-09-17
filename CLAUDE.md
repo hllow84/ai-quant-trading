@@ -46,7 +46,26 @@ under 14x, much closer to 6x's own number than to 14x's pooled headline.** Neith
 multiplier is adopted as a final recommendation; §62's correction stands, but §63
 is a real reason to weight recent performance over the full-sample pooled average
 when actually choosing a sizing. Treat §62+§63 together as authoritative over
-§59-§61's superseded numbers. `research_log.md` has the per-test detail.
+§59-§61's superseded numbers. **2026-09-17 (§64-§66, N=1570→1645):** a fifth
+signal family (momentum) was pushed through the joint grid method on US30
+H4 and found a genuine buy-and-hold-beating candidate (Sharpe +1.010, maxDD
+19.0%, OOS holds, 6/8 years positive) — but it is structurally the weakest
+of the five candidates (maxDD 1.4x-4.6x the others, low 30% win rate, needed
+three edge-following rounds), added to the pool but not recommended standalone
+(§64). The FTMO ruleset was run on a second combined book (US30 macross +
+US30 breakout, §48): despite near-identical Sharpe/maxDD to §52's book, it
+funds materially worse at every multiplier (16.0% vs 25.5% at 6x, 22.3% vs
+33.0% at 14x) — §52's ORB gold + US30 breakout book remains the best FTMO
+candidate, now confirmed against a real second comparison (§65). A causal
+walk-forward risk-multiplier rule (pick the largest multiplier whose trailing,
+no-look-ahead maxDD stays under a cap) was tested to resolve §62/§63's 6x-
+vs-14x tradeoff: an EXPANDING trailing window is degenerate (picks one
+multiplier forever, never adapts — a methodological trap now documented), but
+a ROLLING 2-year window at a 20% cap beats fixed 6x on the same challenge
+pool (30.5% vs 28.0% funded) while staying more stable across eras than
+14x — the closest thing to an actual resolution of the sizing question,
+though still a single stated rule, not a swept optimum (§66). `research_log.md`
+has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)
 
