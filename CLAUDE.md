@@ -80,6 +80,23 @@ sample, not a robust multi-year confirmation. **Do not treat any
 2018-2025-only backtest result in this project as sufficient grounds for
 live deployment** — this is exactly the failure mode the project's own
 out-of-regime convention exists to catch, and it caught it again.
+**2026-09-17 §68 (UPGRADES §67 for two candidates):** completed the
+XAUUSD 2013-2017 M1 backfill (`data/XAUUSD_M1_2013_2017_spot_
+dukascopy.csv`, 1.63M rows, real spread) that §67 was missing. Re-ran ORB
+gold RETEST and the §52 combined book on the FULL 5-year window instead
+of the thin 2017 stub: **ORB gold RETEST now has genuine multi-year
+confirmation** (Sharpe +1.457, 5/5 years positive, decisively beats a
+NEGATIVE gold buy-and-hold of −0.304 — profits through an actual bear/
+chop regime). **The §52 deployable combined book (ORB gold + US30
+breakout, rolling risk-parity) is 5/5 years net-positive across the full
+out-of-regime window, Sharpe +1.280, maxDD 3.4%** — the strongest
+evidence any candidate in this project has produced. This does NOT
+rescue the 4 candidates that failed §67 (NAS100 macross, US30 macross,
+US30 breakout-vs-B&H, US30 momentum, or the US30 macross+breakout
+combined book) — their failures were not data-limited. It meaningfully
+upgrades the case for the §52 book specifically, but does not alone
+clear every remaining pre-live gate (DSR still not cleared; FTMO 1x pass
+rate still 0%; live broker execution still unvalidated).
 `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)

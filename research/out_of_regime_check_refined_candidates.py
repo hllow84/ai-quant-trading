@@ -54,7 +54,7 @@ COST_BPS = dict(commission=0.35, slip_normal=0.15, slip_news=0.50)
 
 NAS100_OOR = _ROOT / "data" / "NAS100_H1_2013_2017_cfd_dukascopy.csv"
 US30_OOR = _ROOT / "data" / "US30_H1_2013_2017_cfd_dukascopy.csv"
-GOLD_OOR = _ROOT / "data" / "XAUUSD_M1_2017_spot_dukascopy.csv"
+GOLD_OOR = _ROOT / "data" / "XAUUSD_M1_2013_2017_spot_dukascopy.csv"
 
 
 def score_h4(data_path, fn, params, label, native_freq_note):
@@ -148,7 +148,7 @@ def main():
                           "US30 H4 breakout-retest (Sec45 params)", "H1 native, resampled to H4"))
     rows.append(score_h4(US30_OOR, momentum, dict(N=96, k_atr=1.25, R=5.0, H=192),
                           "US30 H4 momentum (Sec64 params)", "H1 native, resampled to H4"))
-    rows.append(score_gold_orb(GOLD_OOR, "ORB gold RETEST (Sec39 params, tol_frac=0.20/moderate)"))
+    rows.append(score_gold_orb(GOLD_OOR, "ORB gold RETEST (Sec39 params, tol_frac=0.20/moderate) -- 2013-2017 full backfill"))
 
     df = pd.DataFrame(rows)
     out = RESULTS / "out_of_regime_check_refined_candidates.csv"

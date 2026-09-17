@@ -9199,3 +9199,92 @@ should be formalized if this line of work continues.
 
 **Trial count: 0 new** (re-running already-tuned configs on different
 data, not a parameter search). **Cumulative trials: N=1645 unchanged.**
+
+---
+
+## §68 — XAUUSD 2013-2017 BACKFILL COMPLETED; ORB GOLD RETEST AND THE §52
+## COMBINED BOOK NOW HAVE A REAL 5-YEAR OUT-OF-REGIME CONFIRMATION
+## (2026-09-17)
+
+§67 flagged that the two "survivors" of the out-of-regime check (ORB gold
+RETEST, and the §52 ORB gold+US30 breakout combined book) rested only on
+a thin single-year (2017) XAUUSD stub — not the kind of robust multi-year
+confirmation the index legs had access to. That gap is now closed.
+
+**Backfill:** `scripts/download_xauusd_2013_2017.sh` pulled XAUUSD M1
+bid+ask, year by year 2013-2017, via the same proven Dukascopy path used
+for the existing 2018-2025 file (10 pulls, ~4 min each, fully resumable
+via `.done` markers, ran detached so it survived the session). All 10
+pulls succeeded on the first attempt. `scripts/merge_xauusd_2013_2017.py`
+merged them into `data/XAUUSD_M1_2013_2017_spot_dukascopy.csv`: 1,625,480
+M1 rows, zero negative spreads, price range $1046-$1695/oz (correct for
+spot gold in this period — gold fell from its 2011-2012 highs through
+most of this window, unlike the 2018-2025 mostly-bull window).
+
+**ORB gold RETEST (§39 params, unchanged) re-run on the FULL 2013-2017
+window:**
+
+| Metric | 2017-stub-only (§67, superseded) | Full 2013-2017 (this section) |
+|---|---|---|
+| n trades | 93 | **447** |
+| Sharpe | +1.421 | **+1.457** |
+| netPF | 1.392 | **1.410** |
+| maxDD | 4.5% | 6.7% |
+| Years positive | 1/1 | **5/5** |
+| vs buy-and-hold | beats (B&H +1.147) | **beats decisively (B&H −0.304)** |
+
+Gold's own buy-and-hold was actually NEGATIVE over 2013-2017 (Sharpe
+−0.304 — the post-2012-peak decline) — ORB gold RETEST not only survives
+but profits through a genuine bear/chop regime for the underlying
+instrument, the strongest possible form of "not just a regime artifact."
+**This is now a real, 5-year, statistically meaningful out-of-regime
+confirmation, not a one-year coincidence.**
+
+**§52 combined book (ORB gold + US30 breakout) re-run on the full
+window:**
+
+| | Standalone gold | Standalone US30 breakout | Combined 50/50 | Combined rolling RP (deployable) |
+|---|---|---|---|---|
+| Sharpe | +1.413 | +0.310 | +1.408 | **+1.280** |
+| maxDD | 6.7% | 5.6% | 3.3% | **3.4%** |
+| Total return | +90.0% | +5.1% | +42.0% | **+29.0%** |
+| Years positive | 5/5 | 4/5 | 5/5 | **5/5** |
+
+**The deployable rolling-risk-parity book is 5/5 years net-positive
+across the full 2013-2017 out-of-regime window**, Sharpe +1.280, maxDD
+3.4% — this is now the strongest evidence any candidate in this project
+has produced: a candidate that beats its own buy-and-hold AND profits
+in a materially different regime (gold bear/chop vs gold bull) AND holds
+up under the exact test that has killed every other "winner" this
+project has found. US30 breakout alone is the weaker leg here (Sharpe
++0.310, barely profitable, 4/5 years) but does not drag the book
+negative — consistent with its role as the diversifier, not the primary
+engine, in this window.
+
+**Updated verdict on live-readiness (revises §67's blanket caution):**
+the ORB gold RETEST leg and the §52 combined book have now cleared the
+project's own out-of-regime bar with real, multi-year evidence — this is
+categorically different from every earlier candidate that "looked great
+in 2018-2025" and is NOT the same as the 4 candidates that failed §67
+(NAS100 macross, US30 macross, US30 breakout standalone vs its own B&H,
+US30 momentum, and the US30 macross+breakout combined book — none of
+which get a pass from this new data, since none of their failures were
+data-limited the way gold's was). This meaningfully upgrades the case
+for the §52 book specifically over the alternatives, though it does not
+by itself resolve every other pre-live gate (DSR still not cleared;
+FTMO Challenge pass rate at 1x risk is still 0% per §58; live execution
+has still never been validated against a real broker feed).
+
+**Files:** `scripts/download_xauusd_2013_2017.sh`,
+`scripts/merge_xauusd_2013_2017.py`,
+`research/out_of_regime_check_combined_book.py` (also updated
+`research/out_of_regime_check_refined_candidates.py`'s `GOLD_OOR` path
+to point at the new full file). Data: `data/XAUUSD_M1_2013_2017_spot_
+dukascopy.csv` (205MB, gitignored). Results:
+`results/out_of_regime_check_combined_book.csv`, `results/
+out_of_regime_check_refined_candidates.csv` (regenerated with the full
+gold window).
+
+**Trial count: 0 new** (re-running already-tuned configs on newly-
+available data, not a parameter search). **Cumulative trials: N=1645
+unchanged.**
