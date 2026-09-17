@@ -10,6 +10,15 @@ macross+breakout combined book) **failed** the out-of-regime check and
 is deliberately excluded from this document — see "What's NOT here and
 why" at the bottom.
 
+**An automated MT5 version of these exact rules now exists** —
+`strategies_mt5/ORB_Gold_RETEST_US30_Breakout_Combined.mq5`, with its own
+deployment guide at `docs/mt5_ea_deployment.md` (compiling it, finding your
+broker's exact symbol names, running it on FTMO's free demo, and what it
+simplifies vs. this document — currently fixed 50/50 sizing, not the
+rolling risk-parity scheme in section 3 below). Read this document first
+either way; the EA is a direct translation of the rules below, not a
+different strategy.
+
 **Read the warnings section before trading any of this with real money.**
 
 ---
