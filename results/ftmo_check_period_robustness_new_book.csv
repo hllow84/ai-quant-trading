@@ -1,0 +1,11 @@
+book,multiplier,split,period,n,funded_rate
+Headline (ORB gold + US30 breakout),14.0,halves,2013-2019 (H1),77,0.33766233766233766
+Headline (ORB gold + US30 breakout),14.0,halves,2019-2026 (H2),77,0.3246753246753247
+Headline (ORB gold + US30 breakout),14.0,thirds,2013-2017 (T1),51,0.29411764705882354
+Headline (ORB gold + US30 breakout),14.0,thirds,2017-2021 (T2),52,0.4423076923076923
+Headline (ORB gold + US30 breakout),14.0,thirds,2021-2026 (T3),51,0.2549019607843137
+New book (ORB gold + VIX/real-yield sleeve),6.0,halves,2013-2019 (H1),77,0.35064935064935066
+New book (ORB gold + VIX/real-yield sleeve),6.0,halves,2019-2026 (H2),77,0.36363636363636365
+New book (ORB gold + VIX/real-yield sleeve),6.0,thirds,2013-2017 (T1),51,0.4117647058823529
+New book (ORB gold + VIX/real-yield sleeve),6.0,thirds,2017-2021 (T2),52,0.34615384615384615
+New book (ORB gold + VIX/real-yield sleeve),6.0,thirds,2021-2026 (T3),51,0.3137254901960784

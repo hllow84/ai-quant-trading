@@ -121,6 +121,13 @@ full 2013-2025 window.** This is an FTMO-survival finding specifically
 (the headline book still has the better standalone Sharpe, +1.613 vs
 +1.182) — same standing caveats apply (one 13-year history, overlapping
 challenge windows, DSR never cleared, live execution never validated).
+**§88 checked whether the new 6x peak is more era-stable than the old
+14x one (as §63's original finding might suggest) — it does NOT
+clearly hold; both books show real but different sub-period
+variability, and §88 also revises §63's own conclusion, which turns
+out to be window-dependent (the headline book's 14x peak is actually
+stable across halves on the fuller 2013-2025 span; only §63's shorter
+2017-2025 window showed the steep decline).**
 `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)

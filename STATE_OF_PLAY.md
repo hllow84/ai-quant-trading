@@ -10038,3 +10038,49 @@ ftmo_check_headline_vs_new_book_same_window.py`, `results/
 ftmo_check_headline_vs_new_book_same_window.csv`. **Trial count: 0
 new (FTMO-ruleset checks + window-aligned leg reconstruction, not a
 parameter search). Cumulative trials: N=1717 unchanged.**
+
+## §88 — PERIOD-ROBUSTNESS CHECK: THE "LOWER MULTIPLIER = MORE
+## STABLE" HYPOTHESIS DOES NOT CLEARLY HOLD; ALSO REVISES §63'S OWN
+## FINDING (2026-09-18)
+
+§86/§87 speculated the new book's 6x peak might be more era-stable
+than the headline book's 14x peak, by analogy to §63's original
+finding (6x was comparatively stable there, 14x's advantage was
+front-loaded and decaying). Tested directly rather than assumed, using
+§63's same halves/thirds method on both books' §87 full-window results,
+each at its own peak multiplier. `research/ftmo_check_period_
+robustness_new_book.py`.
+
+**Halves: both books are essentially era-stable on this fuller
+window** — headline@14x: H1 33.8% / H2 32.5% (1.3pp gap); new
+book@6x: H1 35.1% / H2 36.4% (1.3pp gap, opposite direction). This
+**contrasts with §63's earlier finding** of a steep ~18.2pp H1-H2
+decline for the headline book's 14x peak — but §63 was measured on the
+shorter 2017-2025-only window; extending back to 2013 materially
+changes the picture. Stated as an honest revision, not hidden.
+
+**Thirds show real variation for both, in different shapes:**
+headline@14x is non-monotonic (29.4% → 44.2% → 25.5%, a strong middle
+third, 18.7pp range); new book@6x declines monotonically (41.2% →
+34.6% → 31.4%, 9.8pp range, front-loaded toward 2013-2017 — the same
+*direction* of concern §63 originally flagged for 14x, just smaller in
+magnitude).
+
+**Verdict: the "lower multiplier = more era-stable" hypothesis does
+NOT clearly hold — tested honestly, and the answer is genuinely
+mixed, not a clean confirmation of the intuition floated in §86/§87.**
+Neither book's peak should be read as obviously more robust than the
+other's on era-stability grounds alone. This also revises §63's own
+historical conclusion: "14x's advantage is front-loaded and decaying"
+was window-dependent, not a fixed property of that multiplier — on the
+full 2013-2025 span, 14x's halves are actually stable, only its thirds
+show real variation. §63's underlying result stands for the window it
+was computed on; the general lesson (check robustness before trusting
+a pooled average) stands too — the specific magnitude does not
+generalize across windows without re-checking, exactly as this section
+just demonstrated by re-checking it.
+
+**Files:** `research/ftmo_check_period_robustness_new_book.py`,
+`results/ftmo_check_period_robustness_new_book.csv`. **Trial count: 0
+new (period partition of already-computed results). Cumulative
+trials: N=1717 unchanged.**
