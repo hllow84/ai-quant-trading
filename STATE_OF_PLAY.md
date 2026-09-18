@@ -9639,3 +9639,49 @@ matching this project's established combined-book methodology
 **Files:** `scripts/download_real_yield.py`, `research/
 run_real_yield_gold_signal.py`, `data/DFII10_real_yield_fred.csv`.
 **Trial count: 1 new. Cumulative trials: N=1650 → 1651.**
+
+## §76 — COMBINED-BOOK CHECK: ORB GOLD RETEST + REAL-YIELD TREND —
+## NEAR-ZERO CORRELATION, BUT NO BENEFIT (QUALITY GAP TOO LARGE)
+## (2026-09-18)
+
+§75 flagged the real-yield trend signal's complementary regime behavior
+(wins when gold chops/falls, loses when gold trends hard) as suggesting
+a diversifier role. Tested directly: same combined-book methodology as
+§44-§57/§68 (each leg's own unchanged params, union-aligned daily
+returns, fixed 50/50 and rolling causal risk-parity), on the FULL
+2013-2025 window. `research/orb_gold_real_yield_combined_book.py`. This
+is also the first time ORB gold RETEST was scored as one continuous
+2013-2025 series rather than two separate windows (§39: 2018-2025 only,
+§68: 2013-2017 only) — full-window standalone Sharpe +1.479, maxDD
+12.1%, 12/13 years positive, consistent with both prior partial-window
+figures.
+
+**Correlation = 0.028 — the lowest of any pairing tested in this
+project**, even lower than §49's previous record (−0.020). The a
+priori expectation (intraday session strategy vs multi-day macro-trend
+overlay, same instrument, near-unrelated mechanisms) held up exactly.
+
+**But combining still doesn't help:**
+
+| | ORB gold RETEST alone | Real-yield trend alone | Fixed 50/50 | Rolling RP |
+|---|---|---|---|---|
+| Sharpe | **+1.479** | +0.345 | +0.969 | +1.154 |
+| maxDD | 12.1% | 25.3% | 13.3% | 11.7% |
+| Years positive | 12/13 | 8/13 | 11/13 | 11/13 |
+
+Neither weighting beats ORB gold RETEST alone.
+
+**Verdict: confirms this project's established combined-book rule one
+more time (§47/§50/§57) — near-zero correlation is necessary but not
+sufficient; the SIZE OF THE QUALITY GAP dominates.** Real-yield's
+Sharpe is ~4.3x smaller than ORB gold RETEST's, a larger gap than
+§47's already-failed 3.2x pairing. **No combined-book benefit — ORB
+gold RETEST alone remains superior to combining it with the real-yield
+signal.** This closes the real-yield-as-diversifier question rather
+than leaving it open; the honest recommendation is unchanged (ORB gold
+RETEST alone, or the existing §52 book with US30 breakout).
+
+**Files:** `research/orb_gold_real_yield_combined_book.py`, `results/
+orb_gold_real_yield_combined_book.csv`. **Trial count: 0 new
+(portfolio construction, no parameter search). Cumulative trials:
+N=1651 unchanged.**
