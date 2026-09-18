@@ -9345,17 +9345,20 @@ its two symbol inputs — running two instances would have doubled every
 order on both legs. Corrected to exactly one instance before any live
 session could trigger a trade.
 
-**Status as of this section: EA attached and running (one instance),
-AutoTrading state and the ET-timezone log check not yet independently
-verified against a real clock** — the account-holder was pointed to
-`docs/mt5_ea_deployment.md` §4-§5's checklist (AutoTrading toggle in
-both the EA's Common tab and the global toolbar; matching the
-`[GOLD] OR built: ...` log timestamp against a real America/New_York
-clock, since a silent timezone bug would misfire this leg's entire
-edge without ever throwing an error). This is the actual forward-test
-period `docs/manual_trading_rules.md` §0 said would need to happen
-before any real-money decision — no live/demo trade evidence exists
-yet as of this section, only a confirmed-running EA.
+**Update, same day:** the account-holder confirmed both remaining
+pre-flight checks — AutoTrading is enabled (both the EA's own Common-tab
+toggle and the global toolbar button), and the `[GOLD] OR built: ...`
+log timestamp checks out against a real America/New_York clock. This
+clears the two checks most likely to cause a SILENT failure (no
+trades ever firing, or firing on the wrong 1.5-hour window without any
+error). This is the actual forward-test period `docs/manual_trading_
+rules.md` §0 said would need to happen before any real-money decision
+— no live/demo TRADE evidence exists yet as of this section (no
+session has produced a breakout+retest or an H4 signal yet), only a
+confirmed-correctly-configured, confirmed-running EA. Next real
+checkpoint is the first actual trade log entry (`[GOLD] entry ...` or
+`[US30] entry ...`) — that's when the entry/stop/target math can
+finally be checked against `docs/manual_trading_rules.md` by hand.
 
 **Trial count: 0 new** (deployment, not a backtest). **Cumulative
 trials: N=1645 unchanged.**
