@@ -9479,3 +9479,58 @@ of the same near-zero-sum ledger.
 **Files:** `research/run_cot_gold_signal_speculative.py`. **Trial
 count: 1 new (structurally correlated with §71's, stated). Cumulative
 trials: N=1646 → 1647.**
+
+## §73 — COT GOLD, THIRD/FOURTH FRAMING: RATE-OF-CHANGE AND
+## ACCELERATION IN POSITIONING — ALSO KILLED, CLOSES THE COT-ON-GOLD
+## THREAD (2026-09-18)
+
+§72 found commercial and non-commercial LEVEL extremes are structurally
+the same bet (corr −0.977). This section tests a genuinely different
+dimension flagged as the honest next step: does a FRESH recent shift in
+commercial hedging — not a stale level — predict price? A book can sit
+near a multi-year net-long extreme (§71's signal) while still freshly
+accelerating further long or reversing hard; rate-of-change is not
+redundant with level by construction, unlike §72 vs §71.
+
+**Alpha story (a priori):** two variants, reusing this project's own
+established on-chain acceleration methodology (§30.1) and its exact
+thresholds for consistency rather than hand-picking new ones for gold:
+**ROC** = week-over-week change in commercial net %OI, z-scored over a
+trailing 52-week window; **ACCELERATION** = z-score of the second
+difference of the 52-week rolling mean (§30.1's exact formula). Both:
+long when z ≥ +1.5, short when z ≤ −1.5, flat otherwise — fixed a
+priori, no grid, no tuning. `research/run_cot_gold_signal_roc.py`.
+
+**Results:**
+
+| | ROC | Acceleration | Buy-and-hold |
+|---|---|---|---|
+| Sharpe (net) | −0.001 | +0.148 | +0.578 |
+| Sharpe (gross) | +0.046 | +0.198 | — |
+| Total return | −2.0% | +8.0% | +158.5% |
+| maxDD | −28.9% | **−15.2%** | −37.7% |
+| Years positive | 7/13 | 4/13 | — |
+| % days flat | 86.5% | 85.6% | — |
+
+**Verdict: KILL, both variants — but a materially different failure
+mode from §71/§72.** These signals are mostly NEUTRAL (~86% flat)
+rather than actively wrong — the acceleration variant even has a small
+positive gross AND net edge with much tighter drawdown than
+buy-and-hold — but neither comes remotely close to competing with
+simply holding gold through this window. Same "real but too small /
+mostly in cash" terminal pattern this project has already seen in §25
+(PEAD) and §30 (on-chain active addresses). Confirms rate-of-change IS
+a genuinely different dimension from level (a completely different
+trade pattern — ~150 switches vs §71's 85, mostly flat vs mostly
+directional) but it does not rescue the COT-on-gold thesis either.
+
+**This closes the COT-on-gold positioning thread for this project.**
+Level (2 structurally-correlated readings, §71/§72) and rate-of-change/
+acceleration (2 readings, this section) — all four honest a priori
+framings tested, none viable. A different instrument (EUR, Dow
+futures) or a different information source entirely would be the
+honest next step if COT is revisited, not another reading of gold's
+own positioning data.
+
+**Files:** `research/run_cot_gold_signal_roc.py`. **Trial count: 2
+new. Cumulative trials: N=1647 → 1649.**
