@@ -9939,3 +9939,40 @@ improvement is plausible but not assumed without testing it.
 **Files:** `research/vix_real_yield_combined_book.py`, `results/
 vix_real_yield_combined_book.csv`. **Trial count: 0 new (portfolio
 construction). Cumulative trials: N=1717 unchanged.**
+
+## §85 — ORB GOLD RETEST + VIX/REAL-YIELD SLEEVE: STILL LOSES ON
+## SHARPE (CONFIRMS THE 3.4x QUALITY GAP RULE), BUT CUTS DRAWDOWN
+## ~42% (2026-09-18)
+
+Tests whether §84's sleeve (Sharpe +0.432) closes the quality gap
+enough to beat ORB gold RETEST outright, following directly from the
+prior turn's request. `research/orb_gold_vix_real_yield_combined_
+book.py`. Legs: ORB gold RETEST (§39/§68/§76's unchanged full-2013-
+2025 leg, Sharpe +1.479) and §84's fixed-50/50 VIX+real-yield sleeve.
+
+Correlation = 0.019 (near-zero, similar to §76's 0.028). **Neither
+weighting beats ORB gold RETEST alone**: fixed 50/50 Sharpe +1.332,
+rolling RP +1.315, both below +1.479 — confirms the quality-gap rule
+holds even at this narrower ~3.4x gap (between §47's already-failed
+3.2x and §76's 4.3x), extending the rule's known boundary with a real
+data point rather than just repeating it.
+
+**But maxDD improves substantially: −7.0%/−6.9% vs ORB gold RETEST's
+own already-good −12.1%** — a ~42% relative drawdown reduction, the
+largest risk improvement of any combined-book test in this project,
+even though Sharpe and total return both come down modestly. 12/13
+years positive in both weightings (matches the standalone leg).
+
+**Verdict: no new standalone or combined-book candidate — ORB gold
+RETEST alone (or the existing §52 book) remains the honest
+recommendation for raw risk-adjusted return.** But this surfaces a
+genuine, cleanly-quantified tradeoff not previously seen this clearly:
+~10% of Sharpe sacrificed for a ~42% cut in maxDD. Since §58-§66's
+FTMO analysis found funded probability depends heavily on the
+drawdown PATH, not just Sharpe, this specific tradeoff may be worth an
+FTMO-ruleset check as a follow-up — flagged as an open question, not
+assumed to help without testing it.
+
+**Files:** `research/orb_gold_vix_real_yield_combined_book.py`,
+`results/orb_gold_vix_real_yield_combined_book.csv`. **Trial count: 0
+new (portfolio construction). Cumulative trials: N=1717 unchanged.**
