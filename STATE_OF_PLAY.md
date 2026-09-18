@@ -9288,3 +9288,41 @@ gold window).
 **Trial count: 0 new** (re-running already-tuned configs on newly-
 available data, not a parameter search). **Cumulative trials: N=1645
 unchanged.**
+
+## §69 — MT5 EA COMPILED CLEAN (0 ERRORS, 0 WARNINGS), FIRST REAL TEST
+## OF THE §68 TRANSLATION (2026-09-18)
+
+`strategies_mt5/ORB_Gold_RETEST_US30_Breakout_Combined.mq5` (written
+2026-09-17, never before compiled) was compiled via MetaEditor64's
+command-line `/compile` flag against this machine's FTMO Global Markets
+MT5 Terminal install (`C:\Program Files\FTMO Global Markets MT5
+Terminal`), so it built against that terminal's actual `MQL5\Include\
+Trade\Trade.mqh`/`CTrade` headers rather than a generic/assumed
+environment. **Result: 0 errors, 0 warnings on the first attempt.** The
+compiled `ORB_Gold_RETEST_US30_Breakout_Combined.ex5` is committed
+alongside the `.mq5` source in `strategies_mt5/`.
+
+This is a syntax/type-check pass only — it says the EA builds, not that
+its trading logic is correct. Nothing about symbol-name resolution
+(`InpGoldSymbol`/`InpUS30Symbol`), the ET timezone/DST math, the news
+filter, or live fill behavior has been validated; that requires actually
+running it on a live/demo feed per `docs/mt5_ea_deployment.md` §5-§7.
+
+**Blocked on a decision only the account-holder can make:** getting the
+EA onto FTMO's free MT5 demo requires either (a) an FTMO account
+signup (email, ToS acceptance) if one doesn't already exist, or (b) the
+existing FTMO MT5 Terminal install's own login credentials if a demo/
+Challenge account is already provisioned on this machine — this session
+deliberately did not inspect the terminal's stored account credentials
+(`config/accounts.dat`) to check which, since that crosses from
+"deploy code" into "read stored credentials" territory. Whichever
+applies, the remaining steps (find the broker's exact gold/US30 symbol
+strings, attach the EA, verify the timezone log line against a real
+clock — `docs/mt5_ea_deployment.md` §3/§5) still need a human at the
+MT5 GUI at least once, since symbol names and account login are
+broker/account-specific and not derivable from the repo.
+
+**Files:** `strategies_mt5/ORB_Gold_RETEST_US30_Breakout_Combined.ex5`
+(new), `docs/mt5_ea_deployment.md` (updated to record the compile
+result). **Trial count: 0 new** (compiling code, not a backtest).
+**Cumulative trials: N=1645 unchanged.**

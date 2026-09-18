@@ -1,10 +1,18 @@
 # Deploying the MT5 EA — ORB Gold RETEST + US30 Breakout Combined
 
-Covers `strategies_mt5/ORB_Gold_RETEST_US30_Breakout_Combined.mq5`, written
-2026-09-17, **not yet compiled or tested**. Read `docs/manual_trading_rules.md`
-first for what this actually does and why only these two strategies are
-automated (every other candidate in this project failed the out-of-regime
-check — see STATE_OF_PLAY §67/§68).
+Covers `strategies_mt5/ORB_Gold_RETEST_US30_Breakout_Combined.mq5`. Read
+`docs/manual_trading_rules.md` first for what this actually does and why
+only these two strategies are automated (every other candidate in this
+project failed the out-of-regime check — see STATE_OF_PLAY §67/§68).
+
+**Compile status (2026-09-18): PASSED, 0 errors / 0 warnings**, via
+MetaEditor64's command-line `/compile` flag against the FTMO Global Markets
+MT5 Terminal's own `MQL5/Include` tree (so it compiled against the exact
+`Trade.mqh`/`CTrade` headers that terminal ships). The compiled
+`ORB_Gold_RETEST_US30_Breakout_Combined.ex5` is committed alongside the
+`.mq5` source. This is a syntax/type-check pass only — it confirms the EA
+builds cleanly, not that its logic is correct; nothing below about symbol
+names, timezone behavior, or live testing is resolved by a clean compile.
 
 ## 1. Get the FTMO free demo (no cost, no card)
 
@@ -18,14 +26,18 @@ check — see STATE_OF_PLAY §67/§68).
 
 ## 2. Compile the EA
 
-1. Open MetaEditor (F4 inside MT5, or launch it directly).
-2. File → Open → navigate to
-   `strategies_mt5/ORB_Gold_RETEST_US30_Breakout_Combined.mq5`
-   (copy it into your MT5 `MQL5/Experts/` data folder first — MT5 → File →
-   Open Data Folder → `MQL5/Experts/`).
-3. Press **F7** (Compile). Fix any compiler errors before proceeding — this
-   has not been compiled yet in this session, so treat the first compile as
-   a real checkpoint, not a formality.
+**Already done (2026-09-18) against this machine's FTMO MT5 Terminal install
+— 0 errors, 0 warnings.** If you're deploying to a DIFFERENT MT5 terminal
+(a different broker/VPS), recompile there too, since `.ex5` binaries are
+tied to the MetaEditor build that produced them and it's cheap insurance:
+
+1. Copy `strategies_mt5/ORB_Gold_RETEST_US30_Breakout_Combined.mq5` into
+   that terminal's `MQL5/Experts/` data folder (MT5 → File → Open Data
+   Folder → `MQL5/Experts/`).
+2. Open it in MetaEditor (F4 inside MT5, or launch it directly) and press
+   **F7** (Compile), or run MetaEditor64.exe with `/compile:"<path to the
+   .mq5>" /log:"<path>"` from the command line. Fix any compiler errors
+   before proceeding.
 
 ## 3. Find your broker's EXACT symbol names
 
