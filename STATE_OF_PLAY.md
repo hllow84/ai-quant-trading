@@ -9823,3 +9823,71 @@ balance_sheet.py`, `research/run_fed_balance_sheet_gold_signal.py`,
 trends_gold.py`, `research/run_google_trends_gold_signal.py`, `data/
 google_trends_buy_gold_us.csv`. **Trial count: 3 new. Cumulative
 trials: N=1654 → 1657.**
+
+## §82 — REAL-YIELD LOOKBACK GRID: CONFIRMS THE KILL, DOWNGRADES
+## CONFIDENCE IN §75'S OWN NUMBER (2026-09-18)
+
+User asked to keep parameters flexible rather than fixing them a
+priori, going forward. Applied this project's plateau-selection
+convention (spec §8.1) to §75's single free parameter (lookback
+window), gridding LOOKBACK_DAYS in {5,10,15,20,30,40,60,90,120,150,
+200,252} trading days. `research/run_real_yield_gold_lookback_grid.py`.
+
+**0/12 lookbacks beat buy-and-hold Sharpe (+0.578)** — confirms §75's
+kill was not a lucky single pick. But a more important second finding:
+§75's original 20-day choice (+0.345) and its neighbor 30d (+0.354,
+marginally the grid's actual best) form only a **narrow 2-cell
+positive region**, immediately flanked by clearly worse neighbors on
+both sides (15d: −0.163, maxDD −49.8%; 40d: +0.014, maxDD −46.4%) —
+not a broad, robust plateau like this project's genuine winners (e.g.
+§45's H=18/20/22 plateau). Every other lookback is negative or barely
+positive with much worse drawdown (up to −62.9% at 252d — worse than
+B&H's own −37.7%).
+
+**This downgrades confidence in §75's specific number, on top of
+confirming its kill.** A single a priori 20-day guess happened to land
+inside a fragile 2-cell sweet spot bordered by failure — closer to
+this project's documented "one-cell plateau, treat as overfit" red
+flag than to a robust parameter region (even though 20d was §75's
+ORIGINAL a priori pick, not a re-selection after seeing results — this
+grid is the honest after-the-fact check). Real-rate trend-following on
+gold should now be read as a fragile, lookback-sensitive effect, not a
+robust one.
+
+**Files:** `research/run_real_yield_gold_lookback_grid.py`, `results/
+real_yield_gold_lookback_grid.csv`. **Trial count: 12 new. Cumulative
+trials: N=1657 → 1669.**
+
+## §83 — VIX JOINT GRID (WINDOW × THRESHOLD): CONFIRMS THE KILL, BUT
+## FINDS A GENUINE BROADER PLATEAU — UPGRADES CONFIDENCE VS §82's
+## FRAGILE RESULT (2026-09-18)
+
+Same parameter-flexibility request applied to §79's VIX signal, using
+this project's established joint-grid (not staged) method since window
+and threshold interact. 48-cell grid: WINDOW_DAYS in {20,30,40,60,90,
+120,180,252} × Z_THRESHOLD in {1.0,1.25,1.5,1.75,2.0,2.5}. `research/
+run_vix_gold_joint_grid.py`.
+
+**0/48 cells beat buy-and-hold Sharpe** — confirms §79's kill. But
+unlike §82's real-yield grid, the best cell here (window=180d,
+thr=1.25, Sharpe +0.346, maxDD −18.0%) sits inside a **genuine broader
+region**: longer windows (90-252d) at low-to-moderate thresholds
+(1.0-1.5) are consistently positive — 8/9 cells in the best cell's 3×3
+neighborhood are positive, a real plateau, not an isolated spike.
+Short windows (20-40d) are uniformly negative regardless of threshold.
+
+**A materially different robustness verdict than the real-yield
+grid.** VIX's "long-window, moderate-threshold spike" mechanism is
+genuinely more stable across nearby parameter choices, even though no
+cell clears the buy-and-hold bar. This modestly upgrades confidence
+that VIX-based flight-to-safety is a real, structurally stable effect
+on gold — just one too weak to compete with buy-and-hold at any tested
+setting — as opposed to real-yield's fragile 2-cell result, which
+looks closer to noise that happened to test well at exactly the a
+priori pick. Both remain KILLS by the project's B&H gate; **VIX is now
+the stronger diversifier candidate of the two, by robustness if not
+raw Sharpe**, relevant if a combined-book check is run later.
+
+**Files:** `research/run_vix_gold_joint_grid.py`, `results/
+vix_gold_joint_grid.csv`. **Trial count: 48 new. Cumulative trials:
+N=1669 → 1717.**
