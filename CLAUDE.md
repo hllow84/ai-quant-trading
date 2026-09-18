@@ -97,6 +97,17 @@ combined book) — their failures were not data-limited. It meaningfully
 upgrades the case for the §52 book specifically, but does not alone
 clear every remaining pre-live gate (DSR still not cleared; FTMO 1x pass
 rate still 0%; live broker execution still unvalidated).
+**2026-09-18 (§69-§71, N=1645→1646):** the MT5 EA (§68's translation)
+compiled clean (0 errors/0 warnings) and is now attached and running on
+the account-holder's free FTMO MT5 demo — AutoTrading and the ET-
+timezone log check both confirmed passing; no live trade has fired yet
+(§69/§70). In parallel, CFTC Commitment-of-Traders positioning was
+tested on gold as the first genuinely new information category since
+on-chain data — the classic hedger-smart-money COT Index hypothesis
+(commercial net position at a 3yr-percentile extreme) KILLED decisively
+(Sharpe −0.477 vs buy-and-hold +0.578, §71). Does not rule out other COT
+framings (speculative extremes, rate-of-change, other instruments) —
+those are separate future tests, not a post-hoc flip of this result.
 `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)

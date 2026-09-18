@@ -9362,3 +9362,75 @@ finally be checked against `docs/manual_trading_rules.md` by hand.
 
 **Trial count: 0 new** (deployment, not a backtest). **Cumulative
 trials: N=1645 unchanged.**
+
+## §71 — CFTC COT POSITIONING ON GOLD: FIRST NEW ALPHA CATEGORY SINCE
+## ON-CHAIN DATA, KILLED (2026-09-18)
+
+While the MT5 EA runs its forward-test period on the free FTMO demo
+(§69/§70), user asked to look for new alpha in parallel. `CLAUDE.md`'s
+own standing conclusion is that this project's free price/derivatives
+surface is exhausted — the honest next move is a genuinely different
+INFORMATION category, not another parameter sweep on the same price
+series. CFTC Commitment of Traders (COT) positioning data — free,
+weekly, real institutional/hedger positioning, never before tried in
+this project — fit that bar.
+
+**Alpha story (stated a priori, before any result was seen):** the
+classic "COT Index" (Larry Williams) hedger-smart-money hypothesis.
+COMEX Gold commercial traders (miners, refiners, bullion banks — mostly
+hedgers with a genuine physical-market information edge) tend to
+increase net-long hedge exposure ahead of price strength and reduce it
+ahead of weakness, RELATIVE TO THEIR OWN RECENT HISTORY. Signal:
+commercial net position (as % of open interest), converted to a 0-100
+percentile over a trailing 156-week (3yr) window (the textbook COT
+Index). Go long when that index is >= 80 (commercials near their most
+net-long in 3 years), short when <= 20, flat otherwise. Thresholds and
+lookback are the standard textbook values, fixed before running
+anything — not tuned on this data.
+
+**Data:** `scripts/download_cot_gold.py` pulls the full history (1,933
+weekly reports, 1986-2026) for free from CFTC's own public Socrata
+dataset (no API key, no rate limit hit) — Legacy Futures-Only Combined
+report, COMEX Gold. Saved to `data/COT_GOLD_legacy_futures_only.csv`
+(small, tracked in git). Tested against the 2013-2025 window this
+project already has real bid/ask-spread XAUUSD daily data for (both
+existing Dukascopy M1 files, aggregated to daily).
+
+**Causal integrity:** CFTC states each Tuesday's report is published
+the following Friday at 15:30 ET — a report is therefore not knowable
+until then. Every report was treated as usable starting the NEXT
+MONDAY after its report date (>=3-day safety margin past the real
+release), merged onto price dates via `merge_asof(direction=
+'backward')`, with `research/backtest.py`'s own mandatory 1-bar lag
+applied on top (stacking, deliberately conservative). Costs matched
+the project's already-established $/oz figures (`research/
+ftmo_engine.py`): real average spread (3.34bps round-turn measured
+from the actual daily data) + $0.07/oz commission + $0.03/oz/side
+slippage.
+
+**Result: Sharpe (net) −0.477 vs buy-and-hold +0.578 — decisively
+loses.** Total return −53.8% vs B&H +158.5% over the same 13 years;
+maxDD also worse than B&H (−60.2% vs −37.7%). 7/13 years net-positive,
+but the losing years are severe (2020 −22.1%, 2025 −41.1% — the
+signal fought against gold's two strongest buy-and-hold years in the
+sample). DSR is reference-only (N=1 trial, a brand-new family — a
+single-trial pool cannot support a real deflation estimate, stated
+explicitly rather than silently omitted).
+
+**Verdict: KILL.** The textbook hedger-smart-money COT Index
+hypothesis, tested with a priori parameters and no tuning, does not
+hold for gold over this 13-year window. This closes THIS specific
+hypothesis — it does not rule out other COT framings (non-commercial/
+speculative extremes instead of commercial, rate-of-change instead of
+level, other instruments like EUR or Dow futures). Any of those would
+be a separate, freshly pre-registered test, not a post-hoc sign-flip
+of this result (flipping direction after seeing a negative outcome is
+exactly the overfitting pattern this project's own `CLAUDE.md` already
+flags as an anti-pattern from the volatility-filter thread). Real
+value here: COT data is a genuinely new, freely-available information
+source that was worth checking, and now has an honest, cost-inclusive,
+non-look-ahead answer rather than an untested assumption either way.
+
+**Files:** `scripts/download_cot_gold.py`, `research/
+run_cot_gold_signal.py`, `data/COT_GOLD_legacy_futures_only.csv`.
+**Trial count: 1 new. Cumulative trials: N=1645 → 1646.**

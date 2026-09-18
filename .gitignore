@@ -25,6 +25,11 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 # CSVs it is not derived from a licensed/paid data vendor.
 !data/BTC_active_addresses_blockchaininfo.csv
 
+# ...and the free CFTC Commitment of Traders gold positioning series (section
+# 71): tiny (~120 KB), free (public Socrata dataset, no key), one-command
+# reproducible via scripts/download_cot_gold.py.
+!data/COT_GOLD_legacy_futures_only.csv
+
 # Live trading secrets and runtime state -- NEVER commit API keys or local state.
 .env
 live/.env
