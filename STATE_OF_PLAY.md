@@ -9761,3 +9761,65 @@ trial.
 
 **Files:** `research/run_cot_dow_signal_roc.py`. **Trial count: 2
 new. Cumulative trials: N=1652 → 1654.**
+
+## §79-§81 — THREE MORE NEW DATA SOURCES (VIX, FED BALANCE SHEET,
+## GOOGLE TRENDS): 0/3 VIABLE, BUT A REAL RECURRING PATTERN EMERGES
+## (2026-09-18)
+
+With the COT thread closed (§71-§78), user asked to try a different data
+source and, when offered a choice of three, said to run all three.
+
+**§79 — VIX (CBOE fear gauge), "flight to safety":** free CBOE daily
+data since 1990, no key (`scripts/download_vix.py`). Mean-reversion
+spike read (60-day z-score of VIX level, ≥+1.5 long gold / ≤−1.5
+short — VIX itself mean-reverts strongly, unlike a trend read).
+Theoretically mixed a priori case stated up front (gold has
+historically sold off *with* equities in acute liquidity crunches
+before recovering as a hedge). Result: **Sharpe (net) +0.214** (gross
++0.275) vs buy-and-hold +0.578 — loses, but genuinely positive, with
+**maxDD −16.4% vs B&H's −37.7%** (meaningfully tighter). 8/13 years
+positive. KILL per the B&H gate, but a real edge.
+
+**§80 — Fed balance sheet (FRED WALCL), "debasement/QE":** free FRED
+weekly data since 2002, no key (`scripts/download_fed_balance_
+sheet.py`). Trend read (sign of 8-week change in WALCL), mirroring
+§75's real-yield methodology. Mechanistically distinct from real
+yields (quantity of money vs price of money — they can diverge).
+Result: **Sharpe (net) −0.511** vs B&H +0.578 — the cleanest, most
+decisive kill of the three. **maxDD −71.5%, WORSE than simply holding
+gold** (−37.7%) — the only test today where the signal's risk exceeds
+the underlying's. Only 4/13 years positive. No redeeming signal at
+all.
+
+**§81 — Google Trends "buy gold" (US), contrarian fade-the-crowd:**
+free via pytrends (unofficial wrapper, no key), monthly resolution,
+2013-2025 (`scripts/download_google_trends_gold.py`). 24-month z-score
+(chosen because Trends returns only 156 monthly points for this
+span — too short for a 36-month COT-style window), fade spikes
+(short), buy apathy (long). Result: **Sharpe (net) −0.498** vs B&H
++0.578 — decisive loss. Most informative failure: its single worst
+miss is 2025, where a genuine "buy gold" search spike coincided with a
+REAL, ongoing rally (+64.6% B&H that year) rather than a local top —
+direct evidence against the "retail is a lagging indicator" framing in
+gold's most recent regime, not just noise from low data frequency.
+
+**Verdict across all three: 0/3 produced a viable standalone
+candidate — same as the COT thread.** But a genuine pattern has now
+shown up three times this session (real-yield/§75, VIX/§79, and
+COT-acceleration/§73/§78): a real, positive, LOWER-drawdown signal
+that still loses to buy-and-hold because it misses gold's strongest
+trending years. This project's `CLAUDE.md` conclusion about the
+free-price-surface being exhausted may need a sibling conclusion about
+free macro/sentiment overlays specifically: they consistently produce
+defensive, drawdown-reducing, sub-buy-and-hold signals rather than
+either clean alpha or clean noise. None combined successfully with ORB
+gold RETEST either (§76 tested real-yield specifically; VIX not yet
+tested as a diversifier).
+
+**Files:** `scripts/download_vix.py`, `research/run_vix_gold_
+signal.py`, `data/VIX_history_cboe.csv`; `scripts/download_fed_
+balance_sheet.py`, `research/run_fed_balance_sheet_gold_signal.py`,
+`data/WALCL_fed_balance_sheet_fred.csv`; `scripts/download_google_
+trends_gold.py`, `research/run_google_trends_gold_signal.py`, `data/
+google_trends_buy_gold_us.csv`. **Trial count: 3 new. Cumulative
+trials: N=1654 → 1657.**

@@ -40,6 +40,12 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 # one-command reproducible via scripts/download_cot_dow.py.
 !data/COT_DOW_legacy_futures_only.csv
 
+# ...and the three new-data-source free series from section 79-81: all
+# tiny, free (no key), one-command reproducible.
+!data/VIX_history_cboe.csv
+!data/WALCL_fed_balance_sheet_fred.csv
+!data/google_trends_buy_gold_us.csv
+
 # Live trading secrets and runtime state -- NEVER commit API keys or local state.
 .env
 live/.env
