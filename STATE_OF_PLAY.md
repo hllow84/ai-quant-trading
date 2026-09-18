@@ -9891,3 +9891,51 @@ raw Sharpe**, relevant if a combined-book check is run later.
 **Files:** `research/run_vix_gold_joint_grid.py`, `results/
 vix_gold_joint_grid.csv`. **Trial count: 48 new. Cumulative trials:
 N=1669 → 1717.**
+
+## §84 — VIX + REAL-YIELD COMBINED BOOK: GENUINE DIVERSIFICATION
+## BENEFIT — FIRST SUCCESSFUL COMBINATION IN THE NEW-SOURCE THREAD
+## (2026-09-18)
+
+User pushed back on combining VIX or real-yield directly with ORB gold
+RETEST, correctly identifying that §76's failure was a QUALITY-GAP
+problem (a ~1.5-Sharpe leg diluted by a ~0.3-Sharpe leg), not proof
+that combining doesn't work — and proposed combining VIX with
+real-yield first, since both are comparable-magnitude positive-Sharpe
+signals. Tested directly. `research/vix_real_yield_combined_book.py`.
+
+Legs: VIX window=120d/thr=1.25 (an interior point of §83's identified
+plateau, not the argmax — Sharpe +0.190 standalone) and real-yield
+lookback=20d (§75's original pick — §82's fragility caveat carried
+forward explicitly).
+
+**Correlation = −0.199 — genuinely negative**, the first negative
+correlation found among this session's macro/sentiment signals.
+**Fixed 50/50 Sharpe +0.432 beats BOTH standalone legs** (VIX +0.190,
+real-yield +0.345) — real diversification benefit. maxDD improved to
+**−15.0%**, tighter than either leg alone or buy-and-hold's own
+−37.7%. 11/13 years positive — the highest of any signal in this
+thread. Rolling risk-parity, interestingly, **underperformed** the
+naive fixed 50/50 (+0.347 vs +0.432) — the vol-targeting scheme
+optimizes for equal risk contribution, not for the specific
+correlation structure that paid off here.
+
+**Verdict: still a KILL by the project's B&H gate** (+0.432 <
+buy-and-hold's +0.578) — not a new candidate — **but the first
+successful combination in the entire new-data-source thread**, and it
+confirms the user's framing directly: comparable-magnitude, genuinely
+negatively-correlated legs combine constructively, exactly as §76's
+failure (large quality gap, not "one leg was weak") already implied by
+contrast. Real methodological note for future work: rolling
+risk-parity is not automatically better than a naive fixed weight —
+here it was worse, because the benefit came from correlation
+structure the vol-targeting scheme doesn't optimize for.
+
+**Natural follow-up, not run here:** pairing this VIX+real-yield
+sleeve (Sharpe +0.432) with ORB gold RETEST (+1.479) is now a ~3.4x
+quality gap — smaller than §76's real-yield-alone gap (4.3x), but
+still similar in size to §47's already-failed 3.2x pairing, so further
+improvement is plausible but not assumed without testing it.
+
+**Files:** `research/vix_real_yield_combined_book.py`, `results/
+vix_real_yield_combined_book.csv`. **Trial count: 0 new (portfolio
+construction). Cumulative trials: N=1717 unchanged.**
