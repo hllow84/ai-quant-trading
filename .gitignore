@@ -36,6 +36,10 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 # scripts/download_real_yield.py.
 !data/DFII10_real_yield_fred.csv
 
+# ...and the free CFTC E-mini Dow COT series (section 77): tiny, free,
+# one-command reproducible via scripts/download_cot_dow.py.
+!data/COT_DOW_legacy_futures_only.csv
+
 # Live trading secrets and runtime state -- NEVER commit API keys or local state.
 .env
 live/.env

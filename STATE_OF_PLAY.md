@@ -9685,3 +9685,41 @@ RETEST alone, or the existing §52 book with US30 breakout).
 orb_gold_real_yield_combined_book.csv`. **Trial count: 0 new
 (portfolio construction, no parameter search). Cumulative trials:
 N=1651 unchanged.**
+
+## §77 — COT INDEX ON A THIRD INSTRUMENT (E-MINI DOW): ALSO KILLED,
+## CLOSES THE COT QUESTION WITH HIGH CONFIDENCE (2026-09-18)
+
+User asked to try Dow futures after gold (§71-§73) and EUR (§74) both
+failed the same commercial-level-extreme COT Index mechanism. Same
+unmodified parameters, applied to CFTC's E-mini Dow ($5) futures COT
+data via the same free Socrata source. `scripts/download_cot_dow.py`.
+
+**Data limitation found and stated up front, not discovered
+mid-analysis:** CFTC's E-mini Dow reporting **stops at 2022-02-01** —
+verified live that no successor market name picks it up afterward
+(checked every "DOW"-named market in the dataset). This test is
+therefore necessarily a **2013 → 2022-02 partial window** (1,871
+daily bars), not a like-for-like match to the full 2013-2025 gold/EUR
+tests. Tested on the project's existing US30 CFD H1 data with the
+project's established US30 cost convention (0.35bps commission,
+0.15bps/side slippage). `research/run_cot_dow_signal.py`.
+
+**Result: Sharpe (net) 0.145 vs buy-and-hold 0.713** — decisively
+loses, same pattern as gold/EUR. Total return +6.8% vs B&H +131.9%.
+maxDD similar to B&H (−34.7% vs −37.0%, not the tighter-drawdown
+pattern the real-yield signal showed on gold). Only 4/10 years
+net-positive.
+
+**Verdict: KILL — third instrument, third failure. Closes the
+"COT Index on any instrument" question for this project with high
+confidence.** The mechanism has now failed on a metal (bull market), a
+currency (bear market), and an equity index future (mixed regime),
+across three genuinely different asset classes and regimes, using
+identical unmodified parameters every time. This is strong evidence
+the textbook commercial-positioning-extreme COT Index does not carry a
+tradeable edge for this project's instrument set — not an artifact of
+any single market's idiosyncrasies.
+
+**Files:** `scripts/download_cot_dow.py`, `research/
+run_cot_dow_signal.py`, `data/COT_DOW_legacy_futures_only.csv`.
+**Trial count: 1 new. Cumulative trials: N=1651 → 1652.**
