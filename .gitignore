@@ -31,6 +31,11 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 !data/COT_GOLD_legacy_futures_only.csv
 !data/COT_EUR_legacy_futures_only.csv
 
+# ...and the free FRED real-yield series (section 75): tiny, free (public
+# government data, no key), one-command reproducible via
+# scripts/download_real_yield.py.
+!data/DFII10_real_yield_fred.csv
+
 # Live trading secrets and runtime state -- NEVER commit API keys or local state.
 .env
 live/.env

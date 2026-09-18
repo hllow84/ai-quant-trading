@@ -9577,3 +9577,65 @@ download_cot_gold.py` (refactored, behavior unchanged), `scripts/
 download_cot_eur.py`, `research/run_cot_eur_signal.py`, `data/
 COT_EUR_legacy_futures_only.csv`. **Trial count: 1 new. Cumulative
 trials: N=1649 → 1650.**
+
+## §75 — NEW DATA SOURCE: REAL INTEREST RATES (FRED DFII10) VS GOLD —
+## KILLED BY THE B&H GATE, BUT THE MOST CREDIBLE NEW-SOURCE RESULT YET
+## (2026-09-18)
+
+User abandoned the COT-positioning thread (§71-§74: 5 trials, 2
+instruments, all killed) and asked for a different data source. Real
+(inflation-adjusted) US interest rates are the most widely-documented
+macro driver of gold prices outside this project — gold pays no yield,
+so rising real rates raise its opportunity cost (bearish) and falling
+or negative real rates lower it (bullish) — a materially stronger a
+priori case than COT's more mixed empirical record.
+
+**Data:** FRED's free public CSV export for DFII10 (10-year TIPS
+constant-maturity real yield), no API key, daily since 2003
+(`scripts/download_real_yield.py`, `data/DFII10_real_yield_fred.csv`).
+Published same trading day (Treasury H.15 release, ~16:15 ET) — a much
+simpler publication-lag situation than COT's multi-day gap, modeled
+conservatively as 1 calendar day plus the standard 1-bar
+`backtest.py` shift.
+
+**Signal (fixed a priori, no tuning):** trend-following on the
+20-trading-day (~1 month) CHANGE in DFII10 — falling real yields go
+long gold, rising real yields go short, always in market (no dead
+zone). Single lookback, no grid. `research/run_real_yield_gold_
+signal.py`. Same $/oz cost model as every other gold test.
+
+**Result:**
+
+| Metric | Strategy | Buy-and-hold |
+|---|---|---|
+| Sharpe (net) | **+0.345** | +0.578 |
+| Sharpe (gross) | +0.412 | — |
+| Total return | +65.1% | +158.5% |
+| maxDD | **−25.3%** | −37.7% |
+| Years positive | 8/13 | — |
+| % time invested | 97.8% | — |
+
+Decisively beats buy-and-hold during gold's bear/chop years (2013:
++3.9% vs −28.3%; 2015: +33.9% vs −10.4%; 2016: +18.8% vs +8.5%) but
+gets run over by gold's 2023-2025 rally (−4.1%/−2.3%/−0.8% vs
++13.3%/+27.0%/+64.6%) — a real regime mismatch, since gold's most
+recent bull leg has been driven by central-bank buying and geopolitics
+at least as much as by real rates.
+
+**Verdict: KILL, per this project's consistent buy-and-hold gate** (a
+genuinely positive signal that still loses to holding the underlying
+is a kill here, the same standard that closed PEAD/§25 and on-chain/
+§30) — **but the most credible new-data-source result produced today.**
+Positive gross AND net Sharpe, meaningfully tighter drawdown than the
+underlying, and an economic mechanism that is independently
+well-documented rather than mined from this data. Its regime behavior
+(wins when gold chops or falls, loses when gold trends hard) is
+complementary to simple buy-and-hold, suggesting a DIVERSIFIER role
+rather than a standalone trade — not tested here; a genuine follow-up
+would be a combined-book check against the existing candidates,
+matching this project's established combined-book methodology
+(§44-§57), not assumed to work without running it.
+
+**Files:** `scripts/download_real_yield.py`, `research/
+run_real_yield_gold_signal.py`, `data/DFII10_real_yield_fred.csv`.
+**Trial count: 1 new. Cumulative trials: N=1650 → 1651.**
