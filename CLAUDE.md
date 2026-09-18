@@ -139,6 +139,20 @@ FTMO-survival improvement specifically, same honest framing as
 decline across halves (41.6%→33.8%) and thirds (39.2%→42.3%→31.4%),
 with the most recent third still beating the headline book's own T3
 (25.5%).
+**2026-09-18 §90-§93:** four follow-ups on §89. In-sample fixed-weight
+ceiling for the 3-way book is Sharpe +1.695 (w_gold=0.30/w_us30=0.60/
+w_sleeve=0.10), vs the causal rolling RP's +1.477 — the gap is the
+honest cost of not knowing the future, not free money (§90). A finer
+FTMO multiplier sweep confirmed the 3-way book's TRUE peak is 38.3% at
+13x (§89's coarse grid had found 37.7% at 14x, the edge of that
+grid — §91). Adding US30 macross as a 4th leg was tried WITH the
+caveat that it failed §67's out-of-regime check stated up front — the
+caveat held: it hurt every metric (Sharpe +1.477→+1.279, FTMO peak
+38.3%→34.4%), NOT adopted (§92). A DSR sanity check on the session's
+two winning macro signals (VIX, real-yield) confirms neither clears
+DSR against its own honest grid pool (VIX 0.375, real-yield 0.508,
+both far below 0.95) — consistent with their earlier B&H-gate kills,
+not a new finding but a useful discipline check (§93).
 `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)

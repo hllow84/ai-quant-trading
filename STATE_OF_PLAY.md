@@ -10130,3 +10130,63 @@ effective risk ceiling before drawdown limits start to dominate.
 three_way_combined_book.csv`, `results/three_way_combined_book_
 ftmo.csv`. **Trial count: 0 new (portfolio construction + FTMO check
 on three already-scored legs). Cumulative trials: N=1717 unchanged.**
+
+## §90-§93 — FOUR FOLLOW-UPS ON §89: WEIGHT CEILING, TRUE FTMO PEAK,
+## A 4TH LEG THAT HURTS, AND A DSR SANITY CHECK (2026-09-18)
+
+User asked for all four follow-ups flagged after §89: optimize the
+3-way weighting, nail the exact FTMO peak, try a 4th leg, and
+sanity-check the session's macro-signal work with DSR.
+
+**§90 — fixed-weight grid (in-sample ceiling).** 66-cell simplex grid
+(step 0.1) over the same 3 legs, explicitly flagged as an in-sample
+ceiling (full-history argmax), not deployable — the same honest
+caveat this project applied to §51's in-sample risk-parity before
+§52's causal rolling version. `research/three_way_weight_grid.py`.
+**Best: w_gold=0.30/w_us30=0.60/w_sleeve=0.10, Sharpe +1.695, maxDD
+−3.2%** — beats the causal rolling RP's +1.477, as expected with full
+hindsight. Real, useful finding: the sleeve's optimal weight is small
+(~10%), not the naive 1/3 or whatever rolling RP assigns; US30
+breakout deserves the largest allocation in-sample. The gap to rolling
+RP (+1.695 vs +1.477) is the honest cost of causality, not free money
+on the table.
+
+**§91 — finer FTMO multiplier sweep (9x-24x).** §89's coarse grid
+found 37.7% at 14x, the TOP of the tested range — never trust a
+grid-edge result without extending past it. `research/three_way_
+ftmo_fine_sweep.py`. **True peak: 38.3% at 13x**, confirmed interior
+(not a grid edge), declining to 27.9% by 24x as drawdown-breach rate
+climbs past 60%. Small, honest revision of §89's headline number.
+
+**§92 — 4-way combined book: adds US30 macross (§43).** Already
+validated as a diversifier for US30 breakout specifically (§48) — but
+with the caveat stated BEFORE running anything: this leg failed the
+project's own out-of-regime check (§67: Sharpe −1.175 on 2013-2017).
+`research/four_way_combined_book.py`. Standalone US30 macross on the
+full window: Sharpe +0.159, maxDD −24.4% (weak, as its out-of-regime
+failure would predict). **Adding it hurts on every metric: 4-way
+standalone Sharpe falls to +1.279 (from +1.477), FTMO peak falls to
+34.4% at 14x (from 38.3% at 13x).** The caveat played out exactly as
+flagged — a leg that fails standalone out-of-regime does not rescue
+itself through diversification. **Not adopted; the 3-way book remains
+the best combined result.**
+
+**§93 — DSR sanity check on the session's two winning macro
+signals.** Computed DSR properly using each signal's own honest
+STRUCTURAL pool (the actual grid searched): VIX's 48-cell joint grid
+(§83) and real-yield's 12-cell lookback grid (§82). **VIX: DSR=0.375**
+(best Sharpe +0.346 doesn't even clear its own search's E[max SR]=
++0.438, z=−0.32). **Real-yield: DSR=0.508** (best Sharpe +0.354 barely
+above its own E[max SR]=+0.349, z=+0.02) — neither remotely close to
+the 0.95 bar. Not a new kill (both were already killed by the B&H
+gate), but confirms the earlier verdicts weren't marginal — the
+underlying statistical evidence is weak to non-existent even before
+considering buy-and-hold, consistent with every DSR figure this
+project has ever produced for a killed candidate.
+
+**Files:** `research/three_way_weight_grid.py`, `results/
+three_way_weight_grid.csv`; `research/three_way_ftmo_fine_sweep.py`,
+`results/three_way_ftmo_fine_sweep.csv`; `research/four_way_
+combined_book.py`, `results/four_way_combined_book.csv`. **Trial
+count: 66 new (§90's weight grid). Cumulative trials: N=1717 →
+1783.**
