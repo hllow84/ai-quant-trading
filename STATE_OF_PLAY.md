@@ -10084,3 +10084,49 @@ just demonstrated by re-checking it.
 `results/ftmo_check_period_robustness_new_book.csv`. **Trial count: 0
 new (period partition of already-computed results). Cumulative
 trials: N=1717 unchanged.**
+
+## §89 — THREE-WAY COMBINED BOOK: NEW PROJECT-BEST FTMO FUNDED
+## PROBABILITY, 37.7% AT 14x, VERIFIED FOR ERA-STABILITY (2026-09-18)
+
+Natural next step after §87 paired the VIX/real-yield sleeve with ORB
+gold RETEST alone: does adding the sleeve to the project's actual best
+DEPLOYABLE 2-leg book (§52: ORB gold + US30 breakout) help further?
+Generalized §52's 2-leg rolling (causal, monthly-rebalanced) risk-
+parity scheme to 3 legs. `research/three_way_combined_book.py`. All
+three legs reuse already-scored, unchanged mechanisms.
+
+**Standalone: Sharpe +1.477, maxDD −3.7% (the tightest of any combined
+book in this project), 12/13 years positive** — beats US30 breakout
+and the sleeve individually, and beats an equal-weight 3-way blend,
+but sits slightly below the 2-leg headline book's own standalone
+Sharpe (+1.613, §87) — reported honestly, not spun as a clean win.
+
+**FTMO chained funded probability peaks at 37.7% at 14x** — beats
+both the 2-leg headline book (33.1%/14x) and the 2-leg new book
+(35.7%/6x, §87). Checked for era-stability immediately, per §88's
+established discipline of not assuming a peak holds up:
+
+| Split | Result |
+|---|---|
+| Halves | H1 41.6%, H2 33.8% (real but moderate 7.8pp decline) |
+| Thirds | T1 39.2%, T2 42.3%, T3 31.4% |
+
+The most recent third (31.4%) — the era most relevant to an actual
+live decision — is still meaningfully above the 2-leg headline book's
+own T3 (25.5%, §88), and ties the 2-leg new book's T3 (31.4%).
+
+**Verdict: a genuine, multiply-verified new project-best, that holds
+up reasonably (not perfectly) across eras.** Specifically an
+FTMO-Challenge-survival improvement — the standalone Sharpe comparison
+still favors the 2-leg headline book, so this is not a claim about
+the better raw trading system, the same honest framing carried through
+from §86/§87. Interesting structural note, not previously quantified:
+the 3-way book's peak returns to 14x (like the original headline
+book) rather than staying at 6x (like the 2-leg gold+sleeve pairing
+alone) — adding a third, well-diversified leg appears to raise the
+effective risk ceiling before drawdown limits start to dominate.
+
+**Files:** `research/three_way_combined_book.py`, `results/
+three_way_combined_book.csv`, `results/three_way_combined_book_
+ftmo.csv`. **Trial count: 0 new (portfolio construction + FTMO check
+on three already-scored legs). Cumulative trials: N=1717 unchanged.**

@@ -128,6 +128,17 @@ variability, and §88 also revises §63's own conclusion, which turns
 out to be window-dependent (the headline book's 14x peak is actually
 stable across halves on the fuller 2013-2025 span; only §63's shorter
 2017-2025 window showed the steep decline).**
+**2026-09-18 §89 (SECOND MILESTONE):** adding the VIX/real-yield
+sleeve to the FULL §52 book (ORB gold + US30 breakout, not just ORB
+gold alone) produces a THIRD project-best: 3-way rolling risk-parity
+FTMO chained funded probability of **37.7% at 14x** (vs the 2-leg
+headline's 33.1%/14x and the 2-leg new book's 35.7%/6x). Standalone
+Sharpe (+1.477) still trails the 2-leg headline book's (+1.613) — an
+FTMO-survival improvement specifically, same honest framing as
+§86-§88. Checked immediately for era-stability: real but moderate
+decline across halves (41.6%→33.8%) and thirds (39.2%→42.3%→31.4%),
+with the most recent third still beating the headline book's own T3
+(25.5%).
 `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)
