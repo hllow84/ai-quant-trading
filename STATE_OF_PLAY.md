@@ -9326,3 +9326,36 @@ broker/account-specific and not derivable from the repo.
 (new), `docs/mt5_ea_deployment.md` (updated to record the compile
 result). **Trial count: 0 new** (compiling code, not a backtest).
 **Cumulative trials: N=1645 unchanged.**
+
+## §70 — EA LIVE ON THE FTMO FREE DEMO — FORWARD-TEST PERIOD STARTED
+## (2026-09-18)
+
+The account-holder confirmed an FTMO-Demo account was already logged
+into the FTMO Global Markets MT5 Terminal on this machine (server
+folder `FTMO-Demo` found in the terminal's local cache). Default input
+symbols (`InpGoldSymbol="XAUUSD"`, `InpUS30Symbol="US30.cash"`) resolved
+cleanly on `OnInit()` — both printed "initialised" with no symbol-
+resolution error — so this broker's exact symbol names happen to match
+the EA's defaults; no `InpGoldSymbol`/`InpUS30Symbol` edit was needed.
+
+**One real deployment mistake caught and corrected in-session:** the EA
+was initially attached to TWO charts (one XAUUSD, one US30.cash). This
+EA is a single combined instance that manages BOTH legs internally via
+its two symbol inputs — running two instances would have doubled every
+order on both legs. Corrected to exactly one instance before any live
+session could trigger a trade.
+
+**Status as of this section: EA attached and running (one instance),
+AutoTrading state and the ET-timezone log check not yet independently
+verified against a real clock** — the account-holder was pointed to
+`docs/mt5_ea_deployment.md` §4-§5's checklist (AutoTrading toggle in
+both the EA's Common tab and the global toolbar; matching the
+`[GOLD] OR built: ...` log timestamp against a real America/New_York
+clock, since a silent timezone bug would misfire this leg's entire
+edge without ever throwing an error). This is the actual forward-test
+period `docs/manual_trading_rules.md` §0 said would need to happen
+before any real-money decision — no live/demo trade evidence exists
+yet as of this section, only a confirmed-running EA.
+
+**Trial count: 0 new** (deployment, not a backtest). **Cumulative
+trials: N=1645 unchanged.**
