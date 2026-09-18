@@ -126,3 +126,75 @@ considering a paid FTMO Challenge:
   days.
 - Re-read `docs/manual_trading_rules.md` §0's pre-trade warnings — none of
   them are resolved just because the EA compiles and runs.
+
+## 8. v2 — `ORB_Gold_US30_VIX_RealYield_4Leg_Combined.mq5` (written
+2026-09-18, adds Legs 3+4)
+
+Covers the newer 4-leg EA, built the same session STATE_OF_PLAY §86-§93
+found the 3-way combined book (ORB gold RETEST + US30 breakout +
+VIX/real-yield sleeve, rolling risk-parity) produces a new project-best
+FTMO chained funded probability (38.3% at 13x, vs the 2-leg book's
+33.1% at 14x). **Compiled clean, 0 errors/0 warnings, same machine/
+terminal as v1** — but Legs 3/4 and their WebRequest/CSV-parsing
+plumbing are BRAND NEW MQL5 code, written and compiled in a single
+session under real time pressure, with NO prior live-forward-test
+history the way Legs 1/2 already have from v1's demo run. Treat this
+as materially higher-risk on first deployment than v1 was.
+
+**What's new:**
+- **Leg 3 (VIX spike signal):** long gold when VIX's 120-day z-score
+  ≥ +1.25 (flight to safety), short when ≤ −1.25. Fetches CBOE's free
+  public VIX history CSV live, once per UTC calendar day.
+- **Leg 4 (real-yield trend signal):** long gold when the 10yr TIPS
+  real yield (FRED DFII10) has fallen over the last 20 trading days,
+  short when it's risen. Fetches FRED's free public CSV, once per UTC
+  calendar day.
+- Both legs are **continuously-held directional positions with NO
+  STOP-LOSS and NO TARGET** — this matches exactly how they were
+  backtested (a daily mark-to-market return series, not a stop/target
+  trade), but it is a real, stated difference from Legs 1/2 (which DO
+  have stops). An uncapped adverse gap on these two legs is possible.
+  Watch this closely.
+- Sleeve sizing (`InpSleeveWeightPct`, default 10%, split 50/50 across
+  Legs 3/4) is a **fixed-weight approximation** of the backtested
+  causal rolling risk-parity scheme (not implemented here, same
+  category of gap as v1's `RiskParity_TODO()` for Legs 1/2) — chosen
+  from §90's in-sample finding that the sleeve's own optimal weight is
+  small (~10%), not the full deployable scheme.
+
+**Required one-time setup before attaching v2 (do this BEFORE
+attaching, or every fetch will fail silently into the log):**
+
+1. MT5 → **Tools → Options → Expert Advisors** tab.
+2. Check **"Allow WebRequest for listed URL"**.
+3. Add BOTH of these URLs to the list, exactly:
+   - `https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv`
+   - `https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFII10`
+4. Click OK. If you skip this, the Experts log will show
+   `[SLEEVE] ERROR: WebRequest failed ... error=4060` — that error code
+   specifically means "URL not in the allowed list."
+
+**Switching from v1 to v2:** remove the v1 EA from its chart first
+(right-click → Expert Advisors → Remove) before attaching v2 — do NOT
+run both at once, since v1's Legs 1/2 and v2's Legs 1/2 use the SAME
+magic numbers (39100/45100) and would double up orders exactly like
+the original double-attachment mistake caught in §69/§70.
+
+**What to watch for, specific to v2:**
+- **`[SLEEVE]` log lines** each day: confirm both fetches succeed
+  (`recomputed: VIX signal=... real-yield signal=...`), and sanity
+  check the printed VIX level / real-yield value against a real
+  financial data source occasionally — a parsing bug that silently
+  reads garbage would be very hard to notice otherwise.
+- **Insufficient-history messages** (`not enough history yet`) are
+  expected to disappear immediately — both endpoints return their FULL
+  free history (thousands of rows) in one request, so 120/21-day
+  windows are satisfied from the very first successful fetch, unlike a
+  cold-start signal that would need weeks to warm up.
+- **No stop-loss on Legs 3/4** — check equity/margin exposure
+  regularly, since neither leg will self-limit a loss the way Legs 1/2
+  do.
+
+This EA has NEVER been forward-tested even for one day — everything in
+`docs/manual_trading_rules.md` §0's warnings applies at least as
+strongly here as it did for v1's first deployment.

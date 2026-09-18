@@ -10190,3 +10190,62 @@ three_way_weight_grid.csv`; `research/three_way_ftmo_fine_sweep.py`,
 combined_book.py`, `results/four_way_combined_book.csv`. **Trial
 count: 66 new (§90's weight grid). Cumulative trials: N=1717 →
 1783.**
+
+## §94 — MT5 EA v2 BUILT: LEGS 3+4 (VIX + REAL-YIELD SLEEVE) ADDED,
+## COMPILED CLEAN (2026-09-18)
+
+User asked to build §89-§91's actual best-found setup (the 3-way
+combined book) into the live EA before the day's trading window
+closed. New file `strategies_mt5/ORB_Gold_US30_VIX_RealYield_
+4Leg_Combined.mq5`, built on v1's already-compiled, already-running
+Legs 1/2 (unchanged) plus two brand-new legs:
+
+- **Leg 3 (VIX spike signal):** fetches CBOE's free public VIX
+  history CSV live via `WebRequest()` once per UTC calendar day,
+  computes a 120-day z-score (threshold ±1.25, §83).
+- **Leg 4 (real-yield trend signal):** fetches FRED's free public
+  DFII10 CSV the same way, computes a 20-day trend signal (§75).
+
+Both endpoints return their FULL free history in one GET request
+(matching the Python backtest exactly), so no incremental state or
+multi-day bootstrap is needed — the signal is usable from the very
+first successful fetch. Sleeve sizing uses a **fixed 10%-of-equity
+weight, split 50/50 across Legs 3/4** (§90's in-sample finding),
+explicitly flagged as an approximation of the untested causal rolling
+risk-parity scheme — the same category of gap as v1's own
+`RiskParity_TODO()`. Legs 3/4 hold continuously-directional positions
+with **no stop-loss and no target**, matching exactly how they were
+backtested — a real, stated live-risk difference from Legs 1/2, which
+do have stops.
+
+**One real bug caught and fixed before shipping, not after:** a `\r`
+(carriage-return) stripping helper meant to make the CSV line-parser
+robust to Windows line endings was initially written with a raw CR
+byte embedded directly in the source instead of the two-character
+`\r` escape sequence — an artifact of nested shell/Python string
+escaping, not a logic error, but the kind of thing that would compile
+and run while silently doing nothing. Caught by inspecting the file's
+raw bytes rather than trusting a clean compile alone, then fixed and
+recompiled.
+
+**Compiled clean, 0 errors/0 warnings**, same MetaEditor CLI process
+against the same FTMO terminal headers as v1. Legs 3/4 and their
+WebRequest/CSV-parsing plumbing are entirely new MQL5 code with **zero
+live-forward-test history** — unlike Legs 1/2, which already have some
+from v1's ongoing demo run. This is explicitly higher-risk on first
+deployment than v1 was, built under real time pressure (2-3 hours
+before market open).
+
+`docs/mt5_ea_deployment.md` §8 documents: the required one-time
+WebRequest URL whitelist step (both CBOE and FRED URLs must be added
+in Tools → Options → Expert Advisors before attaching), the switch-over
+procedure (remove v1 before attaching v2 — Legs 1/2 share the same
+magic numbers, so running both would double orders exactly like the
+mistake caught in §69/§70), and what to specifically watch for
+(`[SLEEVE]` log lines each day, sanity-checking the fetched VIX/
+real-yield values against a real source, and the no-stop-loss risk on
+Legs 3/4).
+
+**Not a backtest — no new trial count. Cumulative trials: N=1783
+unchanged.** **Files:** `strategies_mt5/ORB_Gold_US30_VIX_RealYield_
+4Leg_Combined.mq5` (+`.ex5`), `docs/mt5_ea_deployment.md`.
