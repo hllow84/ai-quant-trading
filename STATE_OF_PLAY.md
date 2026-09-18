@@ -9434,3 +9434,48 @@ non-look-ahead answer rather than an untested assumption either way.
 **Files:** `scripts/download_cot_gold.py`, `research/
 run_cot_gold_signal.py`, `data/COT_GOLD_legacy_futures_only.csv`.
 **Trial count: 1 new. Cumulative trials: N=1645 → 1646.**
+
+## §72 — COT GOLD, SECOND FRAMING: FADE SPECULATIVE EXTREMES — ALSO
+## KILLED, AND STRUCTURALLY NOT INDEPENDENT OF §71 (2026-09-18)
+
+User asked to try the natural second COT framing: instead of following
+commercial (hedger) positioning, fade non-commercial (speculative)
+positioning at its own 3-year extremes — the classic "crowded trade"
+contrarian read (specs are the crowd, not the informed side). Same
+80/20 thresholds, 156-week lookback, publication-lag handling, and cost
+model as §71 — pre-registered as a genuinely separate hypothesis
+(different series, opposite trade logic), not a sign-flip of §71's
+result. `research/run_cot_gold_signal_speculative.py`.
+
+**A sanity check run before looking at any P&L found
+corr(non-commercial net %OI, commercial net %OI) = −0.977** — the two
+positioning series are near-perfect mirrors of each other, a structural
+feature of futures-market accounting (non-commercial + commercial +
+non-reportable positions net close to zero against open interest, by
+definition). Consequence: despite being computed independently on each
+series' own 3-year percentile scale, this "fade specs" signal produced
+an almost identical trade pattern to §71's "follow commercials" signal
+(82 vs 85 position switches, nearly identical year-by-year returns).
+
+**Result: Sharpe (net) −0.453 vs buy-and-hold +0.578**, total return
+−49.2% vs +158.5%, maxDD −51.3% vs −37.7%, same 7/13 years positive,
+same losing years (2020, 2025) as §71.
+
+**Verdict: KILL — and a real methodological finding beyond the kill
+itself.** Because commercial and non-commercial COT positioning are
+near-mirror-images of each other, "follow commercials" and "fade
+speculators" are NOT two independent tests of the simple-level-extreme
+COT hypothesis on gold — they are the same underlying bet viewed from
+two sides, and both fail the same way. This closes the "simple level
+extreme" branch of COT positioning on gold with 2 honestly-reported
+but structurally-correlated results, not 2 independent confirmations —
+stated explicitly rather than silently double-counted as separate
+evidence. A genuinely different third framing would need the
+non-mirrored dimension of the data (rate-of-change/acceleration
+instead of level, open-interest-weighted magnitude, or a different
+instrument) rather than another simple extreme reading of either side
+of the same near-zero-sum ledger.
+
+**Files:** `research/run_cot_gold_signal_speculative.py`. **Trial
+count: 1 new (structurally correlated with §71's, stated). Cumulative
+trials: N=1646 → 1647.**
