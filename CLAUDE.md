@@ -108,6 +108,19 @@ on-chain data — the classic hedger-smart-money COT Index hypothesis
 (Sharpe −0.477 vs buy-and-hold +0.578, §71). Does not rule out other COT
 framings (speculative extremes, rate-of-change, other instruments) —
 those are separate future tests, not a post-hoc flip of this result.
+The alpha search continued (§72-§85, closing COT across 3 instruments/
+2 framings, then testing VIX/Fed-balance-sheet/Google-Trends): all
+killed standalone, but VIX (§79/§83) and real-yield (§75/§82) combined
+with each other showed a genuine diversification benefit (§84,
+correlation −0.199, combined Sharpe +0.432 beats both legs) — the
+sleeve doesn't beat ORB gold RETEST on Sharpe when paired with it
+(§85, confirms the project's quality-gap rule), but **§86-§87 found it
+produces a new project-best FTMO chained funded probability: 35.7% at
+6x risk (was 33.0% at 14x), verified apples-to-apples on the identical
+full 2013-2025 window.** This is an FTMO-survival finding specifically
+(the headline book still has the better standalone Sharpe, +1.613 vs
++1.182) — same standing caveats apply (one 13-year history, overlapping
+challenge windows, DSR never cleared, live execution never validated).
 `research_log.md` has the per-test detail.
 
 ## Standing Rules (enforced every session, no reminders needed)

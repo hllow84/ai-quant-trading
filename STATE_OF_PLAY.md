@@ -9976,3 +9976,65 @@ assumed to help without testing it.
 **Files:** `research/orb_gold_vix_real_yield_combined_book.py`,
 `results/orb_gold_vix_real_yield_combined_book.csv`. **Trial count: 0
 new (portfolio construction). Cumulative trials: N=1717 unchanged.**
+
+## §86-§87 — NEW PROJECT-BEST FTMO CHAINED FUNDED PROBABILITY: 35.7%
+## AT 6x (WAS 33.0% AT 14x), VERIFIED APPLES-TO-APPLES (2026-09-18)
+
+**§86** ran the standard FTMO chained two-phase check (§59/§62's
+methodology) on §85's combined book (ORB gold RETEST + VIX/real-yield
+sleeve, fixed 50/50), sweeping multipliers 1x-14x to find its own
+peak rather than assuming it matches the headline book's known 14x
+peak. `research/ftmo_check_orb_gold_vix_real_yield.py`. Result: this
+book's chained-funded rate peaks at **35.7% across 6x-7x** (a genuine
+2-cell plateau), then declines monotonically to 20.1% by 14x — a
+materially lower optimal multiplier than the headline book, consistent
+with its lower standalone maxDD hitting drawdown limits sooner as risk
+scales up. The raw 6x-vs-6x comparison against the headline book's
+previously-published number (25.5%, §62) looked like a clean win — but
+that comparison used **different calendar windows** (this book: full
+2013-2025; the headline book's §58-§66 numbers: 2017-2025 only) and
+was flagged explicitly as invalid on its own, not reported as a
+conclusion.
+
+**§87 resolved that window mismatch before drawing any conclusion.**
+Rebuilt the US30 breakout leg (§45's unchanged params) on the full
+2013-2025 span for the first time (concatenating the existing H1
+2013-2017 and M1 2018-2025 files), giving the headline book (§48/§52,
+ORB gold + US30 breakout, rolling risk-parity) its own genuine
+full-window figure — previously only ever scored on 2017-2025. Ran the
+identical multiplier sweep on both books over the SAME 154
+overlapping monthly challenge starts. `research/ftmo_check_headline_
+vs_new_book_same_window.py`.
+
+**On the identical window:**
+
+| Book | Peak funded rate | At multiplier | Standalone 1x Sharpe |
+|---|---|---|---|
+| Headline (ORB gold + US30 breakout, rolling RP) | 33.1% | 14x | +1.613 |
+| **New (ORB gold + VIX/real-yield sleeve, fixed 50/50)** | **35.7%** | **6x** | +1.182 |
+
+**This is a genuine, apples-to-apples, ~2.6pp new project-best in FTMO
+chained funded probability — achieved at less than half the risk
+multiplier of the prior record (6x vs 14x).** The headline book still
+has the better raw standalone Sharpe (+1.613 vs +1.182) — this is
+specifically an FTMO-Challenge-SURVIVAL finding, not a reversal of
+which book has the better risk-adjusted return, consistent with §65's
+established point that funded probability is path-dependent and does
+not reduce to Sharpe/maxDD alone. Because the new peak sits at 6x
+rather than 14x, and §63 found lower multipliers have historically
+been MORE stable across eras than 14x's front-loaded advantage, this
+new peak may also prove more robust — **not yet verified with its own
+period split, a real flagged next step, not assumed.**
+
+**Same standing caveats as every FTMO number in this project, stated
+again rather than allowed to fade with a good headline: one 13-year
+history, 154 OVERLAPPING (not independent) monthly challenge starts,
+DSR never cleared for either book, live execution never validated
+against a real broker feed.**
+
+**Files:** `research/ftmo_check_orb_gold_vix_real_yield.py`,
+`results/ftmo_check_orb_gold_vix_real_yield.csv`, `research/
+ftmo_check_headline_vs_new_book_same_window.py`, `results/
+ftmo_check_headline_vs_new_book_same_window.csv`. **Trial count: 0
+new (FTMO-ruleset checks + window-aligned leg reconstruction, not a
+parameter search). Cumulative trials: N=1717 unchanged.**
