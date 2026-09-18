@@ -10249,3 +10249,39 @@ Legs 3/4).
 **Not a backtest — no new trial count. Cumulative trials: N=1783
 unchanged.** **Files:** `strategies_mt5/ORB_Gold_US30_VIX_RealYield_
 4Leg_Combined.mq5` (+`.ex5`), `docs/mt5_ea_deployment.md`.
+
+## §95 — SAFETY STOP ADDED TO LEGS 3/4: A DELIBERATE DEVIATION FROM
+## THE BACKTEST (2026-09-18)
+
+After §94's EA went live, the account-holder watched the real-yield
+leg open its first trade with no stop-loss at all — correctly matching
+the backtest, but flagged as "not ideal for an always-on auto-trading
+setup." Added a wide catastrophic safety stop as an explicit,
+disclosed departure from what was actually backtested:
+
+- `InpSleeveUseSafetyStop` (default true) and `InpSleeveStopPct`
+  (default 4.0% of entry price — deliberately far wider than gold's
+  typical daily move, so it should almost never fire under normal
+  signal-driven exits, only on a genuine tail-risk gap).
+- New Legs 3/4 entries now carry this stop directly.
+- `RetrofitSleeveStops()`, called every timer tick, adds the stop
+  retroactively to any already-open Leg 3/4 position that doesn't have
+  one (checks `POSITION_SL == 0` only — never overwrites an existing
+  stop), so the real-yield short opened under §94's stop-less version
+  gets protected without needing to be manually closed and reopened.
+
+**Compiled clean, 0 errors/0 warnings**, same process as every other
+compile this session.
+
+**This is a real, stated deviation, not a bug fix** — Sec75/Sec79/
+Sec82-Sec84's Sharpe/maxDD numbers were all measured on a
+never-stopped position, so live results on Legs 3/4 could now differ
+modestly from those backtests specifically because of this addition,
+on top of the usual live-vs-backtest gaps already disclosed for Legs
+1/2. Judged a reasonable, disclosed tradeoff — real account protection
+for an always-on live setup — over strict backtest fidelity, per
+direct user request.
+
+**Not a backtest — no new trial count. Cumulative trials: N=1783
+unchanged.** **Files:** `strategies_mt5/ORB_Gold_US30_VIX_RealYield_
+4Leg_Combined.mq5` (+`.ex5`, updated in place).

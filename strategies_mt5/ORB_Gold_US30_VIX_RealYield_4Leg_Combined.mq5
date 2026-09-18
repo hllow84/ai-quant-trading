@@ -28,16 +28,25 @@
 //|   public CSV export, fetched live via WebRequest() once per UTC   |
 //|   calendar day.                                                    |
 //|                                                                    |
-//| WHY NO STOP ON LEGS 3/4 -- STATED EXPLICITLY, NOT AN OVERSIGHT:    |
+//| SAFETY STOP ON LEGS 3/4 -- A DELIBERATE, FLAGGED DEVIATION FROM    |
+//|   THE BACKTEST (added 2026-09-18, same session as first live use): |
 //|   the backtest (research/run_vix_gold_joint_grid.py, research/    |
 //|   run_real_yield_gold_lookback_grid.py) never modeled a stop for   |
 //|   either signal -- it is a continuously-held directional position |
-//|   marked to market daily. Adding a stop here would be a real,     |
-//|   untested DEVIATION from what was actually backtested. This is a |
-//|   genuine live-trading risk difference from Legs 1/2 (which DO    |
-//|   have stops) -- an uncapped adverse gap on Legs 3/4 is possible.  |
-//|   Flagged prominently in docs/mt5_ea_deployment.md; watch this     |
-//|   closely on the demo.                                             |
+//|   marked to market daily, with the only "exit" being the signal   |
+//|   itself flipping on the next daily recompute. Running that live  |
+//|   with literally no price-based circuit breaker was judged too    |
+//|   risky for an always-on auto-trading setup, so InpSleeveUseSafety|
+//|   Stop (default true) adds a WIDE catastrophic stop -- InpSleeve  |
+//|   StopPct, default 4.0% of entry price, deliberately far wider    |
+//|   than gold's typical daily move so it should almost never fire   |
+//|   under normal signal-driven exits, only on a genuine tail-risk   |
+//|   gap. RetrofitSleeveStops() also adds this stop to any position   |
+//|   opened before this existed. This IS a real, stated departure    |
+//|   from what Sec75/Sec79/Sec82-Sec84's numbers actually measured -- |
+//|   live results on Legs 3/4 could differ modestly from the backtest|
+//|   specifically because of this stop, not just normal live-vs-     |
+//|   backtest noise. Flagged in docs/mt5_ea_deployment.md.            |
 //|                                                                    |
 //| SLEEVE WEIGHTING -- A REAL, STATED SIMPLIFICATION: the backtested  |
 //|   "best" result (Sec89/Sec91, 3-way book incl. Legs 1+2+the        |
@@ -105,6 +114,8 @@ input string   InpFredUrl             = "https://fred.stlouisfed.org/graph/fredg
 input int      InpWebRequestTimeoutMs = 8000;
 input int      InpMagicVix            = 79100;         // magic number, VIX leg (Sec79)
 input int      InpMagicRealYield      = 75100;         // magic number, real-yield leg (Sec75)
+input bool     InpSleeveUseSafetyStop = true;           // DEVIATION from the backtest -- adds a wide catastrophic stop (the backtest itself never modeled one for Legs 3/4)
+input double   InpSleeveStopPct       = 4.0;            // stop distance, % of entry price -- wide on purpose (gold's typical daily move is well under 1.5%), meant to catch tail-risk gaps only, not to interfere with normal signal-driven exits
 
 //====================== GLOBALS =======================================
 
@@ -858,12 +869,46 @@ void SetSleevePosition(string symbol, int magic, string comment, int desiredDir,
       return;
      }
    double price = (desiredDir > 0) ? SymbolInfoDouble(symbol, SYMBOL_ASK) : SymbolInfoDouble(symbol, SYMBOL_BID);
+   double stop = 0.0;
+   if(InpSleeveUseSafetyStop)
+      stop = (desiredDir > 0) ? price * (1.0 - InpSleeveStopPct / 100.0) : price * (1.0 + InpSleeveStopPct / 100.0);
    trade.SetExpertMagicNumber(magic);
    trade.SetDeviationInPoints(InpSlippagePoints);
-   bool ok = (desiredDir > 0) ? trade.Buy(lots, symbol, price, 0, 0, comment)
-                               : trade.Sell(lots, symbol, price, 0, 0, comment);
-   PrintFormat("[SLEEVE] %s entry %s lots=%.2f price=%.2f magic=%d ok=%s", symbol,
-               (desiredDir > 0 ? "LONG" : "SHORT"), lots, price, magic, ok ? "true" : "false");
+   bool ok = (desiredDir > 0) ? trade.Buy(lots, symbol, price, stop, 0, comment)
+                               : trade.Sell(lots, symbol, price, stop, 0, comment);
+   PrintFormat("[SLEEVE] %s entry %s lots=%.2f price=%.2f stop=%.2f magic=%d ok=%s", symbol,
+               (desiredDir > 0 ? "LONG" : "SHORT"), lots, price, stop, magic, ok ? "true" : "false");
+  }
+
+// Retrofits InpSleeveStopPct's safety stop onto any ALREADY-OPEN sleeve
+// position that doesn't have one yet (e.g. one opened before this input
+// existed, or before the EA was updated) -- called every timer tick, cheap
+// (position property reads only, no trade unless a stop is actually
+// missing). Does NOT touch a position that already has a stop, even if
+// that stop differs from the current InpSleeveStopPct value.
+void RetrofitSleeveStops()
+  {
+   if(!InpSleeveUseSafetyStop)
+      return;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+     {
+      ulong ticket = PositionGetTicket(i);
+      if(ticket == 0) continue;
+      int magic = (int)PositionGetInteger(POSITION_MAGIC);
+      if(magic != InpMagicVix && magic != InpMagicRealYield)
+         continue;
+      if(PositionGetString(POSITION_SYMBOL) != InpGoldSymbol)
+         continue;
+      double curSL = PositionGetDouble(POSITION_SL);
+      if(curSL != 0.0)
+         continue;  // already has a stop -- leave it alone
+      double entry = PositionGetDouble(POSITION_PRICE_OPEN);
+      bool isLong = (PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY);
+      double stop = isLong ? entry * (1.0 - InpSleeveStopPct / 100.0) : entry * (1.0 + InpSleeveStopPct / 100.0);
+      bool ok = trade.PositionModify(ticket, stop, 0);
+      PrintFormat("[SLEEVE] retrofitted safety stop onto existing position ticket=%I64u magic=%d entry=%.2f stop=%.2f ok=%s",
+                  ticket, magic, entry, stop, ok ? "true" : "false");
+     }
   }
 
 void ProcessSleeve()
@@ -942,6 +987,7 @@ void OnTimer()
    ProcessGoldLeg();
    ProcessUS30Leg();
    ProcessSleeve();
+   RetrofitSleeveStops();  // every tick, cheap -- catches positions opened before this stop existed
   }
 
 void OnTick()
