@@ -9723,3 +9723,41 @@ any single market's idiosyncrasies.
 **Files:** `scripts/download_cot_dow.py`, `research/
 run_cot_dow_signal.py`, `data/COT_DOW_legacy_futures_only.csv`.
 **Trial count: 1 new. Cumulative trials: N=1651 → 1652.**
+
+## §78 — COT RATE-OF-CHANGE/ACCELERATION ON A SECOND INSTRUMENT
+## (E-MINI DOW): CONFIRMS §73'S PATTERN, FORMALLY CLOSES THE COT
+## THREAD (2026-09-18)
+
+Extends §73's gold-only rate-of-change/acceleration test to the same
+E-mini Dow COT data as §77 (same 2013 → 2022-02 data-limited window,
+stated explicitly). Identical formulas/thresholds, no new tuning.
+`research/run_cot_dow_signal_roc.py`.
+
+| | ROC | Acceleration | Buy-and-hold |
+|---|---|---|---|
+| Sharpe (net) | −0.087 | **+0.327** | +0.713 |
+| Sharpe (gross) | −0.071 | +0.352 | — |
+| Total return | −7.6% | +12.8% | +131.9% |
+| maxDD | −23.3% | **−10.6%** | −37.0% |
+| Years positive | 5/10 | 6/10 | — |
+| % time flat | 87.9% | 86.7% | — |
+
+**Verdict: KILL, both variants — same "real but too small / mostly
+flat" terminal pattern as §73's gold test.** The acceleration variant
+again shows a genuine positive gross AND net edge with real drawdown
+reduction — now a 2-for-2 finding across gold and Dow — but nowhere
+near competitive with buy-and-hold's return over either window.
+Confirms §73's finding generalizes to a second instrument: rate-of-
+change/acceleration in COT positioning is a real, small,
+defensive-leaning signal, not a source of standalone alpha.
+
+**This formally closes the COT thread for this project** across every
+framing and instrument tested: level extremes (3 instruments —
+gold/EUR/Dow, §71/§72/§74/§77) and rate-of-change/acceleration (2
+instruments — gold/Dow, §73/§78). 9 total trials, zero viable
+candidates. Any further COT work would need a genuinely different
+mechanism (not level, not simple rate-of-change) to be worth another
+trial.
+
+**Files:** `research/run_cot_dow_signal_roc.py`. **Trial count: 2
+new. Cumulative trials: N=1652 → 1654.**
