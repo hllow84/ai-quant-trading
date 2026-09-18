@@ -9534,3 +9534,46 @@ own positioning data.
 
 **Files:** `research/run_cot_gold_signal_roc.py`. **Trial count: 2
 new. Cumulative trials: N=1647 → 1649.**
+
+## §74 — COT INDEX ON A DIFFERENT INSTRUMENT (EUR FUTURES): ALSO
+## KILLED, CONFIRMS THE MECHANISM DOESN'T GENERALIZE (2026-09-18)
+
+§73 closed the COT-on-gold thread and flagged the honest next step as a
+different instrument, not another reading of gold's own data. This
+section tests the exact same mechanism as §71 (commercial net %OI at a
+156-week/3yr percentile extreme, ≥80 long/≤20 short, no tuning) on CME
+Euro FX futures (EURUSD) — free via the same CFTC Socrata source
+(1,204 weekly reports back to 2003). `scripts/cot_download_common.py`
+was factored out of the gold downloader so both instruments share the
+same fetch/validate/save logic (re-verified the gold script still
+produces identical output after the refactor). `scripts/
+download_cot_eur.py`, `research/run_cot_eur_signal.py`. Tested on the
+project's existing real-spread EURUSD daily data (2013-2025, §10.8),
+using FTMO's published EURUSD commission (0.30bps round-turn) and the
+project's standard forex slippage convention (0.15bps/side) instead of
+gold's $/oz figures.
+
+**Result: Sharpe (net) −0.282 vs buy-and-hold −0.067.** EUR's own
+buy-and-hold was ALSO negative over this window (a genuinely different
+regime from gold's strong uptrend — this is not the same "fighting a
+rising market" failure mode as §71/§72), but the strategy loses MORE
+than simply holding: total return −17.3% vs B&H's −11.0%, though
+maxDD is tighter (−24.7% vs −31.1%). 8/13 years net-positive, only 41
+position switches (much lower turnover than gold's 82–85).
+
+**Verdict: KILL — and this is stronger evidence than another gold
+test would have been.** The textbook commercial-level-extreme COT
+Index mechanism now fails on two structurally different
+instruments (a metal in a bull market, a currency in a bear market),
+not just one. This meaningfully weakens the case for the mechanism
+itself, rather than leaving open the possibility gold was simply an
+unlucky single draw. Not yet tested on EUR: rate-of-change/
+acceleration, or the non-commercial framing — either would be a
+separate new trial if pursued, per the non-redundancy caveat
+established in §72/§73.
+
+**Files:** `scripts/cot_download_common.py` (new, shared), `scripts/
+download_cot_gold.py` (refactored, behavior unchanged), `scripts/
+download_cot_eur.py`, `research/run_cot_eur_signal.py`, `data/
+COT_EUR_legacy_futures_only.csv`. **Trial count: 1 new. Cumulative
+trials: N=1649 → 1650.**

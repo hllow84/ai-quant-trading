@@ -29,6 +29,7 @@ data/XAUUSD_M1_*_spot_dukascopy.csv
 # 71): tiny (~120 KB), free (public Socrata dataset, no key), one-command
 # reproducible via scripts/download_cot_gold.py.
 !data/COT_GOLD_legacy_futures_only.csv
+!data/COT_EUR_legacy_futures_only.csv
 
 # Live trading secrets and runtime state -- NEVER commit API keys or local state.
 .env
